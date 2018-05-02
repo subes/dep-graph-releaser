@@ -2040,12 +2040,17 @@
       return this$Menu.triggerRelease_0(closure$releasePlan, closure$dependencies, closure$dependencies.jenkinsJobExecutor);
     };
   }
-  function Menu$initRunButtons$lambda_1(this$Menu, closure$dependencies, closure$modifiableJson, closure$releasePlan) {
+  function Menu$initRunButtons$lambda$lambda(closure$dependencies, this$Menu) {
+    return function (it) {
+      this$Menu.publisher_0 = closure$dependencies != null ? closure$dependencies.publisher : null;
+      return Unit;
+    };
+  }
+  function Menu$initRunButtons$lambda_1(this$Menu, closure$nonNullDependencies, closure$releasePlan, closure$dependencies) {
     return function () {
       this$Menu.simulation_0 = true;
-      var jenkinsUrl = 'https://github.com/loewenfels/';
-      var nonNullDependencies = closure$dependencies != null ? closure$dependencies : ensureNotNull(App$Companion_getInstance().createDependencies_vgvz8r$(jenkinsUrl, 'https://github.com/loewenfels/dgr-publisher/', new UsernameToken('test', 'test'), closure$modifiableJson, this$Menu));
-      return this$Menu.triggerRelease_0(closure$releasePlan, nonNullDependencies, nonNullDependencies.simulatingJobExecutor);
+      this$Menu.publisher_0 = closure$nonNullDependencies.publisher;
+      return finally_0(this$Menu.triggerRelease_0(closure$releasePlan, closure$nonNullDependencies, closure$nonNullDependencies.simulatingJobExecutor), Menu$initRunButtons$lambda$lambda(closure$dependencies, this$Menu));
     };
   }
   function Menu$initRunButtons$lambda_2(this$Menu) {
@@ -2097,7 +2102,9 @@
       this.addClickEventListenerIfNotDeactivatedNorDisabled_0(this.releaseButton_0, Menu$initRunButtons$lambda_0(this, releasePlan, dependencies));
     }
     this.activateExploreButton_0();
-    this.addClickEventListenerIfNotDeactivatedNorDisabled_0(this.exploreButton_0, Menu$initRunButtons$lambda_1(this, dependencies, modifiableJson, releasePlan));
+    var jenkinsUrl = 'https://github.com/loewenfels/';
+    var nonNullDependencies = dependencies != null ? dependencies : ensureNotNull(App$Companion_getInstance().createDependencies_vgvz8r$(jenkinsUrl, 'https://github.com/loewenfels/dgr-publisher/', new UsernameToken('test', 'test'), modifiableJson, this));
+    this.addClickEventListenerIfNotDeactivatedNorDisabled_0(this.exploreButton_0, Menu$initRunButtons$lambda_1(this, nonNullDependencies, releasePlan, dependencies));
     Menu$Companion_getInstance().registerForReleaseStartEvent_gbr1zf$(Menu$initRunButtons$lambda_2(this));
     Menu$Companion_getInstance().registerForReleaseEndEvent_y8twos$(Menu$initRunButtons$lambda_3(this));
   };
