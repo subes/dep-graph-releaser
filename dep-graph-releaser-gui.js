@@ -1,8 +1,8 @@
 (function (root, factory) {
   if (typeof define === 'function' && define.amd)
-    define(['exports', 'kotlin', 'dep-graph-releaser-api-js', 'dep-graph-releaser-maven-api-js', 'kotlinx-html-js'], factory);
+    define(['exports', 'kotlin', 'dep-graph-releaser-api-js', 'dep-graph-releaser-maven-api-js', 'kotlinx-html-js', 'kbox-js'], factory);
   else if (typeof exports === 'object')
-    factory(module.exports, require('kotlin'), require('dep-graph-releaser-api-js'), require('dep-graph-releaser-maven-api-js'), require('kotlinx-html-js'));
+    factory(module.exports, require('kotlin'), require('dep-graph-releaser-api-js'), require('dep-graph-releaser-maven-api-js'), require('kotlinx-html-js'), require('kbox-js'));
   else {
     if (typeof kotlin === 'undefined') {
       throw new Error("Error loading module 'dep-graph-releaser-gui'. Its dependency 'kotlin' was not found. Please, check whether 'kotlin' is loaded prior to 'dep-graph-releaser-gui'.");
@@ -16,9 +16,12 @@
     if (typeof this['kotlinx-html-js'] === 'undefined') {
       throw new Error("Error loading module 'dep-graph-releaser-gui'. Its dependency 'kotlinx-html-js' was not found. Please, check whether 'kotlinx-html-js' is loaded prior to 'dep-graph-releaser-gui'.");
     }
-    root['dep-graph-releaser-gui'] = factory(typeof this['dep-graph-releaser-gui'] === 'undefined' ? {} : this['dep-graph-releaser-gui'], kotlin, this['dep-graph-releaser-api-js'], this['dep-graph-releaser-maven-api-js'], this['kotlinx-html-js']);
+    if (typeof this['kbox-js'] === 'undefined') {
+      throw new Error("Error loading module 'dep-graph-releaser-gui'. Its dependency 'kbox-js' was not found. Please, check whether 'kbox-js' is loaded prior to 'dep-graph-releaser-gui'.");
+    }
+    root['dep-graph-releaser-gui'] = factory(typeof this['dep-graph-releaser-gui'] === 'undefined' ? {} : this['dep-graph-releaser-gui'], kotlin, this['dep-graph-releaser-api-js'], this['dep-graph-releaser-maven-api-js'], this['kotlinx-html-js'], this['kbox-js']);
   }
-}(this, function (_, Kotlin, $module$dep_graph_releaser_api_js, $module$dep_graph_releaser_maven_api_js, $module$kotlinx_html_js) {
+}(this, function (_, Kotlin, $module$dep_graph_releaser_api_js, $module$dep_graph_releaser_maven_api_js, $module$kotlinx_html_js, $module$kbox_js) {
   'use strict';
   var $$importsForInline$$ = _.$$importsForInline$$ || (_.$$importsForInline$$ = {});
   var contains = Kotlin.kotlin.text.contains_li3zpu$;
@@ -58,12 +61,13 @@
   var defineInlineFunction = Kotlin.defineInlineFunction;
   var wrapFunction = Kotlin.wrapFunction;
   var ensureNotNull = Kotlin.ensureNotNull;
+  var M2ReleaseCommand = $module$dep_graph_releaser_maven_api_js.ch.loewenfels.depgraph.data.maven.jenkins.M2ReleaseCommand;
   var asList = Kotlin.org.w3c.dom.asList_kt9thq$;
   var listOf = Kotlin.kotlin.collections.listOf_i5x0yv$;
   var div = $module$kotlinx_html_js.kotlinx.html.div_59el9d$;
   var append = $module$kotlinx_html_js.kotlinx.html.dom.append_k9bwru$;
-  var toPeekingIterator = $module$dep_graph_releaser_api_js.ch.loewenfels.depgraph.toPeekingIterator_35ci02$;
-  var hasNextOnTheSameLevel = $module$dep_graph_releaser_api_js.ch.loewenfels.depgraph.hasNextOnTheSameLevel_wvkvts$;
+  var toPeekingIterator = $module$kbox_js.ch.tutteli.kbox.toPeekingIterator_35ci02$;
+  var hasNextOnTheSameLevel = $module$dep_graph_releaser_api_js.ch.loewenfels.depgraph.hasNextOnTheSameLevel_r88oei$;
   var minus = Kotlin.kotlin.collections.minus_khz7k3$;
   var joinToString = Kotlin.kotlin.collections.joinToString_fmv235$;
   var setOf = Kotlin.kotlin.collections.setOf_i5x0yv$;
@@ -74,12 +78,16 @@
   var set_title = $module$kotlinx_html_js.kotlinx.html.set_title_ueiko3$;
   var JenkinsCommand = $module$dep_graph_releaser_maven_api_js.ch.loewenfels.depgraph.data.maven.jenkins.JenkinsCommand;
   var label = $module$kotlinx_html_js.kotlinx.html.label_yd75js$;
+  var set_onKeyUpFunction = $module$kotlinx_html_js.kotlinx.html.js.set_onKeyUpFunction_pszlq2$;
   var textInput = $module$kotlinx_html_js.kotlinx.html.textInput_ap9uf6$;
   var textArea = $module$kotlinx_html_js.kotlinx.html.textArea_b1tfd9$;
   var ReleaseCommand = $module$dep_graph_releaser_api_js.ch.loewenfels.depgraph.data.ReleaseCommand;
   var CommandState = $module$dep_graph_releaser_api_js.ch.loewenfels.depgraph.data.CommandState;
   var i = $module$kotlinx_html_js.kotlinx.html.i_5g1p9k$;
   var a = $module$kotlinx_html_js.kotlinx.html.a_gu26kr$;
+  var getKClass = Kotlin.getKClass;
+  var asSequence = Kotlin.kotlin.collections.asSequence_7wnvza$;
+  var mapWithIndex = $module$kbox_js.ch.tutteli.kbox.mapWithIndex_veqyi0$;
   var checkBoxInput = $module$kotlinx_html_js.kotlinx.html.checkBoxInput_ap9uf6$;
   var IllegalStateException = Kotlin.kotlin.IllegalStateException;
   var removeClass = Kotlin.kotlin.dom.removeClass_hhb33f$;
@@ -93,6 +101,8 @@
   var RuntimeException_init = Kotlin.kotlin.RuntimeException_init_pdl1vj$;
   var RuntimeException = Kotlin.kotlin.RuntimeException;
   var Kind_INTERFACE = Kotlin.Kind.INTERFACE;
+  var Enum = Kotlin.kotlin.Enum;
+  var throwISE = Kotlin.throwISE;
   var get_create = $module$kotlinx_html_js.kotlinx.html.dom.get_create_4wc2mh$;
   var div_1 = $module$kotlinx_html_js.kotlinx.html.js.div_wkomt5$;
   var StringBuilder = Kotlin.kotlin.text.StringBuilder;
@@ -101,26 +111,31 @@
   var substringBefore_0 = Kotlin.kotlin.text.substringBefore_8cymmc$;
   var unboxChar = Kotlin.unboxChar;
   var repeat = Kotlin.kotlin.text.repeat_94bcnn$;
-  var MutableSet = Kotlin.kotlin.collections.MutableSet;
-  var asSequence = Kotlin.kotlin.collections.asSequence_7wnvza$;
-  var map = Kotlin.kotlin.sequences.map_z5avom$;
-  var filter = Kotlin.kotlin.sequences.filter_euau3h$;
-  var toHashSet_0 = Kotlin.kotlin.sequences.toHashSet_veqyi0$;
-  var mapIndexed = Kotlin.kotlin.sequences.mapIndexed_b7yuyq$;
-  var MutableList = Kotlin.kotlin.collections.MutableList;
-  var M2ReleaseCommand = $module$dep_graph_releaser_maven_api_js.ch.loewenfels.depgraph.data.maven.jenkins.M2ReleaseCommand;
-  var joinToString_0 = Kotlin.kotlin.sequences.joinToString_853xkz$;
   var splitToSequence = Kotlin.kotlin.text.splitToSequence_ip8yn$;
+  var map = Kotlin.kotlin.sequences.map_z5avom$;
   var toList_0 = Kotlin.kotlin.sequences.toList_veqyi0$;
   var emptyList = Kotlin.kotlin.collections.emptyList_287e2$;
   var indexOf = Kotlin.kotlin.text.indexOf_8eortd$;
   var contains_0 = Kotlin.kotlin.text.contains_sgbm27$;
-  var IllegalArgumentException_init = Kotlin.kotlin.IllegalArgumentException_init_pdl1vj$;
+  var filter = Kotlin.kotlin.sequences.filter_euau3h$;
+  var joinToString_0 = Kotlin.kotlin.sequences.joinToString_853xkz$;
+  var MutableSet = Kotlin.kotlin.collections.MutableSet;
+  var toHashSet_0 = Kotlin.kotlin.sequences.toHashSet_veqyi0$;
+  var MutableList = Kotlin.kotlin.collections.MutableList;
   var RuntimeException_init_0 = Kotlin.kotlin.RuntimeException_init;
   var sequenceOf = Kotlin.kotlin.sequences.sequenceOf_i5x0yv$;
   var plus = Kotlin.kotlin.sequences.plus_v0iwhp$;
+  var mapWithIndex_0 = $module$kbox_js.ch.tutteli.kbox.mapWithIndex_7wnvza$;
+  var mapIndexed = Kotlin.kotlin.sequences.mapIndexed_b7yuyq$;
+  var mapOf = Kotlin.kotlin.collections.mapOf_qfcya0$;
+  DryRunJobExecutionDataFactory.prototype = Object.create(BaseJobExecutionDataFactory.prototype);
+  DryRunJobExecutionDataFactory.prototype.constructor = DryRunJobExecutionDataFactory;
   JenkinsJobExecutor$PollException.prototype = Object.create(RuntimeException.prototype);
   JenkinsJobExecutor$PollException.prototype.constructor = JenkinsJobExecutor$PollException;
+  Menu$TypeOfRun.prototype = Object.create(Enum.prototype);
+  Menu$TypeOfRun.prototype.constructor = Menu$TypeOfRun;
+  ReleaseJobExecutionDataFactory.prototype = Object.create(BaseJobExecutionDataFactory.prototype);
+  ReleaseJobExecutionDataFactory.prototype.constructor = ReleaseJobExecutionDataFactory;
   Releaser$ReleaseFailure.prototype = Object.create(RuntimeException.prototype);
   Releaser$ReleaseFailure.prototype.constructor = Releaser$ReleaseFailure;
   function App() {
@@ -146,6 +161,7 @@
     }
     return tmp$;
   };
+  var IllegalArgumentException_init = Kotlin.kotlin.IllegalArgumentException_init_pdl1vj$;
   App.prototype.getJobUrl_0 = function (possiblyRelativePublishJobUrl) {
     var tmp$;
     if (!(!contains(possiblyRelativePublishJobUrl, '://') || startsWith(possiblyRelativePublishJobUrl, 'http'))) {
@@ -179,8 +195,8 @@
     return function (body) {
       this$App.switchLoader_0('loaderApiToken', 'loaderJson');
       var modifiableJson = new ModifiableJson(body);
-      var dependencies = App$Companion_getInstance().createDependencies_vgvz8r$(this$App.jenkinsUrl_0, this$App.publishJobUrl_0, closure$usernameToken, modifiableJson, this$App.menu_0);
       var releasePlan = deserialize(body);
+      var dependencies = App$Companion_getInstance().createDependencies_km5731$(this$App.jenkinsUrl_0, this$App.publishJobUrl_0, closure$usernameToken, modifiableJson, releasePlan, this$App.menu_0);
       this$App.menu_0.initDependencies_xts1bw$(releasePlan, new Downloader(modifiableJson), dependencies, modifiableJson);
       (new Gui(releasePlan, this$App.menu_0)).load();
       this$App.switchLoaderJsonWithPipeline_0();
@@ -276,14 +292,16 @@
     this.apiTokenRegex_0 = Regex_init('<input[^>]+name="_\\.apiToken"[^>]+value="([^"]+)"');
     this.usernameRegex_0 = Regex_init('<a[^>]+href="[^"]*/user/([^"]+)"');
   }
-  App$Companion.prototype.createDependencies_vgvz8r$ = function (jenkinsUrl, publishJobUrl, usernameToken, modifiableJson, menu) {
+  App$Companion.prototype.createDependencies_km5731$ = function (jenkinsUrl, publishJobUrl, usernameToken, modifiableJson, releasePlan, menu) {
     var tmp$;
     if (publishJobUrl != null && jenkinsUrl != null && usernameToken != null) {
       var publisher = new Publisher(publishJobUrl, modifiableJson);
       var releaser = new Releaser(jenkinsUrl, modifiableJson, menu);
-      var simulatingJobExecutor = new SimulatingJobExecutor();
       var jenkinsJobExecutor = new JenkinsJobExecutor(jenkinsUrl, usernameToken);
-      tmp$ = new Menu$Dependencies(publisher, releaser, jenkinsJobExecutor, simulatingJobExecutor);
+      var simulatingJobExecutor = new SimulatingJobExecutor();
+      var releaseJobExecutionDataFactory = new ReleaseJobExecutionDataFactory(jenkinsUrl, releasePlan);
+      var dryRunJobExecutionDataFactory = new DryRunJobExecutionDataFactory(jenkinsUrl, releasePlan);
+      tmp$ = new Menu$Dependencies(publisher, releaser, jenkinsJobExecutor, simulatingJobExecutor, releaseJobExecutionDataFactory, dryRunJobExecutionDataFactory);
     }
      else {
       tmp$ = null;
@@ -306,6 +324,30 @@
     kind: Kind_CLASS,
     simpleName: 'App',
     interfaces: []
+  };
+  function BaseJobExecutionDataFactory(jenkinsUrl, releasePlan) {
+    this.jenkinsUrl_of89bu$_0 = jenkinsUrl;
+    this.releasePlan = releasePlan;
+  }
+  BaseJobExecutionDataFactory.prototype.requireConfigEntry_nhrt5l$ = function (config, key) {
+    if (!config.containsKey_11rb$(key)) {
+      var message = key.toString() + ' is not defined in settings';
+      throw IllegalArgumentException_init(message.toString());
+    }
+  };
+  BaseJobExecutionDataFactory.prototype.getConfig_udzor3$ = function (key) {
+    return this.releasePlan.getConfig_udzor3$(key);
+  };
+  BaseJobExecutionDataFactory.prototype.getJobUrl_udzor3$ = function (key) {
+    return this.getJobUrl_61zpoe$(this.getConfig_udzor3$(key));
+  };
+  BaseJobExecutionDataFactory.prototype.getJobUrl_61zpoe$ = function (jobName) {
+    return this.jenkinsUrl_of89bu$_0 + '/job/' + jobName;
+  };
+  BaseJobExecutionDataFactory.$metadata$ = {
+    kind: Kind_CLASS,
+    simpleName: 'BaseJobExecutionDataFactory',
+    interfaces: [JobExecutionDataFactory]
   };
   function ChangeApplier() {
     ChangeApplier_instance = this;
@@ -344,7 +386,7 @@
     var input = getTextField(Gui$Companion_getInstance().RELEASE_ID_HTML_ID);
     if (!equals(releasePlanJson.releaseId, input.value)) {
       if (!!isBlank(input.value)) {
-        var message = 'An empty or blank PublishId is not allowed';
+        var message = 'An empty or blank ReleaseId is not allowed';
         throw IllegalStateException_init(message.toString());
       }
       releasePlanJson.releaseId = input.value;
@@ -648,7 +690,6 @@
     }
     return destination;
   }
-  var getKClass = Kotlin.getKClass;
   function elementById(id) {
     var tmp$;
     var elementByIdOrNull$result;
@@ -794,6 +835,63 @@
     simpleName: 'Downloader',
     interfaces: []
   };
+  function DryRunJobExecutionDataFactory(jenkinsUrl, releasePlan) {
+    BaseJobExecutionDataFactory.call(this, jenkinsUrl, releasePlan);
+    this.checkConfig_0(releasePlan.config);
+  }
+  DryRunJobExecutionDataFactory.prototype.checkConfig_0 = function (config) {
+    this.requireConfigEntry_nhrt5l$(config, ConfigKey.UPDATE_DEPENDENCY_JOB);
+    this.requireConfigEntry_nhrt5l$(config, ConfigKey.DRY_RUN_JOB);
+  };
+  DryRunJobExecutionDataFactory.prototype.create_awtgy4$ = function (project, command) {
+    var tmp$;
+    if (Kotlin.isType(command, JenkinsUpdateDependency))
+      tmp$ = this.triggerUpdateDependency_0(project, command);
+    else if (Kotlin.isType(command, M2ReleaseCommand))
+      tmp$ = this.triggerRelease_0(project);
+    else
+      throw UnsupportedOperationException_init('We do not (yet) support the command: ' + command);
+    return tmp$;
+  };
+  DryRunJobExecutionDataFactory.prototype.triggerUpdateDependency_0 = function (project, command) {
+    var jobName = 'dry update dependency of ' + project.id.identifier;
+    var params = this.createUpdateDependencyParams_0(project, command);
+    return this.createJobExecutionData_0(jobName, params);
+  };
+  DryRunJobExecutionDataFactory.prototype.triggerRelease_0 = function (project) {
+    var jobName = 'dry release ' + project.id.identifier;
+    var params = this.createReleaseParams_0(project);
+    return this.createJobExecutionData_0(jobName, params);
+  };
+  DryRunJobExecutionDataFactory.prototype.createUpdateDependencyParams_0 = function (project, command) {
+    var tmp$;
+    var dependency = this.releasePlan.getProject_lljhqa$(command.projectId);
+    var dependencyMavenProjectId = Kotlin.isType(tmp$ = dependency.id, MavenProjectId) ? tmp$ : throwCCE();
+    var releaseVersion = '';
+    var groupId = dependencyMavenProjectId.groupId;
+    var artifactId = dependencyMavenProjectId.artifactId;
+    var newVersion = dependency.releaseVersion + '-' + this.releasePlan.releaseId;
+    return this.createParams_0('update', project, releaseVersion, groupId, artifactId, newVersion);
+  };
+  DryRunJobExecutionDataFactory.prototype.createReleaseParams_0 = function (project) {
+    var releaseVersion = project.releaseVersion + '-' + this.releasePlan.releaseId;
+    var groupId = '';
+    var artifactId = '';
+    var newVersion = '';
+    return this.createParams_0('release', project, releaseVersion, groupId, artifactId, newVersion);
+  };
+  DryRunJobExecutionDataFactory.prototype.createParams_0 = function (commandName, project, releaseVersion, groupId, artifactId, newVersion) {
+    return 'command=' + commandName + ('&pathToProject=' + project.relativePath) + ('&releaseId=' + this.releasePlan.releaseId) + ('&releaseVersion=' + releaseVersion) + ('&groupId=' + groupId) + ('&artifactId=' + artifactId) + ('&newVersion=' + newVersion);
+  };
+  DryRunJobExecutionDataFactory.prototype.createJobExecutionData_0 = function (jobName, params) {
+    var jobUrl = this.getJobUrl_udzor3$(ConfigKey.DRY_RUN_JOB);
+    return JobExecutionData$Companion_getInstance().buildWithParameters_6hosri$(jobName, jobUrl, params);
+  };
+  DryRunJobExecutionDataFactory.$metadata$ = {
+    kind: Kind_CLASS,
+    simpleName: 'DryRunJobExecutionDataFactory',
+    interfaces: [BaseJobExecutionDataFactory]
+  };
   function Gui(releasePlan, menu) {
     Gui$Companion_getInstance();
     this.releasePlan_0 = releasePlan;
@@ -818,6 +916,7 @@
     this.setUpConfig_0(this.releasePlan_0);
     this.setUpProjects_0();
     this.toggler_0.registerToggleEvents();
+    this.setUpCommandsOnContextMenu_0();
   };
   function Gui$setUpMessages$lambda(closure$minimized, closure$messages, closure$action) {
     return function (it) {
@@ -852,26 +951,26 @@
       minimized.addEventListener('click', Gui$setUpMessages$lambda(minimized, messages, action));
     }
     var messagesDiv = elementById('messages');
-    addClickEventListener(elementById(Gui$Companion_getInstance().HIDE_MESSAGES_HTML_ID), Gui$setUpMessages$lambda_0(messagesDiv));
+    addClickEventListener(elementById(Gui$Companion_getInstance().HIDE_MESSAGES_HTML_ID), void 0, Gui$setUpMessages$lambda_0(messagesDiv));
   };
   function Gui$setUpConfig$lambda$lambda(closure$releasePlan, this$Gui) {
     return function ($receiver) {
       var tmp$, tmp$_0, tmp$_1, tmp$_2, tmp$_3;
-      this$Gui.fieldWithLabel_0($receiver, Gui$Companion_getInstance().RELEASE_ID_HTML_ID, 'ReleaseId', closure$releasePlan.releaseId);
+      this$Gui.textFieldWithLabel_0($receiver, Gui$Companion_getInstance().RELEASE_ID_HTML_ID, 'ReleaseId', closure$releasePlan.releaseId);
       var config = closure$releasePlan.config;
-      var $receiver_0 = listOf([ConfigKey.COMMIT_PREFIX, ConfigKey.UPDATE_DEPENDENCY_JOB, ConfigKey.REMOTE_REGEX, ConfigKey.REMOTE_JOB, ConfigKey.REGEX_PARAMS]);
+      var $receiver_0 = listOf([ConfigKey.COMMIT_PREFIX, ConfigKey.UPDATE_DEPENDENCY_JOB, ConfigKey.REMOTE_REGEX, ConfigKey.REMOTE_JOB, ConfigKey.DRY_RUN_JOB, ConfigKey.REGEX_PARAMS]);
       var tmp$_4;
       tmp$_4 = $receiver_0.iterator();
       while (tmp$_4.hasNext()) {
         var element = tmp$_4.next();
         var tmp$_5;
-        this$Gui.fieldWithLabel_0($receiver, 'config-' + element.asString(), element.asString(), (tmp$_5 = config.get_11rb$(element)) != null ? tmp$_5 : '');
+        this$Gui.textFieldWithLabel_0($receiver, 'config-' + element.asString(), element.asString(), (tmp$_5 = config.get_11rb$(element)) != null ? tmp$_5 : '');
       }
       var key = ConfigKey.JOB_MAPPING;
       tmp$ = 'config-' + key.asString();
       tmp$_0 = key.asString();
       tmp$_3 = (tmp$_2 = (tmp$_1 = config.get_11rb$(key)) != null ? replace(tmp$_1, '|', '\n') : null) != null ? tmp$_2 : '';
-      this$Gui.textFieldWithLabel_0($receiver, tmp$, tmp$_0, tmp$_3);
+      this$Gui.textAreaWithLabel_0($receiver, tmp$, tmp$_0, tmp$_3);
       return Unit;
     };
   }
@@ -883,6 +982,107 @@
   }
   Gui.prototype.setUpConfig_0 = function (releasePlan) {
     append(elementById('config'), Gui$setUpConfig$lambda(releasePlan, this));
+  };
+  function Gui$setUpCommandsOnContextMenu$lambda$lambda$lambda(this$Gui) {
+    return function (it) {
+      this$Gui.hideAllContextMenus_0();
+      return Unit;
+    };
+  }
+  function Gui$setUpCommandsOnContextMenu$lambda$lambda(this$Gui, closure$idPrefix) {
+    return function (event) {
+      var tmp$, tmp$_0;
+      this$Gui.hideAllContextMenus_0();
+      var contextMenu = elementById(closure$idPrefix + Gui$Companion_getInstance().CONTEXT_MENU_SUFFIX);
+      tmp$_0 = Kotlin.isType(tmp$ = event, MouseEvent) ? tmp$ : throwCCE();
+      this$Gui.moveContextMenuPosition_0(tmp$_0, contextMenu);
+      contextMenu.style.visibility = 'visible';
+      window.addEventListener('click', Gui$setUpCommandsOnContextMenu$lambda$lambda$lambda(this$Gui), {once: true});
+      event.preventDefault();
+      event.stopPropagation();
+      return Unit;
+    };
+  }
+  function Gui$setUpCommandsOnContextMenu$lambda(this$Gui) {
+    return function (it) {
+      this$Gui.hideAllContextMenus_0();
+      return Unit;
+    };
+  }
+  Gui.prototype.setUpCommandsOnContextMenu_0 = function () {
+    var $receiver = asList(document.querySelectorAll('.command > .fields > .toggle'));
+    var destination = ArrayList_init(collectionSizeOrDefault($receiver, 10));
+    var tmp$;
+    tmp$ = $receiver.iterator();
+    while (tmp$.hasNext()) {
+      var item = tmp$.next();
+      var tmp$_0 = destination.add_11rb$;
+      var tmp$_1;
+      var toggle = Kotlin.isType(tmp$_1 = item.firstChild, HTMLInputElement) ? tmp$_1 : throwCCE();
+      tmp$_0.call(destination, to(item, substringBefore(toggle.id, Gui$Companion_getInstance().DEACTIVATE_SUFFIX)));
+    }
+    var toggleLabels = destination;
+    var $receiver_0 = asList(document.querySelectorAll('.state'));
+    var destination_0 = ArrayList_init(collectionSizeOrDefault($receiver_0, 10));
+    var tmp$_2;
+    tmp$_2 = $receiver_0.iterator();
+    while (tmp$_2.hasNext()) {
+      var item_0 = tmp$_2.next();
+      var tmp$_3 = destination_0.add_11rb$;
+      var tmp$_4;
+      var a = Kotlin.isType(tmp$_4 = item_0, HTMLAnchorElement) ? tmp$_4 : throwCCE();
+      tmp$_3.call(destination_0, to(a, substringBefore(a.id, Gui$Companion_getInstance().STATE_SUFFIX)));
+    }
+    var stateIcons = destination_0;
+    var tmp$_5;
+    tmp$_5 = toggleLabels.iterator();
+    while (tmp$_5.hasNext()) {
+      var element = tmp$_5.next();
+      var element_0 = element.component1()
+      , idPrefix = element.component2();
+      element_0.addEventListener('contextmenu', Gui$setUpCommandsOnContextMenu$lambda$lambda(this, idPrefix));
+    }
+    var tmp$_0_0;
+    tmp$_0_0 = stateIcons.iterator();
+    while (tmp$_0_0.hasNext()) {
+      var element_0_0 = tmp$_0_0.next();
+      var element_1 = element_0_0.component1()
+      , idPrefix_0 = element_0_0.component2();
+      element_1.addEventListener('contextmenu', Gui$setUpCommandsOnContextMenu$lambda$lambda(this, idPrefix_0));
+    }
+    window.addEventListener('contextmenu', Gui$setUpCommandsOnContextMenu$lambda(this));
+  };
+  Gui.prototype.hideAllContextMenus_0 = function () {
+    var tmp$;
+    tmp$ = asList(document.querySelectorAll('.contextMenu')).iterator();
+    while (tmp$.hasNext()) {
+      var element = tmp$.next();
+      var tmp$_0;
+      (Kotlin.isType(tmp$_0 = element, HTMLElement) ? tmp$_0 : throwCCE()).style.visibility = 'hidden';
+    }
+  };
+  Gui.prototype.moveContextMenuPosition_0 = function (event, contextMenu) {
+    var tmp$, tmp$_0;
+    var menuWidth = contextMenu.offsetWidth;
+    var menuHeight = contextMenu.offsetHeight;
+    var mouseX = event.pageX;
+    var mouseY = event.pageY;
+    if (mouseX + menuWidth > ensureNotNull(document.body).clientWidth + window.scrollX) {
+      tmp$ = mouseX - menuWidth;
+    }
+     else {
+      tmp$ = mouseX;
+    }
+    var x = tmp$;
+    if (mouseY + menuHeight > ensureNotNull(document.body).clientHeight + window.scrollY) {
+      tmp$_0 = mouseY - menuHeight;
+    }
+     else {
+      tmp$_0 = mouseY;
+    }
+    var y = tmp$_0;
+    contextMenu.style.left = x.toString() + 'px';
+    contextMenu.style.top = y.toString() + 'px';
   };
   function Gui$setUpProjects$lambda$lambda(closure$project, this$Gui, closure$set, closure$itr, closure$level) {
     return function ($receiver) {
@@ -966,8 +1166,8 @@
   }
   function Gui$project$lambda$lambda_0(closure$identifier, closure$project, this$Gui) {
     return function ($receiver) {
-      this$Gui.fieldReadOnlyWithLabel_0($receiver, closure$identifier + ':currentVersion', 'Current Version', closure$project.currentVersion);
-      this$Gui.fieldWithLabel_0($receiver, closure$identifier + ':releaseVersion', 'Release Version', closure$project.releaseVersion);
+      this$Gui.textFieldReadOnlyWithLabel_0($receiver, closure$identifier + ':currentVersion', 'Current Version', closure$project.currentVersion);
+      this$Gui.textFieldWithLabel_0($receiver, closure$identifier + ':releaseVersion', 'Release Version', closure$project.releaseVersion);
       return Unit;
     };
   }
@@ -1016,9 +1216,9 @@
       return Unit;
     };
   }
-  function Gui$commands$lambda$lambda$lambda_0(closure$commandId, closure$project, closure$command, this$Gui) {
+  function Gui$commands$lambda$lambda$lambda_0(closure$commandId, closure$project, closure$index, closure$command, this$Gui) {
     return function ($receiver) {
-      this$Gui.fieldsForCommand_0($receiver, closure$commandId, closure$project.id, closure$command);
+      this$Gui.fieldsForCommand_0($receiver, closure$commandId, closure$project, closure$index, closure$command);
       return Unit;
     };
   }
@@ -1028,7 +1228,7 @@
       set_id($receiver, commandId);
       set_classes($receiver, setOf(['command', Gui$Companion_getInstance().stateToCssClass_0(closure$command.state)]));
       div_0($receiver, 'commandTitle', Gui$commands$lambda$lambda$lambda(commandId, closure$command));
-      div_0($receiver, 'fields', Gui$commands$lambda$lambda$lambda_0(commandId, closure$project, closure$command, this$Gui));
+      div_0($receiver, 'fields', Gui$commands$lambda$lambda$lambda_0(commandId, closure$project, closure$index, closure$command, this$Gui));
       var div = getUnderlyingHtmlElement($receiver);
       div.state = closure$command.state;
       if (Kotlin.isType(closure$command, JenkinsCommand)) {
@@ -1046,61 +1246,26 @@
       div_0($receiver, void 0, Gui$commands$lambda$lambda(project, (tmp$_0 = index, index = tmp$_0 + 1 | 0, tmp$_0), item, this));
     }
   };
-  function Gui$fieldWithLabel$lambda($receiver) {
+  function Gui$textFieldWithLabel$lambda($receiver) {
     return Unit;
   }
-  Gui.prototype.fieldWithLabel_0 = function ($receiver, id, label, text) {
-    this.fieldWithLabel_1($receiver, id, label, text, Gui$fieldWithLabel$lambda);
+  Gui.prototype.textFieldWithLabel_0 = function ($receiver, id, label, value) {
+    this.textFieldWithLabel_1($receiver, id, label, value, Gui$textFieldWithLabel$lambda);
   };
-  function Gui$fieldReadOnlyWithLabel$lambda($receiver) {
+  function Gui$textFieldReadOnlyWithLabel$lambda($receiver) {
     return Unit;
   }
-  function Gui$fieldReadOnlyWithLabel$lambda_0(closure$inputAct) {
+  function Gui$textFieldReadOnlyWithLabel$lambda_0(closure$inputAct) {
     return function ($receiver) {
-      $receiver.disabled = true;
+      $receiver.readonly = true;
       closure$inputAct($receiver);
       return Unit;
     };
   }
-  Gui.prototype.fieldReadOnlyWithLabel_0 = function ($receiver, id, label, text, inputAct) {
+  Gui.prototype.textFieldReadOnlyWithLabel_0 = function ($receiver, id, label, value, inputAct) {
     if (inputAct === void 0)
-      inputAct = Gui$fieldReadOnlyWithLabel$lambda;
-    this.fieldWithLabel_1($receiver, id, label, text, Gui$fieldReadOnlyWithLabel$lambda_0(inputAct));
-  };
-  function Gui$fieldWithLabel$lambda$lambda(closure$id, closure$label) {
-    return function ($receiver) {
-      $receiver.htmlFor = closure$id;
-      $receiver.unaryPlus_pdl1vz$(closure$label);
-      return Unit;
-    };
-  }
-  function Gui$fieldWithLabel$lambda$lambda$lambda(this$Gui) {
-    return function (it) {
-      this$Gui.menu_0.activateSaveButton();
-      return Unit;
-    };
-  }
-  function Gui$fieldWithLabel$lambda$lambda_0(closure$id, closure$text, closure$inputAct, this$Gui) {
-    return function ($receiver) {
-      var tmp$;
-      set_id($receiver, closure$id);
-      $receiver.value = closure$text;
-      closure$inputAct($receiver);
-      var input = Kotlin.isType(tmp$ = getUnderlyingHtmlElement($receiver), HTMLInputElement) ? tmp$ : throwCCE();
-      input.addEventListener('keyup', Gui$fieldWithLabel$lambda$lambda$lambda(this$Gui));
-      Gui$Companion_getInstance().disableUnDisableForReleaseStartAndEnd_fj1ece$(input, input);
-      return Unit;
-    };
-  }
-  function Gui$fieldWithLabel$lambda_0(closure$id, closure$label, closure$text, closure$inputAct, this$Gui) {
-    return function ($receiver) {
-      label($receiver, 'fields', Gui$fieldWithLabel$lambda$lambda(closure$id, closure$label));
-      textInput($receiver, void 0, void 0, void 0, void 0, Gui$fieldWithLabel$lambda$lambda_0(closure$id, closure$text, closure$inputAct, this$Gui));
-      return Unit;
-    };
-  }
-  Gui.prototype.fieldWithLabel_1 = function ($receiver, id, label, text, inputAct) {
-    div_0($receiver, void 0, Gui$fieldWithLabel$lambda_0(id, label, text, inputAct, this));
+      inputAct = Gui$textFieldReadOnlyWithLabel$lambda;
+    this.textFieldWithLabel_1($receiver, id, label, value, Gui$textFieldReadOnlyWithLabel$lambda_0(inputAct));
   };
   function Gui$textFieldWithLabel$lambda$lambda(closure$id, closure$label) {
     return function ($receiver) {
@@ -1115,27 +1280,62 @@
       return Unit;
     };
   }
-  function Gui$textFieldWithLabel$lambda$lambda_0(closure$id, closure$text, this$Gui) {
+  function Gui$textFieldWithLabel$lambda$lambda_0(closure$id, closure$value, closure$inputAct, this$Gui) {
     return function ($receiver) {
       var tmp$;
       set_id($receiver, closure$id);
-      $receiver.unaryPlus_pdl1vz$(closure$text);
+      $receiver.value = closure$value;
+      closure$inputAct($receiver);
+      set_onKeyUpFunction($receiver, Gui$textFieldWithLabel$lambda$lambda$lambda(this$Gui));
+      var input = Kotlin.isType(tmp$ = getUnderlyingHtmlElement($receiver), HTMLInputElement) ? tmp$ : throwCCE();
+      Gui$Companion_getInstance().disableUnDisableForReleaseStartAndEnd_fj1ece$(input, input);
+      return Unit;
+    };
+  }
+  function Gui$textFieldWithLabel$lambda_0(closure$id, closure$label, closure$value, closure$inputAct, this$Gui) {
+    return function ($receiver) {
+      label($receiver, 'fields', Gui$textFieldWithLabel$lambda$lambda(closure$id, closure$label));
+      textInput($receiver, void 0, void 0, void 0, void 0, Gui$textFieldWithLabel$lambda$lambda_0(closure$id, closure$value, closure$inputAct, this$Gui));
+      return Unit;
+    };
+  }
+  Gui.prototype.textFieldWithLabel_1 = function ($receiver, id, label, value, inputAct) {
+    div_0($receiver, void 0, Gui$textFieldWithLabel$lambda_0(id, label, value, inputAct, this));
+  };
+  function Gui$textAreaWithLabel$lambda$lambda(closure$id, closure$label) {
+    return function ($receiver) {
+      $receiver.htmlFor = closure$id;
+      $receiver.unaryPlus_pdl1vz$(closure$label);
+      return Unit;
+    };
+  }
+  function Gui$textAreaWithLabel$lambda$lambda$lambda(this$Gui) {
+    return function (it) {
+      this$Gui.menu_0.activateSaveButton();
+      return Unit;
+    };
+  }
+  function Gui$textAreaWithLabel$lambda$lambda_0(closure$id, closure$value, this$Gui) {
+    return function ($receiver) {
+      var tmp$;
+      set_id($receiver, closure$id);
+      $receiver.unaryPlus_pdl1vz$(closure$value);
+      set_onKeyUpFunction($receiver, Gui$textAreaWithLabel$lambda$lambda$lambda(this$Gui));
       var htmlTextAreaElement = Kotlin.isType(tmp$ = getUnderlyingHtmlElement($receiver), HTMLTextAreaElement) ? tmp$ : throwCCE();
-      htmlTextAreaElement.addEventListener('keyup', Gui$textFieldWithLabel$lambda$lambda$lambda(this$Gui));
       var input = htmlTextAreaElement;
       Gui$Companion_getInstance().disableUnDisableForReleaseStartAndEnd_fj1ece$(input, htmlTextAreaElement);
       return Unit;
     };
   }
-  function Gui$textFieldWithLabel$lambda(closure$id, closure$label, closure$text, this$Gui) {
+  function Gui$textAreaWithLabel$lambda(closure$id, closure$label, closure$value, this$Gui) {
     return function ($receiver) {
-      label($receiver, 'fields', Gui$textFieldWithLabel$lambda$lambda(closure$id, closure$label));
-      textArea($receiver, void 0, void 0, void 0, void 0, Gui$textFieldWithLabel$lambda$lambda_0(closure$id, closure$text, this$Gui));
+      label($receiver, 'fields', Gui$textAreaWithLabel$lambda$lambda(closure$id, closure$label));
+      textArea($receiver, void 0, void 0, void 0, void 0, Gui$textAreaWithLabel$lambda$lambda_0(closure$id, closure$value, this$Gui));
       return Unit;
     };
   }
-  Gui.prototype.textFieldWithLabel_0 = function ($receiver, id, label, text) {
-    div_0($receiver, void 0, Gui$textFieldWithLabel$lambda(id, label, text, this));
+  Gui.prototype.textAreaWithLabel_0 = function ($receiver, id, label, value) {
+    div_0($receiver, void 0, Gui$textAreaWithLabel$lambda(id, label, value, this));
   };
   function Gui$fieldsForCommand$lambda$lambda(closure$idPrefix) {
     return function ($receiver) {
@@ -1156,23 +1356,132 @@
       return Unit;
     };
   }
-  Gui.prototype.fieldsForCommand_0 = function ($receiver, idPrefix, projectId, command) {
-    var tmp$;
-    if (Kotlin.isType(command, ReleaseCommand))
-      tmp$ = 'release';
-    else
-      tmp$ = '';
-    var cssClass = tmp$;
+  function Gui$fieldsForCommand$lambda$lambda$lambda($receiver) {
+    span($receiver);
+    return Unit;
+  }
+  function Gui$fieldsForCommand$lambda$lambda$lambda_0($receiver) {
+    $receiver.unaryPlus_pdl1vz$('Set Command to Succeeded');
+    return Unit;
+  }
+  function Gui$fieldsForCommand$lambda$lambda$lambda_1(closure$project, closure$index, this$Gui) {
+    return function (it) {
+      this$Gui.transitionToSucceededIfOk_0(closure$project, closure$index);
+      return Unit;
+    };
+  }
+  function Gui$fieldsForCommand$lambda$lambda_0(closure$project, closure$index, this$Gui) {
+    return function ($receiver) {
+      set_title($receiver, 'Forcibly sets the state of this command to Succeeded, to be used with care.');
+      i($receiver, 'material-icons', Gui$fieldsForCommand$lambda$lambda$lambda);
+      span($receiver, void 0, Gui$fieldsForCommand$lambda$lambda$lambda_0);
+      addClickEventListener(getUnderlyingHtmlElement($receiver), void 0, Gui$fieldsForCommand$lambda$lambda$lambda_1(closure$project, closure$index, this$Gui));
+      return Unit;
+    };
+  }
+  function Gui$fieldsForCommand$lambda_0(closure$idPrefix, closure$project, closure$index, this$Gui) {
+    return function ($receiver) {
+      set_id($receiver, closure$idPrefix + Gui$Companion_getInstance().CONTEXT_MENU_SUFFIX);
+      div_0($receiver, 'succeeded', Gui$fieldsForCommand$lambda$lambda_0(closure$project, closure$index, this$Gui));
+      return Unit;
+    };
+  }
+  Gui.prototype.fieldsForCommand_0 = function ($receiver, idPrefix, project, index, command) {
+    var cssClass = Kotlin.isType(command, ReleaseCommand) ? 'release' : '';
     this.toggle_0($receiver, idPrefix + Gui$Companion_getInstance().DEACTIVATE_SUFFIX, 'Click to deactivate command', !Kotlin.isType(command.state, CommandState$Deactivated), command.state === CommandState.Disabled, cssClass);
     a($receiver, void 0, void 0, 'state', Gui$fieldsForCommand$lambda(idPrefix, command));
+    div_0($receiver, 'contextMenu', Gui$fieldsForCommand$lambda_0(idPrefix, project, index, this));
     if (Kotlin.isType(command, JenkinsMavenReleasePlugin))
       this.appendJenkinsMavenReleasePluginField_0($receiver, idPrefix, command);
     else if (Kotlin.isType(command, JenkinsMultiMavenReleasePlugin))
-      this.appendJenkinsMultiMavenReleasePluginFields_0($receiver, idPrefix, projectId, command);
+      this.appendJenkinsMultiMavenReleasePluginFields_0($receiver, idPrefix, project.id, command);
     else if (Kotlin.isType(command, JenkinsUpdateDependency))
       this.appendJenkinsUpdateDependencyField_0($receiver, idPrefix, command);
     else
       showError('Unknown command found, cannot display its fields.' + '\n' + command);
+  };
+  function Gui$transitionToSucceededIfOk$lambda(closure$project, this$Gui) {
+    return function (setAllToSucceeded) {
+      if (setAllToSucceeded) {
+        this$Gui.transitionAllCommandsToSucceeded_0(closure$project);
+        this$Gui.menu_0.activateSaveButton();
+      }
+      return Unit;
+    };
+  }
+  Gui.prototype.transitionToSucceededIfOk_0 = function (project, index) {
+    if (Kotlin.isType(project.commands.get_za3lpa$(index), ReleaseCommand)) {
+      if (this.notAllOtherCommandsSucceeded_0(project, index)) {
+        var succeeded = getKClass(Object.getPrototypeOf(CommandState.Succeeded).constructor).simpleName;
+        showDialog('You cannot set this command to the state ' + toString(succeeded) + ' because not all other commands of this project have ' + toString(succeeded) + ' yet.' + '\n\n' + ('Do you want to set all other commands forcibly to ' + toString(succeeded) + ' as well?')).then(Gui$transitionToSucceededIfOk$lambda(project, this));
+        return;
+      }
+    }
+    this.transitionToSucceeded_0(project, index);
+    this.menu_0.activateSaveButton();
+  };
+  Gui.prototype.transitionAllCommandsToSucceeded_0 = function (project) {
+    var tmp$, tmp$_0;
+    var index = 0;
+    tmp$ = project.commands.iterator();
+    while (tmp$.hasNext()) {
+      var item = tmp$.next();
+      this.transitionToSucceeded_0(project, (tmp$_0 = index, index = tmp$_0 + 1 | 0, tmp$_0));
+    }
+    var tmp$_1;
+    tmp$_1 = this.releasePlan_0.getSubmodules_lljhqa$(project.id).iterator();
+    while (tmp$_1.hasNext()) {
+      var element = tmp$_1.next();
+      this.transitionAllCommandsToSucceeded_0(this.releasePlan_0.getProject_lljhqa$(element));
+    }
+  };
+  function Gui$transitionToSucceeded$lambda(f, f_0) {
+    return CommandState.Succeeded;
+  }
+  Gui.prototype.transitionToSucceeded_0 = function (project, index) {
+    Gui$Companion_getInstance().changeStateOfCommand_0(project, index, CommandState.Succeeded, Gui$Companion_getInstance().stateToTitle_0(CommandState.Succeeded), Gui$transitionToSucceeded$lambda);
+  };
+  Gui.prototype.notAllOtherCommandsSucceeded_0 = function (project, index) {
+    var $receiver = mapWithIndex(asSequence(project.commands));
+    var any$result;
+    any$break: do {
+      var tmp$;
+      tmp$ = $receiver.iterator();
+      while (tmp$.hasNext()) {
+        var element = tmp$.next();
+        var i = element.component1();
+        if ((index == null || i !== index) && Gui$Companion_getInstance().getCommandState_o8feeo$(project.id, i) !== CommandState.Succeeded) {
+          any$result = true;
+          break any$break;
+        }
+      }
+      any$result = false;
+    }
+     while (false);
+    var tmp$_0 = any$result;
+    if (!tmp$_0) {
+      var $receiver_0 = this.releasePlan_0.getSubmodules_lljhqa$(project.id);
+      var any$result_0;
+      any$break: do {
+        var tmp$_1;
+        if (Kotlin.isType($receiver_0, Collection) && $receiver_0.isEmpty()) {
+          any$result_0 = false;
+          break any$break;
+        }
+        tmp$_1 = $receiver_0.iterator();
+        while (tmp$_1.hasNext()) {
+          var element_0 = tmp$_1.next();
+          if (this.notAllOtherCommandsSucceeded_0(this.releasePlan_0.getProject_lljhqa$(element_0), null)) {
+            any$result_0 = true;
+            break any$break;
+          }
+        }
+        any$result_0 = false;
+      }
+       while (false);
+      tmp$_0 = any$result_0;
+    }
+    return tmp$_0;
   };
   Gui.prototype.appendJenkinsMavenReleasePluginField_0 = function ($receiver, idPrefix, command) {
     this.fieldNextDevVersion_0($receiver, idPrefix, command, command.nextDevVersion);
@@ -1186,7 +1495,7 @@
     };
   }
   Gui.prototype.fieldNextDevVersion_0 = function ($receiver, idPrefix, command, nextDevVersion) {
-    this.fieldWithLabel_1($receiver, idPrefix + Gui$Companion_getInstance().NEXT_DEV_VERSION_SUFFIX, 'Next Dev Version', nextDevVersion, Gui$fieldNextDevVersion$lambda(command));
+    this.textFieldWithLabel_1($receiver, idPrefix + Gui$Companion_getInstance().NEXT_DEV_VERSION_SUFFIX, 'Next Dev Version', nextDevVersion, Gui$fieldNextDevVersion$lambda(command));
   };
   Gui.prototype.appendJenkinsMultiMavenReleasePluginFields_0 = function ($receiver, idPrefix, projectId, command) {
     this.fieldNextDevVersion_0($receiver, idPrefix, command, command.nextDevVersion);
@@ -1218,19 +1527,19 @@
     };
   }
   Gui.prototype.appendJenkinsUpdateDependencyField_0 = function ($receiver, idPrefix, command) {
-    this.fieldReadOnlyWithLabel_0($receiver, idPrefix + ':groupId', 'Dependency', command.projectId.identifier, Gui$appendJenkinsUpdateDependencyField$lambda(command, this));
+    this.textFieldReadOnlyWithLabel_0($receiver, idPrefix + ':groupId', 'Dependency', command.projectId.identifier, Gui$appendJenkinsUpdateDependencyField$lambda(command, this));
   };
-  function Gui$toggle$lambda$lambda(closure$id, closure$checked, closure$disabled) {
+  function Gui$toggle$lambda$lambda(closure$idCheckbox, closure$checked, closure$disabled) {
     return function ($receiver) {
-      set_id($receiver, closure$id);
+      set_id($receiver, closure$idCheckbox);
       $receiver.checked = (closure$checked && !closure$disabled);
       $receiver.disabled = closure$disabled;
       return Unit;
     };
   }
-  function Gui$toggle$lambda$lambda_0(closure$id, closure$title, closure$disabled) {
+  function Gui$toggle$lambda$lambda_0(closure$idCheckbox, closure$title, closure$disabled) {
     return function ($receiver) {
-      set_id($receiver, closure$id + Gui$Companion_getInstance().SLIDER_SUFFIX);
+      set_id($receiver, closure$idCheckbox + Gui$Companion_getInstance().SLIDER_SUFFIX);
       set_title($receiver, closure$title);
       if (closure$disabled) {
         set_title($receiver, Gui$Companion_getInstance().STATE_DISABLED);
@@ -1238,17 +1547,17 @@
       return Unit;
     };
   }
-  function Gui$toggle$lambda(closure$checkboxCssClass, closure$id, closure$checked, closure$disabled, closure$title) {
+  function Gui$toggle$lambda(closure$checkboxCssClass, closure$idCheckbox, closure$checked, closure$disabled, closure$title) {
     return function ($receiver) {
-      checkBoxInput($receiver, void 0, void 0, void 0, closure$checkboxCssClass, Gui$toggle$lambda$lambda(closure$id, closure$checked, closure$disabled));
-      span($receiver, 'slider', Gui$toggle$lambda$lambda_0(closure$id, closure$title, closure$disabled));
+      checkBoxInput($receiver, void 0, void 0, void 0, closure$checkboxCssClass, Gui$toggle$lambda$lambda(closure$idCheckbox, closure$checked, closure$disabled));
+      span($receiver, 'slider', Gui$toggle$lambda$lambda_0(closure$idCheckbox, closure$title, closure$disabled));
       return Unit;
     };
   }
-  Gui.prototype.toggle_0 = function ($receiver, id, title, checked, disabled, checkboxCssClass) {
+  Gui.prototype.toggle_0 = function ($receiver, idCheckbox, title, checked, disabled, checkboxCssClass) {
     if (checkboxCssClass === void 0)
       checkboxCssClass = '';
-    label($receiver, 'toggle', Gui$toggle$lambda(checkboxCssClass, id, checked, disabled, title));
+    label($receiver, 'toggle', Gui$toggle$lambda(checkboxCssClass, idCheckbox, checked, disabled, title));
   };
   function Gui$Companion() {
     Gui$Companion_instance = this;
@@ -1263,9 +1572,10 @@
     this.NEXT_DEV_VERSION_SUFFIX = ':nextDevVersion';
     this.STATE_SUFFIX = ':state';
     this.TITLE_SUFFIX = ':title';
+    this.CONTEXT_MENU_SUFFIX = ':contextMenu';
     this.STATE_WAITING_0 = 'Wait for dependent projects to complete.';
     this.STATE_READY = 'Ready to be queued for execution.';
-    this.STATE_READY_TO_RE_TRIGGER = 'Ready to be re-scheduled';
+    this.STATE_READY_TO_BE_TRIGGER = 'Ready to be re-scheduled';
     this.STATE_QUEUEING = 'Currently queueing the job.';
     this.STATE_IN_PROGRESS = 'Job is running.';
     this.STATE_SUCCEEDED = 'Job completed successfully.';
@@ -1342,23 +1652,31 @@
     tmp$.href = buildUrl;
     elementById(commandId).buildUrl = buildUrl;
   };
+  function Gui$Companion$changeStateOfCommand$lambda(closure$newState, this$Gui$, closure$index, closure$project) {
+    return function (previousState, commandId) {
+      try {
+        return previousState.checkTransitionAllowed_m86w84$(closure$newState);
+      }
+       catch (e) {
+        if (Kotlin.isType(e, IllegalStateException)) {
+          var commandTitle = elementById(commandId + this$Gui$.TITLE_SUFFIX);
+          throw new IllegalStateException('Cannot change the state of the command ' + commandTitle.innerText + ' (' + (closure$index + 1 | 0) + '. command) ' + ('of the project ' + closure$project.id.identifier), e);
+        }
+         else
+          throw e;
+      }
+    };
+  }
   Gui$Companion.prototype.changeStateOfCommand_q143v3$ = function (project, index, newState, title) {
+    this.changeStateOfCommand_0(project, index, newState, title, Gui$Companion$changeStateOfCommand$lambda(newState, this, index, project));
+  };
+  Gui$Companion.prototype.changeStateOfCommand_0 = function (project, index, newState, title, checkStateTransition) {
     var tmp$;
     var commandId = this.getCommandId_xgsuvp$(project, index);
     var command = elementById(commandId);
     var dynCommand = command;
     var previousState = Kotlin.isType(tmp$ = dynCommand.state, CommandState) ? tmp$ : throwCCE();
-    try {
-      dynCommand.state = previousState.checkTransitionAllowed_m86w84$(newState);
-    }
-     catch (e) {
-      if (Kotlin.isType(e, IllegalStateException)) {
-        var commandTitle = elementById(commandId + this.TITLE_SUFFIX);
-        throw new IllegalStateException('Cannot change the state of the command ' + commandTitle.innerText + ' (' + (index + 1 | 0) + '. command) ' + ('of the project ' + project.id.identifier), e);
-      }
-       else
-        throw e;
-    }
+    dynCommand.state = checkStateTransition(previousState, commandId);
     removeClass(command, [this.stateToCssClass_0(previousState)]);
     addClass(command, [this.stateToCssClass_0(newState)]);
     elementById(commandId + this.STATE_SUFFIX).title = title;
@@ -1368,8 +1686,8 @@
       return 'waiting';
     else if (equals(state, CommandState.Ready))
       return 'ready';
-    else if (equals(state, CommandState.ReadyToRetrigger))
-      return 'readyToRetrigger';
+    else if (equals(state, CommandState.ReadyToReTrigger))
+      return 'readyToReTrigger';
     else if (equals(state, CommandState.Queueing))
       return 'queueing';
     else if (equals(state, CommandState.InProgress))
@@ -1398,8 +1716,8 @@
       return this.STATE_WAITING_0;
     else if (equals(state, CommandState.Ready))
       return this.STATE_READY;
-    else if (equals(state, CommandState.ReadyToRetrigger))
-      return this.STATE_READY_TO_RE_TRIGGER;
+    else if (equals(state, CommandState.ReadyToReTrigger))
+      return this.STATE_READY_TO_BE_TRIGGER;
     else if (equals(state, CommandState.Queueing))
       return this.STATE_QUEUEING;
     else if (equals(state, CommandState.InProgress))
@@ -1447,8 +1765,10 @@
       return Unit;
     };
   }
-  function addClickEventListener($receiver, action) {
-    $receiver.addEventListener('click', addClickEventListener$lambda(action));
+  function addClickEventListener($receiver, options, action) {
+    if (options === void 0)
+      options = {};
+    $receiver.addEventListener('click', addClickEventListener$lambda(action), options);
   }
   function addChangeEventListener$lambda(closure$action) {
     return function (it) {
@@ -1456,8 +1776,10 @@
       return Unit;
     };
   }
-  function addChangeEventListener($receiver, action) {
-    $receiver.addEventListener('change', addChangeEventListener$lambda(action));
+  function addChangeEventListener($receiver, options, action) {
+    if (options === void 0)
+      options = {};
+    $receiver.addEventListener('change', addChangeEventListener$lambda(action), options);
   }
   function toggleClass($receiver, cssClass) {
     if (hasClass($receiver, cssClass)) {
@@ -1644,7 +1966,7 @@
   }
   function JenkinsJobExecutor$trigger$lambda$lambda$lambda(closure$crumbWithId, closure$queuedItemUrl, this$JenkinsJobExecutor) {
     return function (it) {
-      return this$JenkinsJobExecutor.extractBuildNumber_0(closure$crumbWithId, closure$queuedItemUrl + 'api/xml');
+      return this$JenkinsJobExecutor.extractBuildNumber_0(closure$crumbWithId, closure$queuedItemUrl);
     };
   }
   function JenkinsJobExecutor$trigger$lambda$lambda$lambda_0(it) {
@@ -1653,14 +1975,14 @@
   function JenkinsJobExecutor$trigger$lambda$lambda_1(closure$verbose, closure$jobName, closure$jobQueuedHook, closure$crumbWithId, this$JenkinsJobExecutor) {
     return function (queuedItemUrl) {
       if (closure$verbose) {
-        showInfo('Queued ' + closure$jobName + ' successfully, wait for execution...', 2000);
+        showInfo('Queued ' + closure$jobName + ' successfully, wait for execution...' + '\n' + 'Queued item URL: ' + queuedItemUrl + 'api/xml', 2000);
       }
-      return closure$jobQueuedHook(queuedItemUrl).then(JenkinsJobExecutor$trigger$lambda$lambda$lambda(closure$crumbWithId, queuedItemUrl, this$JenkinsJobExecutor)).then(JenkinsJobExecutor$trigger$lambda$lambda$lambda_0);
+      return closure$jobQueuedHook(queuedItemUrl + 'api/xml').then(JenkinsJobExecutor$trigger$lambda$lambda$lambda(closure$crumbWithId, queuedItemUrl, this$JenkinsJobExecutor)).then(JenkinsJobExecutor$trigger$lambda$lambda$lambda_0);
     };
   }
-  function JenkinsJobExecutor$trigger$lambda$lambda$lambda_1(closure$crumbWithId, closure$jobUrl, closure$buildNumber, closure$pollEverySecond, closure$maxWaitingTimeForCompleteness, this$JenkinsJobExecutor) {
+  function JenkinsJobExecutor$trigger$lambda$lambda$lambda_1(closure$crumbWithId, closure$jobExecutionData, closure$buildNumber, closure$pollEverySecond, closure$maxWaitingTimeForCompletenessInSeconds, this$JenkinsJobExecutor) {
     return function (it) {
-      return this$JenkinsJobExecutor.pollJobForCompletion_0(closure$crumbWithId, closure$jobUrl, closure$buildNumber, closure$pollEverySecond, closure$maxWaitingTimeForCompleteness);
+      return this$JenkinsJobExecutor.pollJobForCompletion_0(closure$crumbWithId, closure$jobExecutionData.jobBaseUrl, closure$buildNumber, closure$pollEverySecond, closure$maxWaitingTimeForCompletenessInSeconds);
     };
   }
   function JenkinsJobExecutor$trigger$lambda$lambda$lambda_2(closure$buildNumber) {
@@ -1668,41 +1990,42 @@
       return to(closure$buildNumber, result);
     };
   }
-  function JenkinsJobExecutor$trigger$lambda$lambda_2(closure$verbose, closure$jobName, closure$jobStartedHook, closure$crumbWithId, closure$jobUrl, closure$pollEverySecond, closure$maxWaitingTimeForCompleteness, this$JenkinsJobExecutor) {
+  function JenkinsJobExecutor$trigger$lambda$lambda_2(closure$verbose, closure$jobName, closure$jobStartedHook, closure$crumbWithId, closure$jobExecutionData, closure$pollEverySecond, closure$maxWaitingTimeForCompletenessInSeconds, this$JenkinsJobExecutor) {
     return function (buildNumber) {
       if (closure$verbose) {
         showInfo(closure$jobName + ' started with build number ' + buildNumber + ', wait for completion...', 2000);
       }
-      return closure$jobStartedHook(buildNumber).then(JenkinsJobExecutor$trigger$lambda$lambda$lambda_1(closure$crumbWithId, closure$jobUrl, buildNumber, closure$pollEverySecond, closure$maxWaitingTimeForCompleteness, this$JenkinsJobExecutor)).then(JenkinsJobExecutor$trigger$lambda$lambda$lambda_2(buildNumber));
+      return closure$jobStartedHook(buildNumber).then(JenkinsJobExecutor$trigger$lambda$lambda$lambda_1(closure$crumbWithId, closure$jobExecutionData, buildNumber, closure$pollEverySecond, closure$maxWaitingTimeForCompletenessInSeconds, this$JenkinsJobExecutor)).then(JenkinsJobExecutor$trigger$lambda$lambda$lambda_2(buildNumber));
     };
   }
-  function JenkinsJobExecutor$trigger$lambda$lambda_3(closure$jobName, closure$jobUrl, closure$crumbWithId) {
+  function JenkinsJobExecutor$trigger$lambda$lambda_3(closure$jobName, closure$jobExecutionData, closure$crumbWithId) {
     return function (f) {
       var buildNumber = f.component1()
       , result = f.component2();
       var value = equals(result, JenkinsJobExecutor$Companion_getInstance().SUCCESS_0);
       if (!value) {
         var closure$jobName_0 = closure$jobName;
-        var closure$jobUrl_0 = closure$jobUrl;
-        var message = closure$jobName_0 + ' failed, job did not end with status ' + JenkinsJobExecutor$Companion_getInstance().SUCCESS_0 + ' but ' + result + '.' + ('\n' + 'Visit ' + closure$jobUrl_0 + buildNumber + ' for further information');
+        var closure$jobExecutionData_0 = closure$jobExecutionData;
+        var message = closure$jobName_0 + ' failed, job did not end with status ' + JenkinsJobExecutor$Companion_getInstance().SUCCESS_0 + ' but ' + result + '.' + ('\n' + 'Visit ' + closure$jobExecutionData_0.jobBaseUrl + buildNumber + ' for further information');
         throw IllegalStateException_init(message.toString());
       }
       return to(closure$crumbWithId, buildNumber);
     };
   }
-  function JenkinsJobExecutor$trigger$lambda(closure$jobUrl, closure$body, this$JenkinsJobExecutor, closure$jobName, closure$verbose, closure$jobQueuedHook, closure$jobStartedHook, closure$pollEverySecond, closure$maxWaitingTimeForCompleteness) {
+  function JenkinsJobExecutor$trigger$lambda(closure$jobExecutionData, this$JenkinsJobExecutor, closure$jobName, closure$verbose, closure$jobQueuedHook, closure$jobStartedHook, closure$pollEverySecond, closure$maxWaitingTimeForCompletenessInSeconds) {
     return function (crumbWithId) {
-      var $receiver = this$JenkinsJobExecutor.post_0(crumbWithId, closure$jobUrl, closure$body).then(JenkinsJobExecutor$trigger$lambda$lambda(closure$jobName, this$JenkinsJobExecutor)).catch(JenkinsJobExecutor$trigger$lambda$lambda_0(closure$jobName));
+      var $receiver = this$JenkinsJobExecutor.triggerJob_0(crumbWithId, closure$jobExecutionData).then(JenkinsJobExecutor$trigger$lambda$lambda(closure$jobName, this$JenkinsJobExecutor)).catch(JenkinsJobExecutor$trigger$lambda$lambda_0(closure$jobName));
       var onFulfilled = JenkinsJobExecutor$trigger$lambda$lambda_1(closure$verbose, closure$jobName, closure$jobQueuedHook, crumbWithId, this$JenkinsJobExecutor);
       var $receiver_0 = $receiver.then(onFulfilled);
-      var onFulfilled_0 = JenkinsJobExecutor$trigger$lambda$lambda_2(closure$verbose, closure$jobName, closure$jobStartedHook, crumbWithId, closure$jobUrl, closure$pollEverySecond, closure$maxWaitingTimeForCompleteness, this$JenkinsJobExecutor);
+      var onFulfilled_0 = JenkinsJobExecutor$trigger$lambda$lambda_2(closure$verbose, closure$jobName, closure$jobStartedHook, crumbWithId, closure$jobExecutionData, closure$pollEverySecond, closure$maxWaitingTimeForCompletenessInSeconds, this$JenkinsJobExecutor);
       var $receiver_1 = $receiver_0.then(onFulfilled_0);
-      var onFulfilled_1 = JenkinsJobExecutor$trigger$lambda$lambda_3(closure$jobName, closure$jobUrl, crumbWithId);
+      var onFulfilled_1 = JenkinsJobExecutor$trigger$lambda$lambda_3(closure$jobName, closure$jobExecutionData, crumbWithId);
       return $receiver_1.then(onFulfilled_1);
     };
   }
-  JenkinsJobExecutor.prototype.trigger_7817gb$$default = function (jobUrl, jobName, body, jobQueuedHook, jobStartedHook, pollEverySecond, maxWaitingTimeForCompleteness, verbose) {
-    return this.issueCrumb_0(this.jenkinsUrl_0).then(JenkinsJobExecutor$trigger$lambda(jobUrl, body, this, jobName, verbose, jobQueuedHook, jobStartedHook, pollEverySecond, maxWaitingTimeForCompleteness));
+  JenkinsJobExecutor.prototype.trigger_shi73r$$default = function (jobExecutionData, jobQueuedHook, jobStartedHook, pollEverySecond, maxWaitingTimeForCompletenessInSeconds, verbose) {
+    var jobName = jobExecutionData.jobName;
+    return this.issueCrumb_0(this.jenkinsUrl_0).then(JenkinsJobExecutor$trigger$lambda(jobExecutionData, this, jobName, verbose, jobQueuedHook, jobStartedHook, pollEverySecond, maxWaitingTimeForCompletenessInSeconds));
   };
   function JenkinsJobExecutor$checkStatusAndExtractQueuedItemUrl$lambda(closure$response, closure$jobName) {
     return function (it) {
@@ -1740,11 +2063,11 @@
       return checkStatusOkOr404(response);
     })).catch(JenkinsJobExecutor$issueCrumb$lambda).then(JenkinsJobExecutor$issueCrumb$lambda_0);
   };
-  JenkinsJobExecutor.prototype.post_0 = function (crumbWithId, jobUrl, body) {
+  JenkinsJobExecutor.prototype.triggerJob_0 = function (crumbWithId, jobExecutionData) {
     var headers = createHeaderWithAuthAndCrumb(crumbWithId, this.usernameToken_0);
     headers['content-type'] = 'application/x-www-form-urlencoded; charset=utf-8';
-    var init = createRequestInit(body, 'POST', headers);
-    return window.fetch(jobUrl + 'buildWithParameters', init);
+    var init = createRequestInit(jobExecutionData.body, 'POST', headers);
+    return window.fetch(jobExecutionData.jobTriggerUrl, init);
   };
   function JenkinsJobExecutor$extractBuildNumber$lambda$lambda(closure$queuedItemUrl) {
     return function (e) {
@@ -1796,25 +2119,25 @@
       return to(false, '');
     }
   }
-  function JenkinsJobExecutor$pollJobForCompletion$lambda(closure$crumbWithId, closure$jobUrl, closure$buildNumber, closure$pollEverySecond, closure$maxWaitingTime, this$JenkinsJobExecutor) {
+  function JenkinsJobExecutor$pollJobForCompletion$lambda(closure$crumbWithId, closure$jobUrl, closure$buildNumber, closure$pollEverySecond, closure$maxWaitingTimeInSeconds, this$JenkinsJobExecutor) {
     return function () {
-      return this$JenkinsJobExecutor.poll_0(closure$crumbWithId, closure$jobUrl + closure$buildNumber + '/api/xml?xpath=/*/result', 0, closure$pollEverySecond, closure$maxWaitingTime, JenkinsJobExecutor$pollJobForCompletion$lambda$lambda);
+      return this$JenkinsJobExecutor.poll_0(closure$crumbWithId, closure$jobUrl + closure$buildNumber + '/api/xml?xpath=/*/result', 0, closure$pollEverySecond, closure$maxWaitingTimeInSeconds, JenkinsJobExecutor$pollJobForCompletion$lambda$lambda);
     };
   }
-  JenkinsJobExecutor.prototype.pollJobForCompletion_0 = function (crumbWithId, jobUrl, buildNumber, pollEverySecond, maxWaitingTime) {
-    return sleep(pollEverySecond * 500 | 0, JenkinsJobExecutor$pollJobForCompletion$lambda(crumbWithId, jobUrl, buildNumber, pollEverySecond, maxWaitingTime, this));
+  JenkinsJobExecutor.prototype.pollJobForCompletion_0 = function (crumbWithId, jobUrl, buildNumber, pollEverySecond, maxWaitingTimeInSeconds) {
+    return sleep(pollEverySecond * 500 | 0, JenkinsJobExecutor$pollJobForCompletion$lambda(crumbWithId, jobUrl, buildNumber, pollEverySecond, maxWaitingTimeInSeconds, this));
   };
-  function JenkinsJobExecutor$poll$lambda$lambda(closure$crumbWithId, closure$pollUrl, closure$numberOfTries, closure$pollEverySecond, closure$maxWaitingTime, closure$action, this$JenkinsJobExecutor) {
+  function JenkinsJobExecutor$poll$lambda$lambda(closure$crumbWithId, closure$pollUrl, closure$numberOfTries, closure$pollEverySecond, closure$maxWaitingTimeInSeconds, closure$action, this$JenkinsJobExecutor) {
     return function () {
-      return this$JenkinsJobExecutor.poll_0(closure$crumbWithId, closure$pollUrl, closure$numberOfTries + 1 | 0, closure$pollEverySecond, closure$maxWaitingTime, closure$action);
+      return this$JenkinsJobExecutor.poll_0(closure$crumbWithId, closure$pollUrl, closure$numberOfTries + 1 | 0, closure$pollEverySecond, closure$maxWaitingTimeInSeconds, closure$action);
     };
   }
-  function JenkinsJobExecutor$poll$lambda(closure$numberOfTries, closure$pollEverySecond, closure$maxWaitingTime, closure$crumbWithId, closure$pollUrl, closure$action, this$JenkinsJobExecutor) {
+  function JenkinsJobExecutor$poll$lambda(closure$numberOfTries, closure$pollEverySecond, closure$maxWaitingTimeInSeconds, closure$crumbWithId, closure$pollUrl, closure$action, this$JenkinsJobExecutor) {
     return function (body) {
-      if (Kotlin.imul(closure$numberOfTries, closure$pollEverySecond) >= closure$maxWaitingTime) {
-        throw new JenkinsJobExecutor$PollException('Waited at least ' + closure$maxWaitingTime + ' seconds', body);
+      if (Kotlin.imul(closure$numberOfTries, closure$pollEverySecond) >= closure$maxWaitingTimeInSeconds) {
+        throw new JenkinsJobExecutor$PollException('Waited at least ' + closure$maxWaitingTimeInSeconds + ' seconds', body);
       }
-      var p = sleep(closure$pollEverySecond * 1000 | 0, JenkinsJobExecutor$poll$lambda$lambda(closure$crumbWithId, closure$pollUrl, closure$numberOfTries, closure$pollEverySecond, closure$maxWaitingTime, closure$action, this$JenkinsJobExecutor));
+      var p = sleep(closure$pollEverySecond * 1000 | 0, JenkinsJobExecutor$poll$lambda$lambda(closure$crumbWithId, closure$pollUrl, closure$numberOfTries, closure$pollEverySecond, closure$maxWaitingTimeInSeconds, closure$action, this$JenkinsJobExecutor));
       return p;
     };
   }
@@ -1844,10 +2167,10 @@
       }
     };
   }
-  JenkinsJobExecutor.prototype.poll_0 = function (crumbWithId, pollUrl, numberOfTries, pollEverySecond, maxWaitingTime, action) {
+  JenkinsJobExecutor.prototype.poll_0 = function (crumbWithId, pollUrl, numberOfTries, pollEverySecond, maxWaitingTimeInSeconds, action) {
     var headers = createHeaderWithAuthAndCrumb(crumbWithId, this.usernameToken_0);
     var init = createRequestInit(null, 'GET', headers);
-    var rePoll = JenkinsJobExecutor$poll$lambda(numberOfTries, pollEverySecond, maxWaitingTime, crumbWithId, pollUrl, action, this);
+    var rePoll = JenkinsJobExecutor$poll$lambda(numberOfTries, pollEverySecond, maxWaitingTimeInSeconds, crumbWithId, pollUrl, action, this);
     return window.fetch(pollUrl, init).then(getCallableRef('checkStatusOk', function (response) {
       return checkStatusOk(response);
     })).then(JenkinsJobExecutor$poll$lambda_0(action, rePoll)).catch(JenkinsJobExecutor$poll$lambda_1(rePoll));
@@ -1885,12 +2208,86 @@
     simpleName: 'JenkinsJobExecutor',
     interfaces: [JobExecutor]
   };
+  function JobExecutionData(jobName, jobBaseUrl, jobTriggerUrl, body) {
+    JobExecutionData$Companion_getInstance();
+    this.jobName = jobName;
+    this.jobBaseUrl = jobBaseUrl;
+    this.jobTriggerUrl = jobTriggerUrl;
+    this.body = body;
+  }
+  function JobExecutionData$Companion() {
+    JobExecutionData$Companion_instance = this;
+  }
+  JobExecutionData$Companion.prototype.buildWithParameters_6hosri$ = function (jobName, jobBaseUrl, body) {
+    var jobBaseUrlWithSlash = this.assureEndsWithSlash_0(jobBaseUrl);
+    return this.create_w74nik$(jobName, jobBaseUrlWithSlash, jobBaseUrlWithSlash + 'buildWithParameters', body);
+  };
+  JobExecutionData$Companion.prototype.create_w74nik$ = function (jobName, jobBaseUrl, jobTriggerUrl, body) {
+    var jobBaseUrlWithSlash = this.assureEndsWithSlash_0(jobBaseUrl);
+    return new JobExecutionData(jobName, jobBaseUrlWithSlash, jobTriggerUrl, body);
+  };
+  JobExecutionData$Companion.prototype.assureEndsWithSlash_0 = function (jobBaseUrl) {
+    return endsWith(jobBaseUrl, '/') ? jobBaseUrl : jobBaseUrl + '/';
+  };
+  JobExecutionData$Companion.$metadata$ = {
+    kind: Kind_OBJECT,
+    simpleName: 'Companion',
+    interfaces: []
+  };
+  var JobExecutionData$Companion_instance = null;
+  function JobExecutionData$Companion_getInstance() {
+    if (JobExecutionData$Companion_instance === null) {
+      new JobExecutionData$Companion();
+    }
+    return JobExecutionData$Companion_instance;
+  }
+  JobExecutionData.$metadata$ = {
+    kind: Kind_CLASS,
+    simpleName: 'JobExecutionData',
+    interfaces: []
+  };
+  JobExecutionData.prototype.component1 = function () {
+    return this.jobName;
+  };
+  JobExecutionData.prototype.component2 = function () {
+    return this.jobBaseUrl;
+  };
+  JobExecutionData.prototype.component3 = function () {
+    return this.jobTriggerUrl;
+  };
+  JobExecutionData.prototype.component4 = function () {
+    return this.body;
+  };
+  JobExecutionData.prototype.copy_w74nik$ = function (jobName, jobBaseUrl, jobTriggerUrl, body) {
+    return new JobExecutionData(jobName === void 0 ? this.jobName : jobName, jobBaseUrl === void 0 ? this.jobBaseUrl : jobBaseUrl, jobTriggerUrl === void 0 ? this.jobTriggerUrl : jobTriggerUrl, body === void 0 ? this.body : body);
+  };
+  JobExecutionData.prototype.toString = function () {
+    return 'JobExecutionData(jobName=' + Kotlin.toString(this.jobName) + (', jobBaseUrl=' + Kotlin.toString(this.jobBaseUrl)) + (', jobTriggerUrl=' + Kotlin.toString(this.jobTriggerUrl)) + (', body=' + Kotlin.toString(this.body)) + ')';
+  };
+  JobExecutionData.prototype.hashCode = function () {
+    var result = 0;
+    result = result * 31 + Kotlin.hashCode(this.jobName) | 0;
+    result = result * 31 + Kotlin.hashCode(this.jobBaseUrl) | 0;
+    result = result * 31 + Kotlin.hashCode(this.jobTriggerUrl) | 0;
+    result = result * 31 + Kotlin.hashCode(this.body) | 0;
+    return result;
+  };
+  JobExecutionData.prototype.equals = function (other) {
+    return this === other || (other !== null && (typeof other === 'object' && (Object.getPrototypeOf(this) === Object.getPrototypeOf(other) && (Kotlin.equals(this.jobName, other.jobName) && Kotlin.equals(this.jobBaseUrl, other.jobBaseUrl) && Kotlin.equals(this.jobTriggerUrl, other.jobTriggerUrl) && Kotlin.equals(this.body, other.body)))));
+  };
+  function JobExecutionDataFactory() {
+  }
+  JobExecutionDataFactory.$metadata$ = {
+    kind: Kind_INTERFACE,
+    simpleName: 'JobExecutionDataFactory',
+    interfaces: []
+  };
   function JobExecutor() {
   }
-  JobExecutor.prototype.trigger_7817gb$ = function (jobUrl, jobName, body, jobQueuedHook, jobStartedHook, pollEverySecond, maxWaitingTimeForCompleteness, verbose, callback$default) {
+  JobExecutor.prototype.trigger_shi73r$ = function (jobExecutionData, jobQueuedHook, jobStartedHook, pollEverySecond, maxWaitingTimeForCompletenessInSeconds, verbose, callback$default) {
     if (verbose === void 0)
       verbose = true;
-    return callback$default ? callback$default(jobUrl, jobName, body, jobQueuedHook, jobStartedHook, pollEverySecond, maxWaitingTimeForCompleteness, verbose) : this.trigger_7817gb$$default(jobUrl, jobName, body, jobQueuedHook, jobStartedHook, pollEverySecond, maxWaitingTimeForCompleteness, verbose);
+    return callback$default ? callback$default(jobExecutionData, jobQueuedHook, jobStartedHook, pollEverySecond, maxWaitingTimeForCompletenessInSeconds, verbose) : this.trigger_shi73r$$default(jobExecutionData, jobQueuedHook, jobStartedHook, pollEverySecond, maxWaitingTimeForCompletenessInSeconds, verbose);
   };
   JobExecutor.$metadata$ = {
     kind: Kind_INTERFACE,
@@ -1900,9 +2297,9 @@
   function Menu() {
     Menu$Companion_getInstance();
     this.publisher_0 = null;
-    this.simulation_0 = false;
+    this.typeOfRun_0 = Menu$TypeOfRun$SIMULATION_getInstance();
     this.addClickEventListenerIfNotDeactivatedNorDisabled_0(this.settingsButton_0, Menu_init$lambda);
-    addClickEventListener(elementById('config_close'), Menu_init$lambda_0);
+    addClickEventListener(elementById('config:close'), void 0, Menu_init$lambda_0);
   }
   Object.defineProperty(Menu.prototype, 'userButton_0', {
     get: function () {
@@ -2031,13 +2428,16 @@
     removeClass(this.downloadButton_0, [Menu$Companion_getInstance().DEACTIVATED_0]);
     this.addClickEventListenerIfNotDeactivatedNorDisabled_0(this.downloadButton_0, Menu$initSaveAndDownloadButton$lambda_0(downloader));
   };
-  function Menu$initRunButtons$lambda() {
-    return Unit;
+  function Menu$initRunButtons$lambda(this$Menu, closure$releasePlan, closure$dependencies) {
+    return function () {
+      this$Menu.typeOfRun_0 = Menu$TypeOfRun$DRY_RUN_getInstance();
+      return this$Menu.triggerRelease_0(closure$releasePlan, closure$dependencies, closure$dependencies.jenkinsJobExecutor, closure$dependencies.dryRunExecutionDataFactory);
+    };
   }
   function Menu$initRunButtons$lambda_0(this$Menu, closure$releasePlan, closure$dependencies) {
     return function () {
-      this$Menu.simulation_0 = false;
-      return this$Menu.triggerRelease_0(closure$releasePlan, closure$dependencies, closure$dependencies.jenkinsJobExecutor);
+      this$Menu.typeOfRun_0 = Menu$TypeOfRun$RELEASE_getInstance();
+      return this$Menu.triggerRelease_0(closure$releasePlan, closure$dependencies, closure$dependencies.jenkinsJobExecutor, closure$dependencies.releaseJobExecutionDataFactory);
     };
   }
   function Menu$initRunButtons$lambda$lambda(closure$dependencies, this$Menu) {
@@ -2048,9 +2448,9 @@
   }
   function Menu$initRunButtons$lambda_1(this$Menu, closure$nonNullDependencies, closure$releasePlan, closure$dependencies) {
     return function () {
-      this$Menu.simulation_0 = true;
+      this$Menu.typeOfRun_0 = Menu$TypeOfRun$SIMULATION_getInstance();
       this$Menu.publisher_0 = closure$nonNullDependencies.publisher;
-      return finally_0(this$Menu.triggerRelease_0(closure$releasePlan, closure$nonNullDependencies, closure$nonNullDependencies.simulatingJobExecutor), Menu$initRunButtons$lambda$lambda(closure$dependencies, this$Menu));
+      return finally_0(this$Menu.triggerRelease_0(closure$releasePlan, closure$nonNullDependencies, closure$nonNullDependencies.simulatingJobExecutor, closure$nonNullDependencies.releaseJobExecutionDataFactory), Menu$initRunButtons$lambda$lambda(closure$dependencies, this$Menu));
     };
   }
   function Menu$initRunButtons$lambda_2(this$Menu) {
@@ -2079,17 +2479,25 @@
       }
        else {
         showError('Release ended with failure :(' + '\nAt least one job failed. Check errors, fix them and then you can re-trigger the failed jobs, the pipeline respectively, by clicking on the release button.' + '\n(You might have to delete git tags and remove artifacts if they have already been created).');
-        if (this$Menu.simulation_0) {
-          tmp$ = to(this$Menu.exploreButton_0, elementById('explore.text'));
-        }
-         else {
-          tmp$ = to(this$Menu.releaseButton_0, elementById('release.text'));
+        switch (this$Menu.typeOfRun_0.name) {
+          case 'SIMULATION':
+            tmp$ = new Triple('Explore Release Order', this$Menu.exploreButton_0, elementById('explore:text'));
+            break;
+          case 'DRY_RUN':
+            tmp$ = new Triple('Dry Run', this$Menu.dryRunButton_0, elementById('dryRun:text'));
+            break;
+          case 'RELEASE':
+            tmp$ = new Triple('Release', this$Menu.releaseButton_0, elementById('release:text'));
+            break;
+          default:tmp$ = Kotlin.noWhenBranchMatched();
+            break;
         }
         var tmp$_1 = tmp$;
-        var button = tmp$_1.component1()
-        , buttonText = tmp$_1.component2();
+        var processName = tmp$_1.component1()
+        , button = tmp$_1.component2()
+        , buttonText = tmp$_1.component3();
         buttonText.innerText = 'Re-trigger failed Jobs';
-        button.title = 'Continue with the release process by re-triggering previously failed jobs.';
+        button.title = 'Continue with the ' + processName + ' process by re-triggering previously failed jobs.';
         removeClass(button, [Menu$Companion_getInstance().DISABLED_0]);
       }
       return Unit;
@@ -2097,13 +2505,14 @@
   }
   Menu.prototype.initRunButtons_0 = function (releasePlan, dependencies, modifiableJson) {
     if (dependencies != null) {
-      this.addClickEventListenerIfNotDeactivatedNorDisabled_0(this.dryRunButton_0, Menu$initRunButtons$lambda);
+      this.activateDryRunButton_0();
+      this.addClickEventListenerIfNotDeactivatedNorDisabled_0(this.dryRunButton_0, Menu$initRunButtons$lambda(this, releasePlan, dependencies));
       this.activateReleaseButton_0();
       this.addClickEventListenerIfNotDeactivatedNorDisabled_0(this.releaseButton_0, Menu$initRunButtons$lambda_0(this, releasePlan, dependencies));
     }
     this.activateExploreButton_0();
     var jenkinsUrl = 'https://github.com/loewenfels/';
-    var nonNullDependencies = dependencies != null ? dependencies : ensureNotNull(App$Companion_getInstance().createDependencies_vgvz8r$(jenkinsUrl, 'https://github.com/loewenfels/dgr-publisher/', new UsernameToken('test', 'test'), modifiableJson, this));
+    var nonNullDependencies = dependencies != null ? dependencies : ensureNotNull(App$Companion_getInstance().createDependencies_km5731$(jenkinsUrl, 'https://github.com/loewenfels/dgr-publisher/', new UsernameToken('test', 'test'), modifiableJson, releasePlan, this));
     this.addClickEventListenerIfNotDeactivatedNorDisabled_0(this.exploreButton_0, Menu$initRunButtons$lambda_1(this, nonNullDependencies, releasePlan, dependencies));
     Menu$Companion_getInstance().registerForReleaseStartEvent_gbr1zf$(Menu$initRunButtons$lambda_2(this));
     Menu$Companion_getInstance().registerForReleaseEndEvent_y8twos$(Menu$initRunButtons$lambda_3(this));
@@ -2116,12 +2525,12 @@
     Menu$Companion_getInstance().dispatchReleaseEnd_0(false);
     throw t;
   }
-  Menu.prototype.triggerRelease_0 = function (releasePlan, dependencies, jobExecutor) {
+  Menu.prototype.triggerRelease_0 = function (releasePlan, dependencies, jobExecutor, jobExecutionDataFactory) {
     if (Gui$Companion_getInstance().getReleaseState() === ReleaseState.Failed) {
       this.turnFailedIntoReTrigger_0(releasePlan);
     }
     Menu$Companion_getInstance().dispatchReleaseStart_0();
-    return dependencies.releaser.release_4589td$(jobExecutor).then(Menu$triggerRelease$lambda, Menu$triggerRelease$lambda_0);
+    return dependencies.releaser.release_x3u2bj$(jobExecutor, jobExecutionDataFactory).then(Menu$triggerRelease$lambda, Menu$triggerRelease$lambda_0);
   };
   Menu.prototype.turnFailedIntoReTrigger_0 = function (releasePlan) {
     var $receiver = releasePlan.iterator();
@@ -2135,7 +2544,7 @@
         var index_0 = (tmp$_0 = index, index = tmp$_0 + 1 | 0, tmp$_0);
         var commandState = Gui$Companion_getInstance().getCommandState_o8feeo$(element.id, index_0);
         if (commandState === CommandState.Failed) {
-          Gui$Companion_getInstance().changeStateOfCommand_q143v3$(element, index_0, CommandState.ReadyToRetrigger, Gui$Companion_getInstance().STATE_READY_TO_RE_TRIGGER);
+          Gui$Companion_getInstance().changeStateOfCommand_q143v3$(element, index_0, CommandState.ReadyToReTrigger, Gui$Companion_getInstance().STATE_READY_TO_BE_TRIGGER);
         }
       }
     }
@@ -2148,7 +2557,7 @@
     };
   }
   Menu.prototype.addClickEventListenerIfNotDeactivatedNorDisabled_0 = function ($receiver, action) {
-    addClickEventListener($receiver, Menu$addClickEventListenerIfNotDeactivatedNorDisabled$lambda($receiver, action));
+    addClickEventListener($receiver, void 0, Menu$addClickEventListenerIfNotDeactivatedNorDisabled$lambda($receiver, action));
   };
   Menu.prototype.disable_0 = function ($receiver, reason) {
     addClass($receiver, [Menu$Companion_getInstance().DISABLED_0]);
@@ -2188,6 +2597,12 @@
       var element = tmp$.next();
       this.deactivate_0(element, saveFirst);
     }
+  };
+  Menu.prototype.activateDryRunButton_0 = function () {
+    if (this.isDisabled_0(this.dryRunButton_0))
+      return;
+    removeClass(this.dryRunButton_0, [Menu$Companion_getInstance().DEACTIVATED_0]);
+    this.dryRunButton_0.title = 'Start a dry run based on this release plan (no commit will be made, no artifact deployed etc.).';
   };
   Menu.prototype.activateReleaseButton_0 = function () {
     if (this.isDisabled_0(this.releaseButton_0))
@@ -2272,17 +2687,67 @@
     }
     return Menu$Companion_instance;
   }
-  function Menu$Dependencies(publisher, releaser, jenkinsJobExecutor, simulatingJobExecutor) {
+  function Menu$Dependencies(publisher, releaser, jenkinsJobExecutor, simulatingJobExecutor, releaseJobExecutionDataFactory, dryRunExecutionDataFactory) {
     this.publisher = publisher;
     this.releaser = releaser;
     this.jenkinsJobExecutor = jenkinsJobExecutor;
     this.simulatingJobExecutor = simulatingJobExecutor;
+    this.releaseJobExecutionDataFactory = releaseJobExecutionDataFactory;
+    this.dryRunExecutionDataFactory = dryRunExecutionDataFactory;
   }
   Menu$Dependencies.$metadata$ = {
     kind: Kind_CLASS,
     simpleName: 'Dependencies',
     interfaces: []
   };
+  function Menu$TypeOfRun(name, ordinal) {
+    Enum.call(this);
+    this.name$ = name;
+    this.ordinal$ = ordinal;
+  }
+  function Menu$TypeOfRun_initFields() {
+    Menu$TypeOfRun_initFields = function () {
+    };
+    Menu$TypeOfRun$SIMULATION_instance = new Menu$TypeOfRun('SIMULATION', 0);
+    Menu$TypeOfRun$DRY_RUN_instance = new Menu$TypeOfRun('DRY_RUN', 1);
+    Menu$TypeOfRun$RELEASE_instance = new Menu$TypeOfRun('RELEASE', 2);
+  }
+  var Menu$TypeOfRun$SIMULATION_instance;
+  function Menu$TypeOfRun$SIMULATION_getInstance() {
+    Menu$TypeOfRun_initFields();
+    return Menu$TypeOfRun$SIMULATION_instance;
+  }
+  var Menu$TypeOfRun$DRY_RUN_instance;
+  function Menu$TypeOfRun$DRY_RUN_getInstance() {
+    Menu$TypeOfRun_initFields();
+    return Menu$TypeOfRun$DRY_RUN_instance;
+  }
+  var Menu$TypeOfRun$RELEASE_instance;
+  function Menu$TypeOfRun$RELEASE_getInstance() {
+    Menu$TypeOfRun_initFields();
+    return Menu$TypeOfRun$RELEASE_instance;
+  }
+  Menu$TypeOfRun.$metadata$ = {
+    kind: Kind_CLASS,
+    simpleName: 'TypeOfRun',
+    interfaces: [Enum]
+  };
+  function Menu$TypeOfRun$values() {
+    return [Menu$TypeOfRun$SIMULATION_getInstance(), Menu$TypeOfRun$DRY_RUN_getInstance(), Menu$TypeOfRun$RELEASE_getInstance()];
+  }
+  Menu$TypeOfRun.values = Menu$TypeOfRun$values;
+  function Menu$TypeOfRun$valueOf(name) {
+    switch (name) {
+      case 'SIMULATION':
+        return Menu$TypeOfRun$SIMULATION_getInstance();
+      case 'DRY_RUN':
+        return Menu$TypeOfRun$DRY_RUN_getInstance();
+      case 'RELEASE':
+        return Menu$TypeOfRun$RELEASE_getInstance();
+      default:throwISE('No enum constant ch.loewenfels.depgraph.gui.Menu.TypeOfRun.' + name);
+    }
+  }
+  Menu$TypeOfRun.valueOf_61zpoe$ = Menu$TypeOfRun$valueOf;
   function Menu_init$lambda() {
     toggleClass(elementById('config'), 'active');
     return Unit;
@@ -2468,6 +2933,123 @@
     }
   }
   var urlRegex;
+  function showDialog$lambda$lambda$lambda$lambda(closure$box, closure$resolve) {
+    return function (it) {
+      closure$box.remove();
+      closure$resolve(true);
+      return Unit;
+    };
+  }
+  function showDialog$lambda$lambda$lambda(closure$box, closure$resolve) {
+    return function ($receiver) {
+      $receiver.unaryPlus_pdl1vz$('Yes');
+      addClickEventListener(getUnderlyingHtmlElement($receiver), {once: true}, showDialog$lambda$lambda$lambda$lambda(closure$box, closure$resolve));
+      return Unit;
+    };
+  }
+  function showDialog$lambda$lambda$lambda$lambda_0(closure$box, closure$resolve) {
+    return function (it) {
+      closure$box.style.visibility = 'hidden';
+      closure$resolve(false);
+      return Unit;
+    };
+  }
+  function showDialog$lambda$lambda$lambda_0(closure$box, closure$resolve) {
+    return function ($receiver) {
+      $receiver.unaryPlus_pdl1vz$('No');
+      addClickEventListener(getUnderlyingHtmlElement($receiver), {once: true}, showDialog$lambda$lambda$lambda$lambda_0(closure$box, closure$resolve));
+      return Unit;
+    };
+  }
+  function showDialog$lambda$lambda(closure$resolve) {
+    return function ($receiver, box) {
+      span($receiver, void 0, showDialog$lambda$lambda$lambda(box, closure$resolve));
+      span($receiver, void 0, showDialog$lambda$lambda$lambda_0(box, closure$resolve));
+      return Unit;
+    };
+  }
+  function showDialog$lambda(closure$msg) {
+    return function (resolve, f) {
+      showModal(closure$msg, showDialog$lambda$lambda(resolve));
+      return Unit;
+    };
+  }
+  function showDialog(msg) {
+    return new Promise(showDialog$lambda(msg));
+  }
+  function showAlert$lambda$lambda$lambda$lambda(closure$box, closure$resolve) {
+    return function (it) {
+      closure$box.remove();
+      closure$resolve(Unit);
+      return Unit;
+    };
+  }
+  function showAlert$lambda$lambda$lambda(closure$box, closure$resolve) {
+    return function ($receiver) {
+      $receiver.unaryPlus_pdl1vz$('OK');
+      addClickEventListener(getUnderlyingHtmlElement($receiver), {once: true}, showAlert$lambda$lambda$lambda$lambda(closure$box, closure$resolve));
+      return Unit;
+    };
+  }
+  function showAlert$lambda$lambda(closure$resolve) {
+    return function ($receiver, box) {
+      span($receiver, void 0, showAlert$lambda$lambda$lambda(box, closure$resolve));
+      return Unit;
+    };
+  }
+  function showAlert$lambda(closure$msg) {
+    return function (resolve, f) {
+      showModal(closure$msg, showAlert$lambda$lambda(resolve));
+      return Unit;
+    };
+  }
+  function showAlert(msg) {
+    return new Promise(showAlert$lambda(msg));
+  }
+  function showModal$lambda$lambda$lambda$lambda($receiver) {
+    $receiver.unaryPlus_pdl1vz$('help_outline');
+    return Unit;
+  }
+  function showModal$lambda$lambda$lambda$lambda_0(closure$msg) {
+    return function ($receiver) {
+      $receiver.unaryPlus_pdl1vz$(closure$msg);
+      return Unit;
+    };
+  }
+  function showModal$lambda$lambda$lambda(closure$msg) {
+    return function ($receiver) {
+      i($receiver, 'material-icons', showModal$lambda$lambda$lambda$lambda);
+      span($receiver, void 0, showModal$lambda$lambda$lambda$lambda_0(closure$msg));
+      return Unit;
+    };
+  }
+  function showModal$lambda$lambda$lambda_0(closure$buttonCreator, closure$box) {
+    return function ($receiver) {
+      closure$buttonCreator($receiver, closure$box);
+      return Unit;
+    };
+  }
+  function showModal$lambda$lambda(closure$msg, closure$buttonCreator) {
+    return function ($receiver) {
+      var box = getUnderlyingHtmlElement($receiver);
+      div_0($receiver, 'text', showModal$lambda$lambda$lambda(closure$msg));
+      div_0($receiver, 'buttons', showModal$lambda$lambda$lambda_0(closure$buttonCreator, box));
+      var top = ensureNotNull(document.body).clientHeight / 3 | 0;
+      var left = (ensureNotNull(document.body).clientWidth / 2 | 0) - (box.offsetWidth / 2 | 0) | 0;
+      box.style.top = top.toString() + 'px';
+      box.style.left = left.toString() + 'px';
+      return Unit;
+    };
+  }
+  function showModal$lambda(closure$msg, closure$buttonCreator) {
+    return function ($receiver) {
+      div_1($receiver, 'box', showModal$lambda$lambda(closure$msg, closure$buttonCreator));
+      return Unit;
+    };
+  }
+  function showModal(msg, buttonCreator) {
+    append(elementById('modals'), showModal$lambda(msg, buttonCreator));
+  }
   function Publisher(publishJobUrl, modifiableJson) {
     Publisher$Companion_getInstance();
     this.publishJobUrl_0 = publishJobUrl;
@@ -2502,9 +3084,9 @@
   }
   Publisher.prototype.publish_lkprpu$ = function (fileName, verbose, jobExecutor) {
     changeCursorToProgress();
-    var body = 'fileName=' + fileName + '&json=' + this.modifiableJson_0.json;
     var doNothingPromise = Publisher$publish$lambda;
-    return finally_0(jobExecutor.trigger_7817gb$(this.publishJobUrl_0, 'publish release-' + fileName + '.json', body, doNothingPromise, doNothingPromise, 2, 20, verbose).then(Publisher$publish$lambda_0(jobExecutor, this)).then(Publisher$publish$lambda_1(this, verbose)), Publisher$publish$lambda_2);
+    var jobExecutionData = JobExecutionData$Companion_getInstance().buildWithParameters_6hosri$('publish ' + fileName + '.json', this.publishJobUrl_0, 'fileName=' + fileName + '&json=' + this.modifiableJson_0.json);
+    return finally_0(jobExecutor.trigger_shi73r$(jobExecutionData, doNothingPromise, doNothingPromise, 2, 20, verbose).then(Publisher$publish$lambda_0(jobExecutor, this)).then(Publisher$publish$lambda_1(this, verbose)), Publisher$publish$lambda_2);
   };
   function Publisher$extractResultJsonUrl$lambda(closure$jobUrl) {
     return function (e) {
@@ -2583,29 +3165,159 @@
     simpleName: 'Publisher',
     interfaces: []
   };
+  function ReleaseJobExecutionDataFactory(jenkinsUrl, releasePlan) {
+    BaseJobExecutionDataFactory.call(this, jenkinsUrl, releasePlan);
+    this.regexParametersList_0 = null;
+    this.jobMapping_0 = null;
+    this.checkConfig_0(releasePlan.config);
+    this.regexParametersList_0 = this.parseRegexParameters_0();
+    this.jobMapping_0 = this.parseJobMapping_0();
+  }
+  ReleaseJobExecutionDataFactory.prototype.checkConfig_0 = function (config) {
+    this.requireConfigEntry_nhrt5l$(config, ConfigKey.UPDATE_DEPENDENCY_JOB);
+    this.requireConfigEntry_nhrt5l$(config, ConfigKey.REMOTE_REGEX);
+    this.requireConfigEntry_nhrt5l$(config, ConfigKey.REMOTE_JOB);
+    this.requireConfigEntry_nhrt5l$(config, ConfigKey.COMMIT_PREFIX);
+  };
+  function ReleaseJobExecutionDataFactory$parseRegexParameters$lambda(closure$regexParameters, this$ReleaseJobExecutionDataFactory) {
+    return function (pair) {
+      var index = this$ReleaseJobExecutionDataFactory.checkRegexNotEmpty_0(pair, closure$regexParameters);
+      var startIndex = index + 1 | 0;
+      var parameters = pair.substring(startIndex);
+      this$ReleaseJobExecutionDataFactory.checkAtLeastOneParameter_0(parameters, closure$regexParameters);
+      return to(Regex_init(pair.substring(0, index)), parameters);
+    };
+  }
+  ReleaseJobExecutionDataFactory.prototype.parseRegexParameters_0 = function () {
+    var tmp$;
+    var regexParameters = this.getConfig_udzor3$(ConfigKey.REGEX_PARAMS);
+    if (regexParameters.length > 0) {
+      tmp$ = toList_0(map(splitToSequence(regexParameters, ['$']), ReleaseJobExecutionDataFactory$parseRegexParameters$lambda(regexParameters, this)));
+    }
+     else {
+      tmp$ = emptyList();
+    }
+    return tmp$;
+  };
+  ReleaseJobExecutionDataFactory.prototype.checkRegexNotEmpty_0 = function (pair, regexParameters) {
+    var index = indexOf(pair, 35);
+    if (!(index > 0)) {
+      var message = 'regex requires at least one character.' + '\n' + 'regexParameters: ' + regexParameters;
+      throw IllegalStateException_init(message.toString());
+    }
+    return index;
+  };
+  ReleaseJobExecutionDataFactory.prototype.checkAtLeastOneParameter_0 = function (pair, regexParameters) {
+    var index = indexOf(pair, 61);
+    if (!(index > 0)) {
+      var message = 'A regexParam requires at least one parameter.' + '\n' + 'regexParameters: ' + regexParameters;
+      throw IllegalStateException_init(message.toString());
+    }
+    return index;
+  };
+  ReleaseJobExecutionDataFactory.prototype.parseJobMapping_0 = function () {
+    var mapping = this.releasePlan.getConfig_udzor3$(ConfigKey.JOB_MAPPING);
+    var $receiver = split_0(mapping, ['|']);
+    var capacity = coerceAtLeast(mapCapacity(collectionSizeOrDefault($receiver, 10)), 16);
+    var destination = LinkedHashMap_init(capacity);
+    var tmp$;
+    tmp$ = $receiver.iterator();
+    while (tmp$.hasNext()) {
+      var element = tmp$.next();
+      var index = indexOf(element, 61);
+      if (!(index > 0)) {
+        var message = 'At least one mapping has no groupId and artifactId defined.' + '\n' + 'jobMapping: ' + mapping;
+        throw IllegalStateException_init(message.toString());
+      }
+      var groupIdAndArtifactId = element.substring(0, index);
+      if (!contains_0(groupIdAndArtifactId, 58)) {
+        var message_0 = 'At least one groupId and artifactId is erroneous, does not contain a `:`.' + '\n' + 'jobMapping: ' + mapping;
+        throw IllegalStateException_init(message_0.toString());
+      }
+      var startIndex = index + 1 | 0;
+      var jobName = element.substring(startIndex);
+      if (!!isBlank(jobName)) {
+        var message_1 = 'At least one groupId and artifactId is erroneous, has no job name defined.' + '\n' + 'jobMapping: ' + mapping;
+        throw IllegalStateException_init(message_1.toString());
+      }
+      var pair = to(groupIdAndArtifactId, jobName);
+      destination.put_xwzc9p$(pair.first, pair.second);
+    }
+    return destination;
+  };
+  ReleaseJobExecutionDataFactory.prototype.getJobName_0 = function (project) {
+    var tmp$, tmp$_0;
+    var mavenProjectId = Kotlin.isType(tmp$ = project.id, MavenProjectId) ? tmp$ : throwCCE();
+    return (tmp$_0 = this.jobMapping_0.get_11rb$(mavenProjectId.identifier)) != null ? tmp$_0 : mavenProjectId.artifactId;
+  };
+  ReleaseJobExecutionDataFactory.prototype.create_awtgy4$ = function (project, command) {
+    var tmp$;
+    if (Kotlin.isType(command, JenkinsUpdateDependency))
+      tmp$ = this.triggerUpdateDependency_0(project, command);
+    else if (Kotlin.isType(command, M2ReleaseCommand))
+      tmp$ = this.triggerRelease_0(project, command);
+    else
+      throw UnsupportedOperationException_init('We do not (yet) support the command: ' + command);
+    return tmp$;
+  };
+  ReleaseJobExecutionDataFactory.prototype.triggerUpdateDependency_0 = function (project, command) {
+    var jobUrl = this.getJobUrl_udzor3$(ConfigKey.UPDATE_DEPENDENCY_JOB);
+    var jobName = 'update dependency of ' + project.id.identifier;
+    var params = this.createUpdateDependencyParams_0(project, command);
+    return JobExecutionData$Companion_getInstance().buildWithParameters_6hosri$(jobName, jobUrl, params);
+  };
+  ReleaseJobExecutionDataFactory.prototype.createUpdateDependencyParams_0 = function (project, command) {
+    var tmp$;
+    var dependency = this.releasePlan.getProject_lljhqa$(command.projectId);
+    var dependencyMavenProjectId = Kotlin.isType(tmp$ = dependency.id, MavenProjectId) ? tmp$ : throwCCE();
+    return 'pathToProject=' + project.relativePath + ('&groupId=' + dependencyMavenProjectId.groupId) + ('&artifactId=' + dependencyMavenProjectId.artifactId) + ('&newVersion=' + dependency.releaseVersion) + ('&commitPrefix=' + this.getConfig_udzor3$(ConfigKey.COMMIT_PREFIX)) + ('&releaseId=' + this.releasePlan.releaseId);
+  };
+  ReleaseJobExecutionDataFactory.prototype.triggerRelease_0 = function (project, command) {
+    var tmp$ = this.determineJobUrlAndParams_0(project, command);
+    var jobUrl = tmp$.component1()
+    , params = tmp$.component2();
+    return JobExecutionData$Companion_getInstance().buildWithParameters_6hosri$('release ' + project.id.identifier, jobUrl, params);
+  };
+  function ReleaseJobExecutionDataFactory$determineJobUrlAndParams$lambda(closure$mavenProjectId) {
+    return function (f) {
+      var regex = f.component1();
+      return regex.matches_6bul2c$(closure$mavenProjectId.identifier);
+    };
+  }
+  function ReleaseJobExecutionDataFactory$determineJobUrlAndParams$lambda_0(it) {
+    return it.second;
+  }
+  ReleaseJobExecutionDataFactory.prototype.determineJobUrlAndParams_0 = function (project, command) {
+    var tmp$, tmp$_0;
+    var mavenProjectId = Kotlin.isType(tmp$ = project.id, MavenProjectId) ? tmp$ : throwCCE();
+    var regex = Regex_init(this.getConfig_udzor3$(ConfigKey.REMOTE_REGEX));
+    var relevantParams = map(filter(asSequence(this.regexParametersList_0), ReleaseJobExecutionDataFactory$determineJobUrlAndParams$lambda(mavenProjectId)), ReleaseJobExecutionDataFactory$determineJobUrlAndParams$lambda_0);
+    var params = 'releaseVersion=' + project.releaseVersion + ('&nextDevVersion=' + command.nextDevVersion);
+    var jobName = this.getJobName_0(project);
+    if (regex.matches_6bul2c$(project.id.identifier)) {
+      tmp$_0 = to(this.getJobUrl_udzor3$(ConfigKey.REMOTE_JOB), params + '&jobName=' + jobName + '&parameters=' + joinToString_0(relevantParams, ';'));
+    }
+     else {
+      tmp$_0 = to(this.getJobUrl_61zpoe$(jobName), params + '&' + joinToString_0(relevantParams, '&') + '}');
+    }
+    return tmp$_0;
+  };
+  ReleaseJobExecutionDataFactory.$metadata$ = {
+    kind: Kind_CLASS,
+    simpleName: 'ReleaseJobExecutionDataFactory',
+    interfaces: [BaseJobExecutionDataFactory]
+  };
   function Releaser(jenkinsUrl, modifiableJson, menu) {
     this.jenkinsUrl_0 = jenkinsUrl;
     this.modifiableJson_0 = modifiableJson;
     this.menu_0 = menu;
   }
-  Releaser.prototype.release_4589td$ = function (jobExecutor) {
+  Releaser.prototype.release_x3u2bj$ = function (jobExecutor, jobExecutionDataFactory) {
     var releasePlan = deserialize(this.modifiableJson_0.json);
-    this.checkConfig_0(releasePlan);
     this.warnIfNotOnSameHost_0();
-    return this.release_0(jobExecutor, releasePlan);
-  };
-  Releaser.prototype.checkConfig_0 = function (releasePlan) {
-    var config = releasePlan.config;
-    this.requireConfigEntry_0(config, ConfigKey.UPDATE_DEPENDENCY_JOB);
-    this.requireConfigEntry_0(config, ConfigKey.REMOTE_REGEX);
-    this.requireConfigEntry_0(config, ConfigKey.REMOTE_JOB);
-    this.requireConfigEntry_0(config, ConfigKey.COMMIT_PREFIX);
-  };
-  Releaser.prototype.requireConfigEntry_0 = function (config, key) {
-    if (!config.containsKey_11rb$(key)) {
-      var message = key.toString() + ' is not defined in settings';
-      throw IllegalArgumentException_init(message.toString());
-    }
+    var project = releasePlan.getRootProject();
+    var paramObject = new Releaser$ParamObject(releasePlan, jobExecutor, jobExecutionDataFactory, project, HashMap_init(), HashMap_init());
+    return this.release_0(paramObject);
   };
   Releaser.prototype.warnIfNotOnSameHost_0 = function () {
     var prefix = window.location.protocol + '//' + window.location.hostname;
@@ -2630,9 +3342,7 @@
       return result;
     };
   }
-  Releaser.prototype.release_0 = function (jobExecutor, releasePlan) {
-    var project = releasePlan.getRootProject();
-    var paramObject = new Releaser$ParamObject(releasePlan, jobExecutor, project, HashMap_init(), HashMap_init());
+  Releaser.prototype.release_0 = function (paramObject) {
     Gui$Companion_getInstance().changeReleaseState_g1wt0g$(ReleaseState.InProgress);
     return this.releaseProject_0(paramObject).then(Releaser$release$lambda(paramObject, this));
   };
@@ -2792,13 +3502,10 @@
     var promises = destination;
     return Promise.all(copyToArray(promises));
   };
-  function Releaser$triggerNonReleaseCommandsInclSubmoduleCommands$lambda(i, t) {
-    return to(i, t);
+  function Releaser$triggerNonReleaseCommandsInclSubmoduleCommands$lambda(it) {
+    return !Kotlin.isType(it.value, ReleaseCommand);
   }
-  function Releaser$triggerNonReleaseCommandsInclSubmoduleCommands$lambda_0(it) {
-    return !Kotlin.isType(it.second, ReleaseCommand);
-  }
-  function Releaser$triggerNonReleaseCommandsInclSubmoduleCommands$lambda_1(closure$paramObject, this$Releaser) {
+  function Releaser$triggerNonReleaseCommandsInclSubmoduleCommands$lambda_0(closure$paramObject, this$Releaser) {
     return function (f) {
       var index = f.component1()
       , command = f.component2();
@@ -2810,7 +3517,7 @@
       return this$Releaser.triggerNonReleaseCommandsInclSubmoduleCommands_0(Releaser$Releaser$ParamObject_init(closure$paramObject, submoduleId));
     };
   }
-  function Releaser$triggerNonReleaseCommandsInclSubmoduleCommands$lambda_2(closure$paramObject, this$Releaser) {
+  function Releaser$triggerNonReleaseCommandsInclSubmoduleCommands$lambda_1(closure$paramObject, this$Releaser) {
     return function (jobsResults) {
       var tmp$, tmp$_0, tmp$_1, tmp$_2;
       tmp$_2 = asSequence(closure$paramObject.releasePlan.getSubmodules_lljhqa$(closure$paramObject.project.id));
@@ -2819,7 +3526,7 @@
       return this$Releaser.doSequentially_0(tmp$_2, tmp$_0, tmp$_1);
     };
   }
-  function Releaser$triggerNonReleaseCommandsInclSubmoduleCommands$lambda_3(jobsResults) {
+  function Releaser$triggerNonReleaseCommandsInclSubmoduleCommands$lambda_2(jobsResults) {
     var tmp$;
     var firstOrNull$result;
     firstOrNull$break: do {
@@ -2838,7 +3545,7 @@
     return (tmp$ = firstOrNull$result) != null ? tmp$ : CommandState.Succeeded;
   }
   Releaser.prototype.triggerNonReleaseCommandsInclSubmoduleCommands_0 = function (paramObject) {
-    return this.doSequentially_0(filter(mapIndexed(asSequence(paramObject.project.commands), Releaser$triggerNonReleaseCommandsInclSubmoduleCommands$lambda), Releaser$triggerNonReleaseCommandsInclSubmoduleCommands$lambda_0), ArrayList_init(), Releaser$triggerNonReleaseCommandsInclSubmoduleCommands$lambda_1(paramObject, this)).then(Releaser$triggerNonReleaseCommandsInclSubmoduleCommands$lambda_2(paramObject, this)).then(Releaser$triggerNonReleaseCommandsInclSubmoduleCommands$lambda_3);
+    return this.doSequentially_0(filter(mapWithIndex(asSequence(paramObject.project.commands)), Releaser$triggerNonReleaseCommandsInclSubmoduleCommands$lambda), ArrayList_init(), Releaser$triggerNonReleaseCommandsInclSubmoduleCommands$lambda_0(paramObject, this)).then(Releaser$triggerNonReleaseCommandsInclSubmoduleCommands$lambda_1(paramObject, this)).then(Releaser$triggerNonReleaseCommandsInclSubmoduleCommands$lambda_2);
   };
   function Releaser$doSequentially$lambda$lambda$lambda(closure$list) {
     return function (jobResult) {
@@ -2863,20 +3570,17 @@
     }
     return accumulator;
   };
-  function Releaser$triggerReleaseCommands$lambda(i, t) {
-    return to(i, t);
+  function Releaser$triggerReleaseCommands$lambda(it) {
+    return Kotlin.isType(it.value, ReleaseCommand);
   }
-  function Releaser$triggerReleaseCommands$lambda_0(it) {
-    return Kotlin.isType(it.second, ReleaseCommand);
-  }
-  function Releaser$triggerReleaseCommands$lambda_1(closure$paramObject, this$Releaser) {
+  function Releaser$triggerReleaseCommands$lambda_0(closure$paramObject, this$Releaser) {
     return function (f) {
       var index = f.component1()
       , command = f.component2();
       return this$Releaser.createCommandPromise_0(closure$paramObject, command, index);
     };
   }
-  function Releaser$triggerReleaseCommands$lambda_2(jobsResults) {
+  function Releaser$triggerReleaseCommands$lambda_1(jobsResults) {
     var tmp$;
     var firstOrNull$result;
     firstOrNull$break: do {
@@ -2895,12 +3599,12 @@
     return (tmp$ = firstOrNull$result) != null ? tmp$ : CommandState.Succeeded;
   }
   Releaser.prototype.triggerReleaseCommands_0 = function (paramObject) {
-    return this.doSequentially_0(filter(mapIndexed(asSequence(paramObject.project.commands), Releaser$triggerReleaseCommands$lambda), Releaser$triggerReleaseCommands$lambda_0), ArrayList_init(), Releaser$triggerReleaseCommands$lambda_1(paramObject, this)).then(Releaser$triggerReleaseCommands$lambda_2);
+    return this.doSequentially_0(filter(mapWithIndex(asSequence(paramObject.project.commands)), Releaser$triggerReleaseCommands$lambda), ArrayList_init(), Releaser$triggerReleaseCommands$lambda_0(paramObject, this)).then(Releaser$triggerReleaseCommands$lambda_1);
   };
   Releaser.prototype.createCommandPromise_0 = function (paramObject, command, index) {
     var tmp$;
     var state = Gui$Companion_getInstance().getCommandState_o8feeo$(paramObject.project.id, index);
-    if (state === CommandState.Ready || state === CommandState.ReadyToRetrigger) {
+    if (state === CommandState.Ready || state === CommandState.ReadyToReTrigger) {
       tmp$ = this.triggerCommand_0(paramObject, command, index);
     }
      else {
@@ -2909,56 +3613,8 @@
     return tmp$;
   };
   Releaser.prototype.triggerCommand_0 = function (paramObject, command, index) {
-    var tmp$;
-    if (Kotlin.isType(command, JenkinsUpdateDependency))
-      tmp$ = this.triggerUpdateDependency_0(paramObject, command, index);
-    else if (Kotlin.isType(command, M2ReleaseCommand))
-      tmp$ = this.triggerRelease_0(paramObject, command, index);
-    else
-      throw UnsupportedOperationException_init('We do not (yet) support the command: ' + command);
-    return tmp$;
-  };
-  Releaser.prototype.triggerUpdateDependency_0 = function (paramObject, command, index) {
-    var jobUrl = this.jenkinsUrl_0 + '/job/' + paramObject.getConfig_udzor3$(ConfigKey.UPDATE_DEPENDENCY_JOB);
-    var jobName = 'update dependency of ' + paramObject.project.id.identifier;
-    var params = this.createUpdateDependencyParams_0(paramObject, command);
-    return this.triggerJob_0(paramObject, jobUrl, jobName, params, index);
-  };
-  Releaser.prototype.createUpdateDependencyParams_0 = function (paramObject, command) {
-    var tmp$;
-    var dependency = paramObject.releasePlan.getProject_lljhqa$(command.projectId);
-    var dependencyMavenProjectId = Kotlin.isType(tmp$ = dependency.id, MavenProjectId) ? tmp$ : throwCCE();
-    return 'pathToProject=' + paramObject.project.relativePath + ('&groupId=' + dependencyMavenProjectId.groupId) + ('&artifactId=' + dependencyMavenProjectId.artifactId) + ('&newVersion=' + dependency.releaseVersion) + ('&commitPrefix=' + paramObject.getConfig_udzor3$(ConfigKey.COMMIT_PREFIX)) + ('&releaseId=' + paramObject.releasePlan.releaseId);
-  };
-  Releaser.prototype.triggerRelease_0 = function (paramObject, command, index) {
-    var tmp$ = this.determineJobUrlAndParams_0(paramObject, command);
-    var jobUrl = tmp$.component1()
-    , params = tmp$.component2();
-    return this.triggerJob_0(paramObject, jobUrl, 'release ' + paramObject.project.id.identifier, params, index);
-  };
-  function Releaser$determineJobUrlAndParams$lambda(closure$mavenProjectId) {
-    return function (f) {
-      var regex = f.component1();
-      return regex.matches_6bul2c$(closure$mavenProjectId.identifier);
-    };
-  }
-  function Releaser$determineJobUrlAndParams$lambda_0(it) {
-    return it.second;
-  }
-  Releaser.prototype.determineJobUrlAndParams_0 = function (paramObject, command) {
-    var tmp$, tmp$_0;
-    var mavenProjectId = Kotlin.isType(tmp$ = paramObject.project.id, MavenProjectId) ? tmp$ : throwCCE();
-    var regex = Regex_init(paramObject.getConfig_udzor3$(ConfigKey.REMOTE_REGEX));
-    var relevantParams = map(filter(asSequence(paramObject.regexParametersList), Releaser$determineJobUrlAndParams$lambda(mavenProjectId)), Releaser$determineJobUrlAndParams$lambda_0);
-    var params = 'releaseVersion=' + paramObject.project.releaseVersion + ('&nextDevVersion=' + command.nextDevVersion);
-    var jobName = paramObject.getJobName();
-    if (regex.matches_6bul2c$(paramObject.project.id.identifier)) {
-      tmp$_0 = to(this.jenkinsUrl_0 + '/job/' + paramObject.getConfig_udzor3$(ConfigKey.REMOTE_JOB), params + '&jobName=' + jobName + '&parameters=' + joinToString_0(relevantParams, ';'));
-    }
-     else {
-      tmp$_0 = to(this.jenkinsUrl_0 + '/job/' + jobName, params + '&' + joinToString_0(relevantParams, '&') + '}');
-    }
-    return tmp$_0;
+    var jobExecutionData = paramObject.jobExecutionDataFactory.create_awtgy4$(paramObject.project, command);
+    return this.triggerJob_0(paramObject, index, jobExecutionData);
   };
   function Releaser$triggerJob$lambda(closure$project, closure$index, closure$paramObject, this$Releaser) {
     return function (queuedItemUrl) {
@@ -2966,18 +3622,18 @@
       return this$Releaser.save_0(closure$paramObject);
     };
   }
-  function Releaser$triggerJob$lambda_0(closure$project, closure$index, closure$jobUrlWithSlash) {
+  function Releaser$triggerJob$lambda_0(closure$project, closure$index, closure$jobExecutionData) {
     return function (buildNumber) {
-      Gui$Companion_getInstance().changeStateOfCommandAndAddBuildUrl_85y8bj$(closure$project, closure$index, CommandState.InProgress, Gui$Companion_getInstance().STATE_IN_PROGRESS, closure$jobUrlWithSlash + buildNumber + '/');
+      Gui$Companion_getInstance().changeStateOfCommandAndAddBuildUrl_85y8bj$(closure$project, closure$index, CommandState.InProgress, Gui$Companion_getInstance().STATE_IN_PROGRESS, closure$jobExecutionData.jobBaseUrl + buildNumber + '/');
       return Promise.resolve(1);
     };
   }
   function Releaser$triggerJob$lambda_1(it) {
     return to(CommandState.Succeeded, Gui$Companion_getInstance().STATE_SUCCEEDED);
   }
-  function Releaser$triggerJob$lambda_2(closure$jobName, closure$project, closure$index) {
+  function Releaser$triggerJob$lambda_2(closure$jobExecutionData, closure$project, closure$index) {
     return function (t) {
-      showThrowable(new Error_0('Job ' + closure$jobName + ' failed', t));
+      showThrowable(new Error_0('Job ' + closure$jobExecutionData.jobName + ' failed', t));
       var id = Gui$Companion_getInstance().getCommandId_xgsuvp$(closure$project, closure$index) + Gui$Companion_getInstance().STATE_SUFFIX;
       var tmp$;
       var elementByIdOrNull$result;
@@ -3017,12 +3673,10 @@
       return state;
     };
   }
-  Releaser.prototype.triggerJob_0 = function (paramObject, jobUrl, jobName, params, index) {
+  Releaser.prototype.triggerJob_0 = function (paramObject, index, jobExecutionData) {
     var project = paramObject.project;
-    console.log('trigger: ' + project.id.identifier + ' / ' + jobUrl + ' / ' + params);
-    var jobUrlWithSlash = endsWith(jobUrl, '/') ? jobUrl : jobUrl + '/';
     changeCursorToProgress();
-    return paramObject.jobExecutor.trigger_7817gb$(jobUrlWithSlash, jobName, params, Releaser$triggerJob$lambda(project, index, paramObject, this), Releaser$triggerJob$lambda_0(project, index, jobUrlWithSlash), 10, 60 * 15 | 0, false).then(Releaser$triggerJob$lambda_1, Releaser$triggerJob$lambda_2(jobName, project, index)).then(Releaser$triggerJob$lambda_3(project, index));
+    return paramObject.jobExecutor.trigger_shi73r$(jobExecutionData, Releaser$triggerJob$lambda(project, index, paramObject, this), Releaser$triggerJob$lambda_0(project, index, jobExecutionData), 10, 900, false).then(Releaser$triggerJob$lambda_1, Releaser$triggerJob$lambda_2(jobExecutionData, project, index)).then(Releaser$triggerJob$lambda_3(project, index));
   };
   function Releaser$save$lambda(closure$paramObject) {
     return function (hadChanges) {
@@ -3037,94 +3691,17 @@
       verbose = false;
     return this.menu_0.save_g760o8$(paramObject.jobExecutor, verbose).then(Releaser$save$lambda(paramObject));
   };
-  function Releaser$ParamObject(releasePlan, jobExecutor, project, locks, projectResults) {
+  function Releaser$ParamObject(releasePlan, jobExecutor, jobExecutionDataFactory, project, locks, projectResults) {
     this.releasePlan = releasePlan;
     this.jobExecutor = jobExecutor;
+    this.jobExecutionDataFactory = jobExecutionDataFactory;
     this.project = project;
-    this.locks = locks;
+    this.locks_0 = locks;
     this.projectResults = projectResults;
-    this.regexParametersList = null;
-    this.jobMapping_0 = null;
-    this.regexParametersList = this.parseRegexParameters_0();
-    this.jobMapping_0 = this.parseJobMapping_0();
   }
-  function Releaser$ParamObject$parseRegexParameters$lambda(closure$regexParameters, this$ParamObject) {
-    return function (pair) {
-      var index = this$ParamObject.checkRegexNotEmpty_0(pair, closure$regexParameters);
-      var startIndex = index + 1 | 0;
-      var parameters = pair.substring(startIndex);
-      this$ParamObject.checkAtLeastOneParameter_0(parameters, closure$regexParameters);
-      return to(Regex_init(pair.substring(0, index)), parameters);
-    };
-  }
-  Releaser$ParamObject.prototype.parseRegexParameters_0 = function () {
-    var tmp$;
-    var regexParameters = this.getConfig_udzor3$(ConfigKey.REGEX_PARAMS);
-    if (regexParameters.length > 0) {
-      tmp$ = toList_0(map(splitToSequence(regexParameters, ['$']), Releaser$ParamObject$parseRegexParameters$lambda(regexParameters, this)));
-    }
-     else {
-      tmp$ = emptyList();
-    }
-    return tmp$;
-  };
-  Releaser$ParamObject.prototype.checkRegexNotEmpty_0 = function (pair, regexParameters) {
-    var index = indexOf(pair, 35);
-    if (!(index > 0)) {
-      var message = 'regex requires at least one character.' + '\n' + 'regexParameters: ' + regexParameters;
-      throw IllegalStateException_init(message.toString());
-    }
-    return index;
-  };
-  Releaser$ParamObject.prototype.checkAtLeastOneParameter_0 = function (pair, regexParameters) {
-    var index = indexOf(pair, 61);
-    if (!(index > 0)) {
-      var message = 'A regexParam requires at least one parameter.' + '\n' + 'regexParameters: ' + regexParameters;
-      throw IllegalStateException_init(message.toString());
-    }
-    return index;
-  };
-  Releaser$ParamObject.prototype.parseJobMapping_0 = function () {
-    var mapping = this.getConfig_udzor3$(ConfigKey.JOB_MAPPING);
-    var $receiver = split_0(mapping, ['|']);
-    var capacity = coerceAtLeast(mapCapacity(collectionSizeOrDefault($receiver, 10)), 16);
-    var destination = LinkedHashMap_init(capacity);
-    var tmp$;
-    tmp$ = $receiver.iterator();
-    while (tmp$.hasNext()) {
-      var element = tmp$.next();
-      var index = indexOf(element, 61);
-      if (!(index > 0)) {
-        var message = 'At least one mapping has no groupId and artifactId defined.' + '\n' + 'jobMapping: ' + mapping;
-        throw IllegalStateException_init(message.toString());
-      }
-      var groupIdAndArtifactId = element.substring(0, index);
-      if (!contains_0(groupIdAndArtifactId, 58)) {
-        var message_0 = 'At least one groupId and artifactId is erroneous, does not contain a `:`.' + '\n' + 'jobMapping: ' + mapping;
-        throw IllegalStateException_init(message_0.toString());
-      }
-      var startIndex = index + 1 | 0;
-      var jobName = element.substring(startIndex);
-      if (!!isBlank(jobName)) {
-        var message_1 = 'At least one groupId and artifactId is erroneous, has no job name defined.' + '\n' + 'jobMapping: ' + mapping;
-        throw IllegalStateException_init(message_1.toString());
-      }
-      var pair = to(groupIdAndArtifactId, jobName);
-      destination.put_xwzc9p$(pair.first, pair.second);
-    }
-    return destination;
-  };
-  Releaser$ParamObject.prototype.getConfig_udzor3$ = function (configKey) {
-    var tmp$;
-    tmp$ = this.releasePlan.config.get_11rb$(configKey);
-    if (tmp$ == null) {
-      throw IllegalArgumentException_init('unknown config key: ' + configKey);
-    }
-    return tmp$;
-  };
   function Releaser$ParamObject$withLockForProject$lambda(this$ParamObject, closure$projectId) {
     return function (result) {
-      this$ParamObject.locks.remove_11rb$(closure$projectId);
+      this$ParamObject.locks_0.remove_11rb$(closure$projectId);
       return result;
     };
   }
@@ -3136,21 +3713,16 @@
   Releaser$ParamObject.prototype.withLockForProject_509nd4$ = function (act) {
     var tmp$;
     var projectId = this.project.id;
-    var lock = this.locks.get_11rb$(projectId);
+    var lock = this.locks_0.get_11rb$(projectId);
     if (lock == null) {
       var promise = act();
-      this.locks.put_xwzc9p$(projectId, promise);
+      this.locks_0.put_xwzc9p$(projectId, promise);
       tmp$ = promise.then(Releaser$ParamObject$withLockForProject$lambda(this, projectId));
     }
      else {
       tmp$ = lock.then(Releaser$ParamObject$withLockForProject$lambda_0(act, this));
     }
     return tmp$;
-  };
-  Releaser$ParamObject.prototype.getJobName = function () {
-    var tmp$, tmp$_0;
-    var mavenProjectId = Kotlin.isType(tmp$ = this.project.id, MavenProjectId) ? tmp$ : throwCCE();
-    return (tmp$_0 = this.jobMapping_0.get_11rb$(mavenProjectId.identifier)) != null ? tmp$_0 : mavenProjectId.artifactId;
   };
   Releaser$ParamObject.$metadata$ = {
     kind: Kind_CLASS,
@@ -3164,7 +3736,7 @@
   }
   function Releaser$Releaser$ParamObject_init_0(paramObject, newProject, $this) {
     $this = $this || Object.create(Releaser$ParamObject.prototype);
-    Releaser$ParamObject.call($this, paramObject.releasePlan, paramObject.jobExecutor, newProject, paramObject.locks, paramObject.projectResults);
+    Releaser$ParamObject.call($this, paramObject.releasePlan, paramObject.jobExecutor, paramObject.jobExecutionDataFactory, newProject, paramObject.locks_0, paramObject.projectResults);
     return $this;
   }
   Releaser$ParamObject.prototype.component1 = function () {
@@ -3174,31 +3746,35 @@
     return this.jobExecutor;
   };
   Releaser$ParamObject.prototype.component3 = function () {
-    return this.project;
+    return this.jobExecutionDataFactory;
   };
   Releaser$ParamObject.prototype.component4 = function () {
-    return this.locks;
+    return this.project;
   };
-  Releaser$ParamObject.prototype.component5 = function () {
+  Releaser$ParamObject.prototype.component5_0 = function () {
+    return this.locks_0;
+  };
+  Releaser$ParamObject.prototype.component6 = function () {
     return this.projectResults;
   };
-  Releaser$ParamObject.prototype.copy_5ai37b$ = function (releasePlan, jobExecutor, project, locks, projectResults) {
-    return new Releaser$ParamObject(releasePlan === void 0 ? this.releasePlan : releasePlan, jobExecutor === void 0 ? this.jobExecutor : jobExecutor, project === void 0 ? this.project : project, locks === void 0 ? this.locks : locks, projectResults === void 0 ? this.projectResults : projectResults);
+  Releaser$ParamObject.prototype.copy_wgeqvr$ = function (releasePlan, jobExecutor, jobExecutionDataFactory, project, locks, projectResults) {
+    return new Releaser$ParamObject(releasePlan === void 0 ? this.releasePlan : releasePlan, jobExecutor === void 0 ? this.jobExecutor : jobExecutor, jobExecutionDataFactory === void 0 ? this.jobExecutionDataFactory : jobExecutionDataFactory, project === void 0 ? this.project : project, locks === void 0 ? this.locks_0 : locks, projectResults === void 0 ? this.projectResults : projectResults);
   };
   Releaser$ParamObject.prototype.toString = function () {
-    return 'ParamObject(releasePlan=' + Kotlin.toString(this.releasePlan) + (', jobExecutor=' + Kotlin.toString(this.jobExecutor)) + (', project=' + Kotlin.toString(this.project)) + (', locks=' + Kotlin.toString(this.locks)) + (', projectResults=' + Kotlin.toString(this.projectResults)) + ')';
+    return 'ParamObject(releasePlan=' + Kotlin.toString(this.releasePlan) + (', jobExecutor=' + Kotlin.toString(this.jobExecutor)) + (', jobExecutionDataFactory=' + Kotlin.toString(this.jobExecutionDataFactory)) + (', project=' + Kotlin.toString(this.project)) + (', locks=' + Kotlin.toString(this.locks_0)) + (', projectResults=' + Kotlin.toString(this.projectResults)) + ')';
   };
   Releaser$ParamObject.prototype.hashCode = function () {
     var result = 0;
     result = result * 31 + Kotlin.hashCode(this.releasePlan) | 0;
     result = result * 31 + Kotlin.hashCode(this.jobExecutor) | 0;
+    result = result * 31 + Kotlin.hashCode(this.jobExecutionDataFactory) | 0;
     result = result * 31 + Kotlin.hashCode(this.project) | 0;
-    result = result * 31 + Kotlin.hashCode(this.locks) | 0;
+    result = result * 31 + Kotlin.hashCode(this.locks_0) | 0;
     result = result * 31 + Kotlin.hashCode(this.projectResults) | 0;
     return result;
   };
   Releaser$ParamObject.prototype.equals = function (other) {
-    return this === other || (other !== null && (typeof other === 'object' && (Object.getPrototypeOf(this) === Object.getPrototypeOf(other) && (Kotlin.equals(this.releasePlan, other.releasePlan) && Kotlin.equals(this.jobExecutor, other.jobExecutor) && Kotlin.equals(this.project, other.project) && Kotlin.equals(this.locks, other.locks) && Kotlin.equals(this.projectResults, other.projectResults)))));
+    return this === other || (other !== null && (typeof other === 'object' && (Object.getPrototypeOf(this) === Object.getPrototypeOf(other) && (Kotlin.equals(this.releasePlan, other.releasePlan) && Kotlin.equals(this.jobExecutor, other.jobExecutor) && Kotlin.equals(this.jobExecutionDataFactory, other.jobExecutionDataFactory) && Kotlin.equals(this.project, other.project) && Kotlin.equals(this.locks_0, other.locks_0) && Kotlin.equals(this.projectResults, other.projectResults)))));
   };
   function Releaser$ReleaseFailure() {
     Releaser$ReleaseFailure_instance = this;
@@ -3228,25 +3804,30 @@
   SimulatingJobExecutor.prototype.pollAndExtract_x0psdq$ = function (crumbWithId, url, regex, errorHandler) {
     return Promise.resolve('simulation-only.json');
   };
-  function SimulatingJobExecutor$trigger$lambda(closure$jobQueuedHook, closure$jobUrl) {
+  function SimulatingJobExecutor$trigger$lambda(closure$jobQueuedHook, closure$jobExecutionData, closure$jobName, this$SimulatingJobExecutor) {
     return function () {
-      return closure$jobQueuedHook(closure$jobUrl + 'queuingUrl');
+      closure$jobQueuedHook(closure$jobExecutionData.jobBaseUrl + 'queuingUrl');
+      return this$SimulatingJobExecutor.informIfStepWiseAndNotPublish_0('job ' + closure$jobName + ' queued', closure$jobName);
     };
   }
-  function SimulatingJobExecutor$trigger$lambda$lambda(closure$jobStartedHook) {
+  function SimulatingJobExecutor$trigger$lambda$lambda(closure$jobStartedHook, closure$jobName, this$SimulatingJobExecutor) {
     return function () {
-      return closure$jobStartedHook(100);
+      closure$jobStartedHook(100);
+      return this$SimulatingJobExecutor.informIfStepWiseAndNotPublish_0('job ' + closure$jobName + ' started', closure$jobName);
     };
   }
-  function SimulatingJobExecutor$trigger$lambda_0(closure$jobStartedHook) {
+  function SimulatingJobExecutor$trigger$lambda_0(closure$jobStartedHook, closure$jobName, this$SimulatingJobExecutor) {
     return function (it) {
-      return sleep(300, SimulatingJobExecutor$trigger$lambda$lambda(closure$jobStartedHook));
+      return sleep(waitBetweenSteps, SimulatingJobExecutor$trigger$lambda$lambda(closure$jobStartedHook, closure$jobName, this$SimulatingJobExecutor));
     };
+  }
+  function SimulatingJobExecutor$trigger$lambda$lambda$lambda(it) {
+    return true;
   }
   function SimulatingJobExecutor$trigger$lambda$lambda_0(this$SimulatingJobExecutor, closure$jobName) {
     return function () {
       this$SimulatingJobExecutor.count_0 = this$SimulatingJobExecutor.count_0 + 1 | 0;
-      if (this$SimulatingJobExecutor.count_0 > failAfter) {
+      if (this$SimulatingJobExecutor.count_0 > failAfterSteps) {
         if (!false) {
           var this$SimulatingJobExecutor_0 = this$SimulatingJobExecutor;
           var closure$jobName_0 = closure$jobName;
@@ -3255,19 +3836,40 @@
           throw IllegalStateException_init(message.toString());
         }
       }
-      return true;
+      return this$SimulatingJobExecutor.informIfStepWise_0('job ' + closure$jobName + ' ended').then(SimulatingJobExecutor$trigger$lambda$lambda$lambda);
     };
   }
   function SimulatingJobExecutor$trigger$lambda_1(this$SimulatingJobExecutor, closure$jobName) {
     return function (it) {
-      return sleep(300, SimulatingJobExecutor$trigger$lambda$lambda_0(this$SimulatingJobExecutor, closure$jobName));
+      return sleep(waitBetweenSteps, SimulatingJobExecutor$trigger$lambda$lambda_0(this$SimulatingJobExecutor, closure$jobName));
     };
   }
   function SimulatingJobExecutor$trigger$lambda_2(it) {
     return to(new CrumbWithId('Jenkins-Crumb', 'onlySimulation'), 100);
   }
-  SimulatingJobExecutor.prototype.trigger_7817gb$$default = function (jobUrl, jobName, body, jobQueuedHook, jobStartedHook, pollEverySecond, maxWaitingTimeForCompleteness, verbose) {
-    return sleep(100, SimulatingJobExecutor$trigger$lambda(jobQueuedHook, jobUrl)).then(SimulatingJobExecutor$trigger$lambda_0(jobStartedHook)).then(SimulatingJobExecutor$trigger$lambda_1(this, jobName)).then(SimulatingJobExecutor$trigger$lambda_2);
+  SimulatingJobExecutor.prototype.trigger_shi73r$$default = function (jobExecutionData, jobQueuedHook, jobStartedHook, pollEverySecond, maxWaitingTimeForCompletenessInSeconds, verbose) {
+    var jobName = jobExecutionData.jobName;
+    return sleep(100, SimulatingJobExecutor$trigger$lambda(jobQueuedHook, jobExecutionData, jobName, this)).then(SimulatingJobExecutor$trigger$lambda_0(jobStartedHook, jobName, this)).then(SimulatingJobExecutor$trigger$lambda_1(this, jobName)).then(SimulatingJobExecutor$trigger$lambda_2);
+  };
+  SimulatingJobExecutor.prototype.informIfStepWiseAndNotPublish_0 = function (msg, jobName) {
+    var tmp$;
+    if (!startsWith(jobName, 'publish')) {
+      tmp$ = this.informIfStepWise_0(msg);
+    }
+     else {
+      tmp$ = Promise.resolve(Unit);
+    }
+    return tmp$;
+  };
+  SimulatingJobExecutor.prototype.informIfStepWise_0 = function (msg) {
+    var tmp$;
+    if (stepWise) {
+      tmp$ = showAlert(msg);
+    }
+     else {
+      tmp$ = Promise.resolve(Unit);
+    }
+    return tmp$;
   };
   SimulatingJobExecutor.$metadata$ = {
     kind: Kind_CLASS,
@@ -3329,7 +3931,7 @@
     };
   }
   Toggler.prototype.registerAllToggleEvents_0 = function (allToggle, project) {
-    addChangeEventListener(allToggle, Toggler$registerAllToggleEvents$lambda(allToggle, project, this));
+    addChangeEventListener(allToggle, void 0, Toggler$registerAllToggleEvents$lambda(allToggle, project, this));
     Gui$Companion_getInstance().disableUnDisableForReleaseStartAndEnd_fj1ece$(allToggle, elementById(allToggle.id + Gui$Companion_getInstance().SLIDER_SUFFIX));
   };
   function Toggler$registerCommandToggleEvents$lambda$lambda(closure$project, closure$index, this$Toggler) {
@@ -3380,7 +3982,7 @@
       var index_0 = (tmp$_0 = index, index = tmp$_0 + 1 | 0, tmp$_0);
       var toggle = this.getToggle_0(project, index_0);
       if (Kotlin.isType(item, ReleaseCommand)) {
-        addChangeEventListener(toggle, Toggler$registerCommandToggleEvents$lambda$lambda(project, index_0, this));
+        addChangeEventListener(toggle, void 0, Toggler$registerCommandToggleEvents$lambda$lambda(project, index_0, this));
         this.disallowClickIfNotAllCommandsOrSubmodulesActive_0(project, toggle);
         var projectAndSubmodules = plus(sequenceOf([project]), map(asSequence(this.releasePlan_0.getSubmodules_lljhqa$(project.id)), Toggler$registerCommandToggleEvents$lambda$lambda_0(this)));
         var tmp$_1;
@@ -3391,7 +3993,7 @@
         }
       }
        else {
-        addChangeEventListener(toggle, Toggler$registerCommandToggleEvents$lambda$lambda_1(project, index_0, this));
+        addChangeEventListener(toggle, void 0, Toggler$registerCommandToggleEvents$lambda$lambda_1(project, index_0, this));
       }
       Gui$Companion_getInstance().disableUnDisableForReleaseStartAndEnd_fj1ece$(toggle, elementById(toggle.id + Gui$Companion_getInstance().SLIDER_SUFFIX));
       this.registerForProjectEvent_0(project, Toggler$Companion_getInstance().EVENT_ALL_TOGGLE_CHECKED_0, Toggler$registerCommandToggleEvents$lambda$lambda_2(project, index_0, this, toggle));
@@ -3456,7 +4058,7 @@
     };
   }
   Toggler.prototype.disallowClickIfNotAllCommandsOrSubmodulesActive_0 = function (project, toggle) {
-    addClickEventListener(toggle, Toggler$disallowClickIfNotAllCommandsOrSubmodulesActive$lambda(toggle, project, this));
+    addClickEventListener(toggle, void 0, Toggler$disallowClickIfNotAllCommandsOrSubmodulesActive$lambda(toggle, project, this));
   };
   function Toggler$notAllCommandsOrSubmodulesActive$lambda(closure$toggle) {
     return function (it) {
@@ -3481,20 +4083,12 @@
         var element = tmp$.next();
         var projectId = element.component1()
         , dependentId = element.component2();
-        var $receiver = this.releasePlan_0.getProject_lljhqa$(dependentId).commands;
-        var destination = ArrayList_init(collectionSizeOrDefault($receiver, 10));
-        var tmp$_0, tmp$_0_0;
-        var index = 0;
+        var $receiver = mapWithIndex_0(this.releasePlan_0.getProject_lljhqa$(dependentId).commands);
+        var destination = ArrayList_init();
+        var tmp$_0;
         tmp$_0 = $receiver.iterator();
         while (tmp$_0.hasNext()) {
-          var item = tmp$_0.next();
-          destination.add_11rb$(to((tmp$_0_0 = index, index = tmp$_0_0 + 1 | 0, tmp$_0_0), item));
-        }
-        var destination_0 = ArrayList_init();
-        var tmp$_1;
-        tmp$_1 = destination.iterator();
-        while (tmp$_1.hasNext()) {
-          var element_0 = tmp$_1.next();
+          var element_0 = tmp$_0.next();
           var predicate$result;
           predicate$break: do {
             var command = element_0.component2();
@@ -3507,14 +4101,14 @@
           }
            while (false);
           if (predicate$result)
-            destination_0.add_11rb$(element_0);
+            destination.add_11rb$(element_0);
         }
-        var tmp$_2;
-        tmp$_2 = destination_0.iterator();
-        while (tmp$_2.hasNext()) {
-          var element_1 = tmp$_2.next();
-          var index_0 = element_1.component1();
-          this.registerForProjectEvent_0(project, Toggler$Companion_getInstance().EVENT_RELEASE_TOGGLE_UNCHECKED_0, Toggler$registerReleaseUncheckEventForDependentsAndSubmodules$lambda$lambda$lambda(this, dependentId, index_0));
+        var tmp$_1;
+        tmp$_1 = destination.iterator();
+        while (tmp$_1.hasNext()) {
+          var element_1 = tmp$_1.next();
+          var index = element_1.component1();
+          this.registerForProjectEvent_0(project, Toggler$Companion_getInstance().EVENT_RELEASE_TOGGLE_UNCHECKED_0, Toggler$registerReleaseUncheckEventForDependentsAndSubmodules$lambda$lambda$lambda(this, dependentId, index));
         }
       }
     }
@@ -3672,7 +4266,17 @@
     window.onload = main$lambda;
   }
   var onlyUsedToCallMain;
-  var failAfter;
+  var failAfterSteps;
+  var waitBetweenSteps;
+  var stepWise;
+  function options$lambda(f) {
+    var k = f.key;
+    var v = f.value;
+    return k + ': ' + v;
+  }
+  function options() {
+    console.log(joinToString(mapOf([to('failAfterSteps', failAfterSteps), to('waitBetweenSteps', waitBetweenSteps), to('stepWise', stepWise)]).entries, '\n', void 0, void 0, void 0, void 0, options$lambda));
+  }
   Object.defineProperty(App, 'Companion', {
     get: App$Companion_getInstance
   });
@@ -3681,6 +4285,7 @@
   var package$depgraph = package$loewenfels.depgraph || (package$loewenfels.depgraph = {});
   var package$gui = package$depgraph.gui || (package$depgraph.gui = {});
   package$gui.App = App;
+  package$gui.BaseJobExecutionDataFactory = BaseJobExecutionDataFactory;
   Object.defineProperty(package$gui, 'ChangeApplier', {
     get: ChangeApplier_getInstance
   });
@@ -3724,13 +4329,15 @@
   package$gui.getTextFieldOrNull_61zpoe$ = getTextFieldOrNull;
   package$gui.getInputElementOrNull_puj7f4$ = getInputElementOrNull;
   package$gui.Downloader = Downloader;
+  package$gui.DryRunJobExecutionDataFactory = DryRunJobExecutionDataFactory;
+  $$importsForInline$$['kbox-js'] = $module$kbox_js;
   Object.defineProperty(Gui, 'Companion', {
     get: Gui$Companion_getInstance
   });
   package$gui.Gui = Gui;
   package$gui.getUnderlyingHtmlElement_8alqek$ = getUnderlyingHtmlElement;
-  package$gui.addClickEventListener_g4c12y$ = addClickEventListener;
-  package$gui.addChangeEventListener_g4c12y$ = addChangeEventListener;
+  package$gui.addClickEventListener_7wfdf5$ = addClickEventListener;
+  package$gui.addChangeEventListener_7wfdf5$ = addChangeEventListener;
   package$gui.toggleClass_9bm2zh$ = toggleClass;
   package$gui.withErrorHandling_f39uuh$ = withErrorHandling;
   package$gui.getOldTitle_y4uc6z$ = getOldTitle;
@@ -3752,6 +4359,11 @@
     get: JenkinsJobExecutor$Companion_getInstance
   });
   package$gui.JenkinsJobExecutor = JenkinsJobExecutor;
+  Object.defineProperty(JobExecutionData, 'Companion', {
+    get: JobExecutionData$Companion_getInstance
+  });
+  package$gui.JobExecutionData = JobExecutionData;
+  package$gui.JobExecutionDataFactory = JobExecutionDataFactory;
   package$gui.JobExecutor = JobExecutor;
   Object.defineProperty(Menu, 'Companion', {
     get: Menu$Companion_getInstance
@@ -3767,10 +4379,13 @@
   package$gui.showThrowableAndThrow_tcv7n7$ = showThrowableAndThrow;
   package$gui.showThrowable_tcv7n7$ = showThrowable;
   package$gui.turnThrowableIntoMessage_tcv7n7$ = turnThrowableIntoMessage;
+  package$gui.showDialog_61zpoe$ = showDialog;
+  package$gui.showAlert_61zpoe$ = showAlert;
   Object.defineProperty(Publisher, 'Companion', {
     get: Publisher$Companion_getInstance
   });
   package$gui.Publisher = Publisher;
+  package$gui.ReleaseJobExecutionDataFactory = ReleaseJobExecutionDataFactory;
   package$gui.Releaser = Releaser;
   package$gui.SimulatingJobExecutor = SimulatingJobExecutor;
   Object.defineProperty(Toggler, 'Companion', {
@@ -3787,16 +4402,33 @@
       return onlyUsedToCallMain;
     }
   });
-  Object.defineProperty(_, 'failAfter', {
+  Object.defineProperty(_, 'failAfterSteps', {
     get: function () {
-      return failAfter;
+      return failAfterSteps;
     },
     set: function (value) {
-      failAfter = value;
+      failAfterSteps = value;
     }
   });
-  JenkinsJobExecutor.prototype.trigger_7817gb$ = JobExecutor.prototype.trigger_7817gb$;
-  SimulatingJobExecutor.prototype.trigger_7817gb$ = JobExecutor.prototype.trigger_7817gb$;
+  Object.defineProperty(_, 'waitBetweenSteps', {
+    get: function () {
+      return waitBetweenSteps;
+    },
+    set: function (value) {
+      waitBetweenSteps = value;
+    }
+  });
+  Object.defineProperty(_, 'stepWise', {
+    get: function () {
+      return stepWise;
+    },
+    set: function (value) {
+      stepWise = value;
+    }
+  });
+  _.options = options;
+  JenkinsJobExecutor.prototype.trigger_shi73r$ = JobExecutor.prototype.trigger_shi73r$;
+  SimulatingJobExecutor.prototype.trigger_shi73r$ = JobExecutor.prototype.trigger_shi73r$;
   MAVEN_PROJECT_ID = 'ch.loewenfels.depgraph.data.maven.MavenProjectId';
   JENKINS_MAVEN_RELEASE_PLUGIN = 'ch.loewenfels.depgraph.data.maven.jenkins.JenkinsMavenReleasePlugin';
   JENKINS_MULTI_MAVEN_RELEASE_PLUGIN = 'ch.loewenfels.depgraph.data.maven.jenkins.JenkinsMultiMavenReleasePlugin';
@@ -3804,7 +4436,9 @@
   msgCounter = 0;
   urlRegex = Regex_init('http(?:s)://[^ ]+');
   onlyUsedToCallMain = main();
-  failAfter = 1000;
+  failAfterSteps = 10000;
+  waitBetweenSteps = 500;
+  stepWise = false;
   Kotlin.defineModule('dep-graph-releaser-gui', _);
   return _;
 }));

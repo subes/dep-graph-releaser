@@ -14,23 +14,23 @@
   var $$importsForInline$$ = _.$$importsForInline$$ || (_.$$importsForInline$$ = {});
   var Unit = Kotlin.kotlin.Unit;
   var wrapFunction = Kotlin.wrapFunction;
-  var throwNPE = Kotlin.throwNPE;
+  var ensureNotNull = Kotlin.ensureNotNull;
   var throwCCE = Kotlin.throwCCE;
   var last = Kotlin.kotlin.collections.last_2p1efm$;
-  var IllegalStateException = Kotlin.kotlin.IllegalStateException;
+  var IllegalStateException_init = Kotlin.kotlin.IllegalStateException_init_pdl1vj$;
   var equals = Kotlin.equals;
   var get_lastIndex = Kotlin.kotlin.collections.get_lastIndex_55thoc$;
   var asList = Kotlin.org.w3c.dom.asList_kt9thq$;
   var first = Kotlin.kotlin.collections.first_2p1efm$;
   var Kind_CLASS = Kotlin.Kind.CLASS;
   var ArrayList_init = Kotlin.kotlin.collections.ArrayList_init_ww73n8$;
-  var UnsupportedOperationException = Kotlin.kotlin.UnsupportedOperationException;
+  var UnsupportedOperationException_init = Kotlin.kotlin.UnsupportedOperationException_init_pdl1vj$;
   var Kind_INTERFACE = Kotlin.Kind.INTERFACE;
   var Kind_OBJECT = Kotlin.Kind.OBJECT;
   var emptyList = Kotlin.kotlin.collections.emptyList_287e2$;
   var to = Kotlin.kotlin.to_ujzrz7$;
   var Throwable = Error;
-  var IllegalArgumentException = Kotlin.kotlin.IllegalArgumentException;
+  var IllegalArgumentException_init = Kotlin.kotlin.IllegalArgumentException_init_pdl1vj$;
   var emptyMap = Kotlin.kotlin.collections.emptyMap_q3lmfv$;
   var StringBuilder = Kotlin.kotlin.text.StringBuilder;
   var Annotation = Kotlin.kotlin.Annotation;
@@ -53,8 +53,10 @@
   var mapOf = Kotlin.kotlin.collections.mapOf_qfcya0$;
   var unboxChar = Kotlin.unboxChar;
   var max = Kotlin.kotlin.collections.max_exjks8$;
+  var toChar = Kotlin.toChar;
   var CharRange = Kotlin.kotlin.ranges.CharRange;
   var contains = Kotlin.kotlin.text.contains_sgbm27$;
+  var indexOf = Kotlin.kotlin.text.indexOf_l5u8uk$;
   var toString = Kotlin.toString;
   StringAttribute.prototype = Object.create(Attribute.prototype);
   StringAttribute.prototype.constructor = StringAttribute;
@@ -224,6 +226,8 @@
   LI.prototype.constructor = LI;
   LINK.prototype = Object.create(HTMLTag.prototype);
   LINK.prototype.constructor = LINK;
+  MAIN.prototype = Object.create(HTMLTag.prototype);
+  MAIN.prototype.constructor = MAIN;
   MAP.prototype = Object.create(HTMLTag.prototype);
   MAP.prototype.constructor = MAP;
   MARK.prototype = Object.create(HTMLTag.prototype);
@@ -355,17 +359,16 @@
     this.lastLeaved_0 = null;
   }
   JSDOMBuilder.prototype.onTagStart_tkgjla$ = function (tag) {
-    var tmp$, tmp$_0, tmp$_1;
-    if (tag.namespace != null) {
-      tmp$_1 = this.document.createElementNS((tmp$ = tag.namespace) != null ? tmp$ : throwNPE(), tag.tagName);
-    }
-     else
-      tmp$_1 = Kotlin.isType(tmp$_0 = this.document.createElement(tag.tagName), HTMLElement) ? tmp$_0 : throwCCE();
-    var element = tmp$_1;
-    var tmp$_2;
-    tmp$_2 = tag.attributesEntries.iterator();
-    while (tmp$_2.hasNext()) {
-      var element_0 = tmp$_2.next();
+    var tmp$, tmp$_0;
+    if (tag.namespace != null)
+      tmp$_0 = this.document.createElementNS(ensureNotNull(tag.namespace), tag.tagName);
+    else
+      tmp$_0 = Kotlin.isType(tmp$ = this.document.createElement(tag.tagName), HTMLElement) ? tmp$ : throwCCE();
+    var element = tmp$_0;
+    var tmp$_1;
+    tmp$_1 = tag.attributesEntries.iterator();
+    while (tmp$_1.hasNext()) {
+      var element_0 = tmp$_1.next();
       element.setAttribute(element_0.key, element_0.value);
     }
     if (!this.path_0.isEmpty()) {
@@ -375,10 +378,10 @@
   };
   JSDOMBuilder.prototype.onTagAttributeChange_5n2z71$ = function (tag, attribute, value) {
     if (this.path_0.isEmpty())
-      throw new IllegalStateException('No current tag');
+      throw IllegalStateException_init('No current tag');
     else {
       if (!equals(last(this.path_0).tagName.toLowerCase(), tag.tagName.toLowerCase()))
-        throw new IllegalStateException('Wrong current tag');
+        throw IllegalStateException_init('Wrong current tag');
       else {
         var node = last(this.path_0);
         if (value == null) {
@@ -392,10 +395,10 @@
   };
   JSDOMBuilder.prototype.onTagEvent_azi6uv$ = function (tag, event, value) {
     if (this.path_0.isEmpty())
-      throw new IllegalStateException('No current tag');
+      throw IllegalStateException_init('No current tag');
     else {
       if (!equals(last(this.path_0).tagName.toLowerCase(), tag.tagName.toLowerCase()))
-        throw new IllegalStateException('Wrong current tag');
+        throw IllegalStateException_init('Wrong current tag');
       else {
         last(this.path_0)[event] = value;
       }
@@ -407,20 +410,20 @@
       tmp$ = !equals(last(this.path_0).tagName.toLowerCase(), tag.tagName.toLowerCase());
     }
     if (tmp$) {
-      throw new IllegalStateException("We haven't entered tag " + tag.tagName + ' but trying to leave');
+      throw IllegalStateException_init("We haven't entered tag " + tag.tagName + ' but trying to leave');
     }
     this.lastLeaved_0 = this.path_0.removeAt_za3lpa$(get_lastIndex(this.path_0));
   };
   JSDOMBuilder.prototype.onTagContent_6bul2c$ = function (content) {
     if (this.path_0.isEmpty()) {
-      throw new IllegalStateException('No current DOM node');
+      throw IllegalStateException_init('No current DOM node');
     }
     last(this.path_0).appendChild(this.document.createTextNode(content.toString()));
   };
   JSDOMBuilder.prototype.onTagContentEntity_ws8or7$ = function (entity) {
     var tmp$;
     if (this.path_0.isEmpty()) {
-      throw new IllegalStateException('No current DOM node');
+      throw IllegalStateException_init('No current DOM node');
     }
     var s = Kotlin.isType(tmp$ = this.document.createElement('span'), HTMLElement) ? tmp$ : throwCCE();
     s.innerHTML = entity.text;
@@ -441,11 +444,17 @@
     block($receiver);
     last(this.path_0).innerHTML = last(this.path_0).innerHTML + $receiver.toString();
   };
+  JSDOMBuilder.prototype.onTagComment_6bul2c$ = function (content) {
+    if (this.path_0.isEmpty()) {
+      throw IllegalStateException_init('No current DOM node');
+    }
+    last(this.path_0).appendChild(this.document.createComment(content.toString()));
+  };
   JSDOMBuilder.prototype.finalize = function () {
     var tmp$, tmp$_0;
     tmp$_0 = (tmp$ = this.lastLeaved_0) != null ? this.asR_0(tmp$) : null;
     if (tmp$_0 == null) {
-      throw new IllegalStateException("We can't finalize as there was no tags");
+      throw IllegalStateException_init("We can't finalize as there was no tags");
     }
     return tmp$_0;
   };
@@ -477,6 +486,20 @@
     block(onFinalize(createTree(get_ownerDocumentExt($receiver)), append$lambda$lambda(result, $receiver)));
     return result;
   }
+  function prepend$lambda$lambda(closure$result, this$prepend) {
+    return function (it, partial) {
+      if (!partial) {
+        closure$result.add_11rb$(it);
+        this$prepend.insertBefore(it, this$prepend.firstChild);
+      }
+      return Unit;
+    };
+  }
+  function prepend($receiver, block) {
+    var result = ArrayList_init();
+    block(onFinalize(createTree(get_ownerDocumentExt($receiver)), prepend$lambda$lambda(result, $receiver)));
+    return result;
+  }
   function get_append$lambda(this$append) {
     return function (element, partial) {
       if (!partial) {
@@ -488,6 +511,17 @@
   function get_append($receiver) {
     return onFinalize(createTree(get_ownerDocumentExt($receiver)), get_append$lambda($receiver));
   }
+  function get_prepend$lambda(this$prepend) {
+    return function (element, partial) {
+      if (!partial) {
+        this$prepend.insertBefore(element, this$prepend.firstChild);
+      }
+      return Unit;
+    };
+  }
+  function get_prepend($receiver) {
+    return onFinalize(createTree(get_ownerDocumentExt($receiver)), get_prepend$lambda($receiver));
+  }
   function get_ownerDocumentExt($receiver) {
     var tmp$;
     if (Kotlin.isType($receiver, Document))
@@ -495,7 +529,7 @@
     else {
       tmp$ = $receiver.ownerDocument;
       if (tmp$ == null) {
-        throw new IllegalStateException('Node has no ownerDocument');
+        throw IllegalStateException_init('Node has no ownerDocument');
       }
       return tmp$;
     }
@@ -657,11 +691,13 @@
   function button$lambda($receiver) {
     return Unit;
   }
-  function button($receiver, formEncType, formMethod, type, classes, block) {
+  function button($receiver, formEncType, formMethod, name, type, classes, block) {
     if (formEncType === void 0)
       formEncType = null;
     if (formMethod === void 0)
       formMethod = null;
+    if (name === void 0)
+      name = null;
     if (type === void 0)
       type = null;
     if (classes === void 0)
@@ -669,7 +705,7 @@
     if (block === void 0)
       block = button$lambda;
     var tmp$;
-    return Kotlin.isType(tmp$ = visitAndFinalize(new BUTTON(attributesMapOf_1(['formenctype', formEncType != null ? enumEncode(formEncType) : null, 'formmethod', formMethod != null ? enumEncode(formMethod) : null, 'type', type != null ? enumEncode(type) : null, 'class', classes]), $receiver), $receiver, block), HTMLButtonElement) ? tmp$ : throwCCE();
+    return Kotlin.isType(tmp$ = visitAndFinalize(new BUTTON(attributesMapOf_1(['formenctype', formEncType != null ? enumEncode(formEncType) : null, 'formmethod', formMethod != null ? enumEncode(formMethod) : null, 'name', name, 'type', type != null ? enumEncode(type) : null, 'class', classes]), $receiver), $receiver, block), HTMLButtonElement) ? tmp$ : throwCCE();
   }
   function canvas$lambda(closure$content) {
     return function ($receiver) {
@@ -1057,20 +1093,24 @@
       return Unit;
     };
   }
-  function html($receiver, content) {
+  function html($receiver, content, namespace) {
     if (content === void 0)
       content = '';
+    if (namespace === void 0)
+      namespace = null;
     var tmp$;
-    return Kotlin.isType(tmp$ = visitAndFinalize(new HTML(emptyMap_0, $receiver), $receiver, html$lambda(content)), HTMLHtmlElement) ? tmp$ : throwCCE();
+    return Kotlin.isType(tmp$ = visitAndFinalize(new HTML(emptyMap_0, $receiver, namespace), $receiver, html$lambda(content)), HTMLHtmlElement) ? tmp$ : throwCCE();
   }
   function html$lambda_0($receiver) {
     return Unit;
   }
-  function html_0($receiver, block) {
+  function html_0($receiver, namespace, block) {
+    if (namespace === void 0)
+      namespace = null;
     if (block === void 0)
       block = html$lambda_0;
     var tmp$;
-    return Kotlin.isType(tmp$ = visitAndFinalize(new HTML(emptyMap_0, $receiver), $receiver, block), HTMLHtmlElement) ? tmp$ : throwCCE();
+    return Kotlin.isType(tmp$ = visitAndFinalize(new HTML(emptyMap_0, $receiver, namespace), $receiver, block), HTMLHtmlElement) ? tmp$ : throwCCE();
   }
   function i$lambda($receiver) {
     return Unit;
@@ -1222,6 +1262,16 @@
       block = link$lambda;
     var tmp$;
     return Kotlin.isType(tmp$ = visitAndFinalize(new LINK(attributesMapOf_1(['href', href, 'rel', rel, 'type', type]), $receiver), $receiver, block), HTMLLinkElement) ? tmp$ : throwCCE();
+  }
+  function main$lambda($receiver) {
+    return Unit;
+  }
+  function main($receiver, classes, block) {
+    if (classes === void 0)
+      classes = null;
+    if (block === void 0)
+      block = main$lambda;
+    return visitAndFinalize(new MAIN(attributesMapOf_0('class', classes), $receiver), $receiver, block);
   }
   function map$lambda($receiver) {
     return Unit;
@@ -1830,334 +1880,376 @@
     return Kotlin.isType(tmp$ = visitAndFinalize(new VIDEO(attributesMapOf_0('class', classes), $receiver), $receiver, block), HTMLVideoElement) ? tmp$ : throwCCE();
   }
   function get_onAbortFunction($receiver) {
-    throw new UnsupportedOperationException("You can't read variable onAbort");
+    throw UnsupportedOperationException_init("You can't read variable onAbort");
   }
   function set_onAbortFunction($receiver, newValue) {
     $receiver.consumer.onTagEvent_azi6uv$($receiver, 'onabort', newValue);
   }
   function get_onBlurFunction($receiver) {
-    throw new UnsupportedOperationException("You can't read variable onBlur");
+    throw UnsupportedOperationException_init("You can't read variable onBlur");
   }
   function set_onBlurFunction($receiver, newValue) {
     $receiver.consumer.onTagEvent_azi6uv$($receiver, 'onblur', newValue);
   }
   function get_onCanPlayFunction($receiver) {
-    throw new UnsupportedOperationException("You can't read variable onCanPlay");
+    throw UnsupportedOperationException_init("You can't read variable onCanPlay");
   }
   function set_onCanPlayFunction($receiver, newValue) {
     $receiver.consumer.onTagEvent_azi6uv$($receiver, 'oncanplay', newValue);
   }
   function get_onCanPlayThroughFunction($receiver) {
-    throw new UnsupportedOperationException("You can't read variable onCanPlayThrough");
+    throw UnsupportedOperationException_init("You can't read variable onCanPlayThrough");
   }
   function set_onCanPlayThroughFunction($receiver, newValue) {
     $receiver.consumer.onTagEvent_azi6uv$($receiver, 'oncanplaythrough', newValue);
   }
   function get_onChangeFunction($receiver) {
-    throw new UnsupportedOperationException("You can't read variable onChange");
+    throw UnsupportedOperationException_init("You can't read variable onChange");
   }
   function set_onChangeFunction($receiver, newValue) {
     $receiver.consumer.onTagEvent_azi6uv$($receiver, 'onchange', newValue);
   }
   function get_onClickFunction($receiver) {
-    throw new UnsupportedOperationException("You can't read variable onClick");
+    throw UnsupportedOperationException_init("You can't read variable onClick");
   }
   function set_onClickFunction($receiver, newValue) {
     $receiver.consumer.onTagEvent_azi6uv$($receiver, 'onclick', newValue);
   }
   function get_onContextMenuFunction($receiver) {
-    throw new UnsupportedOperationException("You can't read variable onContextMenu");
+    throw UnsupportedOperationException_init("You can't read variable onContextMenu");
   }
   function set_onContextMenuFunction($receiver, newValue) {
     $receiver.consumer.onTagEvent_azi6uv$($receiver, 'oncontextmenu', newValue);
   }
   function get_onDoubleClickFunction($receiver) {
-    throw new UnsupportedOperationException("You can't read variable onDoubleClick");
+    throw UnsupportedOperationException_init("You can't read variable onDoubleClick");
   }
   function set_onDoubleClickFunction($receiver, newValue) {
     $receiver.consumer.onTagEvent_azi6uv$($receiver, 'ondblclick', newValue);
   }
   function get_onDragFunction($receiver) {
-    throw new UnsupportedOperationException("You can't read variable onDrag");
+    throw UnsupportedOperationException_init("You can't read variable onDrag");
   }
   function set_onDragFunction($receiver, newValue) {
     $receiver.consumer.onTagEvent_azi6uv$($receiver, 'ondrag', newValue);
   }
   function get_onDragEndFunction($receiver) {
-    throw new UnsupportedOperationException("You can't read variable onDragEnd");
+    throw UnsupportedOperationException_init("You can't read variable onDragEnd");
   }
   function set_onDragEndFunction($receiver, newValue) {
     $receiver.consumer.onTagEvent_azi6uv$($receiver, 'ondragend', newValue);
   }
   function get_onDragEnterFunction($receiver) {
-    throw new UnsupportedOperationException("You can't read variable onDragEnter");
+    throw UnsupportedOperationException_init("You can't read variable onDragEnter");
   }
   function set_onDragEnterFunction($receiver, newValue) {
     $receiver.consumer.onTagEvent_azi6uv$($receiver, 'ondragenter', newValue);
   }
   function get_onDragLeaveFunction($receiver) {
-    throw new UnsupportedOperationException("You can't read variable onDragLeave");
+    throw UnsupportedOperationException_init("You can't read variable onDragLeave");
   }
   function set_onDragLeaveFunction($receiver, newValue) {
     $receiver.consumer.onTagEvent_azi6uv$($receiver, 'ondragleave', newValue);
   }
   function get_onDragOverFunction($receiver) {
-    throw new UnsupportedOperationException("You can't read variable onDragOver");
+    throw UnsupportedOperationException_init("You can't read variable onDragOver");
   }
   function set_onDragOverFunction($receiver, newValue) {
     $receiver.consumer.onTagEvent_azi6uv$($receiver, 'ondragover', newValue);
   }
   function get_onDragStartFunction($receiver) {
-    throw new UnsupportedOperationException("You can't read variable onDragStart");
+    throw UnsupportedOperationException_init("You can't read variable onDragStart");
   }
   function set_onDragStartFunction($receiver, newValue) {
     $receiver.consumer.onTagEvent_azi6uv$($receiver, 'ondragstart', newValue);
   }
   function get_onDropFunction($receiver) {
-    throw new UnsupportedOperationException("You can't read variable onDrop");
+    throw UnsupportedOperationException_init("You can't read variable onDrop");
   }
   function set_onDropFunction($receiver, newValue) {
     $receiver.consumer.onTagEvent_azi6uv$($receiver, 'ondrop', newValue);
   }
   function get_onDurationChangeFunction($receiver) {
-    throw new UnsupportedOperationException("You can't read variable onDurationChange");
+    throw UnsupportedOperationException_init("You can't read variable onDurationChange");
   }
   function set_onDurationChangeFunction($receiver, newValue) {
     $receiver.consumer.onTagEvent_azi6uv$($receiver, 'ondurationchange', newValue);
   }
   function get_onEmptiedFunction($receiver) {
-    throw new UnsupportedOperationException("You can't read variable onEmptied");
+    throw UnsupportedOperationException_init("You can't read variable onEmptied");
   }
   function set_onEmptiedFunction($receiver, newValue) {
     $receiver.consumer.onTagEvent_azi6uv$($receiver, 'onemptied', newValue);
   }
   function get_onEndedFunction($receiver) {
-    throw new UnsupportedOperationException("You can't read variable onEnded");
+    throw UnsupportedOperationException_init("You can't read variable onEnded");
   }
   function set_onEndedFunction($receiver, newValue) {
     $receiver.consumer.onTagEvent_azi6uv$($receiver, 'onended', newValue);
   }
   function get_onErrorFunction($receiver) {
-    throw new UnsupportedOperationException("You can't read variable onError");
+    throw UnsupportedOperationException_init("You can't read variable onError");
   }
   function set_onErrorFunction($receiver, newValue) {
     $receiver.consumer.onTagEvent_azi6uv$($receiver, 'onerror', newValue);
   }
   function get_onFocusFunction($receiver) {
-    throw new UnsupportedOperationException("You can't read variable onFocus");
+    throw UnsupportedOperationException_init("You can't read variable onFocus");
   }
   function set_onFocusFunction($receiver, newValue) {
     $receiver.consumer.onTagEvent_azi6uv$($receiver, 'onfocus', newValue);
   }
+  function get_onFocusInFunction($receiver) {
+    throw UnsupportedOperationException_init("You can't read variable onFocusIn");
+  }
+  function set_onFocusInFunction($receiver, newValue) {
+    $receiver.consumer.onTagEvent_azi6uv$($receiver, 'onfocusin', newValue);
+  }
+  function get_onFocusOutFunction($receiver) {
+    throw UnsupportedOperationException_init("You can't read variable onFocusOut");
+  }
+  function set_onFocusOutFunction($receiver, newValue) {
+    $receiver.consumer.onTagEvent_azi6uv$($receiver, 'onfocusout', newValue);
+  }
   function get_onFormChangeFunction($receiver) {
-    throw new UnsupportedOperationException("You can't read variable onFormChange");
+    throw UnsupportedOperationException_init("You can't read variable onFormChange");
   }
   function set_onFormChangeFunction($receiver, newValue) {
     $receiver.consumer.onTagEvent_azi6uv$($receiver, 'onformchange', newValue);
   }
   function get_onFormInputFunction($receiver) {
-    throw new UnsupportedOperationException("You can't read variable onFormInput");
+    throw UnsupportedOperationException_init("You can't read variable onFormInput");
   }
   function set_onFormInputFunction($receiver, newValue) {
     $receiver.consumer.onTagEvent_azi6uv$($receiver, 'onforminput', newValue);
   }
   function get_onInputFunction($receiver) {
-    throw new UnsupportedOperationException("You can't read variable onInput");
+    throw UnsupportedOperationException_init("You can't read variable onInput");
   }
   function set_onInputFunction($receiver, newValue) {
     $receiver.consumer.onTagEvent_azi6uv$($receiver, 'oninput', newValue);
   }
   function get_onInvalidFunction($receiver) {
-    throw new UnsupportedOperationException("You can't read variable onInvalid");
+    throw UnsupportedOperationException_init("You can't read variable onInvalid");
   }
   function set_onInvalidFunction($receiver, newValue) {
     $receiver.consumer.onTagEvent_azi6uv$($receiver, 'oninvalid', newValue);
   }
   function get_onKeyDownFunction($receiver) {
-    throw new UnsupportedOperationException("You can't read variable onKeyDown");
+    throw UnsupportedOperationException_init("You can't read variable onKeyDown");
   }
   function set_onKeyDownFunction($receiver, newValue) {
     $receiver.consumer.onTagEvent_azi6uv$($receiver, 'onkeydown', newValue);
   }
   function get_onKeyPressFunction($receiver) {
-    throw new UnsupportedOperationException("You can't read variable onKeyPress");
+    throw UnsupportedOperationException_init("You can't read variable onKeyPress");
   }
   function set_onKeyPressFunction($receiver, newValue) {
     $receiver.consumer.onTagEvent_azi6uv$($receiver, 'onkeypress', newValue);
   }
   function get_onKeyUpFunction($receiver) {
-    throw new UnsupportedOperationException("You can't read variable onKeyUp");
+    throw UnsupportedOperationException_init("You can't read variable onKeyUp");
   }
   function set_onKeyUpFunction($receiver, newValue) {
     $receiver.consumer.onTagEvent_azi6uv$($receiver, 'onkeyup', newValue);
   }
   function get_onLoadFunction($receiver) {
-    throw new UnsupportedOperationException("You can't read variable onLoad");
+    throw UnsupportedOperationException_init("You can't read variable onLoad");
   }
   function set_onLoadFunction($receiver, newValue) {
     $receiver.consumer.onTagEvent_azi6uv$($receiver, 'onload', newValue);
   }
   function get_onLoadedDataFunction($receiver) {
-    throw new UnsupportedOperationException("You can't read variable onLoadedData");
+    throw UnsupportedOperationException_init("You can't read variable onLoadedData");
   }
   function set_onLoadedDataFunction($receiver, newValue) {
     $receiver.consumer.onTagEvent_azi6uv$($receiver, 'onloadeddata', newValue);
   }
   function get_onLoadedMetaDataFunction($receiver) {
-    throw new UnsupportedOperationException("You can't read variable onLoadedMetaData");
+    throw UnsupportedOperationException_init("You can't read variable onLoadedMetaData");
   }
   function set_onLoadedMetaDataFunction($receiver, newValue) {
     $receiver.consumer.onTagEvent_azi6uv$($receiver, 'onloadedmetadata', newValue);
   }
   function get_onLoadStartFunction($receiver) {
-    throw new UnsupportedOperationException("You can't read variable onLoadStart");
+    throw UnsupportedOperationException_init("You can't read variable onLoadStart");
   }
   function set_onLoadStartFunction($receiver, newValue) {
     $receiver.consumer.onTagEvent_azi6uv$($receiver, 'onloadstart', newValue);
   }
   function get_onMouseDownFunction($receiver) {
-    throw new UnsupportedOperationException("You can't read variable onMouseDown");
+    throw UnsupportedOperationException_init("You can't read variable onMouseDown");
   }
   function set_onMouseDownFunction($receiver, newValue) {
     $receiver.consumer.onTagEvent_azi6uv$($receiver, 'onmousedown', newValue);
   }
   function get_onMouseMoveFunction($receiver) {
-    throw new UnsupportedOperationException("You can't read variable onMouseMove");
+    throw UnsupportedOperationException_init("You can't read variable onMouseMove");
   }
   function set_onMouseMoveFunction($receiver, newValue) {
     $receiver.consumer.onTagEvent_azi6uv$($receiver, 'onmousemove', newValue);
   }
   function get_onMouseOutFunction($receiver) {
-    throw new UnsupportedOperationException("You can't read variable onMouseOut");
+    throw UnsupportedOperationException_init("You can't read variable onMouseOut");
   }
   function set_onMouseOutFunction($receiver, newValue) {
     $receiver.consumer.onTagEvent_azi6uv$($receiver, 'onmouseout', newValue);
   }
   function get_onMouseOverFunction($receiver) {
-    throw new UnsupportedOperationException("You can't read variable onMouseOver");
+    throw UnsupportedOperationException_init("You can't read variable onMouseOver");
   }
   function set_onMouseOverFunction($receiver, newValue) {
     $receiver.consumer.onTagEvent_azi6uv$($receiver, 'onmouseover', newValue);
   }
   function get_onMouseUpFunction($receiver) {
-    throw new UnsupportedOperationException("You can't read variable onMouseUp");
+    throw UnsupportedOperationException_init("You can't read variable onMouseUp");
   }
   function set_onMouseUpFunction($receiver, newValue) {
     $receiver.consumer.onTagEvent_azi6uv$($receiver, 'onmouseup', newValue);
   }
   function get_onMouseWheelFunction($receiver) {
-    throw new UnsupportedOperationException("You can't read variable onMouseWheel");
+    throw UnsupportedOperationException_init("You can't read variable onMouseWheel");
   }
   function set_onMouseWheelFunction($receiver, newValue) {
     $receiver.consumer.onTagEvent_azi6uv$($receiver, 'onmousewheel', newValue);
   }
   function get_onPauseFunction($receiver) {
-    throw new UnsupportedOperationException("You can't read variable onPause");
+    throw UnsupportedOperationException_init("You can't read variable onPause");
   }
   function set_onPauseFunction($receiver, newValue) {
     $receiver.consumer.onTagEvent_azi6uv$($receiver, 'onpause', newValue);
   }
   function get_onPlayFunction($receiver) {
-    throw new UnsupportedOperationException("You can't read variable onPlay");
+    throw UnsupportedOperationException_init("You can't read variable onPlay");
   }
   function set_onPlayFunction($receiver, newValue) {
     $receiver.consumer.onTagEvent_azi6uv$($receiver, 'onplay', newValue);
   }
   function get_onPlayingFunction($receiver) {
-    throw new UnsupportedOperationException("You can't read variable onPlaying");
+    throw UnsupportedOperationException_init("You can't read variable onPlaying");
   }
   function set_onPlayingFunction($receiver, newValue) {
     $receiver.consumer.onTagEvent_azi6uv$($receiver, 'onplaying', newValue);
   }
   function get_onProgressFunction($receiver) {
-    throw new UnsupportedOperationException("You can't read variable onProgress");
+    throw UnsupportedOperationException_init("You can't read variable onProgress");
   }
   function set_onProgressFunction($receiver, newValue) {
     $receiver.consumer.onTagEvent_azi6uv$($receiver, 'onprogress', newValue);
   }
   function get_onRateChangeFunction($receiver) {
-    throw new UnsupportedOperationException("You can't read variable onRateChange");
+    throw UnsupportedOperationException_init("You can't read variable onRateChange");
   }
   function set_onRateChangeFunction($receiver, newValue) {
     $receiver.consumer.onTagEvent_azi6uv$($receiver, 'onratechange', newValue);
   }
   function get_onReadyStateChangeFunction($receiver) {
-    throw new UnsupportedOperationException("You can't read variable onReadyStateChange");
+    throw UnsupportedOperationException_init("You can't read variable onReadyStateChange");
   }
   function set_onReadyStateChangeFunction($receiver, newValue) {
     $receiver.consumer.onTagEvent_azi6uv$($receiver, 'onreadystatechange', newValue);
   }
   function get_onScrollFunction($receiver) {
-    throw new UnsupportedOperationException("You can't read variable onScroll");
+    throw UnsupportedOperationException_init("You can't read variable onScroll");
   }
   function set_onScrollFunction($receiver, newValue) {
     $receiver.consumer.onTagEvent_azi6uv$($receiver, 'onscroll', newValue);
   }
   function get_onSearchFunction($receiver) {
-    throw new UnsupportedOperationException("You can't read variable onSearch");
+    throw UnsupportedOperationException_init("You can't read variable onSearch");
   }
   function set_onSearchFunction($receiver, newValue) {
     $receiver.consumer.onTagEvent_azi6uv$($receiver, 'onsearch', newValue);
   }
   function get_onSeekedFunction($receiver) {
-    throw new UnsupportedOperationException("You can't read variable onSeeked");
+    throw UnsupportedOperationException_init("You can't read variable onSeeked");
   }
   function set_onSeekedFunction($receiver, newValue) {
     $receiver.consumer.onTagEvent_azi6uv$($receiver, 'onseeked', newValue);
   }
   function get_onSeekingFunction($receiver) {
-    throw new UnsupportedOperationException("You can't read variable onSeeking");
+    throw UnsupportedOperationException_init("You can't read variable onSeeking");
   }
   function set_onSeekingFunction($receiver, newValue) {
     $receiver.consumer.onTagEvent_azi6uv$($receiver, 'onseeking', newValue);
   }
   function get_onSelectFunction($receiver) {
-    throw new UnsupportedOperationException("You can't read variable onSelect");
+    throw UnsupportedOperationException_init("You can't read variable onSelect");
   }
   function set_onSelectFunction($receiver, newValue) {
     $receiver.consumer.onTagEvent_azi6uv$($receiver, 'onselect', newValue);
   }
   function get_onShowFunction($receiver) {
-    throw new UnsupportedOperationException("You can't read variable onShow");
+    throw UnsupportedOperationException_init("You can't read variable onShow");
   }
   function set_onShowFunction($receiver, newValue) {
     $receiver.consumer.onTagEvent_azi6uv$($receiver, 'onshow', newValue);
   }
   function get_onStalledFunction($receiver) {
-    throw new UnsupportedOperationException("You can't read variable onStalled");
+    throw UnsupportedOperationException_init("You can't read variable onStalled");
   }
   function set_onStalledFunction($receiver, newValue) {
     $receiver.consumer.onTagEvent_azi6uv$($receiver, 'onstalled', newValue);
   }
   function get_onSubmitFunction($receiver) {
-    throw new UnsupportedOperationException("You can't read variable onSubmit");
+    throw UnsupportedOperationException_init("You can't read variable onSubmit");
   }
   function set_onSubmitFunction($receiver, newValue) {
     $receiver.consumer.onTagEvent_azi6uv$($receiver, 'onsubmit', newValue);
   }
   function get_onSuspendFunction($receiver) {
-    throw new UnsupportedOperationException("You can't read variable onSuspend");
+    throw UnsupportedOperationException_init("You can't read variable onSuspend");
   }
   function set_onSuspendFunction($receiver, newValue) {
     $receiver.consumer.onTagEvent_azi6uv$($receiver, 'onsuspend', newValue);
   }
   function get_onTimeUpdateFunction($receiver) {
-    throw new UnsupportedOperationException("You can't read variable onTimeUpdate");
+    throw UnsupportedOperationException_init("You can't read variable onTimeUpdate");
   }
   function set_onTimeUpdateFunction($receiver, newValue) {
     $receiver.consumer.onTagEvent_azi6uv$($receiver, 'ontimeupdate', newValue);
   }
+  function get_onTouchCancelFunction($receiver) {
+    throw UnsupportedOperationException_init("You can't read variable onTouchCancel");
+  }
+  function set_onTouchCancelFunction($receiver, newValue) {
+    $receiver.consumer.onTagEvent_azi6uv$($receiver, 'ontouchcancel', newValue);
+  }
+  function get_onTouchEndFunction($receiver) {
+    throw UnsupportedOperationException_init("You can't read variable onTouchEnd");
+  }
+  function set_onTouchEndFunction($receiver, newValue) {
+    $receiver.consumer.onTagEvent_azi6uv$($receiver, 'ontouchend', newValue);
+  }
+  function get_onTouchMoveFunction($receiver) {
+    throw UnsupportedOperationException_init("You can't read variable onTouchMove");
+  }
+  function set_onTouchMoveFunction($receiver, newValue) {
+    $receiver.consumer.onTagEvent_azi6uv$($receiver, 'ontouchmove', newValue);
+  }
+  function get_onTouchStartFunction($receiver) {
+    throw UnsupportedOperationException_init("You can't read variable onTouchStart");
+  }
+  function set_onTouchStartFunction($receiver, newValue) {
+    $receiver.consumer.onTagEvent_azi6uv$($receiver, 'ontouchstart', newValue);
+  }
   function get_onVolumeChangeFunction($receiver) {
-    throw new UnsupportedOperationException("You can't read variable onVolumeChange");
+    throw UnsupportedOperationException_init("You can't read variable onVolumeChange");
   }
   function set_onVolumeChangeFunction($receiver, newValue) {
     $receiver.consumer.onTagEvent_azi6uv$($receiver, 'onvolumechange', newValue);
   }
   function get_onWaitingFunction($receiver) {
-    throw new UnsupportedOperationException("You can't read variable onWaiting");
+    throw UnsupportedOperationException_init("You can't read variable onWaiting");
   }
   function set_onWaitingFunction($receiver, newValue) {
     $receiver.consumer.onTagEvent_azi6uv$($receiver, 'onwaiting', newValue);
+  }
+  function get_onWheelFunction($receiver) {
+    throw UnsupportedOperationException_init("You can't read variable onWheel");
+  }
+  function set_onWheelFunction($receiver, newValue) {
+    $receiver.consumer.onTagEvent_azi6uv$($receiver, 'onwheel', newValue);
   }
   function injectTo($receiver, bean, field) {
     field.set(bean, $receiver);
@@ -2390,6 +2482,9 @@
   InjectorConsumer.prototype.onTagAttributeChange_5n2z71$ = function (tag, attribute, value) {
     return this.downstream.onTagAttributeChange_5n2z71$(tag, attribute, value);
   };
+  InjectorConsumer.prototype.onTagComment_6bul2c$ = function (content) {
+    return this.downstream.onTagComment_6bul2c$(content);
+  };
   InjectorConsumer.prototype.onTagContent_6bul2c$ = function (content) {
     return this.downstream.onTagContent_6bul2c$(content);
   };
@@ -2462,6 +2557,9 @@
   Tag.prototype.entity_ws8or7$ = function (e) {
     this.consumer.onTagContentEntity_ws8or7$(e);
   };
+  Tag.prototype.comment_61zpoe$ = function (s) {
+    this.consumer.onTagComment_6bul2c$(s);
+  };
   Tag.$metadata$ = {
     kind: Kind_INTERFACE,
     simpleName: 'Tag',
@@ -2511,7 +2609,7 @@
   }
   function visitAndFinalize($receiver, consumer, block) {
     if ($receiver.consumer !== consumer) {
-      throw new IllegalArgumentException('Wrong exception');
+      throw IllegalArgumentException_init('Wrong exception');
     }
     visit($receiver, block);
     return consumer.finalize();
@@ -2644,7 +2742,7 @@
   function AttributeEncoder() {
   }
   AttributeEncoder.prototype.empty_l5rr1g$ = function (attributeName, tag) {
-    throw new IllegalStateException('Attribute ' + attributeName + ' is not yet defined for tag ' + tag.tagName);
+    throw IllegalStateException_init('Attribute ' + attributeName + ' is not yet defined for tag ' + tag.tagName);
   };
   AttributeEncoder.$metadata$ = {
     kind: Kind_INTERFACE,
@@ -2715,7 +2813,7 @@
     else if (equals(value, this.falseValue))
       return false;
     else
-      throw new IllegalArgumentException('Unknown value ' + value + ' for ' + attributeName);
+      throw IllegalArgumentException_init('Unknown value ' + value + ' for ' + attributeName);
   };
   BooleanEncoder.$metadata$ = {
     kind: Kind_CLASS,
@@ -2784,7 +2882,7 @@
     var tmp$;
     tmp$ = this.valuesMap.get_11rb$(value);
     if (tmp$ == null) {
-      throw new IllegalArgumentException('Unknown value ' + value + ' for ' + attributeName);
+      throw IllegalArgumentException_init('Unknown value ' + value + ' for ' + attributeName);
     }
     return tmp$;
   };
@@ -2805,11 +2903,11 @@
     simpleName: 'EnumAttribute',
     interfaces: [Attribute]
   };
-  var Regex = Kotlin.kotlin.text.Regex_61zpoe$;
+  var Regex_init = Kotlin.kotlin.text.Regex_init_61zpoe$;
   function stringSetDecode(value) {
     var tmp$, tmp$_0;
     var tmp$_1;
-    if ((tmp$ = value != null ? Regex('\\s+').split_905azu$(value, 0) : null) != null) {
+    if ((tmp$ = value != null ? Regex_init('\\s+').split_905azu$(value, 0) : null) != null) {
       var destination = ArrayList_init();
       var tmp$_2;
       tmp$_2 = tmp$.iterator();
@@ -2834,8 +2932,7 @@
     return joinToString(value, ' ');
   };
   StringSetEncoder.prototype.decode_puj7f4$ = function (attributeName, value) {
-    var tmp$;
-    return (tmp$ = stringSetDecode(value)) != null ? tmp$ : throwNPE();
+    return ensureNotNull(stringSetDecode(value));
   };
   StringSetEncoder.prototype.empty_l5rr1g$ = function (attributeName, tag) {
     return emptySet();
@@ -2959,6 +3056,18 @@
   function set_for__0($receiver, value) {
     $receiver.htmlFor = value;
   }
+  function get_onTouchcancel($receiver) {
+    return get_onTouchCancel($receiver);
+  }
+  function set_onTouchcancel($receiver, newValue) {
+    set_onTouchCancel($receiver, newValue);
+  }
+  function get_onTouchmove($receiver) {
+    return get_onTouchMove($receiver);
+  }
+  function set_onTouchmove($receiver, newValue) {
+    set_onTouchMove($receiver, newValue);
+  }
   function DelayedConsumer(downstream) {
     this.downstream = downstream;
     this.delayed_0 = null;
@@ -2969,12 +3078,12 @@
   };
   DelayedConsumer.prototype.onTagAttributeChange_5n2z71$ = function (tag, attribute, value) {
     if (this.delayed_0 == null || !equals(this.delayed_0, tag)) {
-      throw new IllegalStateException("You can't change tag attribute because it was already passed to the downstream");
+      throw IllegalStateException_init("You can't change tag attribute because it was already passed to the downstream");
     }
   };
   DelayedConsumer.prototype.onTagEvent_azi6uv$ = function (tag, event, value) {
     if (this.delayed_0 == null || !equals(this.delayed_0, tag)) {
-      throw new IllegalStateException("You can't change tag attribute because it was already passed to the downstream");
+      throw IllegalStateException_init("You can't change tag attribute because it was already passed to the downstream");
     }
   };
   DelayedConsumer.prototype.onTagEnd_tkgjla$ = function (tag) {
@@ -2992,6 +3101,10 @@
   DelayedConsumer.prototype.onTagError_cjwpn3$ = function (tag, exception) {
     this.processDelayedTag_0();
     this.downstream.onTagError_cjwpn3$(tag, exception);
+  };
+  DelayedConsumer.prototype.onTagComment_6bul2c$ = function (content) {
+    this.processDelayedTag_0();
+    this.downstream.onTagComment_6bul2c$(content);
   };
   DelayedConsumer.prototype.finalize = function () {
     this.processDelayedTag_0();
@@ -3017,8 +3130,8 @@
     return Kotlin.isType($receiver, DelayedConsumer) ? $receiver : new DelayedConsumer($receiver);
   }
   function DelegatingMap(initialValues, tag, consumer) {
-    this.tag = tag;
-    this.consumer = consumer;
+    this.tag_0 = tag;
+    this.consumer_0 = consumer;
     this.backing_0 = initialValues;
     this.backingMutable_0 = false;
   }
@@ -3043,7 +3156,7 @@
     var mutable = this.switchToMutable_0();
     var old = mutable.put_xwzc9p$(key, value);
     if (!equals(old, value)) {
-      this.consumer().onTagAttributeChange_5n2z71$(this.tag, key, value);
+      this.consumer_0().onTagAttributeChange_5n2z71$(this.tag_0, key, value);
     }
     return old;
   };
@@ -3052,9 +3165,7 @@
     var mutable = this.switchToMutable_0();
     var tmp$_0;
     if ((tmp$ = mutable.remove_11rb$(key)) != null) {
-      if (typeof key === 'string') {
-        this.consumer().onTagAttributeChange_5n2z71$(this.tag, key, null);
-      }
+      this.consumer_0().onTagAttributeChange_5n2z71$(this.tag_0, key, null);
       tmp$_0 = tmp$;
     }
      else
@@ -3062,11 +3173,17 @@
     return tmp$_0;
   };
   DelegatingMap.prototype.putAll_a2k3zr$ = function (from) {
+    if (from.isEmpty())
+      return;
+    var consumer = this.consumer_0();
+    var mutable = this.switchToMutable_0();
     var tmp$;
     tmp$ = from.entries.iterator();
     while (tmp$.hasNext()) {
       var element = tmp$.next();
-      this.put_xwzc9p$(element.key, element.value);
+      if (!equals(mutable.put_xwzc9p$(element.key, element.value), element.value)) {
+        consumer.onTagAttributeChange_5n2z71$(this.tag_0, element.key, element.value);
+      }
     }
   };
   DelegatingMap.prototype.clear = function () {
@@ -3074,7 +3191,7 @@
     tmp$ = this.backing_0.entries.iterator();
     while (tmp$.hasNext()) {
       var element = tmp$.next();
-      this.consumer().onTagAttributeChange_5n2z71$(this.tag, element.key, null);
+      this.consumer_0().onTagAttributeChange_5n2z71$(this.tag_0, element.key, null);
     }
     this.backing_0 = emptyMap();
     this.backingMutable_0 = false;
@@ -3128,6 +3245,9 @@
   };
   DelegatingExceptionConsumer.prototype.onTagAttributeChange_5n2z71$ = function (tag, attribute, value) {
     return this.underlying.onTagAttributeChange_5n2z71$(tag, attribute, value);
+  };
+  DelegatingExceptionConsumer.prototype.onTagComment_6bul2c$ = function (content) {
+    return this.underlying.onTagComment_6bul2c$(content);
   };
   DelegatingExceptionConsumer.prototype.onTagContent_6bul2c$ = function (content) {
     return this.underlying.onTagContent_6bul2c$(content);
@@ -3229,25 +3349,28 @@
     this.dropLevel_0 = null;
   }
   FilterTagConsumer.prototype.onTagStart_tkgjla$ = function (tag) {
-    var tmp$;
     this.currentLevel_0 = this.currentLevel_0 + 1 | 0;
     if (this.dropLevel_0 == null) {
-      tmp$ = this.predicate(tag);
-      if (equals(tmp$, PredicateResult$PASS_getInstance()))
-        this.downstream.onTagStart_tkgjla$(tag);
-      else if (equals(tmp$, PredicateResult$SKIP_getInstance()))
-        this.skippedLevels_0.add_11rb$(this.currentLevel_0);
-      else if (equals(tmp$, PredicateResult$DROP_getInstance()))
-        this.dropLevel_0 = this.currentLevel_0;
-      else
-        Kotlin.noWhenBranchMatched();
+      switch (this.predicate(tag).name) {
+        case 'PASS':
+          this.downstream.onTagStart_tkgjla$(tag);
+          break;
+        case 'SKIP':
+          this.skippedLevels_0.add_11rb$(this.currentLevel_0);
+          break;
+        case 'DROP':
+          this.dropLevel_0 = this.currentLevel_0;
+          break;
+        default:Kotlin.noWhenBranchMatched();
+          break;
+      }
     }
   };
   FilterTagConsumer.prototype.onTagAttributeChange_5n2z71$ = function (tag, attribute, value) {
-    throw new UnsupportedOperationException("this filter doesn't support attribute change");
+    throw UnsupportedOperationException_init("this filter doesn't support attribute change");
   };
   FilterTagConsumer.prototype.onTagEvent_azi6uv$ = function (tag, event, value) {
-    throw new UnsupportedOperationException("this filter doesn't support attribute change");
+    throw UnsupportedOperationException_init("this filter doesn't support attribute change");
   };
   FilterTagConsumer.prototype.onTagEnd_tkgjla$ = function (tag) {
     if (this.canPassCurrentLevel_0()) {
@@ -3280,6 +3403,11 @@
   FilterTagConsumer.prototype.onTagError_cjwpn3$ = function (tag, exception) {
     if (this.canPassCurrentLevel_0()) {
       this.downstream.onTagError_cjwpn3$(tag, exception);
+    }
+  };
+  FilterTagConsumer.prototype.onTagComment_6bul2c$ = function (content) {
+    if (this.canPassCurrentLevel_0()) {
+      this.downstream.onTagComment_6bul2c$(content);
     }
   };
   FilterTagConsumer.prototype.finalize = function () {
@@ -3328,6 +3456,9 @@
   };
   FinalizeConsumer.prototype.onTagError_cjwpn3$ = function (tag, exception) {
     this.downstream.onTagError_cjwpn3$(tag, exception);
+  };
+  FinalizeConsumer.prototype.onTagComment_6bul2c$ = function (content) {
+    this.downstream.onTagComment_6bul2c$(content);
   };
   FinalizeConsumer.prototype.finalize = function () {
     return this.block(this.downstream.finalize(), this.level_0 > 0);
@@ -3572,6 +3703,18 @@
   function set_onFocus($receiver, newValue) {
     attributeStringString.set_fid0sb$($receiver, 'onfocus', newValue);
   }
+  function get_onFocusIn($receiver) {
+    return attributeStringString.get_txhc1s$($receiver, 'onfocusin');
+  }
+  function set_onFocusIn($receiver, newValue) {
+    attributeStringString.set_fid0sb$($receiver, 'onfocusin', newValue);
+  }
+  function get_onFocusOut($receiver) {
+    return attributeStringString.get_txhc1s$($receiver, 'onfocusout');
+  }
+  function set_onFocusOut($receiver, newValue) {
+    attributeStringString.set_fid0sb$($receiver, 'onfocusout', newValue);
+  }
   function get_onFormChange($receiver) {
     return attributeStringString.get_txhc1s$($receiver, 'onformchange');
   }
@@ -3770,6 +3913,30 @@
   function set_onTimeUpdate($receiver, newValue) {
     attributeStringString.set_fid0sb$($receiver, 'ontimeupdate', newValue);
   }
+  function get_onTouchCancel($receiver) {
+    return attributeStringString.get_txhc1s$($receiver, 'ontouchcancel');
+  }
+  function set_onTouchCancel($receiver, newValue) {
+    attributeStringString.set_fid0sb$($receiver, 'ontouchcancel', newValue);
+  }
+  function get_onTouchEnd($receiver) {
+    return attributeStringString.get_txhc1s$($receiver, 'ontouchend');
+  }
+  function set_onTouchEnd($receiver, newValue) {
+    attributeStringString.set_fid0sb$($receiver, 'ontouchend', newValue);
+  }
+  function get_onTouchMove($receiver) {
+    return attributeStringString.get_txhc1s$($receiver, 'ontouchmove');
+  }
+  function set_onTouchMove($receiver, newValue) {
+    attributeStringString.set_fid0sb$($receiver, 'ontouchmove', newValue);
+  }
+  function get_onTouchStart($receiver) {
+    return attributeStringString.get_txhc1s$($receiver, 'ontouchstart');
+  }
+  function set_onTouchStart($receiver, newValue) {
+    attributeStringString.set_fid0sb$($receiver, 'ontouchstart', newValue);
+  }
   function get_onVolumeChange($receiver) {
     return attributeStringString.get_txhc1s$($receiver, 'onvolumechange');
   }
@@ -3781,6 +3948,12 @@
   }
   function set_onWaiting($receiver, newValue) {
     attributeStringString.set_fid0sb$($receiver, 'onwaiting', newValue);
+  }
+  function get_onWheel($receiver) {
+    return attributeStringString.get_txhc1s$($receiver, 'onwheel');
+  }
+  function set_onWheel($receiver, newValue) {
+    attributeStringString.set_fid0sb$($receiver, 'onwheel', newValue);
   }
   function get_role($receiver) {
     return attributeStringString.get_txhc1s$($receiver, 'role');
@@ -4065,18 +4238,20 @@
   function button$lambda_0($receiver) {
     return Unit;
   }
-  function button_0($receiver, formEncType, formMethod, type, classes, block) {
+  function button_0($receiver, formEncType, formMethod, name, type, classes, block) {
     if (formEncType === void 0)
       formEncType = null;
     if (formMethod === void 0)
       formMethod = null;
+    if (name === void 0)
+      name = null;
     if (type === void 0)
       type = null;
     if (classes === void 0)
       classes = null;
     if (block === void 0)
       block = button$lambda_0;
-    return visitAndFinalize(new BUTTON(attributesMapOf_1(['formenctype', formEncType != null ? enumEncode(formEncType) : null, 'formmethod', formMethod != null ? enumEncode(formMethod) : null, 'type', type != null ? enumEncode(type) : null, 'class', classes]), $receiver), $receiver, block);
+    return visitAndFinalize(new BUTTON(attributesMapOf_1(['formenctype', formEncType != null ? enumEncode(formEncType) : null, 'formmethod', formMethod != null ? enumEncode(formMethod) : null, 'name', name, 'type', type != null ? enumEncode(type) : null, 'class', classes]), $receiver), $receiver, block);
   }
   function canvas$lambda_1(closure$content) {
     return function ($receiver) {
@@ -4444,18 +4619,22 @@
       return Unit;
     };
   }
-  function html_1($receiver, content) {
+  function html_1($receiver, content, namespace) {
     if (content === void 0)
       content = '';
-    return visitAndFinalize(new HTML(emptyMap_0, $receiver), $receiver, html$lambda_1(content));
+    if (namespace === void 0)
+      namespace = null;
+    return visitAndFinalize(new HTML(emptyMap_0, $receiver, namespace), $receiver, html$lambda_1(content));
   }
   function html$lambda_2($receiver) {
     return Unit;
   }
-  function html_2($receiver, block) {
+  function html_2($receiver, namespace, block) {
+    if (namespace === void 0)
+      namespace = null;
     if (block === void 0)
       block = html$lambda_2;
-    return visitAndFinalize(new HTML(emptyMap_0, $receiver), $receiver, block);
+    return visitAndFinalize(new HTML(emptyMap_0, $receiver, namespace), $receiver, block);
   }
   function i$lambda_0($receiver) {
     return Unit;
@@ -4601,6 +4780,16 @@
     if (block === void 0)
       block = link$lambda_0;
     return visitAndFinalize(new LINK(attributesMapOf_1(['href', href, 'rel', rel, 'type', type]), $receiver), $receiver, block);
+  }
+  function main$lambda_0($receiver) {
+    return Unit;
+  }
+  function main_0($receiver, classes, block) {
+    if (classes === void 0)
+      classes = null;
+    if (block === void 0)
+      block = main$lambda_0;
+    return visitAndFinalize(new MAIN(attributesMapOf_0('class', classes), $receiver), $receiver, block);
   }
   function map$lambda_0($receiver) {
     return Unit;
@@ -7594,6 +7783,13 @@
     simpleName: 'HtmlBlockInlineTag',
     interfaces: [HtmlInlineTag, HtmlBlockTag, FlowPhrasingContent, CommonAttributeGroupFacade]
   };
+  function CommonAttributeGroupFacadeFlowPhrasingSectioningContent() {
+  }
+  CommonAttributeGroupFacadeFlowPhrasingSectioningContent.$metadata$ = {
+    kind: Kind_INTERFACE,
+    simpleName: 'CommonAttributeGroupFacadeFlowPhrasingSectioningContent',
+    interfaces: [HtmlBlockInlineTag, HtmlInlineTag, FlowPhrasingContent, CommonAttributeGroupFacadeFlowSectioningContent, HtmlBlockTag, CommonAttributeGroupFacade]
+  };
   function CommonAttributeGroupFacadeFlowSectioningContent() {
   }
   CommonAttributeGroupFacadeFlowSectioningContent.$metadata$ = {
@@ -8649,6 +8845,16 @@
       block = aside$lambda_1;
     visit(new ASIDE(attributesMapOf_0('class', classes), $receiver.consumer), block);
   }
+  function main$lambda_1($receiver) {
+    return Unit;
+  }
+  function main_1($receiver, classes, block) {
+    if (classes === void 0)
+      classes = null;
+    if (block === void 0)
+      block = main$lambda_1;
+    visit(new MAIN(attributesMapOf_0('class', classes), $receiver.consumer), block);
+  }
   function nav$lambda_1($receiver) {
     return Unit;
   }
@@ -8696,88 +8902,100 @@
   function button$lambda_1($receiver) {
     return Unit;
   }
-  function button_1($receiver, formEncType, formMethod, type, classes, block) {
+  function button_1($receiver, formEncType, formMethod, name, type, classes, block) {
     if (formEncType === void 0)
       formEncType = null;
     if (formMethod === void 0)
       formMethod = null;
+    if (name === void 0)
+      name = null;
     if (type === void 0)
       type = null;
     if (classes === void 0)
       classes = null;
     if (block === void 0)
       block = button$lambda_1;
-    visit(new BUTTON(attributesMapOf_1(['formenctype', formEncType != null ? enumEncode(formEncType) : null, 'formmethod', formMethod != null ? enumEncode(formMethod) : null, 'type', type != null ? enumEncode(type) : null, 'class', classes]), $receiver.consumer), block);
+    visit(new BUTTON(attributesMapOf_1(['formenctype', formEncType != null ? enumEncode(formEncType) : null, 'formmethod', formMethod != null ? enumEncode(formMethod) : null, 'name', name, 'type', type != null ? enumEncode(type) : null, 'class', classes]), $receiver.consumer), block);
   }
   function getButton$lambda($receiver) {
     return Unit;
   }
-  function getButton($receiver, formEncType, type, classes, block) {
+  function getButton($receiver, formEncType, name, type, classes, block) {
     if (formEncType === void 0)
       formEncType = null;
+    if (name === void 0)
+      name = null;
     if (type === void 0)
       type = null;
     if (classes === void 0)
       classes = null;
     if (block === void 0)
       block = getButton$lambda;
-    visit(new BUTTON(attributesMapOf_1(['formenctype', formEncType != null ? enumEncode(formEncType) : null, 'formmethod', ButtonFormMethod$get_getInstance().realValue, 'type', type != null ? enumEncode(type) : null, 'class', classes]), $receiver.consumer), block);
+    visit(new BUTTON(attributesMapOf_1(['formenctype', formEncType != null ? enumEncode(formEncType) : null, 'formmethod', ButtonFormMethod$get_getInstance().realValue, 'name', name, 'type', type != null ? enumEncode(type) : null, 'class', classes]), $receiver.consumer), block);
   }
   function postButton$lambda($receiver) {
     return Unit;
   }
-  function postButton($receiver, formEncType, type, classes, block) {
+  function postButton($receiver, formEncType, name, type, classes, block) {
     if (formEncType === void 0)
       formEncType = null;
+    if (name === void 0)
+      name = null;
     if (type === void 0)
       type = null;
     if (classes === void 0)
       classes = null;
     if (block === void 0)
       block = postButton$lambda;
-    visit(new BUTTON(attributesMapOf_1(['formenctype', formEncType != null ? enumEncode(formEncType) : null, 'formmethod', ButtonFormMethod$post_getInstance().realValue, 'type', type != null ? enumEncode(type) : null, 'class', classes]), $receiver.consumer), block);
+    visit(new BUTTON(attributesMapOf_1(['formenctype', formEncType != null ? enumEncode(formEncType) : null, 'formmethod', ButtonFormMethod$post_getInstance().realValue, 'name', name, 'type', type != null ? enumEncode(type) : null, 'class', classes]), $receiver.consumer), block);
   }
   function putButton$lambda($receiver) {
     return Unit;
   }
-  function putButton($receiver, formEncType, type, classes, block) {
+  function putButton($receiver, formEncType, name, type, classes, block) {
     if (formEncType === void 0)
       formEncType = null;
+    if (name === void 0)
+      name = null;
     if (type === void 0)
       type = null;
     if (classes === void 0)
       classes = null;
     if (block === void 0)
       block = putButton$lambda;
-    visit(new BUTTON(attributesMapOf_1(['formenctype', formEncType != null ? enumEncode(formEncType) : null, 'formmethod', ButtonFormMethod$put_getInstance().realValue, 'type', type != null ? enumEncode(type) : null, 'class', classes]), $receiver.consumer), block);
+    visit(new BUTTON(attributesMapOf_1(['formenctype', formEncType != null ? enumEncode(formEncType) : null, 'formmethod', ButtonFormMethod$put_getInstance().realValue, 'name', name, 'type', type != null ? enumEncode(type) : null, 'class', classes]), $receiver.consumer), block);
   }
   function deleteButton$lambda($receiver) {
     return Unit;
   }
-  function deleteButton($receiver, formEncType, type, classes, block) {
+  function deleteButton($receiver, formEncType, name, type, classes, block) {
     if (formEncType === void 0)
       formEncType = null;
+    if (name === void 0)
+      name = null;
     if (type === void 0)
       type = null;
     if (classes === void 0)
       classes = null;
     if (block === void 0)
       block = deleteButton$lambda;
-    visit(new BUTTON(attributesMapOf_1(['formenctype', formEncType != null ? enumEncode(formEncType) : null, 'formmethod', ButtonFormMethod$delete_getInstance().realValue, 'type', type != null ? enumEncode(type) : null, 'class', classes]), $receiver.consumer), block);
+    visit(new BUTTON(attributesMapOf_1(['formenctype', formEncType != null ? enumEncode(formEncType) : null, 'formmethod', ButtonFormMethod$delete_getInstance().realValue, 'name', name, 'type', type != null ? enumEncode(type) : null, 'class', classes]), $receiver.consumer), block);
   }
   function patchButton$lambda($receiver) {
     return Unit;
   }
-  function patchButton($receiver, formEncType, type, classes, block) {
+  function patchButton($receiver, formEncType, name, type, classes, block) {
     if (formEncType === void 0)
       formEncType = null;
+    if (name === void 0)
+      name = null;
     if (type === void 0)
       type = null;
     if (classes === void 0)
       classes = null;
     if (block === void 0)
       block = patchButton$lambda;
-    visit(new BUTTON(attributesMapOf_1(['formenctype', formEncType != null ? enumEncode(formEncType) : null, 'formmethod', ButtonFormMethod$patch_getInstance().realValue, 'type', type != null ? enumEncode(type) : null, 'class', classes]), $receiver.consumer), block);
+    visit(new BUTTON(attributesMapOf_1(['formenctype', formEncType != null ? enumEncode(formEncType) : null, 'formmethod', ButtonFormMethod$patch_getInstance().realValue, 'name', name, 'type', type != null ? enumEncode(type) : null, 'class', classes]), $receiver.consumer), block);
   }
   function embed$lambda_1($receiver) {
     return Unit;
@@ -11041,8 +11259,10 @@
     simpleName: 'HR',
     interfaces: [HtmlBlockTag, HTMLTag]
   };
-  function HTML(initialAttributes, consumer) {
-    HTMLTag.call(this, 'html', consumer, initialAttributes, null, false, false);
+  function HTML(initialAttributes, consumer, namespace) {
+    if (namespace === void 0)
+      namespace = null;
+    HTMLTag.call(this, 'html', consumer, initialAttributes, namespace, false, false);
     this.consumer_7o7wi5$_0 = consumer;
   }
   Object.defineProperty(HTML.prototype, 'consumer', {
@@ -11819,6 +12039,20 @@
   function get_asPhrasingContent_26($receiver) {
     return $receiver;
   }
+  function MAIN(initialAttributes, consumer) {
+    HTMLTag.call(this, 'main', consumer, initialAttributes, null, false, false);
+    this.consumer_9wvspx$_0 = consumer;
+  }
+  Object.defineProperty(MAIN.prototype, 'consumer', {
+    get: function () {
+      return this.consumer_9wvspx$_0;
+    }
+  });
+  MAIN.$metadata$ = {
+    kind: Kind_CLASS,
+    simpleName: 'MAIN',
+    interfaces: [CommonAttributeGroupFacadeFlowPhrasingSectioningContent, HTMLTag]
+  };
   function MAP(initialAttributes, consumer) {
     HTMLTag.call(this, 'map', consumer, initialAttributes, null, true, false);
     this.consumer_nryj5m$_0 = consumer;
@@ -13732,6 +13966,9 @@
   TimeMeasureConsumer.prototype.onTagError_cjwpn3$ = function (tag, exception) {
     this.downstream.onTagError_cjwpn3$(tag, exception);
   };
+  TimeMeasureConsumer.prototype.onTagComment_6bul2c$ = function (content) {
+    this.downstream.onTagComment_6bul2c$(content);
+  };
   TimeMeasureConsumer.prototype.finalize = function () {
     return new TimedResult(this.downstream.finalize(), currentTimeMillis().subtract(this.start_0));
   };
@@ -13743,9 +13980,10 @@
   function measureTime($receiver) {
     return new TimeMeasureConsumer($receiver);
   }
-  function HTMLStreamBuilder(out, prettyPrint) {
+  function HTMLStreamBuilder(out, prettyPrint, xhtmlCompatible) {
     this.out = out;
     this.prettyPrint = prettyPrint;
+    this.xhtmlCompatible = xhtmlCompatible;
     this.level_0 = 0;
     this.ln_0 = true;
     this.UnsafeImpl = new HTMLStreamBuilder$UnsafeImpl$ObjectLiteral(this);
@@ -13770,7 +14008,7 @@
         var item = tmp$.next();
         index = index + 1 | 0;
         if (!isValidXmlAttributeName(item.key)) {
-          throw new IllegalArgumentException('Tag ' + tag.tagName + ' has invalid attribute name ' + item.key);
+          throw IllegalArgumentException_init('Tag ' + tag.tagName + ' has invalid attribute name ' + item.key);
         }
         this.out.append_s8itvh$(32);
         this.out.append_gw00v9$(item.key);
@@ -13779,14 +14017,17 @@
         this.out.append_s8itvh$(34);
       }
     }
+    if (this.xhtmlCompatible && tag.emptyTag) {
+      this.out.append_gw00v9$('/');
+    }
     this.out.append_gw00v9$('>');
     this.ln_0 = false;
   };
   HTMLStreamBuilder.prototype.onTagAttributeChange_5n2z71$ = function (tag, attribute, value) {
-    throw new UnsupportedOperationException("tag attribute can't be changed as it was already written to the stream. Use with DelayedConsumer to be able to modify attributes");
+    throw UnsupportedOperationException_init("tag attribute can't be changed as it was already written to the stream. Use with DelayedConsumer to be able to modify attributes");
   };
   HTMLStreamBuilder.prototype.onTagEvent_azi6uv$ = function (tag, event, value) {
-    throw new UnsupportedOperationException("you can't assign lambda event handler when building text");
+    throw UnsupportedOperationException_init("you can't assign lambda event handler when building text");
   };
   HTMLStreamBuilder.prototype.onTagEnd_tkgjla$ = function (tag) {
     this.level_0 = this.level_0 - 1 | 0;
@@ -13815,6 +14056,15 @@
   };
   HTMLStreamBuilder.prototype.onTagContentUnsafe_kntra7$ = function (block) {
     block(this.UnsafeImpl);
+  };
+  HTMLStreamBuilder.prototype.onTagComment_6bul2c$ = function (content) {
+    if (this.prettyPrint) {
+      this.indent_0();
+    }
+    this.out.append_gw00v9$('<!--');
+    escapeComment(this.out, content);
+    this.out.append_gw00v9$('-->');
+    this.ln_0 = false;
   };
   HTMLStreamBuilder.prototype.appenln_0 = function () {
     if (this.prettyPrint && !this.ln_0) {
@@ -13861,15 +14111,19 @@
   function createHTML$lambda(sb, f) {
     return sb.toString();
   }
-  function createHTML(prettyPrint) {
+  function createHTML(prettyPrint, xhtmlCompatible) {
     if (prettyPrint === void 0)
       prettyPrint = true;
-    return delayed(onFinalizeMap(new HTMLStreamBuilder(StringBuilder_init(AVERAGE_PAGE_SIZE), prettyPrint), createHTML$lambda));
+    if (xhtmlCompatible === void 0)
+      xhtmlCompatible = false;
+    return delayed(onFinalizeMap(new HTMLStreamBuilder(StringBuilder_init(AVERAGE_PAGE_SIZE), prettyPrint, xhtmlCompatible), createHTML$lambda));
   }
-  function appendHTML($receiver, prettyPrint) {
+  function appendHTML($receiver, prettyPrint, xhtmlCompatible) {
     if (prettyPrint === void 0)
       prettyPrint = true;
-    return delayed(new HTMLStreamBuilder($receiver, prettyPrint));
+    if (xhtmlCompatible === void 0)
+      xhtmlCompatible = false;
+    return delayed(new HTMLStreamBuilder($receiver, prettyPrint, xhtmlCompatible));
   }
   var Array_0 = Array;
   var escapeMap;
@@ -13951,6 +14205,23 @@
       $receiver.append_gw00v9$(Kotlin.subSequence(s, startIndex_0, endIndex).toString());
     }
   }
+  function escapeComment($receiver, s) {
+    var start = 0;
+    while (start < s.length) {
+      var index = indexOf(s, '--');
+      if (index === -1) {
+        if (start === 0) {
+          $receiver.append_gw00v9$(s);
+        }
+         else {
+          $receiver.append_ezbsdh$(s, start, s.length);
+        }
+        break;
+      }
+      $receiver.append_ezbsdh$(s, start, index);
+      start = start + 2 | 0;
+    }
+  }
   function TraceConsumer(downstream, println) {
     this.downstream = downstream;
     this.println = println;
@@ -13979,6 +14250,9 @@
     var v = this.downstream.finalize();
     this.println('[' + this.id_0 + '] finalized: ' + toString(v));
     return v;
+  };
+  TraceConsumer.prototype.onTagComment_6bul2c$ = function (content) {
+    return this.downstream.onTagComment_6bul2c$(content);
   };
   TraceConsumer.prototype.onTagContent_6bul2c$ = function (content) {
     return this.downstream.onTagContent_6bul2c$(content);
@@ -14028,7 +14302,9 @@
   package$dom.createTree_4wc2mh$ = createTree;
   package$dom.get_create_4wc2mh$ = get_create;
   package$dom.append_k9bwru$ = append;
+  package$dom.prepend_k9bwru$ = prepend;
   package$dom.get_append_y4uc6z$ = get_append;
+  package$dom.get_prepend_y4uc6z$ = get_prepend;
   package$js.a_5i6vd$ = a;
   package$js.abbr_y8m8ul$ = abbr;
   package$js.address_ywnrmy$ = address;
@@ -14043,7 +14319,7 @@
   package$js.blockQuote_rw5zzj$ = blockQuote;
   package$js.body_sbi9b0$ = body;
   package$js.br_jn093m$ = br;
-  package$js.button_5fpah4$ = button;
+  package$js.button_yqfwmz$ = button;
   package$js.canvas_61vnh7$ = canvas;
   package$js.canvas_o2d15m$ = canvas_0;
   package$js.caption_2b4nbw$ = caption;
@@ -14079,8 +14355,8 @@
   package$js.header_sok7e9$ = header;
   package$js.hGroup_8f4qzd$ = hGroup;
   package$js.hr_v0qv1w$ = hr;
-  package$js.html_bq9830$ = html;
-  package$js.html_rkyhvw$ = html_0;
+  package$js.html_18z1of$ = html;
+  package$js.html_aq4td9$ = html_0;
   package$js.i_5jry8x$ = i;
   package$js.iframe_4ksjnb$ = iframe;
   package$js.iframe_g0q2yy$ = iframe_0;
@@ -14093,6 +14369,7 @@
   package$js.legend_ax8bv3$ = legend;
   package$js.li_525bpd$ = li;
   package$js.link_iq3rqc$ = link;
+  package$js.main_cutem3$ = main;
   package$js.map_ibzf9n$ = map;
   package$js.mark_44qn2n$ = mark;
   package$js.math_giqjli$ = math;
@@ -14186,6 +14463,10 @@
   package$js.set_onErrorFunction_pszlq2$ = set_onErrorFunction;
   package$js.get_onFocusFunction_fxodxh$ = get_onFocusFunction;
   package$js.set_onFocusFunction_pszlq2$ = set_onFocusFunction;
+  package$js.get_onFocusInFunction_fxodxh$ = get_onFocusInFunction;
+  package$js.set_onFocusInFunction_pszlq2$ = set_onFocusInFunction;
+  package$js.get_onFocusOutFunction_fxodxh$ = get_onFocusOutFunction;
+  package$js.set_onFocusOutFunction_pszlq2$ = set_onFocusOutFunction;
   package$js.get_onFormChangeFunction_fxodxh$ = get_onFormChangeFunction;
   package$js.set_onFormChangeFunction_pszlq2$ = set_onFormChangeFunction;
   package$js.get_onFormInputFunction_fxodxh$ = get_onFormInputFunction;
@@ -14252,10 +14533,20 @@
   package$js.set_onSuspendFunction_pszlq2$ = set_onSuspendFunction;
   package$js.get_onTimeUpdateFunction_fxodxh$ = get_onTimeUpdateFunction;
   package$js.set_onTimeUpdateFunction_pszlq2$ = set_onTimeUpdateFunction;
+  package$js.get_onTouchCancelFunction_fxodxh$ = get_onTouchCancelFunction;
+  package$js.set_onTouchCancelFunction_pszlq2$ = set_onTouchCancelFunction;
+  package$js.get_onTouchEndFunction_fxodxh$ = get_onTouchEndFunction;
+  package$js.set_onTouchEndFunction_pszlq2$ = set_onTouchEndFunction;
+  package$js.get_onTouchMoveFunction_fxodxh$ = get_onTouchMoveFunction;
+  package$js.set_onTouchMoveFunction_pszlq2$ = set_onTouchMoveFunction;
+  package$js.get_onTouchStartFunction_fxodxh$ = get_onTouchStartFunction;
+  package$js.set_onTouchStartFunction_pszlq2$ = set_onTouchStartFunction;
   package$js.get_onVolumeChangeFunction_fxodxh$ = get_onVolumeChangeFunction;
   package$js.set_onVolumeChangeFunction_pszlq2$ = set_onVolumeChangeFunction;
   package$js.get_onWaitingFunction_fxodxh$ = get_onWaitingFunction;
   package$js.set_onWaitingFunction_pszlq2$ = set_onWaitingFunction;
+  package$js.get_onWheelFunction_fxodxh$ = get_onWheelFunction;
+  package$js.set_onWheelFunction_pszlq2$ = set_onWheelFunction;
   var package$injector = package$html.injector || (package$html.injector = {});
   package$injector.injectTo_n418us$ = injectTo;
   package$injector.InjectCapture = InjectCapture;
@@ -14328,6 +14619,10 @@
   package$html.set_for__i8xdhl$ = set_for_;
   package$html.get_for__mffrb2$ = get_for__0;
   package$html.set_for__4rgb9g$ = set_for__0;
+  package$html.get_onTouchcancel_fxodxh$ = get_onTouchcancel;
+  package$html.set_onTouchcancel_ueiko3$ = set_onTouchcancel;
+  package$html.get_onTouchmove_fxodxh$ = get_onTouchmove;
+  package$html.set_onTouchmove_ueiko3$ = set_onTouchmove;
   package$consumers.DelayedConsumer = DelayedConsumer;
   package$consumers.delayed_3mrk8e$ = delayed;
   var package$impl = package$html.impl || (package$html.impl = {});
@@ -14423,6 +14718,10 @@
   package$html.set_onError_ueiko3$ = set_onError;
   package$html.get_onFocus_fxodxh$ = get_onFocus;
   package$html.set_onFocus_ueiko3$ = set_onFocus;
+  package$html.get_onFocusIn_fxodxh$ = get_onFocusIn;
+  package$html.set_onFocusIn_ueiko3$ = set_onFocusIn;
+  package$html.get_onFocusOut_fxodxh$ = get_onFocusOut;
+  package$html.set_onFocusOut_ueiko3$ = set_onFocusOut;
   package$html.get_onFormChange_fxodxh$ = get_onFormChange;
   package$html.set_onFormChange_ueiko3$ = set_onFormChange;
   package$html.get_onFormInput_fxodxh$ = get_onFormInput;
@@ -14489,10 +14788,20 @@
   package$html.set_onSuspend_ueiko3$ = set_onSuspend;
   package$html.get_onTimeUpdate_fxodxh$ = get_onTimeUpdate;
   package$html.set_onTimeUpdate_ueiko3$ = set_onTimeUpdate;
+  package$html.get_onTouchCancel_fxodxh$ = get_onTouchCancel;
+  package$html.set_onTouchCancel_ueiko3$ = set_onTouchCancel;
+  package$html.get_onTouchEnd_fxodxh$ = get_onTouchEnd;
+  package$html.set_onTouchEnd_ueiko3$ = set_onTouchEnd;
+  package$html.get_onTouchMove_fxodxh$ = get_onTouchMove;
+  package$html.set_onTouchMove_ueiko3$ = set_onTouchMove;
+  package$html.get_onTouchStart_fxodxh$ = get_onTouchStart;
+  package$html.set_onTouchStart_ueiko3$ = set_onTouchStart;
   package$html.get_onVolumeChange_fxodxh$ = get_onVolumeChange;
   package$html.set_onVolumeChange_ueiko3$ = set_onVolumeChange;
   package$html.get_onWaiting_fxodxh$ = get_onWaiting;
   package$html.set_onWaiting_ueiko3$ = set_onWaiting;
+  package$html.get_onWheel_fxodxh$ = get_onWheel;
+  package$html.set_onWheel_ueiko3$ = set_onWheel;
   package$html.get_role_fxodxh$ = get_role;
   package$html.set_role_ueiko3$ = set_role;
   package$html.get_runAt_fxodxh$ = get_runAt;
@@ -14645,7 +14954,7 @@
   package$html.blockQuote_kqn8r$ = blockQuote_0;
   package$html.body_z1rdug$ = body_0;
   package$html.br_msntey$ = br_0;
-  package$html.button_lzqaus$ = button_0;
+  package$html.button_yup7tf$ = button_0;
   package$html.canvas_89i3hl$ = canvas_1;
   package$html.canvas_q2368u$ = canvas_2;
   package$html.caption_7tv3ws$ = caption_0;
@@ -14681,8 +14990,8 @@
   package$html.header_dwfinh$ = header_0;
   package$html.hGroup_o3ebz7$ = hGroup_0;
   package$html.hr_ks0ewg$ = hr_0;
-  package$html.html_qjf5rw$ = html_1;
-  package$html.html_dq808k$ = html_2;
+  package$html.html_lo9rwl$ = html_1;
+  package$html.html_ym5t9t$ = html_2;
   package$html.i_gncgg9$ = i_0;
   package$html.iframe_i3obeb$ = iframe_1;
   package$html.iframe_k7pgs2$ = iframe_2;
@@ -14695,6 +15004,7 @@
   package$html.legend_99jryr$ = legend_0;
   package$html.li_jf6zlv$ = li_0;
   package$html.link_hbbg0w$ = link_0;
+  package$html.main_hf6ozl$ = main_0;
   package$html.map_r08uhb$ = map_0;
   package$html.mark_m8f11v$ = mark_0;
   package$html.math_bhulte$ = math_0;
@@ -15433,6 +15743,7 @@
   package$html.CommonAttributeGroupFacadeFlowMetaDataContent = CommonAttributeGroupFacadeFlowMetaDataContent;
   package$html.CommonAttributeGroupFacadeFlowMetaDataPhrasingContent = CommonAttributeGroupFacadeFlowMetaDataPhrasingContent;
   package$html.HtmlBlockInlineTag = HtmlBlockInlineTag;
+  package$html.CommonAttributeGroupFacadeFlowPhrasingSectioningContent = CommonAttributeGroupFacadeFlowPhrasingSectioningContent;
   package$html.CommonAttributeGroupFacadeFlowSectioningContent = CommonAttributeGroupFacadeFlowSectioningContent;
   package$html.FlowMetaDataContent = FlowMetaDataContent;
   package$html.FlowMetaDataPhrasingContent = FlowMetaDataPhrasingContent;
@@ -15538,16 +15849,17 @@
   package$html.script_r4c9ct$ = script_4;
   package$html.article_hpv6ge$ = article_1;
   package$html.aside_3uzs4w$ = aside_1;
+  package$html.main_m1e3ev$ = main_1;
   package$html.nav_19d8h1$ = nav_1;
   package$html.section_ac1jhf$ = section_1;
   package$html.a_gu26kr$ = a_1;
   package$html.audio_hb8i2y$ = audio_1;
-  package$html.button_whohl6$ = button_1;
-  package$html.getButton_2ghcrw$ = getButton;
-  package$html.postButton_2ghcrw$ = postButton;
-  package$html.putButton_2ghcrw$ = putButton;
-  package$html.deleteButton_2ghcrw$ = deleteButton;
-  package$html.patchButton_2ghcrw$ = patchButton;
+  package$html.button_i4xb7r$ = button_1;
+  package$html.getButton_2rocz3$ = getButton;
+  package$html.postButton_2rocz3$ = postButton;
+  package$html.putButton_2rocz3$ = putButton;
+  package$html.deleteButton_2rocz3$ = deleteButton;
+  package$html.patchButton_2rocz3$ = patchButton;
   package$html.embed_l7ro7h$ = embed_1;
   package$html.iframe_rz24s4$ = iframe_3;
   package$html.iframe_9ubjn9$ = iframe_4;
@@ -15748,6 +16060,7 @@
   package$html.get_asFlowContent_2nqvqh$ = get_asFlowContent_30;
   package$html.get_asMetaDataContent_2nqvqh$ = get_asMetaDataContent_0;
   package$html.get_asPhrasingContent_2nqvqh$ = get_asPhrasingContent_26;
+  package$html.MAIN = MAIN;
   package$html.MAP = MAP;
   package$html.get_asFlowContent_6sczi9$ = get_asFlowContent_31;
   package$html.get_asPhrasingContent_6sczi9$ = get_asPhrasingContent_27;
@@ -15891,8 +16204,8 @@
   package$consumers.measureTime_3mrk8e$ = measureTime;
   var package$stream = package$html.stream || (package$html.stream = {});
   package$stream.HTMLStreamBuilder = HTMLStreamBuilder;
-  package$stream.createHTML_6taknv$ = createHTML;
-  package$stream.appendHTML_9kwp7w$ = appendHTML;
+  package$stream.createHTML_dqye30$ = createHTML;
+  package$stream.appendHTML_94plub$ = appendHTML;
   package$consumers.TraceConsumer = TraceConsumer;
   package$consumers.trace_y1nvlf$ = trace_0;
   package$html.styleLink_hlvmud$ = styleLink;
@@ -15911,76 +16224,199 @@
   CommonAttributeGroupFacade.prototype.text_61zpoe$ = Tag.prototype.text_61zpoe$;
   CommonAttributeGroupFacade.prototype.text_3p81yu$ = Tag.prototype.text_3p81yu$;
   CommonAttributeGroupFacade.prototype.entity_ws8or7$ = Tag.prototype.entity_ws8or7$;
+  CommonAttributeGroupFacade.prototype.comment_61zpoe$ = Tag.prototype.comment_61zpoe$;
   FormServerAttributeGroupFacade.prototype.unaryPlus_lvwjq6$ = Tag.prototype.unaryPlus_lvwjq6$;
   FormServerAttributeGroupFacade.prototype.unaryPlus_pdl1vz$ = Tag.prototype.unaryPlus_pdl1vz$;
   FormServerAttributeGroupFacade.prototype.text_61zpoe$ = Tag.prototype.text_61zpoe$;
   FormServerAttributeGroupFacade.prototype.text_3p81yu$ = Tag.prototype.text_3p81yu$;
   FormServerAttributeGroupFacade.prototype.entity_ws8or7$ = Tag.prototype.entity_ws8or7$;
+  FormServerAttributeGroupFacade.prototype.comment_61zpoe$ = Tag.prototype.comment_61zpoe$;
   InputServerAttributeGroupFacade.prototype.unaryPlus_lvwjq6$ = Tag.prototype.unaryPlus_lvwjq6$;
   InputServerAttributeGroupFacade.prototype.unaryPlus_pdl1vz$ = Tag.prototype.unaryPlus_pdl1vz$;
   InputServerAttributeGroupFacade.prototype.text_61zpoe$ = Tag.prototype.text_61zpoe$;
   InputServerAttributeGroupFacade.prototype.text_3p81yu$ = Tag.prototype.text_3p81yu$;
   InputServerAttributeGroupFacade.prototype.entity_ws8or7$ = Tag.prototype.entity_ws8or7$;
+  InputServerAttributeGroupFacade.prototype.comment_61zpoe$ = Tag.prototype.comment_61zpoe$;
   SelectServerAttributeGroupFacade.prototype.unaryPlus_lvwjq6$ = Tag.prototype.unaryPlus_lvwjq6$;
   SelectServerAttributeGroupFacade.prototype.unaryPlus_pdl1vz$ = Tag.prototype.unaryPlus_pdl1vz$;
   SelectServerAttributeGroupFacade.prototype.text_61zpoe$ = Tag.prototype.text_61zpoe$;
   SelectServerAttributeGroupFacade.prototype.text_3p81yu$ = Tag.prototype.text_3p81yu$;
   SelectServerAttributeGroupFacade.prototype.entity_ws8or7$ = Tag.prototype.entity_ws8or7$;
+  SelectServerAttributeGroupFacade.prototype.comment_61zpoe$ = Tag.prototype.comment_61zpoe$;
   FlowOrHeadingContent.prototype.unaryPlus_lvwjq6$ = Tag.prototype.unaryPlus_lvwjq6$;
   FlowOrHeadingContent.prototype.unaryPlus_pdl1vz$ = Tag.prototype.unaryPlus_pdl1vz$;
   FlowOrHeadingContent.prototype.text_61zpoe$ = Tag.prototype.text_61zpoe$;
   FlowOrHeadingContent.prototype.text_3p81yu$ = Tag.prototype.text_3p81yu$;
   FlowOrHeadingContent.prototype.entity_ws8or7$ = Tag.prototype.entity_ws8or7$;
-  HeadingContent.prototype.unaryPlus_lvwjq6$ = Tag.prototype.unaryPlus_lvwjq6$;
-  HeadingContent.prototype.unaryPlus_pdl1vz$ = Tag.prototype.unaryPlus_pdl1vz$;
-  HeadingContent.prototype.text_61zpoe$ = Tag.prototype.text_61zpoe$;
-  HeadingContent.prototype.text_3p81yu$ = Tag.prototype.text_3p81yu$;
-  HeadingContent.prototype.entity_ws8or7$ = Tag.prototype.entity_ws8or7$;
+  FlowOrHeadingContent.prototype.comment_61zpoe$ = Tag.prototype.comment_61zpoe$;
+  HeadingContent.prototype.unaryPlus_lvwjq6$ = FlowOrHeadingContent.prototype.unaryPlus_lvwjq6$;
+  HeadingContent.prototype.unaryPlus_pdl1vz$ = FlowOrHeadingContent.prototype.unaryPlus_pdl1vz$;
+  HeadingContent.prototype.text_61zpoe$ = FlowOrHeadingContent.prototype.text_61zpoe$;
+  HeadingContent.prototype.text_3p81yu$ = FlowOrHeadingContent.prototype.text_3p81yu$;
+  HeadingContent.prototype.entity_ws8or7$ = FlowOrHeadingContent.prototype.entity_ws8or7$;
+  HeadingContent.prototype.comment_61zpoe$ = FlowOrHeadingContent.prototype.comment_61zpoe$;
   FlowOrPhrasingOrMetaDataContent.prototype.unaryPlus_lvwjq6$ = Tag.prototype.unaryPlus_lvwjq6$;
   FlowOrPhrasingOrMetaDataContent.prototype.unaryPlus_pdl1vz$ = Tag.prototype.unaryPlus_pdl1vz$;
   FlowOrPhrasingOrMetaDataContent.prototype.text_61zpoe$ = Tag.prototype.text_61zpoe$;
   FlowOrPhrasingOrMetaDataContent.prototype.text_3p81yu$ = Tag.prototype.text_3p81yu$;
   FlowOrPhrasingOrMetaDataContent.prototype.entity_ws8or7$ = Tag.prototype.entity_ws8or7$;
-  FlowOrMetaDataContent.prototype.unaryPlus_lvwjq6$ = Tag.prototype.unaryPlus_lvwjq6$;
-  FlowOrMetaDataContent.prototype.unaryPlus_pdl1vz$ = Tag.prototype.unaryPlus_pdl1vz$;
-  FlowOrMetaDataContent.prototype.text_61zpoe$ = Tag.prototype.text_61zpoe$;
-  FlowOrMetaDataContent.prototype.text_3p81yu$ = Tag.prototype.text_3p81yu$;
-  FlowOrMetaDataContent.prototype.entity_ws8or7$ = Tag.prototype.entity_ws8or7$;
+  FlowOrPhrasingOrMetaDataContent.prototype.comment_61zpoe$ = Tag.prototype.comment_61zpoe$;
+  FlowOrMetaDataContent.prototype.unaryPlus_lvwjq6$ = FlowOrPhrasingOrMetaDataContent.prototype.unaryPlus_lvwjq6$;
+  FlowOrMetaDataContent.prototype.unaryPlus_pdl1vz$ = FlowOrPhrasingOrMetaDataContent.prototype.unaryPlus_pdl1vz$;
+  FlowOrMetaDataContent.prototype.text_61zpoe$ = FlowOrPhrasingOrMetaDataContent.prototype.text_61zpoe$;
+  FlowOrMetaDataContent.prototype.text_3p81yu$ = FlowOrPhrasingOrMetaDataContent.prototype.text_3p81yu$;
+  FlowOrMetaDataContent.prototype.entity_ws8or7$ = FlowOrPhrasingOrMetaDataContent.prototype.entity_ws8or7$;
+  FlowOrMetaDataContent.prototype.comment_61zpoe$ = FlowOrPhrasingOrMetaDataContent.prototype.comment_61zpoe$;
   FlowOrInteractiveOrPhrasingContent.prototype.unaryPlus_lvwjq6$ = Tag.prototype.unaryPlus_lvwjq6$;
   FlowOrInteractiveOrPhrasingContent.prototype.unaryPlus_pdl1vz$ = Tag.prototype.unaryPlus_pdl1vz$;
   FlowOrInteractiveOrPhrasingContent.prototype.text_61zpoe$ = Tag.prototype.text_61zpoe$;
   FlowOrInteractiveOrPhrasingContent.prototype.text_3p81yu$ = Tag.prototype.text_3p81yu$;
   FlowOrInteractiveOrPhrasingContent.prototype.entity_ws8or7$ = Tag.prototype.entity_ws8or7$;
-  FlowOrInteractiveContent.prototype.unaryPlus_lvwjq6$ = Tag.prototype.unaryPlus_lvwjq6$;
-  FlowOrInteractiveContent.prototype.unaryPlus_pdl1vz$ = Tag.prototype.unaryPlus_pdl1vz$;
-  FlowOrInteractiveContent.prototype.text_61zpoe$ = Tag.prototype.text_61zpoe$;
-  FlowOrInteractiveContent.prototype.text_3p81yu$ = Tag.prototype.text_3p81yu$;
-  FlowOrInteractiveContent.prototype.entity_ws8or7$ = Tag.prototype.entity_ws8or7$;
+  FlowOrInteractiveOrPhrasingContent.prototype.comment_61zpoe$ = Tag.prototype.comment_61zpoe$;
+  FlowOrInteractiveContent.prototype.unaryPlus_lvwjq6$ = FlowOrInteractiveOrPhrasingContent.prototype.unaryPlus_lvwjq6$;
+  FlowOrInteractiveContent.prototype.unaryPlus_pdl1vz$ = FlowOrInteractiveOrPhrasingContent.prototype.unaryPlus_pdl1vz$;
+  FlowOrInteractiveContent.prototype.text_61zpoe$ = FlowOrInteractiveOrPhrasingContent.prototype.text_61zpoe$;
+  FlowOrInteractiveContent.prototype.text_3p81yu$ = FlowOrInteractiveOrPhrasingContent.prototype.text_3p81yu$;
+  FlowOrInteractiveContent.prototype.entity_ws8or7$ = FlowOrInteractiveOrPhrasingContent.prototype.entity_ws8or7$;
+  FlowOrInteractiveContent.prototype.comment_61zpoe$ = FlowOrInteractiveOrPhrasingContent.prototype.comment_61zpoe$;
+  FlowOrPhrasingContent.prototype.unaryPlus_lvwjq6$ = FlowOrInteractiveOrPhrasingContent.prototype.unaryPlus_lvwjq6$;
+  FlowOrPhrasingContent.prototype.unaryPlus_pdl1vz$ = FlowOrInteractiveOrPhrasingContent.prototype.unaryPlus_pdl1vz$;
+  FlowOrPhrasingContent.prototype.text_61zpoe$ = FlowOrInteractiveOrPhrasingContent.prototype.text_61zpoe$;
+  FlowOrPhrasingContent.prototype.text_3p81yu$ = FlowOrInteractiveOrPhrasingContent.prototype.text_3p81yu$;
+  FlowOrPhrasingContent.prototype.entity_ws8or7$ = FlowOrInteractiveOrPhrasingContent.prototype.entity_ws8or7$;
+  FlowOrPhrasingContent.prototype.comment_61zpoe$ = FlowOrInteractiveOrPhrasingContent.prototype.comment_61zpoe$;
   SectioningOrFlowContent.prototype.unaryPlus_lvwjq6$ = Tag.prototype.unaryPlus_lvwjq6$;
   SectioningOrFlowContent.prototype.unaryPlus_pdl1vz$ = Tag.prototype.unaryPlus_pdl1vz$;
   SectioningOrFlowContent.prototype.text_61zpoe$ = Tag.prototype.text_61zpoe$;
   SectioningOrFlowContent.prototype.text_3p81yu$ = Tag.prototype.text_3p81yu$;
   SectioningOrFlowContent.prototype.entity_ws8or7$ = Tag.prototype.entity_ws8or7$;
-  InteractiveContent.prototype.unaryPlus_lvwjq6$ = Tag.prototype.unaryPlus_lvwjq6$;
-  InteractiveContent.prototype.unaryPlus_pdl1vz$ = Tag.prototype.unaryPlus_pdl1vz$;
-  InteractiveContent.prototype.text_61zpoe$ = Tag.prototype.text_61zpoe$;
-  InteractiveContent.prototype.text_3p81yu$ = Tag.prototype.text_3p81yu$;
-  InteractiveContent.prototype.entity_ws8or7$ = Tag.prototype.entity_ws8or7$;
-  MetaDataContent.prototype.unaryPlus_lvwjq6$ = Tag.prototype.unaryPlus_lvwjq6$;
-  MetaDataContent.prototype.unaryPlus_pdl1vz$ = Tag.prototype.unaryPlus_pdl1vz$;
-  MetaDataContent.prototype.text_61zpoe$ = Tag.prototype.text_61zpoe$;
-  MetaDataContent.prototype.text_3p81yu$ = Tag.prototype.text_3p81yu$;
-  MetaDataContent.prototype.entity_ws8or7$ = Tag.prototype.entity_ws8or7$;
-  SectioningContent.prototype.unaryPlus_lvwjq6$ = Tag.prototype.unaryPlus_lvwjq6$;
-  SectioningContent.prototype.unaryPlus_pdl1vz$ = Tag.prototype.unaryPlus_pdl1vz$;
-  SectioningContent.prototype.text_61zpoe$ = Tag.prototype.text_61zpoe$;
-  SectioningContent.prototype.text_3p81yu$ = Tag.prototype.text_3p81yu$;
-  SectioningContent.prototype.entity_ws8or7$ = Tag.prototype.entity_ws8or7$;
+  SectioningOrFlowContent.prototype.comment_61zpoe$ = Tag.prototype.comment_61zpoe$;
+  FlowContent.prototype.unaryPlus_lvwjq6$ = FlowOrHeadingContent.prototype.unaryPlus_lvwjq6$;
+  FlowContent.prototype.unaryPlus_pdl1vz$ = FlowOrHeadingContent.prototype.unaryPlus_pdl1vz$;
+  FlowContent.prototype.text_61zpoe$ = FlowOrHeadingContent.prototype.text_61zpoe$;
+  FlowContent.prototype.text_3p81yu$ = FlowOrHeadingContent.prototype.text_3p81yu$;
+  FlowContent.prototype.entity_ws8or7$ = FlowOrHeadingContent.prototype.entity_ws8or7$;
+  FlowContent.prototype.comment_61zpoe$ = FlowOrHeadingContent.prototype.comment_61zpoe$;
+  HtmlBlockTag.prototype.unaryPlus_lvwjq6$ = CommonAttributeGroupFacade.prototype.unaryPlus_lvwjq6$;
+  HtmlBlockTag.prototype.unaryPlus_pdl1vz$ = CommonAttributeGroupFacade.prototype.unaryPlus_pdl1vz$;
+  HtmlBlockTag.prototype.text_61zpoe$ = CommonAttributeGroupFacade.prototype.text_61zpoe$;
+  HtmlBlockTag.prototype.text_3p81yu$ = CommonAttributeGroupFacade.prototype.text_3p81yu$;
+  HtmlBlockTag.prototype.entity_ws8or7$ = CommonAttributeGroupFacade.prototype.entity_ws8or7$;
+  HtmlBlockTag.prototype.comment_61zpoe$ = CommonAttributeGroupFacade.prototype.comment_61zpoe$;
+  CommonAttributeGroupFacadeFlowHeadingContent.prototype.unaryPlus_lvwjq6$ = CommonAttributeGroupFacade.prototype.unaryPlus_lvwjq6$;
+  CommonAttributeGroupFacadeFlowHeadingContent.prototype.unaryPlus_pdl1vz$ = CommonAttributeGroupFacade.prototype.unaryPlus_pdl1vz$;
+  CommonAttributeGroupFacadeFlowHeadingContent.prototype.text_61zpoe$ = CommonAttributeGroupFacade.prototype.text_61zpoe$;
+  CommonAttributeGroupFacadeFlowHeadingContent.prototype.text_3p81yu$ = CommonAttributeGroupFacade.prototype.text_3p81yu$;
+  CommonAttributeGroupFacadeFlowHeadingContent.prototype.entity_ws8or7$ = CommonAttributeGroupFacade.prototype.entity_ws8or7$;
+  CommonAttributeGroupFacadeFlowHeadingContent.prototype.comment_61zpoe$ = CommonAttributeGroupFacade.prototype.comment_61zpoe$;
+  PhrasingContent.prototype.unaryPlus_lvwjq6$ = FlowOrPhrasingContent.prototype.unaryPlus_lvwjq6$;
+  PhrasingContent.prototype.unaryPlus_pdl1vz$ = FlowOrPhrasingContent.prototype.unaryPlus_pdl1vz$;
+  PhrasingContent.prototype.text_61zpoe$ = FlowOrPhrasingContent.prototype.text_61zpoe$;
+  PhrasingContent.prototype.text_3p81yu$ = FlowOrPhrasingContent.prototype.text_3p81yu$;
+  PhrasingContent.prototype.entity_ws8or7$ = FlowOrPhrasingContent.prototype.entity_ws8or7$;
+  PhrasingContent.prototype.comment_61zpoe$ = FlowOrPhrasingContent.prototype.comment_61zpoe$;
+  FlowPhrasingContent.prototype.unaryPlus_lvwjq6$ = FlowContent.prototype.unaryPlus_lvwjq6$;
+  FlowPhrasingContent.prototype.unaryPlus_pdl1vz$ = FlowContent.prototype.unaryPlus_pdl1vz$;
+  FlowPhrasingContent.prototype.text_61zpoe$ = FlowContent.prototype.text_61zpoe$;
+  FlowPhrasingContent.prototype.text_3p81yu$ = FlowContent.prototype.text_3p81yu$;
+  FlowPhrasingContent.prototype.entity_ws8or7$ = FlowContent.prototype.entity_ws8or7$;
+  FlowPhrasingContent.prototype.comment_61zpoe$ = FlowContent.prototype.comment_61zpoe$;
+  HtmlInlineTag.prototype.unaryPlus_lvwjq6$ = CommonAttributeGroupFacade.prototype.unaryPlus_lvwjq6$;
+  HtmlInlineTag.prototype.unaryPlus_pdl1vz$ = CommonAttributeGroupFacade.prototype.unaryPlus_pdl1vz$;
+  HtmlInlineTag.prototype.text_61zpoe$ = CommonAttributeGroupFacade.prototype.text_61zpoe$;
+  HtmlInlineTag.prototype.text_3p81yu$ = CommonAttributeGroupFacade.prototype.text_3p81yu$;
+  HtmlInlineTag.prototype.entity_ws8or7$ = CommonAttributeGroupFacade.prototype.entity_ws8or7$;
+  HtmlInlineTag.prototype.comment_61zpoe$ = CommonAttributeGroupFacade.prototype.comment_61zpoe$;
+  HtmlBlockInlineTag.prototype.unaryPlus_lvwjq6$ = CommonAttributeGroupFacade.prototype.unaryPlus_lvwjq6$;
+  HtmlBlockInlineTag.prototype.unaryPlus_pdl1vz$ = CommonAttributeGroupFacade.prototype.unaryPlus_pdl1vz$;
+  HtmlBlockInlineTag.prototype.text_61zpoe$ = CommonAttributeGroupFacade.prototype.text_61zpoe$;
+  HtmlBlockInlineTag.prototype.text_3p81yu$ = CommonAttributeGroupFacade.prototype.text_3p81yu$;
+  HtmlBlockInlineTag.prototype.entity_ws8or7$ = CommonAttributeGroupFacade.prototype.entity_ws8or7$;
+  HtmlBlockInlineTag.prototype.comment_61zpoe$ = CommonAttributeGroupFacade.prototype.comment_61zpoe$;
+  CommonAttributeGroupFacadeFlowHeadingPhrasingContent.prototype.unaryPlus_lvwjq6$ = CommonAttributeGroupFacade.prototype.unaryPlus_lvwjq6$;
+  CommonAttributeGroupFacadeFlowHeadingPhrasingContent.prototype.unaryPlus_pdl1vz$ = CommonAttributeGroupFacade.prototype.unaryPlus_pdl1vz$;
+  CommonAttributeGroupFacadeFlowHeadingPhrasingContent.prototype.text_61zpoe$ = CommonAttributeGroupFacade.prototype.text_61zpoe$;
+  CommonAttributeGroupFacadeFlowHeadingPhrasingContent.prototype.text_3p81yu$ = CommonAttributeGroupFacade.prototype.text_3p81yu$;
+  CommonAttributeGroupFacadeFlowHeadingPhrasingContent.prototype.entity_ws8or7$ = CommonAttributeGroupFacade.prototype.entity_ws8or7$;
+  CommonAttributeGroupFacadeFlowHeadingPhrasingContent.prototype.comment_61zpoe$ = CommonAttributeGroupFacade.prototype.comment_61zpoe$;
+  InteractiveContent.prototype.unaryPlus_lvwjq6$ = FlowOrInteractiveContent.prototype.unaryPlus_lvwjq6$;
+  InteractiveContent.prototype.unaryPlus_pdl1vz$ = FlowOrInteractiveContent.prototype.unaryPlus_pdl1vz$;
+  InteractiveContent.prototype.text_61zpoe$ = FlowOrInteractiveContent.prototype.text_61zpoe$;
+  InteractiveContent.prototype.text_3p81yu$ = FlowOrInteractiveContent.prototype.text_3p81yu$;
+  InteractiveContent.prototype.entity_ws8or7$ = FlowOrInteractiveContent.prototype.entity_ws8or7$;
+  InteractiveContent.prototype.comment_61zpoe$ = FlowOrInteractiveContent.prototype.comment_61zpoe$;
+  CommonAttributeGroupFacadeFlowInteractiveContent.prototype.unaryPlus_lvwjq6$ = CommonAttributeGroupFacade.prototype.unaryPlus_lvwjq6$;
+  CommonAttributeGroupFacadeFlowInteractiveContent.prototype.unaryPlus_pdl1vz$ = CommonAttributeGroupFacade.prototype.unaryPlus_pdl1vz$;
+  CommonAttributeGroupFacadeFlowInteractiveContent.prototype.text_61zpoe$ = CommonAttributeGroupFacade.prototype.text_61zpoe$;
+  CommonAttributeGroupFacadeFlowInteractiveContent.prototype.text_3p81yu$ = CommonAttributeGroupFacade.prototype.text_3p81yu$;
+  CommonAttributeGroupFacadeFlowInteractiveContent.prototype.entity_ws8or7$ = CommonAttributeGroupFacade.prototype.entity_ws8or7$;
+  CommonAttributeGroupFacadeFlowInteractiveContent.prototype.comment_61zpoe$ = CommonAttributeGroupFacade.prototype.comment_61zpoe$;
+  CommonAttributeGroupFacadeFlowInteractivePhrasingContent.prototype.unaryPlus_lvwjq6$ = CommonAttributeGroupFacade.prototype.unaryPlus_lvwjq6$;
+  CommonAttributeGroupFacadeFlowInteractivePhrasingContent.prototype.unaryPlus_pdl1vz$ = CommonAttributeGroupFacade.prototype.unaryPlus_pdl1vz$;
+  CommonAttributeGroupFacadeFlowInteractivePhrasingContent.prototype.text_61zpoe$ = CommonAttributeGroupFacade.prototype.text_61zpoe$;
+  CommonAttributeGroupFacadeFlowInteractivePhrasingContent.prototype.text_3p81yu$ = CommonAttributeGroupFacade.prototype.text_3p81yu$;
+  CommonAttributeGroupFacadeFlowInteractivePhrasingContent.prototype.entity_ws8or7$ = CommonAttributeGroupFacade.prototype.entity_ws8or7$;
+  CommonAttributeGroupFacadeFlowInteractivePhrasingContent.prototype.comment_61zpoe$ = CommonAttributeGroupFacade.prototype.comment_61zpoe$;
+  MetaDataContent.prototype.unaryPlus_lvwjq6$ = FlowOrMetaDataContent.prototype.unaryPlus_lvwjq6$;
+  MetaDataContent.prototype.unaryPlus_pdl1vz$ = FlowOrMetaDataContent.prototype.unaryPlus_pdl1vz$;
+  MetaDataContent.prototype.text_61zpoe$ = FlowOrMetaDataContent.prototype.text_61zpoe$;
+  MetaDataContent.prototype.text_3p81yu$ = FlowOrMetaDataContent.prototype.text_3p81yu$;
+  MetaDataContent.prototype.entity_ws8or7$ = FlowOrMetaDataContent.prototype.entity_ws8or7$;
+  MetaDataContent.prototype.comment_61zpoe$ = FlowOrMetaDataContent.prototype.comment_61zpoe$;
+  FlowMetaDataContent.prototype.unaryPlus_lvwjq6$ = FlowContent.prototype.unaryPlus_lvwjq6$;
+  FlowMetaDataContent.prototype.unaryPlus_pdl1vz$ = FlowContent.prototype.unaryPlus_pdl1vz$;
+  FlowMetaDataContent.prototype.text_61zpoe$ = FlowContent.prototype.text_61zpoe$;
+  FlowMetaDataContent.prototype.text_3p81yu$ = FlowContent.prototype.text_3p81yu$;
+  FlowMetaDataContent.prototype.entity_ws8or7$ = FlowContent.prototype.entity_ws8or7$;
+  FlowMetaDataContent.prototype.comment_61zpoe$ = FlowContent.prototype.comment_61zpoe$;
+  HtmlHeadTag.prototype.unaryPlus_lvwjq6$ = CommonAttributeGroupFacade.prototype.unaryPlus_lvwjq6$;
+  HtmlHeadTag.prototype.unaryPlus_pdl1vz$ = CommonAttributeGroupFacade.prototype.unaryPlus_pdl1vz$;
+  HtmlHeadTag.prototype.text_61zpoe$ = CommonAttributeGroupFacade.prototype.text_61zpoe$;
+  HtmlHeadTag.prototype.text_3p81yu$ = CommonAttributeGroupFacade.prototype.text_3p81yu$;
+  HtmlHeadTag.prototype.entity_ws8or7$ = CommonAttributeGroupFacade.prototype.entity_ws8or7$;
+  HtmlHeadTag.prototype.comment_61zpoe$ = CommonAttributeGroupFacade.prototype.comment_61zpoe$;
+  CommonAttributeGroupFacadeFlowMetaDataContent.prototype.unaryPlus_lvwjq6$ = CommonAttributeGroupFacade.prototype.unaryPlus_lvwjq6$;
+  CommonAttributeGroupFacadeFlowMetaDataContent.prototype.unaryPlus_pdl1vz$ = CommonAttributeGroupFacade.prototype.unaryPlus_pdl1vz$;
+  CommonAttributeGroupFacadeFlowMetaDataContent.prototype.text_61zpoe$ = CommonAttributeGroupFacade.prototype.text_61zpoe$;
+  CommonAttributeGroupFacadeFlowMetaDataContent.prototype.text_3p81yu$ = CommonAttributeGroupFacade.prototype.text_3p81yu$;
+  CommonAttributeGroupFacadeFlowMetaDataContent.prototype.entity_ws8or7$ = CommonAttributeGroupFacade.prototype.entity_ws8or7$;
+  CommonAttributeGroupFacadeFlowMetaDataContent.prototype.comment_61zpoe$ = CommonAttributeGroupFacade.prototype.comment_61zpoe$;
+  FlowMetaDataPhrasingContent.prototype.unaryPlus_lvwjq6$ = FlowMetaDataContent.prototype.unaryPlus_lvwjq6$;
+  FlowMetaDataPhrasingContent.prototype.unaryPlus_pdl1vz$ = FlowMetaDataContent.prototype.unaryPlus_pdl1vz$;
+  FlowMetaDataPhrasingContent.prototype.text_61zpoe$ = FlowMetaDataContent.prototype.text_61zpoe$;
+  FlowMetaDataPhrasingContent.prototype.text_3p81yu$ = FlowMetaDataContent.prototype.text_3p81yu$;
+  FlowMetaDataPhrasingContent.prototype.entity_ws8or7$ = FlowMetaDataContent.prototype.entity_ws8or7$;
+  FlowMetaDataPhrasingContent.prototype.comment_61zpoe$ = FlowMetaDataContent.prototype.comment_61zpoe$;
+  CommonAttributeGroupFacadeFlowMetaDataPhrasingContent.prototype.unaryPlus_lvwjq6$ = CommonAttributeGroupFacade.prototype.unaryPlus_lvwjq6$;
+  CommonAttributeGroupFacadeFlowMetaDataPhrasingContent.prototype.unaryPlus_pdl1vz$ = CommonAttributeGroupFacade.prototype.unaryPlus_pdl1vz$;
+  CommonAttributeGroupFacadeFlowMetaDataPhrasingContent.prototype.text_61zpoe$ = CommonAttributeGroupFacade.prototype.text_61zpoe$;
+  CommonAttributeGroupFacadeFlowMetaDataPhrasingContent.prototype.text_3p81yu$ = CommonAttributeGroupFacade.prototype.text_3p81yu$;
+  CommonAttributeGroupFacadeFlowMetaDataPhrasingContent.prototype.entity_ws8or7$ = CommonAttributeGroupFacade.prototype.entity_ws8or7$;
+  CommonAttributeGroupFacadeFlowMetaDataPhrasingContent.prototype.comment_61zpoe$ = CommonAttributeGroupFacade.prototype.comment_61zpoe$;
+  SectioningContent.prototype.unaryPlus_lvwjq6$ = SectioningOrFlowContent.prototype.unaryPlus_lvwjq6$;
+  SectioningContent.prototype.unaryPlus_pdl1vz$ = SectioningOrFlowContent.prototype.unaryPlus_pdl1vz$;
+  SectioningContent.prototype.text_61zpoe$ = SectioningOrFlowContent.prototype.text_61zpoe$;
+  SectioningContent.prototype.text_3p81yu$ = SectioningOrFlowContent.prototype.text_3p81yu$;
+  SectioningContent.prototype.entity_ws8or7$ = SectioningOrFlowContent.prototype.entity_ws8or7$;
+  SectioningContent.prototype.comment_61zpoe$ = SectioningOrFlowContent.prototype.comment_61zpoe$;
+  CommonAttributeGroupFacadeFlowSectioningContent.prototype.unaryPlus_lvwjq6$ = CommonAttributeGroupFacade.prototype.unaryPlus_lvwjq6$;
+  CommonAttributeGroupFacadeFlowSectioningContent.prototype.unaryPlus_pdl1vz$ = CommonAttributeGroupFacade.prototype.unaryPlus_pdl1vz$;
+  CommonAttributeGroupFacadeFlowSectioningContent.prototype.text_61zpoe$ = CommonAttributeGroupFacade.prototype.text_61zpoe$;
+  CommonAttributeGroupFacadeFlowSectioningContent.prototype.text_3p81yu$ = CommonAttributeGroupFacade.prototype.text_3p81yu$;
+  CommonAttributeGroupFacadeFlowSectioningContent.prototype.entity_ws8or7$ = CommonAttributeGroupFacade.prototype.entity_ws8or7$;
+  CommonAttributeGroupFacadeFlowSectioningContent.prototype.comment_61zpoe$ = CommonAttributeGroupFacade.prototype.comment_61zpoe$;
+  CommonAttributeGroupFacadeFlowPhrasingSectioningContent.prototype.unaryPlus_lvwjq6$ = CommonAttributeGroupFacade.prototype.unaryPlus_lvwjq6$;
+  CommonAttributeGroupFacadeFlowPhrasingSectioningContent.prototype.unaryPlus_pdl1vz$ = CommonAttributeGroupFacade.prototype.unaryPlus_pdl1vz$;
+  CommonAttributeGroupFacadeFlowPhrasingSectioningContent.prototype.text_61zpoe$ = CommonAttributeGroupFacade.prototype.text_61zpoe$;
+  CommonAttributeGroupFacadeFlowPhrasingSectioningContent.prototype.text_3p81yu$ = CommonAttributeGroupFacade.prototype.text_3p81yu$;
+  CommonAttributeGroupFacadeFlowPhrasingSectioningContent.prototype.entity_ws8or7$ = CommonAttributeGroupFacade.prototype.entity_ws8or7$;
+  CommonAttributeGroupFacadeFlowPhrasingSectioningContent.prototype.comment_61zpoe$ = CommonAttributeGroupFacade.prototype.comment_61zpoe$;
   HTMLTag.prototype.unaryPlus_lvwjq6$ = Tag.prototype.unaryPlus_lvwjq6$;
   HTMLTag.prototype.unaryPlus_pdl1vz$ = Tag.prototype.unaryPlus_pdl1vz$;
   HTMLTag.prototype.text_61zpoe$ = Tag.prototype.text_61zpoe$;
   HTMLTag.prototype.text_3p81yu$ = Tag.prototype.text_3p81yu$;
   HTMLTag.prototype.entity_ws8or7$ = Tag.prototype.entity_ws8or7$;
+  HTMLTag.prototype.comment_61zpoe$ = Tag.prototype.comment_61zpoe$;
   HTMLStreamBuilder$UnsafeImpl$ObjectLiteral.prototype.unaryPlus_lvwjq6$ = Unsafe.prototype.unaryPlus_lvwjq6$;
   HTMLStreamBuilder$UnsafeImpl$ObjectLiteral.prototype.raw_61zpoe$ = Unsafe.prototype.raw_61zpoe$;
   HTMLStreamBuilder$UnsafeImpl$ObjectLiteral.prototype.raw_ws8or7$ = Unsafe.prototype.raw_ws8or7$;
@@ -16180,7 +16616,7 @@
   var tmp$_18;
   tmp$_18 = array.length - 1 | 0;
   for (var i_2 = 0; i_2 <= tmp$_18; i_2++) {
-    array[i_2] = mappings.get_11rb$(toBoxedChar(Kotlin.toChar(i_2)));
+    array[i_2] = mappings.get_11rb$(toBoxedChar(toChar(i_2)));
   }
   escapeMap = array;
   letterRangeLowerCase = new CharRange(97, 122);

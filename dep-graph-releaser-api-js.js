@@ -3,16 +3,15 @@ if (typeof kotlin === 'undefined') {
 }
 this['dep-graph-releaser-api-js'] = function (_, Kotlin) {
   'use strict';
-  var ensureNotNull = Kotlin.ensureNotNull;
-  var Kind_CLASS = Kotlin.Kind.CLASS;
-  var Iterator = Kotlin.kotlin.collections.Iterator;
   var equals = Kotlin.equals;
   var Kind_OBJECT = Kotlin.Kind.OBJECT;
   var Enum = Kotlin.kotlin.Enum;
+  var Kind_CLASS = Kotlin.Kind.CLASS;
   var throwISE = Kotlin.throwISE;
   var Kind_INTERFACE = Kotlin.Kind.INTERFACE;
   var getKClass = Kotlin.getKClass;
   var toString = Kotlin.toString;
+  var ensureNotNull = Kotlin.ensureNotNull;
   var joinToString = Kotlin.kotlin.collections.joinToString_cgipc5$;
   var IllegalArgumentException_init = Kotlin.kotlin.IllegalArgumentException_init_pdl1vj$;
   var mutableListOf = Kotlin.kotlin.collections.mutableListOf_i5x0yv$;
@@ -21,6 +20,7 @@ this['dep-graph-releaser-api-js'] = function (_, Kotlin) {
   var filter = Kotlin.kotlin.sequences.filter_euau3h$;
   var map = Kotlin.kotlin.sequences.map_z5avom$;
   var Unit = Kotlin.kotlin.Unit;
+  var Iterator = Kotlin.kotlin.collections.Iterator;
   var NoSuchElementException = Kotlin.kotlin.NoSuchElementException;
   var last = Kotlin.kotlin.collections.last_2p1efm$;
   var linkedMapOf = Kotlin.kotlin.collections.linkedMapOf_qfcya0$;
@@ -30,8 +30,8 @@ this['dep-graph-releaser-api-js'] = function (_, Kotlin) {
   CommandState$Waiting.prototype.constructor = CommandState$Waiting;
   CommandState$Ready.prototype = Object.create(CommandState.prototype);
   CommandState$Ready.prototype.constructor = CommandState$Ready;
-  CommandState$ReadyToRetrigger.prototype = Object.create(CommandState.prototype);
-  CommandState$ReadyToRetrigger.prototype.constructor = CommandState$ReadyToRetrigger;
+  CommandState$ReadyToReTrigger.prototype = Object.create(CommandState.prototype);
+  CommandState$ReadyToReTrigger.prototype.constructor = CommandState$ReadyToReTrigger;
   CommandState$Queueing.prototype = Object.create(CommandState.prototype);
   CommandState$Queueing.prototype.constructor = CommandState$Queueing;
   CommandState$InProgress.prototype = Object.create(CommandState.prototype);
@@ -48,36 +48,9 @@ this['dep-graph-releaser-api-js'] = function (_, Kotlin) {
   ReleaseState.prototype.constructor = ReleaseState;
   CommandStateJson$State.prototype = Object.create(Enum.prototype);
   CommandStateJson$State.prototype.constructor = CommandStateJson$State;
-  function PeekingIterator(itr) {
-    this.itr_0 = itr;
-    this.peek_0 = null;
+  function hasNextOnTheSameLevel($receiver, level) {
+    return $receiver.hasNext() && level === $receiver.peek().level;
   }
-  PeekingIterator.prototype.hasNext = function () {
-    return this.peek_0 != null || this.itr_0.hasNext();
-  };
-  PeekingIterator.prototype.next = function () {
-    var tmp$;
-    var peeked = this.peek_0;
-    if (peeked != null) {
-      this.peek_0 = null;
-      tmp$ = peeked;
-    }
-     else {
-      tmp$ = this.itr_0.next();
-    }
-    return tmp$;
-  };
-  PeekingIterator.prototype.peek = function () {
-    if (this.peek_0 == null) {
-      this.peek_0 = this.itr_0.next();
-    }
-    return ensureNotNull(this.peek_0);
-  };
-  PeekingIterator.$metadata$ = {
-    kind: Kind_CLASS,
-    simpleName: 'PeekingIterator',
-    interfaces: [Iterator]
-  };
   function ConfigKey(name, ordinal, key) {
     Enum.call(this);
     this.key_c1gzzu$_0 = key;
@@ -89,10 +62,11 @@ this['dep-graph-releaser-api-js'] = function (_, Kotlin) {
     };
     ConfigKey$COMMIT_PREFIX_instance = new ConfigKey('COMMIT_PREFIX', 0, 'commitPrefix');
     ConfigKey$UPDATE_DEPENDENCY_JOB_instance = new ConfigKey('UPDATE_DEPENDENCY_JOB', 1, 'updateDependencyJob');
-    ConfigKey$REMOTE_REGEX_instance = new ConfigKey('REMOTE_REGEX', 2, 'remoteRegex');
-    ConfigKey$REMOTE_JOB_instance = new ConfigKey('REMOTE_JOB', 3, 'remoteJob');
-    ConfigKey$REGEX_PARAMS_instance = new ConfigKey('REGEX_PARAMS', 4, 'regexParams');
-    ConfigKey$JOB_MAPPING_instance = new ConfigKey('JOB_MAPPING', 5, 'jobMapping');
+    ConfigKey$REMOTE_JOB_instance = new ConfigKey('REMOTE_JOB', 2, 'remoteJob');
+    ConfigKey$REMOTE_REGEX_instance = new ConfigKey('REMOTE_REGEX', 3, 'remoteRegex');
+    ConfigKey$DRY_RUN_JOB_instance = new ConfigKey('DRY_RUN_JOB', 4, 'dryRunJob');
+    ConfigKey$REGEX_PARAMS_instance = new ConfigKey('REGEX_PARAMS', 5, 'regexParams');
+    ConfigKey$JOB_MAPPING_instance = new ConfigKey('JOB_MAPPING', 6, 'jobMapping');
     ConfigKey$Companion_getInstance();
   }
   var ConfigKey$COMMIT_PREFIX_instance;
@@ -105,15 +79,20 @@ this['dep-graph-releaser-api-js'] = function (_, Kotlin) {
     ConfigKey_initFields();
     return ConfigKey$UPDATE_DEPENDENCY_JOB_instance;
   }
+  var ConfigKey$REMOTE_JOB_instance;
+  function ConfigKey$REMOTE_JOB_getInstance() {
+    ConfigKey_initFields();
+    return ConfigKey$REMOTE_JOB_instance;
+  }
   var ConfigKey$REMOTE_REGEX_instance;
   function ConfigKey$REMOTE_REGEX_getInstance() {
     ConfigKey_initFields();
     return ConfigKey$REMOTE_REGEX_instance;
   }
-  var ConfigKey$REMOTE_JOB_instance;
-  function ConfigKey$REMOTE_JOB_getInstance() {
+  var ConfigKey$DRY_RUN_JOB_instance;
+  function ConfigKey$DRY_RUN_JOB_getInstance() {
     ConfigKey_initFields();
-    return ConfigKey$REMOTE_JOB_instance;
+    return ConfigKey$DRY_RUN_JOB_instance;
   }
   var ConfigKey$REGEX_PARAMS_instance;
   function ConfigKey$REGEX_PARAMS_getInstance() {
@@ -167,7 +146,7 @@ this['dep-graph-releaser-api-js'] = function (_, Kotlin) {
     interfaces: [Enum]
   };
   function ConfigKey$values() {
-    return [ConfigKey$COMMIT_PREFIX_getInstance(), ConfigKey$UPDATE_DEPENDENCY_JOB_getInstance(), ConfigKey$REMOTE_REGEX_getInstance(), ConfigKey$REMOTE_JOB_getInstance(), ConfigKey$REGEX_PARAMS_getInstance(), ConfigKey$JOB_MAPPING_getInstance()];
+    return [ConfigKey$COMMIT_PREFIX_getInstance(), ConfigKey$UPDATE_DEPENDENCY_JOB_getInstance(), ConfigKey$REMOTE_JOB_getInstance(), ConfigKey$REMOTE_REGEX_getInstance(), ConfigKey$DRY_RUN_JOB_getInstance(), ConfigKey$REGEX_PARAMS_getInstance(), ConfigKey$JOB_MAPPING_getInstance()];
   }
   ConfigKey.values = ConfigKey$values;
   function ConfigKey$valueOf(name) {
@@ -176,10 +155,12 @@ this['dep-graph-releaser-api-js'] = function (_, Kotlin) {
         return ConfigKey$COMMIT_PREFIX_getInstance();
       case 'UPDATE_DEPENDENCY_JOB':
         return ConfigKey$UPDATE_DEPENDENCY_JOB_getInstance();
-      case 'REMOTE_REGEX':
-        return ConfigKey$REMOTE_REGEX_getInstance();
       case 'REMOTE_JOB':
         return ConfigKey$REMOTE_JOB_getInstance();
+      case 'REMOTE_REGEX':
+        return ConfigKey$REMOTE_REGEX_getInstance();
+      case 'DRY_RUN_JOB':
+        return ConfigKey$DRY_RUN_JOB_getInstance();
       case 'REGEX_PARAMS':
         return ConfigKey$REGEX_PARAMS_getInstance();
       case 'JOB_MAPPING':
@@ -254,21 +235,21 @@ this['dep-graph-releaser-api-js'] = function (_, Kotlin) {
     }
     return CommandState$Ready_instance;
   }
-  function CommandState$ReadyToRetrigger() {
-    CommandState$ReadyToRetrigger_instance = this;
+  function CommandState$ReadyToReTrigger() {
+    CommandState$ReadyToReTrigger_instance = this;
     CommandState.call(this);
   }
-  CommandState$ReadyToRetrigger.$metadata$ = {
+  CommandState$ReadyToReTrigger.$metadata$ = {
     kind: Kind_OBJECT,
-    simpleName: 'ReadyToRetrigger',
+    simpleName: 'ReadyToReTrigger',
     interfaces: [CommandState]
   };
-  var CommandState$ReadyToRetrigger_instance = null;
-  function CommandState$ReadyToRetrigger_getInstance() {
-    if (CommandState$ReadyToRetrigger_instance === null) {
-      new CommandState$ReadyToRetrigger();
+  var CommandState$ReadyToReTrigger_instance = null;
+  function CommandState$ReadyToReTrigger_getInstance() {
+    if (CommandState$ReadyToReTrigger_instance === null) {
+      new CommandState$ReadyToReTrigger();
     }
-    return CommandState$ReadyToRetrigger_instance;
+    return CommandState$ReadyToReTrigger_instance;
   }
   function CommandState$Queueing() {
     CommandState$Queueing_instance = this;
@@ -391,7 +372,7 @@ this['dep-graph-releaser-api-js'] = function (_, Kotlin) {
       var message_0 = CommandState$checkTransitionAllowed$lambda(this, newState)();
       throw IllegalStateException_init(message_0.toString());
     }
-    if (equals(newState, CommandState$ReadyToRetrigger_getInstance()))
+    if (equals(newState, CommandState$ReadyToReTrigger_getInstance()))
       this.checkNewState_fityb6$_0(newState, [getKClass(CommandState$Failed)]);
     else if (equals(newState, CommandState$Ready_getInstance())) {
       this.checkNewState_fityb6$_0(newState, [getKClass(CommandState$Waiting)]);
@@ -403,7 +384,7 @@ this['dep-graph-releaser-api-js'] = function (_, Kotlin) {
       }
     }
      else if (equals(newState, CommandState$Queueing_getInstance()))
-      this.checkNewState_fityb6$_0(newState, [getKClass(CommandState$Ready), getKClass(CommandState$ReadyToRetrigger)]);
+      this.checkNewState_fityb6$_0(newState, [getKClass(CommandState$Ready), getKClass(CommandState$ReadyToReTrigger)]);
     else if (equals(newState, CommandState$InProgress_getInstance()))
       this.checkNewState_fityb6$_0(newState, [getKClass(CommandState$Queueing)]);
     else if (equals(newState, CommandState$Succeeded_getInstance()))
@@ -615,6 +596,14 @@ this['dep-graph-releaser-api-js'] = function (_, Kotlin) {
     tmp$ = this.dependents_0.get_11rb$(projectId);
     if (tmp$ == null) {
       throw IllegalArgumentException_init('Could not find dependents for project with id ' + projectId);
+    }
+    return tmp$;
+  };
+  ReleasePlan.prototype.getConfig_udzor3$ = function (configKey) {
+    var tmp$;
+    tmp$ = this.config.get_11rb$(configKey);
+    if (tmp$ == null) {
+      throw IllegalArgumentException_init('Unknown config key: ' + configKey);
     }
     return tmp$;
   };
@@ -887,7 +876,7 @@ this['dep-graph-releaser-api-js'] = function (_, Kotlin) {
     };
     CommandStateJson$State$Waiting_instance = new CommandStateJson$State('Waiting', 0);
     CommandStateJson$State$Ready_instance = new CommandStateJson$State('Ready', 1);
-    CommandStateJson$State$ReadyToRetrigger_instance = new CommandStateJson$State('ReadyToRetrigger', 2);
+    CommandStateJson$State$ReadyToReTrigger_instance = new CommandStateJson$State('ReadyToReTrigger', 2);
     CommandStateJson$State$Queueing_instance = new CommandStateJson$State('Queueing', 3);
     CommandStateJson$State$InProgress_instance = new CommandStateJson$State('InProgress', 4);
     CommandStateJson$State$Succeeded_instance = new CommandStateJson$State('Succeeded', 5);
@@ -905,10 +894,10 @@ this['dep-graph-releaser-api-js'] = function (_, Kotlin) {
     CommandStateJson$State_initFields();
     return CommandStateJson$State$Ready_instance;
   }
-  var CommandStateJson$State$ReadyToRetrigger_instance;
-  function CommandStateJson$State$ReadyToRetrigger_getInstance() {
+  var CommandStateJson$State$ReadyToReTrigger_instance;
+  function CommandStateJson$State$ReadyToReTrigger_getInstance() {
     CommandStateJson$State_initFields();
-    return CommandStateJson$State$ReadyToRetrigger_instance;
+    return CommandStateJson$State$ReadyToReTrigger_instance;
   }
   var CommandStateJson$State$Queueing_instance;
   function CommandStateJson$State$Queueing_getInstance() {
@@ -946,7 +935,7 @@ this['dep-graph-releaser-api-js'] = function (_, Kotlin) {
     interfaces: [Enum]
   };
   function CommandStateJson$State$values() {
-    return [CommandStateJson$State$Waiting_getInstance(), CommandStateJson$State$Ready_getInstance(), CommandStateJson$State$ReadyToRetrigger_getInstance(), CommandStateJson$State$Queueing_getInstance(), CommandStateJson$State$InProgress_getInstance(), CommandStateJson$State$Succeeded_getInstance(), CommandStateJson$State$Failed_getInstance(), CommandStateJson$State$Deactivated_getInstance(), CommandStateJson$State$Disabled_getInstance()];
+    return [CommandStateJson$State$Waiting_getInstance(), CommandStateJson$State$Ready_getInstance(), CommandStateJson$State$ReadyToReTrigger_getInstance(), CommandStateJson$State$Queueing_getInstance(), CommandStateJson$State$InProgress_getInstance(), CommandStateJson$State$Succeeded_getInstance(), CommandStateJson$State$Failed_getInstance(), CommandStateJson$State$Deactivated_getInstance(), CommandStateJson$State$Disabled_getInstance()];
   }
   CommandStateJson$State.values = CommandStateJson$State$values;
   function CommandStateJson$State$valueOf(name) {
@@ -955,8 +944,8 @@ this['dep-graph-releaser-api-js'] = function (_, Kotlin) {
         return CommandStateJson$State$Waiting_getInstance();
       case 'Ready':
         return CommandStateJson$State$Ready_getInstance();
-      case 'ReadyToRetrigger':
-        return CommandStateJson$State$ReadyToRetrigger_getInstance();
+      case 'ReadyToReTrigger':
+        return CommandStateJson$State$ReadyToReTrigger_getInstance();
       case 'Queueing':
         return CommandStateJson$State$Queueing_getInstance();
       case 'InProgress':
@@ -1025,8 +1014,8 @@ this['dep-graph-releaser-api-js'] = function (_, Kotlin) {
         return new CommandState$Waiting((tmp$ = json.dependencies) != null ? tmp$ : throwIllegal('dependencies', 'Waiting'));
       case 'Ready':
         return CommandState$Ready_getInstance();
-      case 'ReadyToRetrigger':
-        return CommandState$ReadyToRetrigger_getInstance();
+      case 'ReadyToReTrigger':
+        return CommandState$ReadyToReTrigger_getInstance();
       case 'Queueing':
         return CommandState$Queueing_getInstance();
       case 'InProgress':
@@ -1092,27 +1081,24 @@ this['dep-graph-releaser-api-js'] = function (_, Kotlin) {
     simpleName: 'LevelIterator',
     interfaces: [Iterator]
   };
-  function toPeekingIterator($receiver) {
-    return new PeekingIterator($receiver);
-  }
-  function hasNextOnTheSameLevel($receiver, level) {
-    return $receiver.hasNext() && level === $receiver.peek().level;
-  }
   var package$ch = _.ch || (_.ch = {});
   var package$loewenfels = package$ch.loewenfels || (package$ch.loewenfels = {});
   var package$depgraph = package$loewenfels.depgraph || (package$loewenfels.depgraph = {});
-  package$depgraph.PeekingIterator = PeekingIterator;
+  package$depgraph.hasNextOnTheSameLevel_r88oei$ = hasNextOnTheSameLevel;
   Object.defineProperty(ConfigKey, 'COMMIT_PREFIX', {
     get: ConfigKey$COMMIT_PREFIX_getInstance
   });
   Object.defineProperty(ConfigKey, 'UPDATE_DEPENDENCY_JOB', {
     get: ConfigKey$UPDATE_DEPENDENCY_JOB_getInstance
   });
+  Object.defineProperty(ConfigKey, 'REMOTE_JOB', {
+    get: ConfigKey$REMOTE_JOB_getInstance
+  });
   Object.defineProperty(ConfigKey, 'REMOTE_REGEX', {
     get: ConfigKey$REMOTE_REGEX_getInstance
   });
-  Object.defineProperty(ConfigKey, 'REMOTE_JOB', {
-    get: ConfigKey$REMOTE_JOB_getInstance
+  Object.defineProperty(ConfigKey, 'DRY_RUN_JOB', {
+    get: ConfigKey$DRY_RUN_JOB_getInstance
   });
   Object.defineProperty(ConfigKey, 'REGEX_PARAMS', {
     get: ConfigKey$REGEX_PARAMS_getInstance
@@ -1130,8 +1116,8 @@ this['dep-graph-releaser-api-js'] = function (_, Kotlin) {
   Object.defineProperty(CommandState, 'Ready', {
     get: CommandState$Ready_getInstance
   });
-  Object.defineProperty(CommandState, 'ReadyToRetrigger', {
-    get: CommandState$ReadyToRetrigger_getInstance
+  Object.defineProperty(CommandState, 'ReadyToReTrigger', {
+    get: CommandState$ReadyToReTrigger_getInstance
   });
   Object.defineProperty(CommandState, 'Queueing', {
     get: CommandState$Queueing_getInstance
@@ -1179,8 +1165,8 @@ this['dep-graph-releaser-api-js'] = function (_, Kotlin) {
   Object.defineProperty(CommandStateJson$State, 'Ready', {
     get: CommandStateJson$State$Ready_getInstance
   });
-  Object.defineProperty(CommandStateJson$State, 'ReadyToRetrigger', {
-    get: CommandStateJson$State$ReadyToRetrigger_getInstance
+  Object.defineProperty(CommandStateJson$State, 'ReadyToReTrigger', {
+    get: CommandStateJson$State$ReadyToReTrigger_getInstance
   });
   Object.defineProperty(CommandStateJson$State, 'Queueing', {
     get: CommandStateJson$State$Queueing_getInstance
@@ -1208,8 +1194,6 @@ this['dep-graph-releaser-api-js'] = function (_, Kotlin) {
   package$serialization.CommandStateJson = CommandStateJson;
   package$serialization.fromJson_v4rmea$ = fromJson;
   package$depgraph.LevelIterator = LevelIterator;
-  package$depgraph.toPeekingIterator_35ci02$ = toPeekingIterator;
-  package$depgraph.hasNextOnTheSameLevel_wvkvts$ = hasNextOnTheSameLevel;
   ReleaseCommand.prototype.asDeactivated = Command.prototype.asDeactivated;
   ReleaseCommand.prototype.asDisabled = Command.prototype.asDisabled;
   Kotlin.defineModule('dep-graph-releaser-api-js', _);

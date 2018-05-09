@@ -139,13 +139,14 @@ div.level {
     border-right: 1px solid #CCC;
 }
 
-.project, .loader {
-    border:1px solid #CCC;
+.project,
+.loader {
+    border: 1px solid #CCC;
     background: #fff;
     margin: 0 auto 20px auto;
     display: block;
     width: 300px;
-    padding:20px 15px;
+    padding: 20px 15px;
     border-radius: 2px 2px 2px 2px;
     -webkit-box-shadow:
         0 1px 4px rgba(0, 0, 0, 0.3),
@@ -214,7 +215,8 @@ div.title {
 
 div.title::after,
 div.command > div.fields::after,
-#menu::after, .button::after  {
+#menu::after, .button::after,
+#modal .buttons::after {
     content: '';
     display: block;
     clear:both;
@@ -299,6 +301,9 @@ label.toggle input:disabled + .slider {
     background-color: #CDCDCD;
     cursor: not-allowed;
 }
+input:read-only {
+    color: #888;
+}
 input:disabled {
     cursor: not-allowed;
 }
@@ -326,7 +331,7 @@ input:disabled {
 }
 
 .command.ready > .fields > .toggle,
-.command.readyToRetrigger > .fields > .toggle,
+.command.readyToReTrigger > .fields > .toggle,
 .command.queueing > .fields > .toggle,
 .command.inProgress > .fields > .toggle,
 .command.succeeded > .fields > .toggle,
@@ -336,11 +341,11 @@ input:disabled {
 }
 
 .command.ready > .fields > .state,
-.command.readyToRetrigger > .fields > .state {
+.command.readyToReTrigger > .fields > .state {
     display: inline-block;
 }
 
-.command.readyToRetrigger > .fields > .state .material-icons span::after {
+.command.readyToReTrigger > .fields > .state .material-icons span::after {
     content: 'playlist_play';
 }
 
@@ -381,14 +386,15 @@ input:disabled {
     content: 'play_arrow';
 }
 
-.command.succeeded > .fields > .state .material-icons span::after {
+.command.succeeded > .fields > .state .material-icons span::after,
+.contextMenu .succeeded > .material-icons span::after {
     content: 'check';
 }
 .command.succeeded > .fields > .state {
     cursor: pointer;
     display: inline-block;
     border-color: #008000;
-    color:#008000;
+    color: #008000;
     background-color: #c9fdc9;
     animation: none;
     -webkit-animation: none;
@@ -401,7 +407,7 @@ input:disabled {
     cursor: pointer;
     display: inline-block;
     border-color: #a01c1c;
-    color:#a01c1c;
+    color: #a01c1c;
     background-color: #f7dede;
     animation: none;
     -webkit-animation: none;
@@ -434,16 +440,63 @@ input:disabled {
     height: 20px;
 }
 
-#status, #messages {
+.contextMenu {
+    position: absolute;
+    background: #FFF;
+    border: 1px solid #AAA;
+    border-radius: 6px;
+    visibility: hidden;
+    width: 205px;
+    z-index: 1;
+}
+.contextMenu div {
+    cursor: pointer;
+    padding: 5px;
+    padding-right: 20px;
+}
+.contextMenu div:first-child {
+    border-top-left-radius: 6px;
+    border-top-right-radius: 6px;
+}
+.contextMenu div:last-child {
+    border-bottom-left-radius: 6px;
+    border-bottom-right-radius: 6px;
+}
+
+.contextMenu div:hover {
+    background-color: #EFEFEF;
+}
+.contextMenu div > span {
+    vertical-align: middle;
+    margin-left: 2px;
+}
+.contextMenu .material-icons {
+    font-size: 20px;
+    padding: 2px;
+    width: 20px;
+    height: 20px;
+    vertical-align: middle;
+}
+.contextMenu .succeeded .material-icons {
+    color: #008000;
+}
+
+#status,
+#messages {
     position: fixed;
     left: 0;
-    right: 0px;
     bottom: 0px;
     max-height: 40%;
     overflow-y: auto;
     padding-left: 15px;
     padding-right: 15px;
-    padding-bottom: 10px;
+}
+#messages {
+    right: 0px;
+}
+#status {
+    display: inline-block;
+    bottom: 10px;
 }
 
 .minimized {
@@ -588,6 +641,81 @@ input:disabled {
     color: #000;
 }
 
-#hideMessages:only-child {
+#hideMessages:first-child:nth-last-child(2) {
     display: none;
+}
+
+#messages .spacing {
+    display: block;
+    padding-bottom: 10px;
+}
+#messages .spacing:nth-child(2) {
+    display: none;
+}
+
+
+#modals:not(:empty) {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 10;
+    background-color: #AAAAAA90;
+}
+#modals .box {
+    position: absolute;
+    display: inline-block;
+    border: 1px solid black;
+    border-radius: 5px;
+    background-color: #FFF;
+    padding: 20px;
+    padding-right: 30px;
+    padding-bottom: 25px;
+    max-width: 800px;
+    -webkit-box-shadow:
+        0 1px 4px rgba(0, 0, 0, 0.3),
+        0 0 20px rgba(0, 0, 0, 0.1) inset;
+    -moz-box-shadow:
+        0 1px 4px rgba(0, 0, 0, 0.3),
+        0 0 20px rgba(0, 0, 0, 0.1) inset;
+    box-shadow:
+        0 1px 4px rgba(0, 0, 0, 0.3),
+        0 0 20px rgba(0, 0, 0, 0.1) inset;
+}
+
+#modals .text {
+    dispay: table
+}
+#modals .text .material-icons {
+    display: table-cell;
+    padding-right: 15px;
+    color: #2196F3;
+}
+#modals .text span {
+    display: table-cell;
+    vertical-align: top;
+}
+
+#modals .buttons {
+    margin-top: 15px;
+    float: right;
+}
+#modals .buttons span {
+    border: 1px solid #AAA;
+    border-radius: 3px;
+    background-color: #EEE;
+    margin-left: 13px;
+    padding: 6px 10px;
+    cursor: pointer;
+    max-width: 800px;
+    -webkit-box-shadow:
+        0 1px 1px rgba(0, 0, 0, 0.3),
+        0 0 6px rgba(0, 0, 0, 0.1) inset;
+    -moz-box-shadow:
+        0 1px 1px rgba(0, 0, 0, 0.3),
+        0 0 6px rgba(0, 0, 0, 0.1) inset;
+    box-shadow:
+        0 1px 1px rgba(0, 0, 0, 0.3),
+        0 0 6px rgba(0, 0, 0, 0.1) inset;
 }
