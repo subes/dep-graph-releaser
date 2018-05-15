@@ -1388,7 +1388,8 @@
   }
   Gui.prototype.fieldsForCommand_0 = function ($receiver, idPrefix, project, index, command) {
     var cssClass = Kotlin.isType(command, ReleaseCommand) ? 'release' : '';
-    this.toggle_0($receiver, idPrefix + Gui$Companion_getInstance().DEACTIVATE_SUFFIX, 'Click to deactivate command', !Kotlin.isType(command.state, CommandState$Deactivated), command.state === CommandState.Disabled, cssClass);
+    var isNotDeactivated = !Kotlin.isType(command.state, CommandState$Deactivated);
+    this.toggle_0($receiver, idPrefix + Gui$Companion_getInstance().DEACTIVATE_SUFFIX, isNotDeactivated ? 'Click to deactivate command' : 'Click to activate command', isNotDeactivated, command.state === CommandState.Disabled, cssClass);
     a($receiver, void 0, void 0, 'state', Gui$fieldsForCommand$lambda(idPrefix, command));
     div_0($receiver, 'contextMenu', Gui$fieldsForCommand$lambda_0(idPrefix, project, index, this));
     if (Kotlin.isType(command, JenkinsMavenReleasePlugin))
@@ -2949,7 +2950,7 @@
   }
   function showDialog$lambda$lambda$lambda$lambda_0(closure$box, closure$resolve) {
     return function (it) {
-      closure$box.style.visibility = 'hidden';
+      closure$box.remove();
       closure$resolve(false);
       return Unit;
     };
@@ -3408,7 +3409,7 @@
       tmp$_0 = $receiver_0.iterator();
       while (tmp$_0.hasNext()) {
         var element_0 = tmp$_0.next();
-        if (element_0.value !== CommandState.Failed && element_0.value !== CommandState.Succeeded)
+        if (element_0.value !== CommandState.Failed && element_0.value !== CommandState.Succeeded && !Kotlin.isType(element_0.value, CommandState$Deactivated) && element_0.value !== CommandState.Disabled)
           destination.add_11rb$(element_0);
       }
       var erroneousProjects = destination;
@@ -3676,7 +3677,7 @@
   Releaser.prototype.triggerJob_0 = function (paramObject, index, jobExecutionData) {
     var project = paramObject.project;
     changeCursorToProgress();
-    return paramObject.jobExecutor.trigger_shi73r$(jobExecutionData, Releaser$triggerJob$lambda(project, index, paramObject, this), Releaser$triggerJob$lambda_0(project, index, jobExecutionData), 10, 900, false).then(Releaser$triggerJob$lambda_1, Releaser$triggerJob$lambda_2(jobExecutionData, project, index)).then(Releaser$triggerJob$lambda_3(project, index));
+    return paramObject.jobExecutor.trigger_shi73r$(jobExecutionData, Releaser$triggerJob$lambda(project, index, paramObject, this), Releaser$triggerJob$lambda_0(project, index, jobExecutionData), 5, 900, false).then(Releaser$triggerJob$lambda_1, Releaser$triggerJob$lambda_2(jobExecutionData, project, index)).then(Releaser$triggerJob$lambda_3(project, index));
   };
   function Releaser$save$lambda(closure$paramObject) {
     return function (hadChanges) {

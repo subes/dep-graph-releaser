@@ -48,9 +48,6 @@ this['dep-graph-releaser-api-js'] = function (_, Kotlin) {
   ReleaseState.prototype.constructor = ReleaseState;
   CommandStateJson$State.prototype = Object.create(Enum.prototype);
   CommandStateJson$State.prototype.constructor = CommandStateJson$State;
-  function hasNextOnTheSameLevel($receiver, level) {
-    return $receiver.hasNext() && level === $receiver.peek().level;
-  }
   function ConfigKey(name, ordinal, key) {
     Enum.call(this);
     this.key_c1gzzu$_0 = key;
@@ -632,10 +629,7 @@ this['dep-graph-releaser-api-js'] = function (_, Kotlin) {
     return projectIds;
   };
   ReleasePlan.prototype.iterator = function () {
-    return new ReleasePlan$ReleasePlanIterator(this, this.rootProjectId);
-  };
-  ReleasePlan.prototype.iterator_lljhqa$ = function (entryPoint) {
-    return new ReleasePlan$ReleasePlanIterator(this, entryPoint);
+    return new ReleasePlan$ReleasePlanIterator(this);
   };
   ReleasePlan.prototype.getProjectIds = function () {
     return this.projects_0.keys;
@@ -658,9 +652,9 @@ this['dep-graph-releaser-api-js'] = function (_, Kotlin) {
   ReleasePlan.prototype.getAllSubmodules = function () {
     return this.submodules_0;
   };
-  function ReleasePlan$ReleasePlanIterator(releasePlan, entryPoint) {
+  function ReleasePlan$ReleasePlanIterator(releasePlan) {
     this.releasePlan_0 = releasePlan;
-    this.levelIterator_0 = new LevelIterator(to(entryPoint, this.releasePlan_0.getProject_lljhqa$(entryPoint)));
+    this.levelIterator_0 = new LevelIterator(to(this.releasePlan_0.rootProjectId, this.releasePlan_0.getRootProject()));
     this.visitedProjects_0 = HashSet_init();
   }
   ReleasePlan$ReleasePlanIterator.prototype.hasNext = function () {
@@ -1081,10 +1075,9 @@ this['dep-graph-releaser-api-js'] = function (_, Kotlin) {
     simpleName: 'LevelIterator',
     interfaces: [Iterator]
   };
-  var package$ch = _.ch || (_.ch = {});
-  var package$loewenfels = package$ch.loewenfels || (package$ch.loewenfels = {});
-  var package$depgraph = package$loewenfels.depgraph || (package$loewenfels.depgraph = {});
-  package$depgraph.hasNextOnTheSameLevel_r88oei$ = hasNextOnTheSameLevel;
+  function hasNextOnTheSameLevel($receiver, level) {
+    return $receiver.hasNext() && level === $receiver.peek().level;
+  }
   Object.defineProperty(ConfigKey, 'COMMIT_PREFIX', {
     get: ConfigKey$COMMIT_PREFIX_getInstance
   });
@@ -1109,6 +1102,9 @@ this['dep-graph-releaser-api-js'] = function (_, Kotlin) {
   Object.defineProperty(ConfigKey, 'Companion', {
     get: ConfigKey$Companion_getInstance
   });
+  var package$ch = _.ch || (_.ch = {});
+  var package$loewenfels = package$ch.loewenfels || (package$ch.loewenfels = {});
+  var package$depgraph = package$loewenfels.depgraph || (package$loewenfels.depgraph = {});
   package$depgraph.ConfigKey = ConfigKey;
   var package$data = package$depgraph.data || (package$depgraph.data = {});
   package$data.Command = Command;
@@ -1194,6 +1190,7 @@ this['dep-graph-releaser-api-js'] = function (_, Kotlin) {
   package$serialization.CommandStateJson = CommandStateJson;
   package$serialization.fromJson_v4rmea$ = fromJson;
   package$depgraph.LevelIterator = LevelIterator;
+  package$depgraph.hasNextOnTheSameLevel_r88oei$ = hasNextOnTheSameLevel;
   ReleaseCommand.prototype.asDeactivated = Command.prototype.asDeactivated;
   ReleaseCommand.prototype.asDisabled = Command.prototype.asDisabled;
   Kotlin.defineModule('dep-graph-releaser-api-js', _);
