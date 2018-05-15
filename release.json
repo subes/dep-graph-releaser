@@ -880,9 +880,7 @@
         }
     ],
     "warnings": [],
-    "infos": [
-        "Project ch.loewenfels.depgraph:dgr-1-a has one or more inter module cyclic dependencies. Might be handled by the M2 Release Plugin depending what relation they have and depending on where they are defined. It might also fail, in any case you should reconsider your design:\n-> ch.loewenfels.depgraph:dgr-1-b -> ch.loewenfels.depgraph:dgr-1-a"
-    ],
+    "infos": [],
     "config": [
         [
             "commitPrefix",
