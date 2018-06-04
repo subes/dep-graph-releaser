@@ -79,6 +79,9 @@ a:hover {
 #user .material-icons {
     color: #75d075;
 }
+#user.warning .material-icons {
+    color: #e2a35f;
+}
 #user.deactivated .material-icons {
     color: #e67878;
 }
@@ -165,6 +168,15 @@ div.level {
     margin-top: 50px;
     display: none;
 }
+
+.loader .material-icons {
+    vertical-align: middle;
+    color: #008000;
+}
+.loader .material-icons.waiting {
+    color: #000;
+}
+
 #loaderJs {
     display: block
 }
@@ -179,7 +191,7 @@ div.level {
 }
 
 .submodule {
-    width: 295px;
+    width: 300px;
 }
 .submodule:last-child {
     margin-bottom: 0px;
@@ -446,7 +458,8 @@ input:disabled {
     border: 1px solid #AAA;
     border-radius: 6px;
     visibility: hidden;
-    width: 205px;
+    display: inline-block;
+    min-width: 211px;
     z-index: 1;
 }
 .contextMenu div {
@@ -466,6 +479,11 @@ input:disabled {
 .contextMenu div:hover {
     background-color: #EFEFEF;
 }
+.contextMenu div.disabled,
+ .contextMenu div.disabled .material-icons {
+    cursor: not-allowed;
+    color: #CCC;
+}
 .contextMenu div > span {
     vertical-align: middle;
     margin-left: 2px;
@@ -479,6 +497,12 @@ input:disabled {
 }
 .contextMenu .succeeded .material-icons {
     color: #008000;
+}
+.contextMenu .deactivated .material-icons {
+    color: #666;
+}
+.contextMenu .deactivated > .material-icons span::after {
+    content: 'power_off';
 }
 
 #status,

@@ -59,11 +59,10 @@ this['dep-graph-releaser-api-js'] = function (_, Kotlin) {
     };
     ConfigKey$COMMIT_PREFIX_instance = new ConfigKey('COMMIT_PREFIX', 0, 'commitPrefix');
     ConfigKey$UPDATE_DEPENDENCY_JOB_instance = new ConfigKey('UPDATE_DEPENDENCY_JOB', 1, 'updateDependencyJob');
-    ConfigKey$REMOTE_JOB_instance = new ConfigKey('REMOTE_JOB', 2, 'remoteJob');
-    ConfigKey$REMOTE_REGEX_instance = new ConfigKey('REMOTE_REGEX', 3, 'remoteRegex');
-    ConfigKey$DRY_RUN_JOB_instance = new ConfigKey('DRY_RUN_JOB', 4, 'dryRunJob');
-    ConfigKey$REGEX_PARAMS_instance = new ConfigKey('REGEX_PARAMS', 5, 'regexParams');
-    ConfigKey$JOB_MAPPING_instance = new ConfigKey('JOB_MAPPING', 6, 'jobMapping');
+    ConfigKey$REMOTE_REGEX_instance = new ConfigKey('REMOTE_REGEX', 2, 'remoteRegex');
+    ConfigKey$DRY_RUN_JOB_instance = new ConfigKey('DRY_RUN_JOB', 3, 'dryRunJob');
+    ConfigKey$REGEX_PARAMS_instance = new ConfigKey('REGEX_PARAMS', 4, 'regexParams');
+    ConfigKey$JOB_MAPPING_instance = new ConfigKey('JOB_MAPPING', 5, 'jobMapping');
     ConfigKey$Companion_getInstance();
   }
   var ConfigKey$COMMIT_PREFIX_instance;
@@ -75,11 +74,6 @@ this['dep-graph-releaser-api-js'] = function (_, Kotlin) {
   function ConfigKey$UPDATE_DEPENDENCY_JOB_getInstance() {
     ConfigKey_initFields();
     return ConfigKey$UPDATE_DEPENDENCY_JOB_instance;
-  }
-  var ConfigKey$REMOTE_JOB_instance;
-  function ConfigKey$REMOTE_JOB_getInstance() {
-    ConfigKey_initFields();
-    return ConfigKey$REMOTE_JOB_instance;
   }
   var ConfigKey$REMOTE_REGEX_instance;
   function ConfigKey$REMOTE_REGEX_getInstance() {
@@ -143,7 +137,7 @@ this['dep-graph-releaser-api-js'] = function (_, Kotlin) {
     interfaces: [Enum]
   };
   function ConfigKey$values() {
-    return [ConfigKey$COMMIT_PREFIX_getInstance(), ConfigKey$UPDATE_DEPENDENCY_JOB_getInstance(), ConfigKey$REMOTE_JOB_getInstance(), ConfigKey$REMOTE_REGEX_getInstance(), ConfigKey$DRY_RUN_JOB_getInstance(), ConfigKey$REGEX_PARAMS_getInstance(), ConfigKey$JOB_MAPPING_getInstance()];
+    return [ConfigKey$COMMIT_PREFIX_getInstance(), ConfigKey$UPDATE_DEPENDENCY_JOB_getInstance(), ConfigKey$REMOTE_REGEX_getInstance(), ConfigKey$DRY_RUN_JOB_getInstance(), ConfigKey$REGEX_PARAMS_getInstance(), ConfigKey$JOB_MAPPING_getInstance()];
   }
   ConfigKey.values = ConfigKey$values;
   function ConfigKey$valueOf(name) {
@@ -152,8 +146,6 @@ this['dep-graph-releaser-api-js'] = function (_, Kotlin) {
         return ConfigKey$COMMIT_PREFIX_getInstance();
       case 'UPDATE_DEPENDENCY_JOB':
         return ConfigKey$UPDATE_DEPENDENCY_JOB_getInstance();
-      case 'REMOTE_JOB':
-        return ConfigKey$REMOTE_JOB_getInstance();
       case 'REMOTE_REGEX':
         return ConfigKey$REMOTE_REGEX_getInstance();
       case 'DRY_RUN_JOB':
@@ -1083,9 +1075,6 @@ this['dep-graph-releaser-api-js'] = function (_, Kotlin) {
   });
   Object.defineProperty(ConfigKey, 'UPDATE_DEPENDENCY_JOB', {
     get: ConfigKey$UPDATE_DEPENDENCY_JOB_getInstance
-  });
-  Object.defineProperty(ConfigKey, 'REMOTE_JOB', {
-    get: ConfigKey$REMOTE_JOB_getInstance
   });
   Object.defineProperty(ConfigKey, 'REMOTE_REGEX', {
     get: ConfigKey$REMOTE_REGEX_getInstance

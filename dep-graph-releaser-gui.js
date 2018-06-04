@@ -1,8 +1,8 @@
 (function (root, factory) {
   if (typeof define === 'function' && define.amd)
-    define(['exports', 'kotlin', 'dep-graph-releaser-api-js', 'dep-graph-releaser-maven-api-js', 'kotlinx-html-js', 'kbox-js'], factory);
+    define(['exports', 'kotlin', 'dep-graph-releaser-api-js', 'kbox-js', 'kotlinx-html-js', 'dep-graph-releaser-maven-api-js'], factory);
   else if (typeof exports === 'object')
-    factory(module.exports, require('kotlin'), require('dep-graph-releaser-api-js'), require('dep-graph-releaser-maven-api-js'), require('kotlinx-html-js'), require('kbox-js'));
+    factory(module.exports, require('kotlin'), require('dep-graph-releaser-api-js'), require('kbox-js'), require('kotlinx-html-js'), require('dep-graph-releaser-maven-api-js'));
   else {
     if (typeof kotlin === 'undefined') {
       throw new Error("Error loading module 'dep-graph-releaser-gui'. Its dependency 'kotlin' was not found. Please, check whether 'kotlin' is loaded prior to 'dep-graph-releaser-gui'.");
@@ -10,144 +10,789 @@
     if (typeof this['dep-graph-releaser-api-js'] === 'undefined') {
       throw new Error("Error loading module 'dep-graph-releaser-gui'. Its dependency 'dep-graph-releaser-api-js' was not found. Please, check whether 'dep-graph-releaser-api-js' is loaded prior to 'dep-graph-releaser-gui'.");
     }
-    if (typeof this['dep-graph-releaser-maven-api-js'] === 'undefined') {
-      throw new Error("Error loading module 'dep-graph-releaser-gui'. Its dependency 'dep-graph-releaser-maven-api-js' was not found. Please, check whether 'dep-graph-releaser-maven-api-js' is loaded prior to 'dep-graph-releaser-gui'.");
+    if (typeof this['kbox-js'] === 'undefined') {
+      throw new Error("Error loading module 'dep-graph-releaser-gui'. Its dependency 'kbox-js' was not found. Please, check whether 'kbox-js' is loaded prior to 'dep-graph-releaser-gui'.");
     }
     if (typeof this['kotlinx-html-js'] === 'undefined') {
       throw new Error("Error loading module 'dep-graph-releaser-gui'. Its dependency 'kotlinx-html-js' was not found. Please, check whether 'kotlinx-html-js' is loaded prior to 'dep-graph-releaser-gui'.");
     }
-    if (typeof this['kbox-js'] === 'undefined') {
-      throw new Error("Error loading module 'dep-graph-releaser-gui'. Its dependency 'kbox-js' was not found. Please, check whether 'kbox-js' is loaded prior to 'dep-graph-releaser-gui'.");
+    if (typeof this['dep-graph-releaser-maven-api-js'] === 'undefined') {
+      throw new Error("Error loading module 'dep-graph-releaser-gui'. Its dependency 'dep-graph-releaser-maven-api-js' was not found. Please, check whether 'dep-graph-releaser-maven-api-js' is loaded prior to 'dep-graph-releaser-gui'.");
     }
-    root['dep-graph-releaser-gui'] = factory(typeof this['dep-graph-releaser-gui'] === 'undefined' ? {} : this['dep-graph-releaser-gui'], kotlin, this['dep-graph-releaser-api-js'], this['dep-graph-releaser-maven-api-js'], this['kotlinx-html-js'], this['kbox-js']);
+    root['dep-graph-releaser-gui'] = factory(typeof this['dep-graph-releaser-gui'] === 'undefined' ? {} : this['dep-graph-releaser-gui'], kotlin, this['dep-graph-releaser-api-js'], this['kbox-js'], this['kotlinx-html-js'], this['dep-graph-releaser-maven-api-js']);
   }
-}(this, function (_, Kotlin, $module$dep_graph_releaser_api_js, $module$dep_graph_releaser_maven_api_js, $module$kotlinx_html_js, $module$kbox_js) {
+}(this, function (_, Kotlin, $module$dep_graph_releaser_api_js, $module$kbox_js, $module$kotlinx_html_js, $module$dep_graph_releaser_maven_api_js) {
   'use strict';
   var $$importsForInline$$ = _.$$importsForInline$$ || (_.$$importsForInline$$ = {});
-  var contains = Kotlin.kotlin.text.contains_li3zpu$;
-  var substringAfter = Kotlin.kotlin.text.substringAfter_j4ogox$;
-  var startsWith = Kotlin.kotlin.text.startsWith_7epoxm$;
-  var endsWith = Kotlin.kotlin.text.endsWith_7epoxm$;
-  var equals = Kotlin.equals;
-  var substringBefore = Kotlin.kotlin.text.substringBefore_j4ogox$;
-  var IllegalStateException_init = Kotlin.kotlin.IllegalStateException_init_pdl1vj$;
-  var getCallableRef = Kotlin.getCallableRef;
-  var Error_0 = Kotlin.kotlin.Error;
-  var Unit = Kotlin.kotlin.Unit;
   var throwCCE = Kotlin.throwCCE;
-  var toString = Kotlin.toString;
-  var Triple = Kotlin.kotlin.Triple;
-  var Regex_init = Kotlin.kotlin.text.Regex_init_61zpoe$;
-  var Kind_OBJECT = Kotlin.Kind.OBJECT;
+  var ensureNotNull = Kotlin.ensureNotNull;
   var Kind_CLASS = Kotlin.Kind.CLASS;
   var to = Kotlin.kotlin.to_ujzrz7$;
-  var ConfigKey = $module$dep_graph_releaser_api_js.ch.loewenfels.depgraph.ConfigKey;
-  var replace = Kotlin.kotlin.text.replace_680rmw$;
-  var CommandState$Deactivated = $module$dep_graph_releaser_api_js.ch.loewenfels.depgraph.data.CommandState.Deactivated;
-  var CommandState$Waiting = $module$dep_graph_releaser_api_js.ch.loewenfels.depgraph.data.CommandState.Waiting;
-  var MavenProjectId = $module$dep_graph_releaser_maven_api_js.ch.loewenfels.depgraph.data.maven.MavenProjectId;
-  var UnsupportedOperationException_init = Kotlin.kotlin.UnsupportedOperationException_init_pdl1vj$;
-  var toList = Kotlin.kotlin.collections.toList_us0mfu$;
-  var ReleasePlan = $module$dep_graph_releaser_api_js.ch.loewenfels.depgraph.data.ReleasePlan;
+  var mapOf = Kotlin.kotlin.collections.mapOf_qfcya0$;
+  var Unit = Kotlin.kotlin.Unit;
+  var IllegalStateException_init = Kotlin.kotlin.IllegalStateException_init_pdl1vj$;
+  var startsWith = Kotlin.kotlin.text.startsWith_7epoxm$;
+  var substringBefore = Kotlin.kotlin.text.substringBefore_8cymmc$;
+  var substringAfter = Kotlin.kotlin.text.substringAfter_j4ogox$;
+  var unboxChar = Kotlin.unboxChar;
+  var repeat = Kotlin.kotlin.text.repeat_94bcnn$;
+  var Regex_init = Kotlin.kotlin.text.Regex_init_61zpoe$;
+  var Kind_OBJECT = Kotlin.Kind.OBJECT;
   var ReleaseState = $module$dep_graph_releaser_api_js.ch.loewenfels.depgraph.data.ReleaseState;
-  var ReleaseState$valueOf = $module$dep_graph_releaser_api_js.ch.loewenfels.depgraph.data.ReleaseState.valueOf_61zpoe$;
-  var Project = $module$dep_graph_releaser_api_js.ch.loewenfels.depgraph.data.Project;
-  var JenkinsMavenReleasePlugin = $module$dep_graph_releaser_maven_api_js.ch.loewenfels.depgraph.data.maven.jenkins.JenkinsMavenReleasePlugin;
-  var JenkinsMultiMavenReleasePlugin = $module$dep_graph_releaser_maven_api_js.ch.loewenfels.depgraph.data.maven.jenkins.JenkinsMultiMavenReleasePlugin;
-  var JenkinsUpdateDependency = $module$dep_graph_releaser_maven_api_js.ch.loewenfels.depgraph.data.maven.jenkins.JenkinsUpdateDependency;
-  var fromJson = $module$dep_graph_releaser_api_js.ch.loewenfels.depgraph.data.serialization.fromJson_v4rmea$;
-  var toHashSet = Kotlin.kotlin.collections.toHashSet_7wnvza$;
-  var get_js = Kotlin.kotlin.js.get_js_1yb8b7$;
-  var defineInlineFunction = Kotlin.defineInlineFunction;
-  var wrapFunction = Kotlin.wrapFunction;
-  var ensureNotNull = Kotlin.ensureNotNull;
-  var M2ReleaseCommand = $module$dep_graph_releaser_maven_api_js.ch.loewenfels.depgraph.data.maven.jenkins.M2ReleaseCommand;
-  var asList = Kotlin.org.w3c.dom.asList_kt9thq$;
-  var listOf = Kotlin.kotlin.collections.listOf_i5x0yv$;
-  var div = $module$kotlinx_html_js.kotlinx.html.div_59el9d$;
-  var append = $module$kotlinx_html_js.kotlinx.html.dom.append_k9bwru$;
-  var toPeekingIterator = $module$kbox_js.ch.tutteli.kbox.toPeekingIterator_35ci02$;
-  var hasNextOnTheSameLevel = $module$dep_graph_releaser_api_js.ch.loewenfels.depgraph.hasNextOnTheSameLevel_r88oei$;
-  var minus = Kotlin.kotlin.collections.minus_khz7k3$;
+  var Error_0 = Kotlin.kotlin.Error;
+  var CommandState = $module$dep_graph_releaser_api_js.ch.loewenfels.depgraph.data.CommandState;
+  var CommandState$Deactivated = $module$dep_graph_releaser_api_js.ch.loewenfels.depgraph.data.CommandState.Deactivated;
   var joinToString = Kotlin.kotlin.collections.joinToString_fmv235$;
-  var setOf = Kotlin.kotlin.collections.setOf_i5x0yv$;
-  var set_classes = $module$kotlinx_html_js.kotlinx.html.set_classes_njy09m$;
+  var CommandState$Waiting = $module$dep_graph_releaser_api_js.ch.loewenfels.depgraph.data.CommandState.Waiting;
+  var MutableSet = Kotlin.kotlin.collections.MutableSet;
+  var asSequence = Kotlin.kotlin.collections.asSequence_7wnvza$;
+  var map = Kotlin.kotlin.sequences.map_z5avom$;
+  var filter = Kotlin.kotlin.sequences.filter_euau3h$;
+  var toHashSet = Kotlin.kotlin.sequences.toHashSet_veqyi0$;
+  var mapWithIndex = $module$kbox_js.ch.tutteli.kbox.mapWithIndex_veqyi0$;
+  var ReleaseCommand = $module$dep_graph_releaser_api_js.ch.loewenfels.depgraph.data.ReleaseCommand;
+  var MutableList = Kotlin.kotlin.collections.MutableList;
+  var endsWith = Kotlin.kotlin.text.endsWith_7epoxm$;
+  var RuntimeException_init = Kotlin.kotlin.RuntimeException_init;
+  var RuntimeException = Kotlin.kotlin.RuntimeException;
+  var contains = Kotlin.kotlin.text.contains_li3zpu$;
+  var equals = Kotlin.equals;
+  var substringBefore_0 = Kotlin.kotlin.text.substringBefore_j4ogox$;
+  var getCallableRef = Kotlin.getCallableRef;
+  var ArrayList_init = Kotlin.kotlin.collections.ArrayList_init_ww73n8$;
+  var toString = Kotlin.toString;
   var set_id = $module$kotlinx_html_js.kotlinx.html.set_id_ueiko3$;
-  var span = $module$kotlinx_html_js.kotlinx.html.span_6djfml$;
-  var div_0 = $module$kotlinx_html_js.kotlinx.html.div_ri36nr$;
+  var getKClass = Kotlin.getKClass;
+  var div = $module$kotlinx_html_js.kotlinx.html.div_ri36nr$;
   var set_title = $module$kotlinx_html_js.kotlinx.html.set_title_ueiko3$;
-  var JenkinsCommand = $module$dep_graph_releaser_maven_api_js.ch.loewenfels.depgraph.data.maven.jenkins.JenkinsCommand;
+  var span = $module$kotlinx_html_js.kotlinx.html.span_6djfml$;
+  var i = $module$kotlinx_html_js.kotlinx.html.i_5g1p9k$;
+  var asList = Kotlin.org.w3c.dom.asList_kt9thq$;
+  var addClass = Kotlin.kotlin.dom.addClass_hhb33f$;
+  var removeClass = Kotlin.kotlin.dom.removeClass_hhb33f$;
   var label = $module$kotlinx_html_js.kotlinx.html.label_yd75js$;
   var set_onKeyUpFunction = $module$kotlinx_html_js.kotlinx.html.js.set_onKeyUpFunction_pszlq2$;
   var textInput = $module$kotlinx_html_js.kotlinx.html.textInput_ap9uf6$;
   var textArea = $module$kotlinx_html_js.kotlinx.html.textArea_b1tfd9$;
-  var ReleaseCommand = $module$dep_graph_releaser_api_js.ch.loewenfels.depgraph.data.ReleaseCommand;
-  var CommandState = $module$dep_graph_releaser_api_js.ch.loewenfels.depgraph.data.CommandState;
-  var i = $module$kotlinx_html_js.kotlinx.html.i_5g1p9k$;
-  var a = $module$kotlinx_html_js.kotlinx.html.a_gu26kr$;
-  var getKClass = Kotlin.getKClass;
-  var asSequence = Kotlin.kotlin.collections.asSequence_7wnvza$;
-  var mapWithIndex = $module$kbox_js.ch.tutteli.kbox.mapWithIndex_veqyi0$;
-  var checkBoxInput = $module$kotlinx_html_js.kotlinx.html.checkBoxInput_ap9uf6$;
-  var IllegalStateException = Kotlin.kotlin.IllegalStateException;
-  var removeClass = Kotlin.kotlin.dom.removeClass_hhb33f$;
-  var addClass = Kotlin.kotlin.dom.addClass_hhb33f$;
+  var listOf = Kotlin.kotlin.collections.listOf_i5x0yv$;
   var hasClass = Kotlin.kotlin.dom.hasClass_46n0ku$;
-  var toShort = Kotlin.toShort;
-  var split = Kotlin.kotlin.text.split_o64adg$;
-  var toInt = Kotlin.kotlin.text.toInt_pdl1vz$;
-  var Error_init = Kotlin.kotlin.Error_init_pdl1vj$;
-  var Exception = Kotlin.kotlin.Exception;
-  var RuntimeException_init = Kotlin.kotlin.RuntimeException_init_pdl1vj$;
-  var RuntimeException = Kotlin.kotlin.RuntimeException;
-  var Kind_INTERFACE = Kotlin.Kind.INTERFACE;
+  var Triple = Kotlin.kotlin.Triple;
+  var mapWithIndex_0 = $module$kbox_js.ch.tutteli.kbox.mapWithIndex_7wnvza$;
   var Enum = Kotlin.kotlin.Enum;
   var throwISE = Kotlin.throwISE;
-  var get_create = $module$kotlinx_html_js.kotlinx.html.dom.get_create_4wc2mh$;
-  var div_1 = $module$kotlinx_html_js.kotlinx.html.js.div_wkomt5$;
-  var StringBuilder = Kotlin.kotlin.text.StringBuilder;
-  var split_0 = Kotlin.kotlin.text.split_ip8yn$;
-  var get_br = $module$kotlinx_html_js.kotlinx.html.get_br_6s7ubj$;
-  var substringBefore_0 = Kotlin.kotlin.text.substringBefore_8cymmc$;
-  var unboxChar = Kotlin.unboxChar;
-  var repeat = Kotlin.kotlin.text.repeat_94bcnn$;
-  var splitToSequence = Kotlin.kotlin.text.splitToSequence_ip8yn$;
-  var map = Kotlin.kotlin.sequences.map_z5avom$;
-  var toList_0 = Kotlin.kotlin.sequences.toList_veqyi0$;
-  var emptyList = Kotlin.kotlin.collections.emptyList_287e2$;
-  var indexOf = Kotlin.kotlin.text.indexOf_8eortd$;
-  var contains_0 = Kotlin.kotlin.text.contains_sgbm27$;
-  var filter = Kotlin.kotlin.sequences.filter_euau3h$;
-  var joinToString_0 = Kotlin.kotlin.sequences.joinToString_853xkz$;
-  var MutableSet = Kotlin.kotlin.collections.MutableSet;
-  var toHashSet_0 = Kotlin.kotlin.sequences.toHashSet_veqyi0$;
-  var MutableList = Kotlin.kotlin.collections.MutableList;
-  var RuntimeException_init_0 = Kotlin.kotlin.RuntimeException_init;
+  var toPeekingIterator = $module$kbox_js.ch.tutteli.kbox.toPeekingIterator_35ci02$;
+  var hasNextOnTheSameLevel = $module$dep_graph_releaser_api_js.ch.loewenfels.depgraph.hasNextOnTheSameLevel_r88oei$;
+  var div_0 = $module$kotlinx_html_js.kotlinx.html.div_59el9d$;
+  var append = $module$kotlinx_html_js.kotlinx.html.dom.append_k9bwru$;
+  var minus = Kotlin.kotlin.collections.minus_khz7k3$;
+  var setOf = Kotlin.kotlin.collections.setOf_i5x0yv$;
+  var set_classes = $module$kotlinx_html_js.kotlinx.html.set_classes_njy09m$;
+  var MavenProjectId = $module$dep_graph_releaser_maven_api_js.ch.loewenfels.depgraph.data.maven.MavenProjectId;
+  var JenkinsCommand = $module$dep_graph_releaser_maven_api_js.ch.loewenfels.depgraph.data.maven.jenkins.JenkinsCommand;
+  var a = $module$kotlinx_html_js.kotlinx.html.a_gu26kr$;
+  var JenkinsMavenReleasePlugin = $module$dep_graph_releaser_maven_api_js.ch.loewenfels.depgraph.data.maven.jenkins.JenkinsMavenReleasePlugin;
+  var JenkinsMultiMavenReleasePlugin = $module$dep_graph_releaser_maven_api_js.ch.loewenfels.depgraph.data.maven.jenkins.JenkinsMultiMavenReleasePlugin;
+  var JenkinsUpdateDependency = $module$dep_graph_releaser_maven_api_js.ch.loewenfels.depgraph.data.maven.jenkins.JenkinsUpdateDependency;
+  var checkBoxInput = $module$kotlinx_html_js.kotlinx.html.checkBoxInput_ap9uf6$;
+  var IllegalStateException = Kotlin.kotlin.IllegalStateException;
   var sequenceOf = Kotlin.kotlin.sequences.sequenceOf_i5x0yv$;
   var plus = Kotlin.kotlin.sequences.plus_v0iwhp$;
-  var mapWithIndex_0 = $module$kbox_js.ch.tutteli.kbox.mapWithIndex_7wnvza$;
   var mapIndexed = Kotlin.kotlin.sequences.mapIndexed_b7yuyq$;
-  var mapOf = Kotlin.kotlin.collections.mapOf_qfcya0$;
-  DryRunJobExecutionDataFactory.prototype = Object.create(BaseJobExecutionDataFactory.prototype);
-  DryRunJobExecutionDataFactory.prototype.constructor = DryRunJobExecutionDataFactory;
-  JenkinsJobExecutor$PollException.prototype = Object.create(RuntimeException.prototype);
-  JenkinsJobExecutor$PollException.prototype.constructor = JenkinsJobExecutor$PollException;
-  Menu$TypeOfRun.prototype = Object.create(Enum.prototype);
-  Menu$TypeOfRun.prototype.constructor = Menu$TypeOfRun;
-  ReleaseJobExecutionDataFactory.prototype = Object.create(BaseJobExecutionDataFactory.prototype);
-  ReleaseJobExecutionDataFactory.prototype.constructor = ReleaseJobExecutionDataFactory;
+  var ConfigKey = $module$dep_graph_releaser_api_js.ch.loewenfels.depgraph.ConfigKey;
+  var splitToSequence = Kotlin.kotlin.text.splitToSequence_o64adg$;
+  var toList = Kotlin.kotlin.sequences.toList_veqyi0$;
+  var emptyList = Kotlin.kotlin.collections.emptyList_287e2$;
+  var indexOf = Kotlin.kotlin.text.indexOf_8eortd$;
+  var get_js = Kotlin.kotlin.js.get_js_1yb8b7$;
+  var defineInlineFunction = Kotlin.defineInlineFunction;
+  var wrapFunction = Kotlin.wrapFunction;
+  var replace = Kotlin.kotlin.text.replace_680rmw$;
+  var Kind_INTERFACE = Kotlin.Kind.INTERFACE;
+  var toInt = Kotlin.kotlin.text.toInt_pdl1vz$;
+  var M2ReleaseCommand = $module$dep_graph_releaser_maven_api_js.ch.loewenfels.depgraph.data.maven.jenkins.M2ReleaseCommand;
+  var UnsupportedOperationException_init = Kotlin.kotlin.UnsupportedOperationException_init_pdl1vj$;
+  var toShort = Kotlin.toShort;
+  var split = Kotlin.kotlin.text.split_o64adg$;
+  var Error_init = Kotlin.kotlin.Error_init_pdl1vj$;
+  var Exception = Kotlin.kotlin.Exception;
+  var RuntimeException_init_0 = Kotlin.kotlin.RuntimeException_init_pdl1vj$;
+  var split_0 = Kotlin.kotlin.text.split_ip8yn$;
+  var contains_0 = Kotlin.kotlin.text.contains_sgbm27$;
+  var firstOrNull = Kotlin.kotlin.sequences.firstOrNull_veqyi0$;
+  var StringBuilder = Kotlin.kotlin.text.StringBuilder;
+  var asIterable = Kotlin.kotlin.sequences.asIterable_veqyi0$;
+  var substringBeforeLast = Kotlin.kotlin.text.substringBeforeLast_j4ogox$;
+  var get_create = $module$kotlinx_html_js.kotlinx.html.dom.get_create_4wc2mh$;
+  var div_1 = $module$kotlinx_html_js.kotlinx.html.js.div_wkomt5$;
+  var get_br = $module$kotlinx_html_js.kotlinx.html.get_br_6s7ubj$;
+  var toList_0 = Kotlin.kotlin.collections.toList_us0mfu$;
+  var ReleasePlan = $module$dep_graph_releaser_api_js.ch.loewenfels.depgraph.data.ReleasePlan;
+  var ReleaseState$valueOf = $module$dep_graph_releaser_api_js.ch.loewenfels.depgraph.data.ReleaseState.valueOf_61zpoe$;
+  var Project = $module$dep_graph_releaser_api_js.ch.loewenfels.depgraph.data.Project;
+  var fromJson = $module$dep_graph_releaser_api_js.ch.loewenfels.depgraph.data.serialization.fromJson_v4rmea$;
+  var toHashSet_0 = Kotlin.kotlin.collections.toHashSet_7wnvza$;
   Releaser$ReleaseFailure.prototype = Object.create(RuntimeException.prototype);
   Releaser$ReleaseFailure.prototype.constructor = Releaser$ReleaseFailure;
+  Menu$TypeOfRun.prototype = Object.create(Enum.prototype);
+  Menu$TypeOfRun.prototype.constructor = Menu$TypeOfRun;
+  DryRunJobExecutionDataFactory.prototype = Object.create(BaseJobExecutionDataFactory.prototype);
+  DryRunJobExecutionDataFactory.prototype.constructor = DryRunJobExecutionDataFactory;
+  PollException.prototype = Object.create(RuntimeException.prototype);
+  PollException.prototype.constructor = PollException;
+  ReleaseJobExecutionDataFactory.prototype = Object.create(BaseJobExecutionDataFactory.prototype);
+  ReleaseJobExecutionDataFactory.prototype.constructor = ReleaseJobExecutionDataFactory;
+  function Downloader(modifiableJson) {
+    this.modifiableJson_0 = modifiableJson;
+  }
+  Downloader.prototype.download = function () {
+    var tmp$;
+    var json = this.modifiableJson_0.getJsonWithAppliedChanges();
+    var a = Kotlin.isType(tmp$ = document.createElement('a'), HTMLElement) ? tmp$ : throwCCE();
+    a.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(json));
+    a.setAttribute('download', 'release.json');
+    a.style.display = 'none';
+    ensureNotNull(document.body).appendChild(a);
+    a.click();
+    ensureNotNull(document.body).removeChild(a);
+  };
+  Downloader.$metadata$ = {
+    kind: Kind_CLASS,
+    simpleName: 'Downloader',
+    interfaces: []
+  };
+  function Publisher(usernameAndApiToken, publishJobUrl, modifiableJson) {
+    Publisher$Companion_getInstance();
+    this.usernameAndApiToken_0 = usernameAndApiToken;
+    this.publishJobUrl_0 = publishJobUrl;
+    this.modifiableJson_0 = modifiableJson;
+  }
+  function Publisher$publish$lambda(it) {
+    return Promise.resolve(1);
+  }
+  function Publisher$publish$lambda$lambda(closure$buildNumber) {
+    return function (it) {
+      return to(closure$buildNumber, it);
+    };
+  }
+  function Publisher$publish$lambda_0(closure$jobExecutor, this$Publisher) {
+    return function (f) {
+      var authData = f.component1()
+      , buildNumber = f.component2();
+      return this$Publisher.extractResultJsonUrl_0(closure$jobExecutor, authData, this$Publisher.publishJobUrl_0, buildNumber).then(Publisher$publish$lambda$lambda(buildNumber));
+    };
+  }
+  function Publisher$publish$lambda_1(this$Publisher, closure$verbose) {
+    return function (f) {
+      var buildNumber = f.component1()
+      , releaseJsonUrl = f.component2();
+      this$Publisher.changeUrlAndReloadOrAddHint_0(this$Publisher.publishJobUrl_0, buildNumber, releaseJsonUrl, closure$verbose);
+      return Unit;
+    };
+  }
+  function Publisher$publish$lambda_2(it) {
+    changeCursorBackToNormal();
+    return Unit;
+  }
+  Publisher.prototype.publish_1kqjf$ = function (fileName, verbose, jobExecutor) {
+    changeCursorToProgress();
+    var doNothingPromise = Publisher$publish$lambda;
+    var parameters = mapOf([to('fileName', fileName), to('json', this.modifiableJson_0.json)]);
+    var jobExecutionData = JobExecutionData$Companion_getInstance().buildWithParameters_k99ke9$('publish ' + fileName + '.json', this.publishJobUrl_0, toQueryParameters(parameters), parameters);
+    return finally_0(jobExecutor.trigger_cuif7q$(jobExecutionData, doNothingPromise, doNothingPromise, 2, 60, verbose).then(Publisher$publish$lambda_0(jobExecutor, this)).then(Publisher$publish$lambda_1(this, verbose)), Publisher$publish$lambda_2);
+  };
+  function Publisher$extractResultJsonUrl$lambda(closure$jobUrl) {
+    return function (e) {
+      throw IllegalStateException_init('Could not find the published release.json as artifact.' + ('\n' + 'Job URL: ' + closure$jobUrl) + ('\n' + 'Regex used: ' + Publisher$Companion_getInstance().resultRegex_0.pattern) + ('\n' + 'Content: ' + e.body));
+    };
+  }
+  function Publisher$extractResultJsonUrl$lambda_0(closure$jobUrl, closure$buildNumber) {
+    return function (fileName) {
+      return closure$jobUrl + closure$buildNumber + '/artifact/' + fileName;
+    };
+  }
+  Publisher.prototype.extractResultJsonUrl_0 = function (jobExecutor, authData, jobUrl, buildNumber) {
+    var xpathUrl = jobUrl + buildNumber + '/api/xml?xpath=//artifact/fileName';
+    return jobExecutor.pollAndExtract_ljfavh$(authData, xpathUrl, Publisher$Companion_getInstance().resultRegex_0, Publisher$extractResultJsonUrl$lambda(jobUrl)).then(Publisher$extractResultJsonUrl$lambda_0(jobUrl, buildNumber));
+  };
+  function Publisher$changeUrlAndReloadOrAddHint$lambda(closure$url, closure$successMsg) {
+    return function () {
+      window.location.href = closure$url;
+      closure$successMsg.style.display = 'none';
+      return Unit;
+    };
+  }
+  var iterator = Kotlin.kotlin.text.iterator_gw00vp$;
+  var toBoxedChar = Kotlin.toBoxedChar;
+  Publisher.prototype.changeUrlAndReloadOrAddHint_0 = function (jobUrl, buildNumber, releaseJsonUrl, verbose) {
+    var prefix = window.location.protocol + '//' + window.location.hostname + '/';
+    var isOnSameHost = startsWith(jobUrl, prefix);
+    if (isOnSameHost) {
+      var pipelineUrl = substringBefore(window.location.href, 35);
+      var relativeJobUrl = substringAfter(jobUrl, prefix);
+      var tmp$;
+      var count = 0;
+      tmp$ = iterator(substringAfter(pipelineUrl, prefix));
+      while (tmp$.hasNext()) {
+        var element = unboxChar(tmp$.next());
+        if (unboxChar(toBoxedChar(element)) === 47) {
+          count = count + 1 | 0;
+        }
+      }
+      var numOfChars = count;
+      var relativeJsonUrl = repeat('../', numOfChars) + substringAfter(releaseJsonUrl, prefix);
+      var url = pipelineUrl + '#' + relativeJsonUrl + App$Companion_getInstance().PUBLISH_JOB + relativeJobUrl;
+      if (verbose) {
+        var successMsg = showSuccess('Publishing successful, going to change to the new location.' + '\nIf this message does not disappear, then it means the switch failed. Please visit the following url manually:' + ('\n' + url));
+        sleep(2000, Publisher$changeUrlAndReloadOrAddHint$lambda(url, successMsg));
+      }
+       else {
+        window.location.href = url;
+      }
+    }
+     else if (verbose) {
+      showWarning('Remote publish server detected. We currently do not support to consume remote release.json.' + '\nYou can save changes and it gets published on the remote server, but we will not change the url accordingly. Thus, please do not reload the page after a save because you would load the old state of the release.json' + ('\n' + 'Alternatively you can download the published release.json from here: ' + jobUrl + buildNumber + ' and adjust the url manually.'));
+    }
+  };
+  Publisher.prototype.applyChanges = function () {
+    return this.modifiableJson_0.applyChanges();
+  };
+  function Publisher$Companion() {
+    Publisher$Companion_instance = this;
+    this.resultRegex_0 = Regex_init('<fileName>([^<]+)<\/fileName>');
+  }
+  Publisher$Companion.$metadata$ = {
+    kind: Kind_OBJECT,
+    simpleName: 'Companion',
+    interfaces: []
+  };
+  var Publisher$Companion_instance = null;
+  function Publisher$Companion_getInstance() {
+    if (Publisher$Companion_instance === null) {
+      new Publisher$Companion();
+    }
+    return Publisher$Companion_instance;
+  }
+  Publisher.$metadata$ = {
+    kind: Kind_CLASS,
+    simpleName: 'Publisher',
+    interfaces: []
+  };
+  function Releaser(jenkinsBaseUrl, modifiableJson, menu) {
+    this.jenkinsBaseUrl_0 = jenkinsBaseUrl;
+    this.modifiableJson_0 = modifiableJson;
+    this.menu_0 = menu;
+  }
+  var HashMap_init = Kotlin.kotlin.collections.HashMap_init_q3lmfv$;
+  Releaser.prototype.release_q42tl1$ = function (jobExecutor, jobExecutionDataFactory) {
+    var releasePlan = deserialize(this.modifiableJson_0.json);
+    this.warnIfNotOnSameHost_0();
+    var project = releasePlan.getRootProject();
+    var paramObject = new Releaser$ParamObject(releasePlan, jobExecutor, jobExecutionDataFactory, project, HashMap_init(), HashMap_init());
+    return this.release_0(paramObject);
+  };
+  Releaser.prototype.warnIfNotOnSameHost_0 = function () {
+    var prefix = window.location.protocol + '//' + window.location.hostname;
+    var isOnSameHost = startsWith(this.jenkinsBaseUrl_0, prefix);
+    if (!isOnSameHost) {
+      showWarning('Remote publish server detected. We currently do not support to consume remote release.json.' + '\nThis means that we publish changes during the release process but will not change the location. Thus, please do not reload the page during the release process.', 8000);
+    }
+  };
+  function Releaser$release$lambda$lambda(closure$newState) {
+    return function (t) {
+      showThrowable(new Error_0('Could not save the release state (changed to ' + closure$newState + ').' + '\nDo not reload if you want to continue using this pipeline and make sure the publisher works as expected.' + '\nMake a change (e.g. change a Release Version) and try to save (will save the changed release state as well) -- do not forget to revert your change and save again.', t));
+      return Unit;
+    };
+  }
+  function Releaser$release$lambda(closure$paramObject, this$Releaser) {
+    return function (it) {
+      var tmp$ = this$Releaser.checkProjectStates_0(closure$paramObject);
+      var result = tmp$.component1()
+      , newState = tmp$.component2();
+      Pipeline$Companion_getInstance().changeReleaseState_g1wt0g$(newState);
+      this$Releaser.quietSave_0(closure$paramObject, false).catch(Releaser$release$lambda$lambda(newState));
+      return result;
+    };
+  }
+  Releaser.prototype.release_0 = function (paramObject) {
+    Pipeline$Companion_getInstance().changeReleaseState_g1wt0g$(ReleaseState.InProgress);
+    return this.releaseProject_0(paramObject).then(Releaser$release$lambda(paramObject, this));
+  };
+  var Collection = Kotlin.kotlin.collections.Collection;
+  Releaser.prototype.checkProjectStates_0 = function (paramObject) {
+    var tmp$;
+    var $receiver = paramObject.projectResults.values;
+    var all$result;
+    all$break: do {
+      var tmp$_0;
+      if (Kotlin.isType($receiver, Collection) && $receiver.isEmpty()) {
+        all$result = true;
+        break all$break;
+      }
+      tmp$_0 = $receiver.iterator();
+      while (tmp$_0.hasNext()) {
+        var element = tmp$_0.next();
+        if (!(element === CommandState.Succeeded || Kotlin.isType(element, CommandState$Deactivated) || element === CommandState.Disabled)) {
+          all$result = false;
+          break all$break;
+        }
+      }
+      all$result = true;
+    }
+     while (false);
+    var result = all$result;
+    if (result) {
+      tmp$ = ReleaseState.Succeeded;
+    }
+     else {
+      this.checkForNoneFailedBug_0(paramObject);
+      tmp$ = ReleaseState.Failed;
+    }
+    var newState = tmp$;
+    return to(result, newState);
+  };
+  function Releaser$checkForNoneFailedBug$lambda(it) {
+    return it.key.identifier;
+  }
+  Releaser.prototype.checkForNoneFailedBug_0 = function (paramObject) {
+    var $receiver = paramObject.projectResults.values;
+    var none$result;
+    none$break: do {
+      var tmp$;
+      if (Kotlin.isType($receiver, Collection) && $receiver.isEmpty()) {
+        none$result = true;
+        break none$break;
+      }
+      tmp$ = $receiver.iterator();
+      while (tmp$.hasNext()) {
+        var element = tmp$.next();
+        if (element === CommandState.Failed) {
+          none$result = false;
+          break none$break;
+        }
+      }
+      none$result = true;
+    }
+     while (false);
+    if (none$result) {
+      var $receiver_0 = paramObject.projectResults.entries;
+      var destination = ArrayList_init();
+      var tmp$_0;
+      tmp$_0 = $receiver_0.iterator();
+      while (tmp$_0.hasNext()) {
+        var element_0 = tmp$_0.next();
+        if (element_0.value !== CommandState.Failed && element_0.value !== CommandState.Succeeded && !Kotlin.isType(element_0.value, CommandState$Deactivated) && element_0.value !== CommandState.Disabled)
+          destination.add_11rb$(element_0);
+      }
+      var erroneousProjects = destination;
+      if (!erroneousProjects.isEmpty()) {
+        showError('Seems like there is a bug since no command failed but not all are succeeded.' + '\nPlease report a bug, the following projects where affected:' + ('\n' + joinToString(erroneousProjects, '\n', void 0, void 0, void 0, void 0, Releaser$checkForNoneFailedBug$lambda)));
+      }
+    }
+  };
+  function Releaser$releaseProject$lambda$lambda(closure$paramObject, this$Releaser) {
+    return function (jobResult) {
+      if (jobResult !== CommandState.Succeeded)
+        return jobResult;
+      return this$Releaser.triggerReleaseCommands_0(closure$paramObject);
+    };
+  }
+  function Releaser$releaseProject$lambda$lambda_0(closure$paramObject, this$Releaser) {
+    return function (jobResult) {
+      var $receiver = closure$paramObject.projectResults;
+      var key = closure$paramObject.project.id;
+      $receiver.put_xwzc9p$(key, jobResult);
+      if (jobResult !== CommandState.Succeeded)
+        return jobResult;
+      var releasePlan = closure$paramObject.releasePlan;
+      var allDependents = releasePlan.collectDependentsInclDependentsOfAllSubmodules_lljhqa$(closure$paramObject.project.id);
+      this$Releaser.updateStateWaiting_0(releasePlan, allDependents);
+      return this$Releaser.releaseDependentProjects_0(allDependents, releasePlan, closure$paramObject);
+    };
+  }
+  function Releaser$releaseProject$lambda$lambda_1(closure$paramObject) {
+    return function (t) {
+      var $receiver = closure$paramObject.projectResults;
+      var key = closure$paramObject.project.id;
+      var value = CommandState.Failed;
+      $receiver.put_xwzc9p$(key, value);
+      if (t !== Releaser$ReleaseFailure_getInstance())
+        throw t;
+      return Unit;
+    };
+  }
+  function Releaser$releaseProject$lambda(closure$paramObject, this$Releaser) {
+    return function () {
+      return this$Releaser.triggerNonReleaseCommandsInclSubmoduleCommands_0(closure$paramObject).then(Releaser$releaseProject$lambda$lambda(closure$paramObject, this$Releaser)).then(Releaser$releaseProject$lambda$lambda_0(closure$paramObject, this$Releaser)).catch(Releaser$releaseProject$lambda$lambda_1(closure$paramObject));
+    };
+  }
+  Releaser.prototype.releaseProject_0 = function (paramObject) {
+    return paramObject.withLockForProject_509nd4$(Releaser$releaseProject$lambda(paramObject, this));
+  };
+  Releaser.prototype.updateStateWaiting_0 = function (releasePlan, allDependents) {
+    var tmp$;
+    tmp$ = allDependents.iterator();
+    while (tmp$.hasNext()) {
+      var element = tmp$.next();
+      var multiOrSubmoduleId = element.component1()
+      , dependentId = element.component2();
+      var dependentProject = releasePlan.getProject_lljhqa$(dependentId);
+      var tmp$_0, tmp$_0_0;
+      var index = 0;
+      tmp$_0 = dependentProject.commands.iterator();
+      while (tmp$_0.hasNext()) {
+        var item = tmp$_0.next();
+        var index_0 = (tmp$_0_0 = index, index = tmp$_0_0 + 1 | 0, tmp$_0_0);
+        var tmp$_1;
+        var state = Pipeline$Companion_getInstance().getCommandState_o8feeo$(dependentId, index_0);
+        if (Kotlin.isType(state, CommandState$Waiting) && state.dependencies.contains_11rb$(multiOrSubmoduleId)) {
+          (Kotlin.isType(tmp$_1 = state.dependencies, MutableSet) ? tmp$_1 : throwCCE()).remove_11rb$(multiOrSubmoduleId);
+          if (state.dependencies.isEmpty()) {
+            Pipeline$Companion_getInstance().changeStateOfCommand_q143v3$(dependentProject, index_0, CommandState.Ready, Pipeline$Companion_getInstance().STATE_READY);
+          }
+        }
+      }
+    }
+  };
+  function Releaser$releaseDependentProjects$lambda(closure$releasePlan) {
+    return function (f) {
+      var dependentId = f.component2();
+      return closure$releasePlan.getProject_lljhqa$(dependentId);
+    };
+  }
+  function Releaser$releaseDependentProjects$lambda_0(it) {
+    return !it.isSubmodule;
+  }
+  var collectionSizeOrDefault = Kotlin.kotlin.collections.collectionSizeOrDefault_ba2ldo$;
+  var copyToArray = Kotlin.kotlin.collections.copyToArray;
+  Releaser.prototype.releaseDependentProjects_0 = function (allDependents, releasePlan, paramObject) {
+    var $receiver = toHashSet(filter(map(asSequence(allDependents), Releaser$releaseDependentProjects$lambda(releasePlan)), Releaser$releaseDependentProjects$lambda_0));
+    var destination = ArrayList_init(collectionSizeOrDefault($receiver, 10));
+    var tmp$;
+    tmp$ = $receiver.iterator();
+    while (tmp$.hasNext()) {
+      var item = tmp$.next();
+      destination.add_11rb$(this.releaseProject_0(Releaser$Releaser$ParamObject_init_0(paramObject, item)));
+    }
+    var promises = destination;
+    return Promise.all(copyToArray(promises));
+  };
+  function Releaser$triggerNonReleaseCommandsInclSubmoduleCommands$lambda(it) {
+    return !Kotlin.isType(it.value, ReleaseCommand);
+  }
+  function Releaser$triggerNonReleaseCommandsInclSubmoduleCommands$lambda_0(closure$paramObject, this$Releaser) {
+    return function (f) {
+      var index = f.component1()
+      , command = f.component2();
+      return this$Releaser.createCommandPromise_0(closure$paramObject, command, index);
+    };
+  }
+  function Releaser$triggerNonReleaseCommandsInclSubmoduleCommands$lambda$lambda(closure$paramObject, this$Releaser) {
+    return function (submoduleId) {
+      return this$Releaser.triggerNonReleaseCommandsInclSubmoduleCommands_0(Releaser$Releaser$ParamObject_init(closure$paramObject, submoduleId));
+    };
+  }
+  function Releaser$triggerNonReleaseCommandsInclSubmoduleCommands$lambda_1(closure$paramObject, this$Releaser) {
+    return function (jobsResults) {
+      var tmp$, tmp$_0, tmp$_1, tmp$_2;
+      tmp$_2 = asSequence(closure$paramObject.releasePlan.getSubmodules_lljhqa$(closure$paramObject.project.id));
+      tmp$_0 = Kotlin.isType(tmp$ = jobsResults, MutableList) ? tmp$ : throwCCE();
+      tmp$_1 = Releaser$triggerNonReleaseCommandsInclSubmoduleCommands$lambda$lambda(closure$paramObject, this$Releaser);
+      return this$Releaser.doSequentially_0(tmp$_2, tmp$_0, tmp$_1);
+    };
+  }
+  function Releaser$triggerNonReleaseCommandsInclSubmoduleCommands$lambda_2(jobsResults) {
+    var tmp$;
+    var firstOrNull$result;
+    firstOrNull$break: do {
+      var tmp$_0;
+      tmp$_0 = jobsResults.iterator();
+      while (tmp$_0.hasNext()) {
+        var element = tmp$_0.next();
+        if (element !== CommandState.Succeeded) {
+          firstOrNull$result = element;
+          break firstOrNull$break;
+        }
+      }
+      firstOrNull$result = null;
+    }
+     while (false);
+    return (tmp$ = firstOrNull$result) != null ? tmp$ : CommandState.Succeeded;
+  }
+  Releaser.prototype.triggerNonReleaseCommandsInclSubmoduleCommands_0 = function (paramObject) {
+    return this.doSequentially_0(filter(mapWithIndex(asSequence(paramObject.project.commands)), Releaser$triggerNonReleaseCommandsInclSubmoduleCommands$lambda), ArrayList_init(), Releaser$triggerNonReleaseCommandsInclSubmoduleCommands$lambda_0(paramObject, this)).then(Releaser$triggerNonReleaseCommandsInclSubmoduleCommands$lambda_1(paramObject, this)).then(Releaser$triggerNonReleaseCommandsInclSubmoduleCommands$lambda_2);
+  };
+  function Releaser$doSequentially$lambda$lambda$lambda(closure$list) {
+    return function (jobResult) {
+      if (jobResult === CommandState.Failed)
+        throw Releaser$ReleaseFailure_getInstance();
+      closure$list.add_11rb$(jobResult);
+      return closure$list;
+    };
+  }
+  function Releaser$doSequentially$lambda$lambda(closure$action, closure$element) {
+    return function (list) {
+      return closure$action(closure$element).then(Releaser$doSequentially$lambda$lambda$lambda(list));
+    };
+  }
+  Releaser.prototype.doSequentially_0 = function ($receiver, initial, action) {
+    var tmp$;
+    var accumulator = Promise.resolve(initial);
+    tmp$ = $receiver.iterator();
+    while (tmp$.hasNext()) {
+      var element = tmp$.next();
+      accumulator = accumulator.then(Releaser$doSequentially$lambda$lambda(action, element));
+    }
+    return accumulator;
+  };
+  function Releaser$triggerReleaseCommands$lambda(it) {
+    return Kotlin.isType(it.value, ReleaseCommand);
+  }
+  function Releaser$triggerReleaseCommands$lambda_0(closure$paramObject, this$Releaser) {
+    return function (f) {
+      var index = f.component1()
+      , command = f.component2();
+      return this$Releaser.createCommandPromise_0(closure$paramObject, command, index);
+    };
+  }
+  function Releaser$triggerReleaseCommands$lambda_1(jobsResults) {
+    var tmp$;
+    var firstOrNull$result;
+    firstOrNull$break: do {
+      var tmp$_0;
+      tmp$_0 = jobsResults.iterator();
+      while (tmp$_0.hasNext()) {
+        var element = tmp$_0.next();
+        if (element !== CommandState.Succeeded) {
+          firstOrNull$result = element;
+          break firstOrNull$break;
+        }
+      }
+      firstOrNull$result = null;
+    }
+     while (false);
+    return (tmp$ = firstOrNull$result) != null ? tmp$ : CommandState.Succeeded;
+  }
+  Releaser.prototype.triggerReleaseCommands_0 = function (paramObject) {
+    return this.doSequentially_0(filter(mapWithIndex(asSequence(paramObject.project.commands)), Releaser$triggerReleaseCommands$lambda), ArrayList_init(), Releaser$triggerReleaseCommands$lambda_0(paramObject, this)).then(Releaser$triggerReleaseCommands$lambda_1);
+  };
+  Releaser.prototype.createCommandPromise_0 = function (paramObject, command, index) {
+    var tmp$;
+    var state = Pipeline$Companion_getInstance().getCommandState_o8feeo$(paramObject.project.id, index);
+    if (state === CommandState.Ready || state === CommandState.ReadyToReTrigger) {
+      tmp$ = this.triggerCommand_0(paramObject, command, index);
+    }
+     else {
+      tmp$ = Promise.resolve(state);
+    }
+    return tmp$;
+  };
+  Releaser.prototype.triggerCommand_0 = function (paramObject, command, index) {
+    var jobExecutionData = paramObject.jobExecutionDataFactory.create_awtgy4$(paramObject.project, command);
+    return this.triggerJob_0(paramObject, index, jobExecutionData);
+  };
+  function Releaser$triggerJob$lambda(closure$project, closure$index, closure$paramObject, this$Releaser) {
+    return function (queuedItemUrl) {
+      Pipeline$Companion_getInstance().changeStateOfCommandAndAddBuildUrl_85y8bj$(closure$project, closure$index, CommandState.Queueing, Pipeline$Companion_getInstance().STATE_QUEUEING, queuedItemUrl);
+      return this$Releaser.quietSave_0(closure$paramObject);
+    };
+  }
+  function Releaser$triggerJob$lambda_0(closure$project, closure$index, closure$jobExecutionData) {
+    return function (buildNumber) {
+      Pipeline$Companion_getInstance().changeStateOfCommandAndAddBuildUrl_85y8bj$(closure$project, closure$index, CommandState.InProgress, Pipeline$Companion_getInstance().STATE_IN_PROGRESS, closure$jobExecutionData.jobBaseUrl + buildNumber + '/');
+      return Promise.resolve(1);
+    };
+  }
+  function Releaser$triggerJob$lambda_1(closure$project, closure$index) {
+    return function (it) {
+      Pipeline$Companion_getInstance().changeStateOfCommand_q143v3$(closure$project, closure$index, CommandState.Succeeded, Pipeline$Companion_getInstance().STATE_SUCCEEDED);
+      return CommandState.Succeeded;
+    };
+  }
+  var IllegalArgumentException_init = Kotlin.kotlin.IllegalArgumentException_init_pdl1vj$;
+  function Releaser$triggerJob$lambda_2(closure$jobExecutionData, closure$project, closure$index) {
+    return function (t) {
+      var tmp$;
+      showThrowable(new Error_0('Job ' + closure$jobExecutionData.jobName + ' failed', t));
+      var id = Pipeline$Companion_getInstance().getCommandId_xgsuvp$(closure$project, closure$index) + Pipeline$Companion_getInstance().STATE_SUFFIX;
+      var tmp$_0;
+      var elementByIdOrNull$result;
+      elementByIdOrNull$break: do {
+        var tmp$_1;
+        tmp$_1 = document.getElementById(id);
+        if (tmp$_1 == null) {
+          elementByIdOrNull$result = null;
+          break elementByIdOrNull$break;
+        }
+        var element = tmp$_1;
+        if (!Kotlin.isType(element, HTMLAnchorElement)) {
+          var message = 'element with ' + id + ' found but was wrong type.<br/>Expected type ' + get_js(getKClass(HTMLAnchorElement)).name + '<br/>Found ' + element;
+          throw IllegalArgumentException_init(message.toString());
+        }
+        elementByIdOrNull$result = element;
+      }
+       while (false);
+      tmp$_0 = elementByIdOrNull$result;
+      if (tmp$_0 == null) {
+        throw IllegalStateException_init('no element found for id ' + id + ' (expected type ' + get_js(getKClass(HTMLAnchorElement)).name + ')');
+      }
+      var state = tmp$_0;
+      var suffix = 'console#footer';
+      if (!endsWith(state.href, suffix)) {
+        tmp$ = state.href + suffix;
+      }
+       else {
+        tmp$ = state.href;
+      }
+      var href = tmp$;
+      Pipeline$Companion_getInstance().changeStateOfCommandAndAddBuildUrl_85y8bj$(closure$project, closure$index, CommandState.Failed, Pipeline$Companion_getInstance().STATE_FAILED, href);
+      return CommandState.Failed;
+    };
+  }
+  function Releaser$triggerJob$lambda_3(state) {
+    changeCursorBackToNormal();
+    return state;
+  }
+  Releaser.prototype.triggerJob_0 = function (paramObject, index, jobExecutionData) {
+    var project = paramObject.project;
+    changeCursorToProgress();
+    return paramObject.jobExecutor.trigger_cuif7q$(jobExecutionData, Releaser$triggerJob$lambda(project, index, paramObject, this), Releaser$triggerJob$lambda_0(project, index, jobExecutionData), 5, 900, false).then(Releaser$triggerJob$lambda_1(project, index), Releaser$triggerJob$lambda_2(jobExecutionData, project, index)).then(Releaser$triggerJob$lambda_3);
+  };
+  function Releaser$quietSave$lambda(closure$paramObject) {
+    return function (hadChanges) {
+      if (!hadChanges) {
+        showWarning('Could not save changes for project ' + closure$paramObject.project.id.identifier + '. Please report a bug.');
+      }
+      return Unit;
+    };
+  }
+  function Releaser$quietSave$lambda_0(closure$paramObject) {
+    return function (it) {
+      console.error('save failed for ' + closure$paramObject.project, it);
+      return Unit;
+    };
+  }
+  Releaser.prototype.quietSave_0 = function (paramObject, verbose) {
+    if (verbose === void 0)
+      verbose = false;
+    return this.menu_0.save_rt5gs7$(paramObject.jobExecutor, verbose).then(Releaser$quietSave$lambda(paramObject)).catch(Releaser$quietSave$lambda_0(paramObject));
+  };
+  function Releaser$ParamObject(releasePlan, jobExecutor, jobExecutionDataFactory, project, locks, projectResults) {
+    this.releasePlan = releasePlan;
+    this.jobExecutor = jobExecutor;
+    this.jobExecutionDataFactory = jobExecutionDataFactory;
+    this.project = project;
+    this.locks_0 = locks;
+    this.projectResults = projectResults;
+  }
+  function Releaser$ParamObject$withLockForProject$lambda(this$ParamObject, closure$projectId) {
+    return function (result) {
+      this$ParamObject.locks_0.remove_11rb$(closure$projectId);
+      return result;
+    };
+  }
+  function Releaser$ParamObject$withLockForProject$lambda_0(closure$act, this$ParamObject) {
+    return function (it) {
+      return this$ParamObject.withLockForProject_509nd4$(closure$act);
+    };
+  }
+  Releaser$ParamObject.prototype.withLockForProject_509nd4$ = function (act) {
+    var tmp$;
+    var projectId = this.project.id;
+    var lock = this.locks_0.get_11rb$(projectId);
+    if (lock == null) {
+      var promise = act();
+      this.locks_0.put_xwzc9p$(projectId, promise);
+      tmp$ = promise.then(Releaser$ParamObject$withLockForProject$lambda(this, projectId));
+    }
+     else {
+      tmp$ = lock.then(Releaser$ParamObject$withLockForProject$lambda_0(act, this));
+    }
+    return tmp$;
+  };
+  Releaser$ParamObject.$metadata$ = {
+    kind: Kind_CLASS,
+    simpleName: 'ParamObject',
+    interfaces: []
+  };
+  function Releaser$Releaser$ParamObject_init(paramObject, newProjectId, $this) {
+    $this = $this || Object.create(Releaser$ParamObject.prototype);
+    Releaser$Releaser$ParamObject_init_0(paramObject, paramObject.releasePlan.getProject_lljhqa$(newProjectId), $this);
+    return $this;
+  }
+  function Releaser$Releaser$ParamObject_init_0(paramObject, newProject, $this) {
+    $this = $this || Object.create(Releaser$ParamObject.prototype);
+    Releaser$ParamObject.call($this, paramObject.releasePlan, paramObject.jobExecutor, paramObject.jobExecutionDataFactory, newProject, paramObject.locks_0, paramObject.projectResults);
+    return $this;
+  }
+  Releaser$ParamObject.prototype.component1 = function () {
+    return this.releasePlan;
+  };
+  Releaser$ParamObject.prototype.component2 = function () {
+    return this.jobExecutor;
+  };
+  Releaser$ParamObject.prototype.component3 = function () {
+    return this.jobExecutionDataFactory;
+  };
+  Releaser$ParamObject.prototype.component4 = function () {
+    return this.project;
+  };
+  Releaser$ParamObject.prototype.component5_0 = function () {
+    return this.locks_0;
+  };
+  Releaser$ParamObject.prototype.component6 = function () {
+    return this.projectResults;
+  };
+  Releaser$ParamObject.prototype.copy_rhj9gb$ = function (releasePlan, jobExecutor, jobExecutionDataFactory, project, locks, projectResults) {
+    return new Releaser$ParamObject(releasePlan === void 0 ? this.releasePlan : releasePlan, jobExecutor === void 0 ? this.jobExecutor : jobExecutor, jobExecutionDataFactory === void 0 ? this.jobExecutionDataFactory : jobExecutionDataFactory, project === void 0 ? this.project : project, locks === void 0 ? this.locks_0 : locks, projectResults === void 0 ? this.projectResults : projectResults);
+  };
+  Releaser$ParamObject.prototype.toString = function () {
+    return 'ParamObject(releasePlan=' + Kotlin.toString(this.releasePlan) + (', jobExecutor=' + Kotlin.toString(this.jobExecutor)) + (', jobExecutionDataFactory=' + Kotlin.toString(this.jobExecutionDataFactory)) + (', project=' + Kotlin.toString(this.project)) + (', locks=' + Kotlin.toString(this.locks_0)) + (', projectResults=' + Kotlin.toString(this.projectResults)) + ')';
+  };
+  Releaser$ParamObject.prototype.hashCode = function () {
+    var result = 0;
+    result = result * 31 + Kotlin.hashCode(this.releasePlan) | 0;
+    result = result * 31 + Kotlin.hashCode(this.jobExecutor) | 0;
+    result = result * 31 + Kotlin.hashCode(this.jobExecutionDataFactory) | 0;
+    result = result * 31 + Kotlin.hashCode(this.project) | 0;
+    result = result * 31 + Kotlin.hashCode(this.locks_0) | 0;
+    result = result * 31 + Kotlin.hashCode(this.projectResults) | 0;
+    return result;
+  };
+  Releaser$ParamObject.prototype.equals = function (other) {
+    return this === other || (other !== null && (typeof other === 'object' && (Object.getPrototypeOf(this) === Object.getPrototypeOf(other) && (Kotlin.equals(this.releasePlan, other.releasePlan) && Kotlin.equals(this.jobExecutor, other.jobExecutor) && Kotlin.equals(this.jobExecutionDataFactory, other.jobExecutionDataFactory) && Kotlin.equals(this.project, other.project) && Kotlin.equals(this.locks_0, other.locks_0) && Kotlin.equals(this.projectResults, other.projectResults)))));
+  };
+  function Releaser$ReleaseFailure() {
+    Releaser$ReleaseFailure_instance = this;
+    RuntimeException_init(this);
+    this.name = 'Releaser$ReleaseFailure';
+  }
+  Releaser$ReleaseFailure.$metadata$ = {
+    kind: Kind_OBJECT,
+    simpleName: 'ReleaseFailure',
+    interfaces: [RuntimeException]
+  };
+  var Releaser$ReleaseFailure_instance = null;
+  function Releaser$ReleaseFailure_getInstance() {
+    if (Releaser$ReleaseFailure_instance === null) {
+      new Releaser$ReleaseFailure();
+    }
+    return Releaser$ReleaseFailure_instance;
+  }
+  Releaser.$metadata$ = {
+    kind: Kind_CLASS,
+    simpleName: 'Releaser',
+    interfaces: []
+  };
   function App() {
     App$Companion_getInstance();
     this.publishJobUrl_0 = null;
-    this.jenkinsUrl_0 = null;
+    this.defaultJenkinsBaseUrl_0 = null;
     this.menu_0 = null;
     var tmp$;
     this.switchLoader_0('loaderJs', 'loaderApiToken');
     var jsonUrl = this.determineJsonUrl_0();
     this.publishJobUrl_0 = this.determinePublishJob_0();
-    this.jenkinsUrl_0 = (tmp$ = this.publishJobUrl_0) != null ? substringBefore(tmp$, '/job/') : null;
+    this.defaultJenkinsBaseUrl_0 = (tmp$ = this.publishJobUrl_0) != null ? substringBefore_0(tmp$, '/job/') : null;
     this.menu_0 = new Menu();
     this.start_0(jsonUrl);
   }
@@ -161,7 +806,6 @@
     }
     return tmp$;
   };
-  var IllegalArgumentException_init = Kotlin.kotlin.IllegalArgumentException_init_pdl1vj$;
   App.prototype.getJobUrl_0 = function (possiblyRelativePublishJobUrl) {
     var tmp$;
     if (!(!contains(possiblyRelativePublishJobUrl, '://') || startsWith(possiblyRelativePublishJobUrl, 'http'))) {
@@ -181,7 +825,7 @@
   App.prototype.determineJsonUrl_0 = function () {
     var tmp$;
     if (!equals(window.location.hash, '')) {
-      tmp$ = substringBefore(window.location.hash.substring(1), '&');
+      tmp$ = substringBefore_0(window.location.hash.substring(1), '&');
     }
      else {
       tmp$ = showThrowableAndThrow(IllegalStateException_init('You need to specify a release.json.' + ('\n' + 'Append the path with preceding # to the url, e.g., ' + window.location + '#release.json')));
@@ -191,24 +835,30 @@
   function App$start$lambda$lambda(it) {
     throw new Error_0('Could not load json.', it);
   }
+  function App$start$lambda$lambda$lambda(this$App, closure$usernameToken, closure$modifiableJson, closure$releasePlan) {
+    return function (it) {
+      var dependencies = App$Companion_getInstance().createDependencies_tj5i2h$(this$App.defaultJenkinsBaseUrl_0, this$App.publishJobUrl_0, closure$usernameToken, closure$modifiableJson, closure$releasePlan, this$App.menu_0);
+      this$App.menu_0.initDependencies_3sajqp$(closure$releasePlan, new Downloader(closure$modifiableJson), dependencies, closure$modifiableJson);
+      new Gui(closure$releasePlan, this$App.menu_0);
+      this$App.switchLoaderPipelineWithPipeline_0();
+      return Unit;
+    };
+  }
   function App$start$lambda$lambda_0(this$App, closure$usernameToken) {
     return function (body) {
-      this$App.switchLoader_0('loaderApiToken', 'loaderJson');
+      this$App.switchLoader_0('loaderJson', 'loaderPipeline');
       var modifiableJson = new ModifiableJson(body);
       var releasePlan = deserialize(body);
-      var dependencies = App$Companion_getInstance().createDependencies_km5731$(this$App.jenkinsUrl_0, this$App.publishJobUrl_0, closure$usernameToken, modifiableJson, releasePlan, this$App.menu_0);
-      this$App.menu_0.initDependencies_xts1bw$(releasePlan, new Downloader(modifiableJson), dependencies, modifiableJson);
-      (new Gui(releasePlan, this$App.menu_0)).load();
-      this$App.switchLoaderJsonWithPipeline_0();
-      return Unit;
+      return this$App.loadOtherApiTokens_0(releasePlan).then(App$start$lambda$lambda$lambda(this$App, closure$usernameToken, modifiableJson, releasePlan));
     };
   }
   function App$start$lambda$lambda_1(it) {
     return showThrowableAndThrow(it);
   }
-  function App$start$lambda(closure$jsonUrl, this$App) {
+  function App$start$lambda(this$App, closure$jsonUrl) {
     return function (usernameToken) {
       display('gui', 'block');
+      this$App.switchLoader_0('loaderApiToken', 'loaderJson');
       var $receiver = this$App.loadJson_0(closure$jsonUrl, usernameToken).then(getCallableRef('checkStatusOk', function (response) {
         return checkStatusOk(response);
       })).catch(App$start$lambda$lambda);
@@ -217,68 +867,83 @@
     };
   }
   App.prototype.start_0 = function (jsonUrl) {
-    this.retrieveUserAndApiToken_0().then(App$start$lambda(jsonUrl, this));
+    this.retrieveUserAndApiToken_0().then(App$start$lambda(this, jsonUrl));
+  };
+  function App$loadOtherApiTokens$lambda$lambda(closure$remoteJenkinsBaseUrl, this$App) {
+    return function (pair) {
+      this$App.updateUserToolTip_0(closure$remoteJenkinsBaseUrl, pair);
+      if (pair == null) {
+        this$App.menu_0.setHalfVerified();
+        showWarning('You are not logged in at ' + closure$remoteJenkinsBaseUrl + '.' + '\n' + ('You can perform a Dry Run (runs on ' + toString(this$App.defaultJenkinsBaseUrl_0) + ') but a release involving the remote jenkins will most likely fail.' + '\n' + '\n') + ('Go to the log in: ' + closure$remoteJenkinsBaseUrl + '/login?from=') + toString(window.location));
+      }
+      return Unit;
+    };
+  }
+  App.prototype.loadOtherApiTokens_0 = function (releasePlan) {
+    var remoteRegex = parseRemoteRegex(releasePlan);
+    var mutableList = ArrayList_init(remoteRegex.size);
+    var tmp$;
+    tmp$ = remoteRegex.iterator();
+    while (tmp$.hasNext()) {
+      var element = tmp$.next();
+      var remoteJenkinsBaseUrl = element.component2();
+      var tmp$_0;
+      if (this.isUrlAndNotYetRegistered_0(remoteJenkinsBaseUrl)) {
+        tmp$_0 = UsernameTokenRegistry_getInstance().register_61zpoe$(remoteJenkinsBaseUrl).then(App$loadOtherApiTokens$lambda$lambda(remoteJenkinsBaseUrl, this));
+      }
+       else {
+        tmp$_0 = Promise.resolve(Unit);
+      }
+      var promise = tmp$_0;
+      mutableList.add_11rb$(promise);
+    }
+    return Promise.all(copyToArray(mutableList));
+  };
+  App.prototype.isUrlAndNotYetRegistered_0 = function (remoteJenkinsBaseUrl) {
+    return startsWith(remoteJenkinsBaseUrl, 'http') && UsernameTokenRegistry_getInstance().forHost_61zpoe$(remoteJenkinsBaseUrl) == null;
   };
   function App$retrieveUserAndApiToken$lambda(this$App) {
-    return function (body) {
-      if (body == null) {
+    return function (pair) {
+      if (pair == null) {
         var info = 'You need to log in if you want to use other functionality than Download.';
-        this$App.menu_0.disableButtonsDueToNoAuth_puj7f4$(info, info + '\n' + toString(this$App.jenkinsUrl_0) + '/login?from=' + toString(window.location));
+        this$App.menu_0.disableButtonsDueToNoAuth_puj7f4$(info, info + '\n' + toString(this$App.defaultJenkinsBaseUrl_0) + '/login?from=' + toString(window.location));
         return null;
       }
        else {
-        var tmp$ = this$App.extractNameAndApiToken_0(body);
-        var username = tmp$.component1()
-        , name = tmp$.component2()
-        , apiToken = tmp$.component3();
-        this$App.menu_0.setVerifiedUser_puj7f4$(username, name);
-        return new UsernameToken(username, apiToken);
+        var name = pair.component1()
+        , usernameToken = pair.component2();
+        this$App.menu_0.setVerifiedUser_61zpoe$(name);
+        this$App.updateUserToolTip_0(this$App.defaultJenkinsBaseUrl_0, pair);
+        return usernameToken;
       }
     };
   }
   App.prototype.retrieveUserAndApiToken_0 = function () {
     var tmp$, tmp$_0;
-    if (this.jenkinsUrl_0 == null) {
+    if (this.defaultJenkinsBaseUrl_0 == null) {
       this.menu_0.disableButtonsDueToNoPublishUrl();
-      tmp$_0 = Promise.resolve((tmp$ = null) == null || Kotlin.isType(tmp$, UsernameToken) ? tmp$ : throwCCE());
+      tmp$_0 = Promise.resolve((tmp$ = null) == null || Kotlin.isType(tmp$, UsernameAndApiToken) ? tmp$ : throwCCE());
     }
      else {
-      tmp$_0 = window.fetch(toString(this.jenkinsUrl_0) + '/me/configure', createFetchInitWithCredentials()).then(getCallableRef('checkStatusOkOr403', function (response) {
-        return checkStatusOkOr403(response);
-      })).then(App$retrieveUserAndApiToken$lambda(this));
+      tmp$_0 = UsernameTokenRegistry_getInstance().register_61zpoe$(this.defaultJenkinsBaseUrl_0).then(App$retrieveUserAndApiToken$lambda(this));
     }
     return tmp$_0;
   };
-  App.prototype.extractNameAndApiToken_0 = function (body) {
-    var tmp$, tmp$_0, tmp$_1;
-    tmp$ = App$Companion_getInstance().usernameRegex_0.find_905azu$(body);
-    if (tmp$ == null) {
-      throw IllegalStateException_init('Could not find username');
-    }
-    var usernameMatch = tmp$;
-    tmp$_0 = App$Companion_getInstance().fullNameRegex_0.find_905azu$(body);
-    if (tmp$_0 == null) {
-      throw IllegalStateException_init("Could not find user's name");
-    }
-    var fullNameMatch = tmp$_0;
-    tmp$_1 = App$Companion_getInstance().apiTokenRegex_0.find_905azu$(body);
-    if (tmp$_1 == null) {
-      throw IllegalStateException_init('Could not find API token');
-    }
-    var apiTokenMatch = tmp$_1;
-    return new Triple(usernameMatch.groupValues.get_za3lpa$(1), fullNameMatch.groupValues.get_za3lpa$(1), apiTokenMatch.groupValues.get_za3lpa$(1));
+  App.prototype.updateUserToolTip_0 = function (url, pair) {
+    var tmp$, tmp$_0;
+    this.menu_0.appendToUserButtonToolTip_buzeal$(url, (tmp$_0 = (tmp$ = pair != null ? pair.second : null) != null ? tmp$.username : null) != null ? tmp$_0 : 'Anonymous', pair != null ? pair.first : null);
   };
-  App.prototype.loadJson_0 = function (jsonUrl, usernameToken) {
+  App.prototype.loadJson_0 = function (jsonUrl, usernameAndApiToken) {
     var init = createFetchInitWithCredentials();
     var headers = {};
-    if (usernameToken != null) {
-      addAuthentication(headers, usernameToken);
+    if (usernameAndApiToken != null) {
+      addAuthentication(headers, usernameAndApiToken);
     }
     init.headers = headers;
     return window.fetch(jsonUrl, init);
   };
-  App.prototype.switchLoaderJsonWithPipeline_0 = function () {
-    display('loaderJson', 'none');
+  App.prototype.switchLoaderPipelineWithPipeline_0 = function () {
+    display('loaderPipeline', 'none');
     display('pipeline', 'table');
   };
   App.prototype.switchLoader_0 = function (firstLoader, secondLoader) {
@@ -288,19 +953,16 @@
   function App$Companion() {
     App$Companion_instance = this;
     this.PUBLISH_JOB = '&publishJob=';
-    this.fullNameRegex_0 = Regex_init('<input[^>]+name="_\\.fullName"[^>]+value="([^"]+)"');
-    this.apiTokenRegex_0 = Regex_init('<input[^>]+name="_\\.apiToken"[^>]+value="([^"]+)"');
-    this.usernameRegex_0 = Regex_init('<a[^>]+href="[^"]*/user/([^"]+)"');
   }
-  App$Companion.prototype.createDependencies_km5731$ = function (jenkinsUrl, publishJobUrl, usernameToken, modifiableJson, releasePlan, menu) {
+  App$Companion.prototype.createDependencies_tj5i2h$ = function (defaultJenkinsBaseUrl, publishJobUrl, usernameAndApiToken, modifiableJson, releasePlan, menu) {
     var tmp$;
-    if (publishJobUrl != null && jenkinsUrl != null && usernameToken != null) {
-      var publisher = new Publisher(publishJobUrl, modifiableJson);
-      var releaser = new Releaser(jenkinsUrl, modifiableJson, menu);
-      var jenkinsJobExecutor = new JenkinsJobExecutor(jenkinsUrl, usernameToken);
+    if (publishJobUrl != null && defaultJenkinsBaseUrl != null && usernameAndApiToken != null) {
+      var publisher = new Publisher(usernameAndApiToken, publishJobUrl, modifiableJson);
+      var releaser = new Releaser(defaultJenkinsBaseUrl, modifiableJson, menu);
+      var jenkinsJobExecutor = new JenkinsJobExecutor(UsernameTokenRegistry_getInstance());
       var simulatingJobExecutor = new SimulatingJobExecutor();
-      var releaseJobExecutionDataFactory = new ReleaseJobExecutionDataFactory(jenkinsUrl, releasePlan);
-      var dryRunJobExecutionDataFactory = new DryRunJobExecutionDataFactory(jenkinsUrl, releasePlan);
+      var releaseJobExecutionDataFactory = new ReleaseJobExecutionDataFactory(defaultJenkinsBaseUrl, releasePlan);
+      var dryRunJobExecutionDataFactory = new DryRunJobExecutionDataFactory(defaultJenkinsBaseUrl, releasePlan);
       tmp$ = new Menu$Dependencies(publisher, releaser, jenkinsJobExecutor, simulatingJobExecutor, releaseJobExecutionDataFactory, dryRunJobExecutionDataFactory);
     }
      else {
@@ -325,370 +987,1701 @@
     simpleName: 'App',
     interfaces: []
   };
-  function BaseJobExecutionDataFactory(jenkinsUrl, releasePlan) {
-    this.jenkinsUrl_of89bu$_0 = jenkinsUrl;
-    this.releasePlan = releasePlan;
+  function ContextMenu(releasePlan, menu) {
+    ContextMenu$Companion_getInstance();
+    this.releasePlan_0 = releasePlan;
+    this.menu_0 = menu;
   }
-  BaseJobExecutionDataFactory.prototype.requireConfigEntry_nhrt5l$ = function (config, key) {
-    if (!config.containsKey_11rb$(key)) {
-      var message = key.toString() + ' is not defined in settings';
-      throw IllegalArgumentException_init(message.toString());
-    }
-  };
-  BaseJobExecutionDataFactory.prototype.getConfig_udzor3$ = function (key) {
-    return this.releasePlan.getConfig_udzor3$(key);
-  };
-  BaseJobExecutionDataFactory.prototype.getJobUrl_udzor3$ = function (key) {
-    return this.getJobUrl_61zpoe$(this.getConfig_udzor3$(key));
-  };
-  BaseJobExecutionDataFactory.prototype.getJobUrl_61zpoe$ = function (jobName) {
-    return this.jenkinsUrl_of89bu$_0 + '/job/' + jobName;
-  };
-  BaseJobExecutionDataFactory.$metadata$ = {
-    kind: Kind_CLASS,
-    simpleName: 'BaseJobExecutionDataFactory',
-    interfaces: [JobExecutionDataFactory]
-  };
-  function ChangeApplier() {
-    ChangeApplier_instance = this;
+  function ContextMenu$createContextMenu$lambda$lambda(closure$project, closure$index, this$ContextMenu) {
+    return function (it) {
+      this$ContextMenu.transitionToDeactivatedIfOk_0(closure$project, closure$index);
+      return Unit;
+    };
   }
-  ChangeApplier.prototype.createReleasePlanJsonWithChanges_61zpoe$ = function (json) {
-    var releasePlanJson = JSON.parse(json);
-    var changed = this.applyChanges_0(releasePlanJson);
-    var newJson = JSON.stringify(releasePlanJson);
-    return to(changed, newJson);
+  function ContextMenu$createContextMenu$lambda$lambda_0(closure$project, closure$index, this$ContextMenu) {
+    return function (it) {
+      this$ContextMenu.transitionToSucceededIfOk_0(closure$project, closure$index);
+      return Unit;
+    };
+  }
+  function ContextMenu$createContextMenu$lambda(closure$idPrefix, closure$project, closure$index, this$ContextMenu) {
+    return function ($receiver) {
+      set_id($receiver, closure$idPrefix + ContextMenu$Companion_getInstance().CONTEXT_MENU_SUFFIX);
+      this$ContextMenu.contextMenuEntry_0($receiver, closure$idPrefix, ContextMenu$Companion_getInstance().CONTEXT_MENU_DEACTIVATED, getKClass(CommandState$Deactivated), ContextMenu$createContextMenu$lambda$lambda(closure$project, closure$index, this$ContextMenu));
+      this$ContextMenu.contextMenuEntry_0($receiver, closure$idPrefix, ContextMenu$Companion_getInstance().CONTEXT_MENU_SUCCEEDED, getKClass(Object.getPrototypeOf(CommandState.Succeeded).constructor), ContextMenu$createContextMenu$lambda$lambda_0(closure$project, closure$index, this$ContextMenu));
+      return Unit;
+    };
+  }
+  ContextMenu.prototype.createContextMenu_1yrdz4$ = function (div_0, idPrefix, project, index) {
+    div(div_0, 'contextMenu', ContextMenu$createContextMenu$lambda(idPrefix, project, index, this));
   };
-  ChangeApplier.prototype.applyChanges_0 = function (releasePlanJson) {
-    var changed = {v: false};
-    changed.v = changed.v | this.replacePublishIdIfChanged_0(releasePlanJson);
-    changed.v = changed.v | this.replaceReleaseStateIfChanged_0(releasePlanJson);
-    var $receiver = releasePlanJson.projects;
-    var tmp$;
-    for (tmp$ = 0; tmp$ !== $receiver.length; ++tmp$) {
-      var element = $receiver[tmp$];
-      var mavenProjectId = deserializeProjectId(element.id);
-      changed.v = changed.v | this.replaceReleaseVersionIfChanged_0(element, mavenProjectId);
-      var $receiver_0 = element.commands;
-      var tmp$_0, tmp$_0_0;
-      var index = 0;
-      for (tmp$_0 = 0; tmp$_0 !== $receiver_0.length; ++tmp$_0) {
-        var item = $receiver_0[tmp$_0];
-        var index_0 = (tmp$_0_0 = index, index = tmp$_0_0 + 1 | 0, tmp$_0_0);
-        changed.v = changed.v | this.replaceCommandStateIfChanged_0(item, mavenProjectId, index_0) | this.replaceFieldsIfChanged_0(item, mavenProjectId, index_0);
+  function ContextMenu$contextMenuEntry$lambda$lambda($receiver) {
+    span($receiver);
+    return Unit;
+  }
+  function ContextMenu$contextMenuEntry$lambda$lambda_0(closure$commandClass) {
+    return function ($receiver) {
+      $receiver.unaryPlus_pdl1vz$('Set Command to ' + toString(closure$commandClass.simpleName));
+      return Unit;
+    };
+  }
+  function ContextMenu$contextMenuEntry$lambda(closure$idPrefix, closure$cssClass, closure$commandClass, closure$action) {
+    return function ($receiver) {
+      set_id($receiver, closure$idPrefix + closure$cssClass);
+      set_title($receiver, 'Forcibly sets the state of this command to ' + toString(closure$commandClass.simpleName) + ', to be used with care.');
+      i($receiver, 'material-icons', ContextMenu$contextMenuEntry$lambda$lambda);
+      span($receiver, void 0, ContextMenu$contextMenuEntry$lambda$lambda_0(closure$commandClass));
+      addClickEventListener(getUnderlyingHtmlElement($receiver), void 0, closure$action);
+      return Unit;
+    };
+  }
+  ContextMenu.prototype.contextMenuEntry_0 = function ($receiver, idPrefix, cssClass, commandClass, action) {
+    div($receiver, cssClass, ContextMenu$contextMenuEntry$lambda(idPrefix, cssClass, commandClass, action));
+  };
+  ContextMenu.prototype.transitionToDeactivatedIfOk_0 = function (project, index) {
+    var commandState = Pipeline$Companion_getInstance().getCommandState_o8feeo$(project.id, index);
+    if (this.isNotInStateToDeactivate_0(commandState))
+      return;
+    Pipeline$Companion_getInstance().getToggle_xgsuvp$(project, index).click();
+  };
+  ContextMenu.prototype.isNotInStateToDeactivate_0 = function (commandState) {
+    return Kotlin.isType(commandState, CommandState$Deactivated) || commandState === CommandState.Succeeded || commandState === CommandState.Disabled;
+  };
+  function ContextMenu$transitionToSucceededIfOk$lambda(closure$project, this$ContextMenu) {
+    return function (setAllToSucceeded) {
+      if (setAllToSucceeded) {
+        this$ContextMenu.transitionAllCommandsToSucceeded_0(closure$project);
+        this$ContextMenu.menu_0.activateSaveButton();
+      }
+      return Unit;
+    };
+  }
+  ContextMenu.prototype.transitionToSucceededIfOk_0 = function (project, index) {
+    if (Kotlin.isType(project.commands.get_za3lpa$(index), ReleaseCommand)) {
+      if (this.notAllOtherCommandsSucceeded_0(project, index)) {
+        var succeeded = getKClass(Object.getPrototypeOf(CommandState.Succeeded).constructor).simpleName;
+        showDialog('You cannot set this command to the state ' + toString(succeeded) + ' because not all other commands of this project have ' + toString(succeeded) + ' yet.' + '\n\n' + ('Do you want to set all other commands forcibly to ' + toString(succeeded) + ' as well?')).then(ContextMenu$transitionToSucceededIfOk$lambda(project, this));
+        return;
       }
     }
-    changed.v = changed.v | this.replaceConfigEntriesIfChanged_0(releasePlanJson);
-    return changed.v;
+    this.transitionToSucceeded_0(project, index);
+    this.menu_0.activateSaveButton();
   };
-  var isBlank = Kotlin.kotlin.text.isBlank_gw00vp$;
-  ChangeApplier.prototype.replacePublishIdIfChanged_0 = function (releasePlanJson) {
-    var changed = false;
-    var input = getTextField(Gui$Companion_getInstance().RELEASE_ID_HTML_ID);
-    if (!equals(releasePlanJson.releaseId, input.value)) {
-      if (!!isBlank(input.value)) {
-        var message = 'An empty or blank ReleaseId is not allowed';
-        throw IllegalStateException_init(message.toString());
+  ContextMenu.prototype.transitionAllCommandsToSucceeded_0 = function (project) {
+    var tmp$, tmp$_0;
+    var index = 0;
+    tmp$ = project.commands.iterator();
+    while (tmp$.hasNext()) {
+      var item = tmp$.next();
+      this.transitionToSucceeded_0(project, (tmp$_0 = index, index = tmp$_0 + 1 | 0, tmp$_0));
+    }
+    var tmp$_1;
+    tmp$_1 = this.releasePlan_0.getSubmodules_lljhqa$(project.id).iterator();
+    while (tmp$_1.hasNext()) {
+      var element = tmp$_1.next();
+      this.transitionAllCommandsToSucceeded_0(this.releasePlan_0.getProject_lljhqa$(element));
+    }
+  };
+  function ContextMenu$transitionToSucceeded$lambda(f, f_0) {
+    return CommandState.Succeeded;
+  }
+  ContextMenu.prototype.transitionToSucceeded_0 = function (project, index) {
+    Pipeline$Companion_getInstance().changeStateOfCommand_jnlut6$(project, index, CommandState.Succeeded, Pipeline$Companion_getInstance().stateToTitle_du2eex$(CommandState.Succeeded), ContextMenu$transitionToSucceeded$lambda);
+  };
+  ContextMenu.prototype.notAllOtherCommandsSucceeded_0 = function (project, index) {
+    var $receiver = mapWithIndex(asSequence(project.commands));
+    var any$result;
+    any$break: do {
+      var tmp$;
+      tmp$ = $receiver.iterator();
+      while (tmp$.hasNext()) {
+        var element = tmp$.next();
+        var i = element.component1();
+        if ((index == null || i !== index) && Pipeline$Companion_getInstance().getCommandState_o8feeo$(project.id, i) !== CommandState.Succeeded) {
+          any$result = true;
+          break any$break;
+        }
       }
-      releasePlanJson.releaseId = input.value;
-      changed = true;
+      any$result = false;
     }
-    return changed;
-  };
-  ChangeApplier.prototype.replaceReleaseStateIfChanged_0 = function (releasePlanJson) {
-    var changed = false;
-    var newState = Gui$Companion_getInstance().getReleaseState();
-    var currentState = deserializeReleaseState(releasePlanJson);
-    if (currentState !== newState) {
-      releasePlanJson.state = newState.name;
-      changed = true;
-    }
-    return changed;
-  };
-  ChangeApplier.prototype.replaceConfigEntriesIfChanged_0 = function (releasePlanJson) {
-    var changed = {v: false};
-    var $receiver = releasePlanJson.config;
-    var tmp$;
-    for (tmp$ = 0; tmp$ !== $receiver.length; ++tmp$) {
-      var element = $receiver[tmp$];
-      action$break: do {
-        var tmp$_0, tmp$_1, tmp$_2;
-        if (element.length !== 2)
-          break action$break;
-        var input = elementById('config-' + element[0]);
-        if (equals(element[0], ConfigKey.JOB_MAPPING.asString())) {
-          tmp$_2 = replace(replace((Kotlin.isType(tmp$_0 = input, HTMLTextAreaElement) ? tmp$_0 : throwCCE()).value, '\r', ''), '\n', '|');
+     while (false);
+    var tmp$_0 = any$result;
+    if (!tmp$_0) {
+      var $receiver_0 = this.releasePlan_0.getSubmodules_lljhqa$(project.id);
+      var any$result_0;
+      any$break: do {
+        var tmp$_1;
+        if (Kotlin.isType($receiver_0, Collection) && $receiver_0.isEmpty()) {
+          any$result_0 = false;
+          break any$break;
         }
-         else {
-          tmp$_2 = (Kotlin.isType(tmp$_1 = input, HTMLInputElement) ? tmp$_1 : throwCCE()).value;
+        tmp$_1 = $receiver_0.iterator();
+        while (tmp$_1.hasNext()) {
+          var element_0 = tmp$_1.next();
+          if (this.notAllOtherCommandsSucceeded_0(this.releasePlan_0.getProject_lljhqa$(element_0), null)) {
+            any$result_0 = true;
+            break any$break;
+          }
         }
-        var value = tmp$_2;
-        if (!equals(element[1], value)) {
-          element[1] = value;
-          changed.v = true;
-        }
+        any$result_0 = false;
       }
        while (false);
+      tmp$_0 = any$result_0;
     }
-    return changed.v;
+    return tmp$_0;
   };
-  ChangeApplier.prototype.replaceReleaseVersionIfChanged_0 = function (project, mavenProjectId) {
-    var input = getTextFieldOrNull(mavenProjectId.identifier + ':releaseVersion');
-    if (input != null && !equals(project.releaseVersion, input.value)) {
-      if (!!isBlank(input.value)) {
-        var message = 'An empty or blank Release Version is not allowed';
-        throw IllegalStateException_init(message.toString());
-      }
-      project.releaseVersion = input.value;
-      return true;
-    }
-    return false;
-  };
-  var collectionSizeOrDefault = Kotlin.kotlin.collections.collectionSizeOrDefault_ba2ldo$;
-  var ArrayList_init = Kotlin.kotlin.collections.ArrayList_init_ww73n8$;
-  var copyToArray = Kotlin.kotlin.collections.copyToArray;
-  ChangeApplier.prototype.replaceCommandStateIfChanged_0 = function (genericCommand, mavenProjectId, index) {
+  function ContextMenu$setUpCommandsOnContextMenu$lambda$lambda$lambda(this$ContextMenu) {
+    return function (it) {
+      this$ContextMenu.hideAllContextMenus_0();
+      return Unit;
+    };
+  }
+  function ContextMenu$setUpCommandsOnContextMenu$lambda$lambda(this$ContextMenu, closure$idPrefix) {
+    return function (event) {
+      var tmp$, tmp$_0;
+      this$ContextMenu.hideAllContextMenus_0();
+      this$ContextMenu.disableContextEntriesIfNecessary_0(closure$idPrefix);
+      var contextMenu = elementById(closure$idPrefix + ContextMenu$Companion_getInstance().CONTEXT_MENU_SUFFIX);
+      tmp$_0 = Kotlin.isType(tmp$ = event, MouseEvent) ? tmp$ : throwCCE();
+      this$ContextMenu.moveContextMenuPosition_0(tmp$_0, contextMenu);
+      contextMenu.style.visibility = 'visible';
+      window.addEventListener('click', ContextMenu$setUpCommandsOnContextMenu$lambda$lambda$lambda(this$ContextMenu), {once: true});
+      event.preventDefault();
+      event.stopPropagation();
+      return Unit;
+    };
+  }
+  function ContextMenu$setUpCommandsOnContextMenu$lambda(this$ContextMenu) {
+    return function (it) {
+      this$ContextMenu.hideAllContextMenus_0();
+      return Unit;
+    };
+  }
+  ContextMenu.prototype.setUpCommandsOnContextMenu = function () {
+    var $receiver = asList(document.querySelectorAll('.command > .fields > .toggle'));
+    var destination = ArrayList_init(collectionSizeOrDefault($receiver, 10));
     var tmp$;
-    var command = genericCommand.p;
-    var previousState = deserializeCommandState(command);
-    var newState = Gui$Companion_getInstance().getCommandState_o8feeo$(mavenProjectId, index);
-    if (!((tmp$ = Kotlin.getKClassFromExpression(previousState)) != null ? tmp$.equals(Kotlin.getKClassFromExpression(newState)) : null)) {
-      var stateObject = {};
-      stateObject.state = Kotlin.getKClassFromExpression(newState).simpleName;
-      if (Kotlin.isType(newState, CommandState$Deactivated)) {
-        stateObject.previous = command.state;
-      }
-      command.state = stateObject;
-      return true;
+    tmp$ = $receiver.iterator();
+    while (tmp$.hasNext()) {
+      var item = tmp$.next();
+      var tmp$_0 = destination.add_11rb$;
+      var tmp$_1;
+      var toggle = Kotlin.isType(tmp$_1 = item.firstChild, HTMLInputElement) ? tmp$_1 : throwCCE();
+      tmp$_0.call(destination, to(item, substringBefore_0(toggle.id, Pipeline$Companion_getInstance().DEACTIVATE_SUFFIX)));
     }
-    if (Kotlin.isType(previousState, CommandState$Waiting) && Kotlin.isType(newState, CommandState$Waiting) && previousState.dependencies.size !== newState.dependencies.size) {
-      var $receiver = newState.dependencies;
-      var destination = ArrayList_init(collectionSizeOrDefault($receiver, 10));
+    var toggleLabels = destination;
+    var $receiver_0 = asList(document.querySelectorAll('.state'));
+    var destination_0 = ArrayList_init(collectionSizeOrDefault($receiver_0, 10));
+    var tmp$_2;
+    tmp$_2 = $receiver_0.iterator();
+    while (tmp$_2.hasNext()) {
+      var item_0 = tmp$_2.next();
+      var tmp$_3 = destination_0.add_11rb$;
+      var tmp$_4;
+      var a = Kotlin.isType(tmp$_4 = item_0, HTMLAnchorElement) ? tmp$_4 : throwCCE();
+      tmp$_3.call(destination_0, to(a, substringBefore_0(a.id, Pipeline$Companion_getInstance().STATE_SUFFIX)));
+    }
+    var stateIcons = destination_0;
+    var tmp$_5;
+    tmp$_5 = toggleLabels.iterator();
+    while (tmp$_5.hasNext()) {
+      var element = tmp$_5.next();
+      var element_0 = element.component1()
+      , idPrefix = element.component2();
+      element_0.addEventListener('contextmenu', ContextMenu$setUpCommandsOnContextMenu$lambda$lambda(this, idPrefix));
+    }
+    var tmp$_0_0;
+    tmp$_0_0 = stateIcons.iterator();
+    while (tmp$_0_0.hasNext()) {
+      var element_0_0 = tmp$_0_0.next();
+      var element_1 = element_0_0.component1()
+      , idPrefix_0 = element_0_0.component2();
+      element_1.addEventListener('contextmenu', ContextMenu$setUpCommandsOnContextMenu$lambda$lambda(this, idPrefix_0));
+    }
+    window.addEventListener('contextmenu', ContextMenu$setUpCommandsOnContextMenu$lambda(this));
+  };
+  ContextMenu.prototype.disableContextEntriesIfNecessary_0 = function (idPrefix) {
+    var commandState = Pipeline$Companion_getInstance().getCommandState_61zpoe$(idPrefix);
+    this.disableOrEnableContextMenuEntry_0(idPrefix + ContextMenu$Companion_getInstance().CONTEXT_MENU_DEACTIVATED, this.isNotInStateToDeactivate_0(commandState));
+    this.disableOrEnableContextMenuEntry_0(idPrefix + ContextMenu$Companion_getInstance().CONTEXT_MENU_SUCCEEDED, commandState === CommandState.Succeeded);
+  };
+  ContextMenu.prototype.disableOrEnableContextMenuEntry_0 = function (id, disable) {
+    var entry = elementById(id);
+    if (disable) {
+      setTitleSaveOld(entry, 'Cannot apply this action.');
+      addClass(entry, ['disabled']);
+    }
+     else {
+      var title = getOldTitleOrNull(entry);
+      if (title != null) {
+        entry.title = title;
+      }
+      removeClass(entry, ['disabled']);
+    }
+  };
+  ContextMenu.prototype.hideAllContextMenus_0 = function () {
+    var tmp$;
+    tmp$ = asList(document.querySelectorAll('.contextMenu')).iterator();
+    while (tmp$.hasNext()) {
+      var element = tmp$.next();
       var tmp$_0;
-      tmp$_0 = $receiver.iterator();
-      while (tmp$_0.hasNext()) {
-        var item = tmp$_0.next();
-        var tmp$_1 = destination.add_11rb$;
-        var transform$result;
-        if (Kotlin.isType(item, MavenProjectId)) {
-          var entry = {};
-          entry.t = MAVEN_PROJECT_ID;
-          var p = {};
-          p.groupId = item.groupId;
-          p.artifactId = item.artifactId;
-          entry.p = p;
-          transform$result = entry;
-        }
-         else
-          throw UnsupportedOperationException_init(item.toString() + ' is not supported.');
-        tmp$_1.call(destination, transform$result);
-      }
-      var newDependencies = destination;
-      command.state.dependencies = copyToArray(newDependencies);
+      (Kotlin.isType(tmp$_0 = element, HTMLElement) ? tmp$_0 : throwCCE()).style.visibility = 'hidden';
     }
-    return false;
   };
-  ChangeApplier.prototype.replaceFieldsIfChanged_0 = function (command, mavenProjectId, index) {
-    var tmp$;
-    switch (command.t) {
-      case 'ch.loewenfels.depgraph.data.maven.jenkins.JenkinsMavenReleasePlugin':
-      case 'ch.loewenfels.depgraph.data.maven.jenkins.JenkinsMultiMavenReleasePlugin':
-        tmp$ = this.replaceNextVersionIfChanged_0(command.p, mavenProjectId, index) | this.replaceBuildUrlIfChanged_0(command.p, mavenProjectId, index);
-        break;
-      case 'ch.loewenfels.depgraph.data.maven.jenkins.JenkinsUpdateDependency':
-        tmp$ = this.replaceBuildUrlIfChanged_0(command.p, mavenProjectId, index);
-        break;
-      default:throw UnsupportedOperationException_init(command.t + ' is not supported.');
+  ContextMenu.prototype.moveContextMenuPosition_0 = function (event, contextMenu) {
+    var tmp$, tmp$_0;
+    var menuWidth = contextMenu.offsetWidth;
+    var menuHeight = contextMenu.offsetHeight;
+    var mouseX = event.pageX;
+    var mouseY = event.pageY;
+    if (mouseX + menuWidth > ensureNotNull(document.body).clientWidth + window.scrollX) {
+      tmp$ = mouseX - menuWidth;
     }
-    return tmp$;
-  };
-  ChangeApplier.prototype.replaceNextVersionIfChanged_0 = function (command, mavenProjectId, index) {
-    var m2Command = command;
-    var input = getTextField(Gui$Companion_getInstance().getCommandId_o8feeo$(mavenProjectId, index) + Gui$Companion_getInstance().NEXT_DEV_VERSION_SUFFIX);
-    if (!equals(m2Command.nextDevVersion, input.value)) {
-      if (!!isBlank(input.value)) {
-        var message = 'An empty or blank Next Dev Version is not allowed';
-        throw IllegalStateException_init(message.toString());
-      }
-      m2Command.nextDevVersion = input.value;
-      return true;
+     else {
+      tmp$ = mouseX;
     }
-    return false;
-  };
-  ChangeApplier.prototype.replaceBuildUrlIfChanged_0 = function (command, mavenProjectId, index) {
-    var tmp$;
-    var jenkinsCommand = command;
-    var guiCommand = Gui$Companion_getInstance().getCommand_o8feeo$(mavenProjectId, index);
-    var newBuildUrl = typeof (tmp$ = guiCommand.buildUrl) === 'string' ? tmp$ : null;
-    if (newBuildUrl != null && !equals(jenkinsCommand.buildUrl, newBuildUrl)) {
-      jenkinsCommand.buildUrl = newBuildUrl;
-      return true;
+    var x = tmp$;
+    if (mouseY + menuHeight > ensureNotNull(document.body).clientHeight + window.scrollY) {
+      tmp$_0 = mouseY - menuHeight;
     }
-    return false;
+     else {
+      tmp$_0 = mouseY;
+    }
+    var y = tmp$_0;
+    contextMenu.style.left = x.toString() + 'px';
+    contextMenu.style.top = y.toString() + 'px';
   };
-  ChangeApplier.$metadata$ = {
+  function ContextMenu$Companion() {
+    ContextMenu$Companion_instance = this;
+    this.CONTEXT_MENU_SUFFIX = ':contextMenu';
+    this.CONTEXT_MENU_DEACTIVATED = 'deactivated';
+    this.CONTEXT_MENU_SUCCEEDED = 'succeeded';
+  }
+  ContextMenu$Companion.$metadata$ = {
     kind: Kind_OBJECT,
-    simpleName: 'ChangeApplier',
+    simpleName: 'Companion',
     interfaces: []
   };
-  var ChangeApplier_instance = null;
-  function ChangeApplier_getInstance() {
-    if (ChangeApplier_instance === null) {
-      new ChangeApplier();
+  var ContextMenu$Companion_instance = null;
+  function ContextMenu$Companion_getInstance() {
+    if (ContextMenu$Companion_instance === null) {
+      new ContextMenu$Companion();
     }
-    return ChangeApplier_instance;
+    return ContextMenu$Companion_instance;
   }
-  var MAVEN_PROJECT_ID;
-  var JENKINS_MAVEN_RELEASE_PLUGIN;
-  var JENKINS_MULTI_MAVEN_RELEASE_PLUGIN;
-  var JENKINS_UPDATE_DEPENDENCY;
-  function deserialize(body) {
-    var releasePlanJson = JSON.parse(body);
-    var state = deserializeReleaseState(releasePlanJson);
-    var rootProjectId = deserializeProjectId(releasePlanJson.id);
-    var projects = deserializeProjects(releasePlanJson);
-    var submodules = deserializeMapOfProjectIdAndSetProjectId(releasePlanJson.submodules);
-    var dependents = deserializeMapOfProjectIdAndSetProjectId(releasePlanJson.dependents);
-    var warnings = toList(releasePlanJson.warnings);
-    var infos = toList(releasePlanJson.infos);
-    var config = deserializeConfig(releasePlanJson.config);
-    return new ReleasePlan(releasePlanJson.releaseId, state, rootProjectId, projects, submodules, dependents, warnings, infos, config);
+  ContextMenu.$metadata$ = {
+    kind: Kind_CLASS,
+    simpleName: 'ContextMenu',
+    interfaces: []
+  };
+  function textFieldWithLabel$lambda($receiver) {
+    return Unit;
   }
-  function deserializeReleaseState(releasePlanJson) {
-    return ReleaseState$valueOf(releasePlanJson.state);
+  function textFieldWithLabel($receiver, id, label, value, menu) {
+    textFieldWithLabel_0($receiver, id, label, value, menu, textFieldWithLabel$lambda);
   }
-  function deserializeProjectId(id) {
-    var tmp$;
-    if (equals(id.t, MAVEN_PROJECT_ID))
-      tmp$ = createMavenProjectId(id);
-    else
-      throw UnsupportedOperationException_init(id.t + ' is not supported.');
-    return tmp$;
+  function textFieldReadOnlyWithLabel$lambda($receiver) {
+    return Unit;
   }
-  function createMavenProjectId(genericId) {
-    var dynamicId = genericId.p;
-    return new MavenProjectId(dynamicId.groupId, dynamicId.artifactId);
+  function textFieldReadOnlyWithLabel$lambda_0(closure$inputAct) {
+    return function ($receiver) {
+      $receiver.readonly = true;
+      closure$inputAct($receiver);
+      return Unit;
+    };
   }
-  var HashMap_init = Kotlin.kotlin.collections.HashMap_init_q3lmfv$;
-  function deserializeProjects(releasePlanJson) {
-    var map = HashMap_init();
-    var $receiver = releasePlanJson.projects;
-    var tmp$;
-    for (tmp$ = 0; tmp$ !== $receiver.length; ++tmp$) {
-      var element = $receiver[tmp$];
-      var projectId = deserializeProjectId(element.id);
-      var value = new Project(projectId, element.isSubmodule, element.currentVersion, element.releaseVersion, element.level, deserializeCommands(element.commands), element.relativePath);
-      map.put_xwzc9p$(projectId, value);
+  function textFieldReadOnlyWithLabel($receiver, id, label, value, menu, inputAct) {
+    if (inputAct === void 0)
+      inputAct = textFieldReadOnlyWithLabel$lambda;
+    textFieldWithLabel_0($receiver, id, label, value, menu, textFieldReadOnlyWithLabel$lambda_0(inputAct));
+  }
+  function textFieldWithLabel$lambda$lambda(closure$id, closure$label) {
+    return function ($receiver) {
+      $receiver.htmlFor = closure$id;
+      $receiver.unaryPlus_pdl1vz$(closure$label);
+      return Unit;
+    };
+  }
+  function textFieldWithLabel$lambda$lambda$lambda(closure$menu) {
+    return function (it) {
+      closure$menu.activateSaveButton();
+      return Unit;
+    };
+  }
+  function textFieldWithLabel$lambda$lambda_0(closure$id, closure$value, closure$inputAct, closure$menu) {
+    return function ($receiver) {
+      var tmp$;
+      set_id($receiver, closure$id);
+      $receiver.value = closure$value;
+      closure$inputAct($receiver);
+      set_onKeyUpFunction($receiver, textFieldWithLabel$lambda$lambda$lambda(closure$menu));
+      var input = Kotlin.isType(tmp$ = getUnderlyingHtmlElement($receiver), HTMLInputElement) ? tmp$ : throwCCE();
+      Menu$Companion_getInstance().disableUnDisableForReleaseStartAndEnd_fj1ece$(input, input);
+      return Unit;
+    };
+  }
+  function textFieldWithLabel$lambda_0(closure$id, closure$label, closure$value, closure$inputAct, closure$menu) {
+    return function ($receiver) {
+      label($receiver, 'fields', textFieldWithLabel$lambda$lambda(closure$id, closure$label));
+      textInput($receiver, void 0, void 0, void 0, void 0, textFieldWithLabel$lambda$lambda_0(closure$id, closure$value, closure$inputAct, closure$menu));
+      return Unit;
+    };
+  }
+  function textFieldWithLabel_0($receiver, id, label, value, menu, inputAct) {
+    div($receiver, void 0, textFieldWithLabel$lambda_0(id, label, value, inputAct, menu));
+  }
+  function textAreaWithLabel$lambda$lambda(closure$id, closure$label) {
+    return function ($receiver) {
+      $receiver.htmlFor = closure$id;
+      $receiver.unaryPlus_pdl1vz$(closure$label);
+      return Unit;
+    };
+  }
+  function textAreaWithLabel$lambda$lambda$lambda(closure$menu) {
+    return function (it) {
+      closure$menu.activateSaveButton();
+      return Unit;
+    };
+  }
+  function textAreaWithLabel$lambda$lambda_0(closure$id, closure$value, closure$menu) {
+    return function ($receiver) {
+      var tmp$;
+      set_id($receiver, closure$id);
+      $receiver.unaryPlus_pdl1vz$(closure$value);
+      set_onKeyUpFunction($receiver, textAreaWithLabel$lambda$lambda$lambda(closure$menu));
+      var htmlTextAreaElement = Kotlin.isType(tmp$ = getUnderlyingHtmlElement($receiver), HTMLTextAreaElement) ? tmp$ : throwCCE();
+      var input = htmlTextAreaElement;
+      Menu$Companion_getInstance().disableUnDisableForReleaseStartAndEnd_fj1ece$(input, htmlTextAreaElement);
+      return Unit;
+    };
+  }
+  function textAreaWithLabel$lambda(closure$id, closure$label, closure$value, closure$menu) {
+    return function ($receiver) {
+      label($receiver, 'fields', textAreaWithLabel$lambda$lambda(closure$id, closure$label));
+      textArea($receiver, void 0, void 0, void 0, void 0, textAreaWithLabel$lambda$lambda_0(closure$id, closure$value, closure$menu));
+      return Unit;
+    };
+  }
+  function textAreaWithLabel($receiver, id, label, value, menu) {
+    div($receiver, void 0, textAreaWithLabel$lambda(id, label, value, menu));
+  }
+  function Menu() {
+    Menu$Companion_getInstance();
+    this.publisher_0 = null;
+    this.typeOfRun_0 = Menu$TypeOfRun$SIMULATION_getInstance();
+    this.addClickEventListenerIfNotDeactivatedNorDisabled_0(this.settingsButton_0, Menu_init$lambda);
+    addClickEventListener(elementById('config:close'), void 0, Menu_init$lambda_0);
+  }
+  Object.defineProperty(Menu.prototype, 'userButton_0', {
+    get: function () {
+      return elementById('user');
     }
-    return map;
-  }
-  function deserializeCommands(commands) {
-    var destination = ArrayList_init(commands.length);
+  });
+  Object.defineProperty(Menu.prototype, 'userIcon_0', {
+    get: function () {
+      return elementById('user.icon');
+    }
+  });
+  Object.defineProperty(Menu.prototype, 'userName_0', {
+    get: function () {
+      return elementById('user.name');
+    }
+  });
+  Object.defineProperty(Menu.prototype, 'saveButton_0', {
+    get: function () {
+      return elementById('save');
+    }
+  });
+  Object.defineProperty(Menu.prototype, 'downloadButton_0', {
+    get: function () {
+      return elementById('download');
+    }
+  });
+  Object.defineProperty(Menu.prototype, 'dryRunButton_0', {
+    get: function () {
+      return elementById('dryRun');
+    }
+  });
+  Object.defineProperty(Menu.prototype, 'releaseButton_0', {
+    get: function () {
+      return elementById('release');
+    }
+  });
+  Object.defineProperty(Menu.prototype, 'exploreButton_0', {
+    get: function () {
+      return elementById('explore');
+    }
+  });
+  Object.defineProperty(Menu.prototype, 'settingsButton_0', {
+    get: function () {
+      return elementById('settings');
+    }
+  });
+  Menu.prototype.disableButtonsDueToNoPublishUrl = function () {
+    var titleButtons = 'You need to specify publishJob if you want to use other functionality than Download and Explore Release Order.';
+    this.disableButtonsDueToNoAuth_puj7f4$(titleButtons, titleButtons + ('\n' + 'An example: ' + window.location + '&publishJob=jobUrl') + '\nwhere you need to replace jobUrl accordingly.');
+  };
+  Menu.prototype.disableButtonsDueToNoAuth_puj7f4$ = function (titleButtons, info) {
+    showInfo(info);
+    this.userButton_0.title = titleButtons;
+    addClass(this.userButton_0, [Menu$Companion_getInstance().DEACTIVATED_0]);
+    this.userName_0.innerText = 'Anonymous';
+    this.userIcon_0.innerText = 'error';
     var tmp$;
-    for (tmp$ = 0; tmp$ !== commands.length; ++tmp$) {
-      var item = commands[tmp$];
-      var tmp$_0 = destination.add_11rb$;
-      var transform$result;
-      transform$break: do {
-        switch (item.t) {
-          case 'ch.loewenfels.depgraph.data.maven.jenkins.JenkinsMavenReleasePlugin':
-            transform$result = createJenkinsMavenReleasePlugin(item.p);
-            break transform$break;
-          case 'ch.loewenfels.depgraph.data.maven.jenkins.JenkinsMultiMavenReleasePlugin':
-            transform$result = createJenkinsMultiMavenReleasePlugin(item.p);
-            break transform$break;
-          case 'ch.loewenfels.depgraph.data.maven.jenkins.JenkinsUpdateDependency':
-            transform$result = createJenkinsUpdateDependency(item.p);
-            break transform$break;
-          default:throw UnsupportedOperationException_init(item.t + ' is not supported.');
-        }
+    tmp$ = listOf([this.saveButton_0, this.dryRunButton_0, this.releaseButton_0]).iterator();
+    while (tmp$.hasNext()) {
+      var element = tmp$.next();
+      this.disable_0(element, titleButtons);
+    }
+  };
+  Menu.prototype.setVerifiedUser_61zpoe$ = function (name) {
+    this.userName_0.innerText = name;
+    this.userIcon_0.innerText = 'verified_user';
+    removeClass(this.userButton_0, [Menu$Companion_getInstance().DEACTIVATED_0]);
+  };
+  Menu.prototype.setHalfVerified = function () {
+    this.userIcon_0.innerText = 'error';
+    addClass(this.userButton_0, ['warning']);
+  };
+  Menu.prototype.appendToUserButtonToolTip_buzeal$ = function (url, username, name) {
+    var nameSuffix = name != null ? ' (' + toString(name) + ')' : '';
+    this.userButton_0.title = this.userButton_0.title + ('\n' + 'Logged in as ' + username + nameSuffix + ' @ ' + url);
+  };
+  function Menu$initDependencies$lambda(this$Menu) {
+    return function (it) {
+      if (!hasClass(this$Menu.saveButton_0, Menu$Companion_getInstance().DEACTIVATED_0)) {
+        return 'Your changes will be lost, sure you want to leave the page?';
       }
-       while (false);
-      tmp$_0.call(destination, transform$result);
-    }
-    return destination;
-  }
-  function createJenkinsMavenReleasePlugin(command) {
-    var it = command;
-    return new JenkinsMavenReleasePlugin(deserializeCommandState(it), it.nextDevVersion, it.buildUrl);
-  }
-  function createJenkinsMultiMavenReleasePlugin(command) {
-    var it = command;
-    return new JenkinsMultiMavenReleasePlugin(deserializeCommandState(it), it.nextDevVersion, it.buildUrl);
-  }
-  function createJenkinsUpdateDependency(command) {
-    var it = command;
-    var projectId = new MavenProjectId(it.projectId.groupId, it.projectId.artifactId);
-    return new JenkinsUpdateDependency(deserializeCommandState(it), projectId, it.buildUrl);
-  }
-  function deserializeCommandState(it) {
-    var tmp$;
-    var json = it.state;
-    var fixedState = fakeEnumsName(json);
-    var state = fromJson(fixedState);
-    if (Kotlin.isType(state, CommandState$Waiting)) {
-      var realDependencies = Kotlin.isArray(tmp$ = state.dependencies) ? tmp$ : throwCCE();
-      var destination = ArrayList_init(realDependencies.length);
-      var tmp$_0;
-      for (tmp$_0 = 0; tmp$_0 !== realDependencies.length; ++tmp$_0) {
-        var item = realDependencies[tmp$_0];
-        destination.add_11rb$(deserializeProjectId(item));
-      }
-      var deserializedDependencies = toHashSet(destination);
-      state.dependencies = deserializedDependencies;
-    }
-    return state;
-  }
-  function fakeEnumsName(json) {
-    var tmp$;
-    var state = JSON.parse(JSON.stringify(json));
-    var tmp = state;
-    while (tmp != null) {
-      tmp.state = {name: tmp.state};
-      if (equals(tmp.state.name, 'Deactivated')) {
-        tmp$ = tmp.previous;
+       else if (Pipeline$Companion_getInstance().getReleaseState() === ReleaseState.InProgress) {
+        return 'You might lose state changes if you navigate away from this page, sure you want to proceed?';
       }
        else {
-        tmp$ = null;
+        return null;
       }
-      tmp = tmp$;
-    }
-    return state;
+    };
   }
-  var mapCapacity = Kotlin.kotlin.collections.mapCapacity_za3lpa$;
-  var coerceAtLeast = Kotlin.kotlin.ranges.coerceAtLeast_dqglrj$;
-  var LinkedHashMap_init = Kotlin.kotlin.collections.LinkedHashMap_init_xf5xz2$;
-  function deserializeMapOfProjectIdAndSetProjectId(mapJson) {
-    var capacity = coerceAtLeast(mapCapacity(mapJson.length), 16);
-    var destination = LinkedHashMap_init(capacity);
-    var tmp$;
-    for (tmp$ = 0; tmp$ !== mapJson.length; ++tmp$) {
-      var element = mapJson[tmp$];
-      var tmp$_0 = destination.put_xwzc9p$;
-      var tmp$_1 = deserializeProjectId(element.k);
-      var $receiver = element.v;
-      var destination_0 = ArrayList_init($receiver.length);
-      var tmp$_2;
-      for (tmp$_2 = 0; tmp$_2 !== $receiver.length; ++tmp$_2) {
-        var item = $receiver[tmp$_2];
-        destination_0.add_11rb$(deserializeProjectId(item));
-      }
-      tmp$_0.call(destination, tmp$_1, toHashSet(destination_0));
+  Menu.prototype.initDependencies_3sajqp$ = function (releasePlan, downloader, dependencies, modifiableJson) {
+    if (dependencies != null) {
+      this.publisher_0 = dependencies.publisher;
     }
-    return destination;
+    window.onbeforeunload = Menu$initDependencies$lambda(this);
+    this.initSaveAndDownloadButton_0(downloader, dependencies);
+    this.initRunButtons_0(releasePlan, dependencies, modifiableJson);
+    switch (releasePlan.state.name) {
+      case 'Ready':
+        break;
+      case 'InProgress':
+        Menu$Companion_getInstance().dispatchReleaseStart_0();
+        break;
+      case 'Failed':
+      case 'Succeeded':
+        Menu$Companion_getInstance().dispatchReleaseStart_0();
+        Menu$Companion_getInstance().dispatchReleaseEnd_0(releasePlan.state === ReleaseState.Succeeded);
+        break;
+    }
+  };
+  function Menu$initSaveAndDownloadButton$lambda$lambda(this$Menu) {
+    return function (it) {
+      this$Menu.deactivateSaveButton_0();
+      return Unit;
+    };
   }
-  function deserializeConfig(config) {
-    var capacity = coerceAtLeast(mapCapacity(config.length), 16);
-    var destination = LinkedHashMap_init(capacity);
-    var tmp$;
-    for (tmp$ = 0; tmp$ !== config.length; ++tmp$) {
-      var element = config[tmp$];
-      if (element.length !== 2) {
-        showWarning('corrupt config found, size != 2: ' + element);
-      }
-      var pair = to(ConfigKey.Companion.fromString_61zpoe$(element[0]), element[1]);
-      destination.put_xwzc9p$(pair.first, pair.second);
+  function Menu$initSaveAndDownloadButton$lambda(closure$dependencies, this$Menu) {
+    return function () {
+      return this$Menu.save_rt5gs7$(closure$dependencies.jenkinsJobExecutor, true).then(Menu$initSaveAndDownloadButton$lambda$lambda(this$Menu));
+    };
+  }
+  function Menu$initSaveAndDownloadButton$lambda_0(closure$downloader) {
+    return function () {
+      closure$downloader.download();
+      return Unit;
+    };
+  }
+  Menu.prototype.initSaveAndDownloadButton_0 = function (downloader, dependencies) {
+    this.deactivateSaveButton_0();
+    if (dependencies != null) {
+      this.addClickEventListenerIfNotDeactivatedNorDisabled_0(this.saveButton_0, Menu$initSaveAndDownloadButton$lambda(dependencies, this));
     }
-    return destination;
+    this.downloadButton_0.title = 'Download the release.json';
+    removeClass(this.downloadButton_0, [Menu$Companion_getInstance().DEACTIVATED_0]);
+    this.addClickEventListenerIfNotDeactivatedNorDisabled_0(this.downloadButton_0, Menu$initSaveAndDownloadButton$lambda_0(downloader));
+  };
+  function Menu$initRunButtons$lambda(this$Menu, closure$releasePlan, closure$dependencies) {
+    return function () {
+      this$Menu.typeOfRun_0 = Menu$TypeOfRun$DRY_RUN_getInstance();
+      return this$Menu.triggerRelease_0(closure$releasePlan, closure$dependencies, closure$dependencies.jenkinsJobExecutor, closure$dependencies.dryRunExecutionDataFactory);
+    };
+  }
+  function Menu$initRunButtons$lambda_0(this$Menu, closure$releasePlan, closure$dependencies) {
+    return function () {
+      this$Menu.typeOfRun_0 = Menu$TypeOfRun$RELEASE_getInstance();
+      return this$Menu.triggerRelease_0(closure$releasePlan, closure$dependencies, closure$dependencies.jenkinsJobExecutor, closure$dependencies.releaseJobExecutionDataFactory);
+    };
+  }
+  function Menu$initRunButtons$lambda$lambda(closure$dependencies, this$Menu) {
+    return function (it) {
+      this$Menu.publisher_0 = closure$dependencies != null ? closure$dependencies.publisher : null;
+      return Unit;
+    };
+  }
+  function Menu$initRunButtons$lambda_1(this$Menu, closure$nonNullDependencies, closure$releasePlan, closure$dependencies) {
+    return function () {
+      this$Menu.typeOfRun_0 = Menu$TypeOfRun$SIMULATION_getInstance();
+      this$Menu.publisher_0 = closure$nonNullDependencies.publisher;
+      return finally_0(this$Menu.triggerRelease_0(closure$releasePlan, closure$nonNullDependencies, closure$nonNullDependencies.simulatingJobExecutor, closure$nonNullDependencies.releaseJobExecutionDataFactory), Menu$initRunButtons$lambda$lambda(closure$dependencies, this$Menu));
+    };
+  }
+  function Menu$initRunButtons$lambda_2(this$Menu) {
+    return function (it) {
+      var tmp$;
+      tmp$ = listOf([this$Menu.dryRunButton_0, this$Menu.releaseButton_0, this$Menu.exploreButton_0]).iterator();
+      while (tmp$.hasNext()) {
+        var element = tmp$.next();
+        addClass(element, [Menu$Companion_getInstance().DISABLED_0]);
+        element.title = Menu$Companion_getInstance().DISABLED_RELEASE_IN_PROGRESS_0;
+      }
+      return Unit;
+    };
+  }
+  function Menu$initRunButtons$lambda_3(this$Menu) {
+    return function (success) {
+      var tmp$;
+      if (success) {
+        var tmp$_0;
+        tmp$_0 = listOf([this$Menu.dryRunButton_0, this$Menu.releaseButton_0, this$Menu.exploreButton_0]).iterator();
+        while (tmp$_0.hasNext()) {
+          var element = tmp$_0.next();
+          element.title = Menu$Companion_getInstance().DISABLED_RELEASE_SUCCESS_0;
+        }
+        showSuccess('Release ended successfully :) you can now close the window.' + '\nUse a new pipeline for a new release.' + '\nPlease report a bug in case some job failed without us noticing it.');
+      }
+       else {
+        showError('Release ended with failure :(' + '\nAt least one job failed. Check errors, fix them and then you can re-trigger the failed jobs, the pipeline respectively, by clicking on the release button.' + '\n(You might have to delete git tags and remove artifacts if they have already been created).');
+        switch (this$Menu.typeOfRun_0.name) {
+          case 'SIMULATION':
+            tmp$ = new Triple('Explore Release Order', this$Menu.exploreButton_0, elementById('explore:text'));
+            break;
+          case 'DRY_RUN':
+            tmp$ = new Triple('Dry Run', this$Menu.dryRunButton_0, elementById('dryRun:text'));
+            break;
+          case 'RELEASE':
+            tmp$ = new Triple('Release', this$Menu.releaseButton_0, elementById('release:text'));
+            break;
+          default:tmp$ = Kotlin.noWhenBranchMatched();
+            break;
+        }
+        var tmp$_1 = tmp$;
+        var processName = tmp$_1.component1()
+        , button = tmp$_1.component2()
+        , buttonText = tmp$_1.component3();
+        buttonText.innerText = 'Re-trigger failed Jobs';
+        button.title = 'Continue with the ' + processName + ' process by re-processing previously failed projects.';
+        removeClass(button, [Menu$Companion_getInstance().DISABLED_0]);
+      }
+      return Unit;
+    };
+  }
+  Menu.prototype.initRunButtons_0 = function (releasePlan, dependencies, modifiableJson) {
+    if (dependencies != null) {
+      this.activateDryRunButton_0();
+      this.addClickEventListenerIfNotDeactivatedNorDisabled_0(this.dryRunButton_0, Menu$initRunButtons$lambda(this, releasePlan, dependencies));
+      this.activateReleaseButton_0();
+      this.addClickEventListenerIfNotDeactivatedNorDisabled_0(this.releaseButton_0, Menu$initRunButtons$lambda_0(this, releasePlan, dependencies));
+    }
+    this.activateExploreButton_0();
+    var fakeJenkinsBaseUrl = 'https://github.com/loewenfels/';
+    var nonNullDependencies = dependencies != null ? dependencies : ensureNotNull(App$Companion_getInstance().createDependencies_tj5i2h$(fakeJenkinsBaseUrl, 'https://github.com/loewenfels/dgr-publisher/', new UsernameAndApiToken('test', 'test'), modifiableJson, releasePlan, this));
+    this.addClickEventListenerIfNotDeactivatedNorDisabled_0(this.exploreButton_0, Menu$initRunButtons$lambda_1(this, nonNullDependencies, releasePlan, dependencies));
+    Menu$Companion_getInstance().registerForReleaseStartEvent_gbr1zf$(Menu$initRunButtons$lambda_2(this));
+    Menu$Companion_getInstance().registerForReleaseEndEvent_y8twos$(Menu$initRunButtons$lambda_3(this));
+  };
+  function Menu$triggerRelease$lambda(result) {
+    Menu$Companion_getInstance().dispatchReleaseEnd_0(result);
+    return Unit;
+  }
+  function Menu$triggerRelease$lambda_0(t) {
+    Menu$Companion_getInstance().dispatchReleaseEnd_0(false);
+    throw t;
+  }
+  Menu.prototype.triggerRelease_0 = function (releasePlan, dependencies, jobExecutor, jobExecutionDataFactory) {
+    if (Pipeline$Companion_getInstance().getReleaseState() === ReleaseState.Failed) {
+      if (this.typeOfRun_0 === Menu$TypeOfRun$DRY_RUN_getInstance()) {
+        this.turnFailedProjectsIntoReTriggerAndReady_0(releasePlan);
+      }
+       else {
+        this.turnFailedCommandsIntoStateReTrigger_0(releasePlan);
+      }
+    }
+    Menu$Companion_getInstance().dispatchReleaseStart_0();
+    return dependencies.releaser.release_q42tl1$(jobExecutor, jobExecutionDataFactory).then(Menu$triggerRelease$lambda, Menu$triggerRelease$lambda_0);
+  };
+  Menu.prototype.turnFailedProjectsIntoReTriggerAndReady_0 = function (releasePlan) {
+    var $receiver = releasePlan.iterator();
+    while ($receiver.hasNext()) {
+      var element = $receiver.next();
+      if (!element.isSubmodule && this.hasFailedCommandsOrSubmoduleHasFailedCommands_0(element, releasePlan)) {
+        this.turnCommandsIntoStateReadyToReTriggerAndReady_0(releasePlan, element);
+      }
+    }
+  };
+  Menu.prototype.turnCommandsIntoStateReadyToReTriggerAndReady_0 = function (releasePlan, project) {
+    var tmp$, tmp$_0;
+    var index = 0;
+    tmp$ = project.commands.iterator();
+    while (tmp$.hasNext()) {
+      var item = tmp$.next();
+      var index_0 = (tmp$_0 = index, index = tmp$_0 + 1 | 0, tmp$_0);
+      var commandState = Pipeline$Companion_getInstance().getCommandState_o8feeo$(project.id, index_0);
+      if (commandState === CommandState.Failed) {
+        this.changeToStateReadyToReTrigger_0(project, index_0);
+      }
+       else if (commandState === CommandState.Succeeded) {
+        this.changeStateToReadyWithoutCheck_0(project, index_0);
+      }
+    }
+    var tmp$_1;
+    tmp$_1 = releasePlan.getSubmodules_lljhqa$(project.id).iterator();
+    while (tmp$_1.hasNext()) {
+      var element = tmp$_1.next();
+      var submodule = releasePlan.getProject_lljhqa$(element);
+      this.turnCommandsIntoStateReadyToReTriggerAndReady_0(releasePlan, submodule);
+    }
+  };
+  Menu.prototype.hasFailedCommandsOrSubmoduleHasFailedCommands_0 = function ($receiver, releasePlan) {
+    var $receiver_0 = mapWithIndex_0($receiver.commands);
+    var any$result;
+    any$break: do {
+      var tmp$;
+      if (Kotlin.isType($receiver_0, Collection) && $receiver_0.isEmpty()) {
+        any$result = false;
+        break any$break;
+      }
+      tmp$ = $receiver_0.iterator();
+      while (tmp$.hasNext()) {
+        var element = tmp$.next();
+        var index = element.component1();
+        if (Pipeline$Companion_getInstance().getCommandState_o8feeo$($receiver.id, index) === CommandState.Failed) {
+          any$result = true;
+          break any$break;
+        }
+      }
+      any$result = false;
+    }
+     while (false);
+    var tmp$_0 = any$result;
+    if (!tmp$_0) {
+      var $receiver_1 = releasePlan.getSubmodules_lljhqa$($receiver.id);
+      var any$result_0;
+      any$break: do {
+        var tmp$_1;
+        if (Kotlin.isType($receiver_1, Collection) && $receiver_1.isEmpty()) {
+          any$result_0 = false;
+          break any$break;
+        }
+        tmp$_1 = $receiver_1.iterator();
+        while (tmp$_1.hasNext()) {
+          var element_0 = tmp$_1.next();
+          if (this.hasFailedCommandsOrSubmoduleHasFailedCommands_0(releasePlan.getProject_lljhqa$(element_0), releasePlan)) {
+            any$result_0 = true;
+            break any$break;
+          }
+        }
+        any$result_0 = false;
+      }
+       while (false);
+      tmp$_0 = any$result_0;
+    }
+    return tmp$_0;
+  };
+  Menu.prototype.turnFailedCommandsIntoStateReTrigger_0 = function (releasePlan) {
+    var $receiver = releasePlan.iterator();
+    while ($receiver.hasNext()) {
+      var element = $receiver.next();
+      var tmp$, tmp$_0;
+      var index = 0;
+      tmp$ = element.commands.iterator();
+      while (tmp$.hasNext()) {
+        var item = tmp$.next();
+        var index_0 = (tmp$_0 = index, index = tmp$_0 + 1 | 0, tmp$_0);
+        var commandState = Pipeline$Companion_getInstance().getCommandState_o8feeo$(element.id, index_0);
+        if (commandState === CommandState.Failed) {
+          this.changeToStateReadyToReTrigger_0(element, index_0);
+        }
+      }
+    }
+  };
+  function Menu$changeStateToReadyWithoutCheck$lambda(f, f_0) {
+    return CommandState.Ready;
+  }
+  Menu.prototype.changeStateToReadyWithoutCheck_0 = function (project, index) {
+    Pipeline$Companion_getInstance().changeStateOfCommand_jnlut6$(project, index, CommandState.Ready, Pipeline$Companion_getInstance().STATE_READY, Menu$changeStateToReadyWithoutCheck$lambda);
+  };
+  Menu.prototype.changeToStateReadyToReTrigger_0 = function (project, index) {
+    Pipeline$Companion_getInstance().changeStateOfCommand_q143v3$(project, index, CommandState.ReadyToReTrigger, Pipeline$Companion_getInstance().STATE_READY_TO_BE_TRIGGER);
+  };
+  function Menu$addClickEventListenerIfNotDeactivatedNorDisabled$lambda(this$addClickEventListenerIfNotDeactivatedNorDisabled, closure$action) {
+    return function (it) {
+      if (hasClass(this$addClickEventListenerIfNotDeactivatedNorDisabled, Menu$Companion_getInstance().DEACTIVATED_0) || hasClass(this$addClickEventListenerIfNotDeactivatedNorDisabled, Menu$Companion_getInstance().DISABLED_0))
+        return Unit;
+      return closure$action();
+    };
+  }
+  Menu.prototype.addClickEventListenerIfNotDeactivatedNorDisabled_0 = function ($receiver, action) {
+    addClickEventListener($receiver, void 0, Menu$addClickEventListenerIfNotDeactivatedNorDisabled$lambda($receiver, action));
+  };
+  Menu.prototype.disable_0 = function ($receiver, reason) {
+    addClass($receiver, [Menu$Companion_getInstance().DISABLED_0]);
+    $receiver.title = reason;
+  };
+  Menu.prototype.isDisabled_0 = function ($receiver) {
+    return hasClass($receiver, Menu$Companion_getInstance().DISABLED_0);
+  };
+  Menu.prototype.deactivate_0 = function ($receiver, reason) {
+    if (this.isDisabled_0(this.saveButton_0))
+      return;
+    addClass($receiver, [Menu$Companion_getInstance().DEACTIVATED_0]);
+    setTitleSaveOld($receiver, reason);
+  };
+  Menu.prototype.deactivateSaveButton_0 = function () {
+    this.deactivate_0(this.saveButton_0, 'Nothing to save, no changes were made');
+    var tmp$;
+    tmp$ = listOf([this.dryRunButton_0, this.releaseButton_0, this.exploreButton_0]).iterator();
+    while (tmp$.hasNext()) {
+      var element = tmp$.next();
+      var oldTitle = getOldTitleOrNull(element);
+      if (oldTitle != null) {
+        element.title = oldTitle;
+        removeClass(element, [Menu$Companion_getInstance().DEACTIVATED_0]);
+      }
+    }
+  };
+  Menu.prototype.activateSaveButton = function () {
+    if (this.isDisabled_0(this.saveButton_0))
+      return;
+    removeClass(this.saveButton_0, [Menu$Companion_getInstance().DEACTIVATED_0]);
+    this.saveButton_0.title = 'Publish changed json file and change location';
+    var saveFirst = 'You need to save your changes first.';
+    var tmp$;
+    tmp$ = listOf([this.dryRunButton_0, this.releaseButton_0, this.exploreButton_0]).iterator();
+    while (tmp$.hasNext()) {
+      var element = tmp$.next();
+      this.deactivate_0(element, saveFirst);
+    }
+  };
+  Menu.prototype.activateDryRunButton_0 = function () {
+    if (this.isDisabled_0(this.dryRunButton_0))
+      return;
+    removeClass(this.dryRunButton_0, [Menu$Companion_getInstance().DEACTIVATED_0]);
+    this.dryRunButton_0.title = 'Start a dry run based on this release plan (no commit will be made, no artifact deployed etc.).';
+  };
+  Menu.prototype.activateReleaseButton_0 = function () {
+    if (this.isDisabled_0(this.releaseButton_0))
+      return;
+    removeClass(this.releaseButton_0, [Menu$Companion_getInstance().DEACTIVATED_0]);
+    this.releaseButton_0.title = 'Start a release based on this release plan.';
+  };
+  Menu.prototype.activateExploreButton_0 = function () {
+    if (this.isDisabled_0(this.exploreButton_0))
+      return;
+    removeClass(this.exploreButton_0, [Menu$Companion_getInstance().DEACTIVATED_0]);
+    this.exploreButton_0.title = 'See in which order the projects are build, actual order may vary due to unequal execution time.';
+  };
+  function Menu$save$lambda(it) {
+    return true;
+  }
+  Menu.prototype.save_rt5gs7$ = function (jobExecutor, verbose) {
+    var tmp$;
+    var publisher = this.publisher_0;
+    if (publisher == null) {
+      this.deactivateSaveButton_0();
+      showThrowableAndThrow(IllegalStateException_init('Save button should not be activate if no publish job url was specified.\nPlease report a bug.'));
+    }
+    var changed = publisher.applyChanges();
+    if (changed) {
+      var publishId = getTextField(Gui$Companion_getInstance().RELEASE_ID_HTML_ID).value;
+      var newFileName = 'release-' + publishId;
+      tmp$ = publisher.publish_1kqjf$(newFileName, verbose, jobExecutor).then(Menu$save$lambda);
+    }
+     else {
+      if (verbose)
+        showInfo('Seems like all changes have been reverted manually. Will not save anything.');
+      this.deactivateSaveButton_0();
+      tmp$ = Promise.resolve(false);
+    }
+    return tmp$;
+  };
+  function Menu$Companion() {
+    Menu$Companion_instance = this;
+    this.DEACTIVATED_0 = 'deactivated';
+    this.DISABLED_0 = 'disabled';
+    this.EVENT_RELEASE_START_0 = 'release.start';
+    this.EVENT_RELEASE_END_0 = 'release.end';
+    this.DISABLED_RELEASE_IN_PROGRESS_0 = 'disabled due to release which is in progress.';
+    this.DISABLED_RELEASE_SUCCESS_0 = 'Release successful, use a new pipeline for a new release.';
+  }
+  Menu$Companion.prototype.registerForReleaseStartEvent_gbr1zf$ = function (callback) {
+    elementById('menu').addEventListener(this.EVENT_RELEASE_START_0, callback);
+  };
+  function Menu$Companion$registerForReleaseEndEvent$lambda(closure$callback) {
+    return function (e) {
+      var tmp$, tmp$_0;
+      var customEvent = Kotlin.isType(tmp$ = e, CustomEvent) ? tmp$ : throwCCE();
+      var success = typeof (tmp$_0 = customEvent.detail) === 'boolean' ? tmp$_0 : throwCCE();
+      closure$callback(success);
+      return Unit;
+    };
+  }
+  Menu$Companion.prototype.registerForReleaseEndEvent_y8twos$ = function (callback) {
+    elementById('menu').addEventListener(this.EVENT_RELEASE_END_0, Menu$Companion$registerForReleaseEndEvent$lambda(callback));
+  };
+  Menu$Companion.prototype.dispatchReleaseStart_0 = function () {
+    elementById('menu').dispatchEvent(new Event(this.EVENT_RELEASE_START_0));
+  };
+  Menu$Companion.prototype.dispatchReleaseEnd_0 = function (success) {
+    var tmp$ = elementById('menu');
+    var tmp$_0 = this.EVENT_RELEASE_END_0;
+    var o = {};
+    o['detail'] = success;
+    o['bubbles'] = false;
+    o['cancelable'] = false;
+    o['composed'] = false;
+    tmp$.dispatchEvent(new CustomEvent(tmp$_0, o));
+  };
+  function Menu$Companion$disableUnDisableForReleaseStartAndEnd$lambda(closure$input, closure$titleElement, this$Menu$) {
+    return function (it) {
+      closure$input.oldDisabled = closure$input.disabled;
+      closure$input.disabled = true;
+      setTitleSaveOld(closure$titleElement, this$Menu$.DISABLED_RELEASE_IN_PROGRESS_0);
+      return Unit;
+    };
+  }
+  function Menu$Companion$disableUnDisableForReleaseStartAndEnd$lambda_0(this$Menu$, closure$titleElement, closure$input) {
+    return function (success) {
+      var tmp$;
+      if (success) {
+        closure$titleElement.title = this$Menu$.DISABLED_RELEASE_SUCCESS_0;
+      }
+       else {
+        closure$input.disabled = typeof (tmp$ = closure$input.oldDisabled) === 'boolean' ? tmp$ : throwCCE();
+        closure$titleElement.title = getOldTitle(closure$titleElement);
+      }
+      return Unit;
+    };
+  }
+  Menu$Companion.prototype.disableUnDisableForReleaseStartAndEnd_fj1ece$ = function (input, titleElement) {
+    this.registerForReleaseStartEvent_gbr1zf$(Menu$Companion$disableUnDisableForReleaseStartAndEnd$lambda(input, titleElement, this));
+    this.registerForReleaseEndEvent_y8twos$(Menu$Companion$disableUnDisableForReleaseStartAndEnd$lambda_0(this, titleElement, input));
+  };
+  Menu$Companion.$metadata$ = {
+    kind: Kind_OBJECT,
+    simpleName: 'Companion',
+    interfaces: []
+  };
+  var Menu$Companion_instance = null;
+  function Menu$Companion_getInstance() {
+    if (Menu$Companion_instance === null) {
+      new Menu$Companion();
+    }
+    return Menu$Companion_instance;
+  }
+  function Menu$Dependencies(publisher, releaser, jenkinsJobExecutor, simulatingJobExecutor, releaseJobExecutionDataFactory, dryRunExecutionDataFactory) {
+    this.publisher = publisher;
+    this.releaser = releaser;
+    this.jenkinsJobExecutor = jenkinsJobExecutor;
+    this.simulatingJobExecutor = simulatingJobExecutor;
+    this.releaseJobExecutionDataFactory = releaseJobExecutionDataFactory;
+    this.dryRunExecutionDataFactory = dryRunExecutionDataFactory;
+  }
+  Menu$Dependencies.$metadata$ = {
+    kind: Kind_CLASS,
+    simpleName: 'Dependencies',
+    interfaces: []
+  };
+  function Menu$TypeOfRun(name, ordinal) {
+    Enum.call(this);
+    this.name$ = name;
+    this.ordinal$ = ordinal;
+  }
+  function Menu$TypeOfRun_initFields() {
+    Menu$TypeOfRun_initFields = function () {
+    };
+    Menu$TypeOfRun$SIMULATION_instance = new Menu$TypeOfRun('SIMULATION', 0);
+    Menu$TypeOfRun$DRY_RUN_instance = new Menu$TypeOfRun('DRY_RUN', 1);
+    Menu$TypeOfRun$RELEASE_instance = new Menu$TypeOfRun('RELEASE', 2);
+  }
+  var Menu$TypeOfRun$SIMULATION_instance;
+  function Menu$TypeOfRun$SIMULATION_getInstance() {
+    Menu$TypeOfRun_initFields();
+    return Menu$TypeOfRun$SIMULATION_instance;
+  }
+  var Menu$TypeOfRun$DRY_RUN_instance;
+  function Menu$TypeOfRun$DRY_RUN_getInstance() {
+    Menu$TypeOfRun_initFields();
+    return Menu$TypeOfRun$DRY_RUN_instance;
+  }
+  var Menu$TypeOfRun$RELEASE_instance;
+  function Menu$TypeOfRun$RELEASE_getInstance() {
+    Menu$TypeOfRun_initFields();
+    return Menu$TypeOfRun$RELEASE_instance;
+  }
+  Menu$TypeOfRun.$metadata$ = {
+    kind: Kind_CLASS,
+    simpleName: 'TypeOfRun',
+    interfaces: [Enum]
+  };
+  function Menu$TypeOfRun$values() {
+    return [Menu$TypeOfRun$SIMULATION_getInstance(), Menu$TypeOfRun$DRY_RUN_getInstance(), Menu$TypeOfRun$RELEASE_getInstance()];
+  }
+  Menu$TypeOfRun.values = Menu$TypeOfRun$values;
+  function Menu$TypeOfRun$valueOf(name) {
+    switch (name) {
+      case 'SIMULATION':
+        return Menu$TypeOfRun$SIMULATION_getInstance();
+      case 'DRY_RUN':
+        return Menu$TypeOfRun$DRY_RUN_getInstance();
+      case 'RELEASE':
+        return Menu$TypeOfRun$RELEASE_getInstance();
+      default:throwISE('No enum constant ch.loewenfels.depgraph.gui.components.Menu.TypeOfRun.' + name);
+    }
+  }
+  Menu$TypeOfRun.valueOf_61zpoe$ = Menu$TypeOfRun$valueOf;
+  function Menu_init$lambda() {
+    toggleClass(elementById('config'), 'active');
+    return Unit;
+  }
+  function Menu_init$lambda_0(it) {
+    return removeClass(elementById('config'), ['active']);
+  }
+  Menu.$metadata$ = {
+    kind: Kind_CLASS,
+    simpleName: 'Menu',
+    interfaces: []
+  };
+  function Pipeline(releasePlan, menu) {
+    Pipeline$Companion_getInstance();
+    this.releasePlan_0 = releasePlan;
+    this.menu_0 = menu;
+    this.contextMenu_0 = new ContextMenu(this.releasePlan_0, this.menu_0);
+    this.setUpProjects_0();
+    new Toggler(this.releasePlan_0, this.menu_0);
+    this.contextMenu_0.setUpCommandsOnContextMenu();
+  }
+  function Pipeline$setUpProjects$lambda$lambda(closure$project, this$Pipeline, closure$set, closure$itr, closure$level) {
+    return function ($receiver) {
+      if (!closure$project.isSubmodule) {
+        this$Pipeline.project_0($receiver, closure$project);
+      }
+      closure$set.add_11rb$(closure$project.id);
+      while (hasNextOnTheSameLevel(closure$itr, closure$level.v)) {
+        var nextProject = closure$itr.next();
+        if (!nextProject.isSubmodule) {
+          this$Pipeline.project_0($receiver, nextProject);
+        }
+        closure$set.add_11rb$(nextProject.id);
+      }
+      return Unit;
+    };
+  }
+  function Pipeline$setUpProjects$lambda(this$Pipeline, closure$set) {
+    return function ($receiver) {
+      var itr = toPeekingIterator(this$Pipeline.releasePlan_0.iterator());
+      var level = {v: null};
+      while (itr.hasNext()) {
+        var project = itr.next();
+        level.v = project.level;
+        div_0($receiver, 'level l' + level.v, Pipeline$setUpProjects$lambda$lambda(project, this$Pipeline, closure$set, itr, level));
+      }
+      return Unit;
+    };
+  }
+  function Pipeline$setUpProjects$lambda_0(it) {
+    return it.identifier;
+  }
+  var HashSet_init = Kotlin.kotlin.collections.HashSet_init_287e2$;
+  Pipeline.prototype.setUpProjects_0 = function () {
+    var set = HashSet_init();
+    var pipeline = elementById(Pipeline$Companion_getInstance().PIPELINE_HTML_ID_0);
+    pipeline.state = this.releasePlan_0.state;
+    append(pipeline, Pipeline$setUpProjects$lambda(this, set));
+    var involvedProjects = set.size;
+    showStatus('Projects involved: ' + involvedProjects);
+    if (involvedProjects !== this.releasePlan_0.getNumberOfProjects()) {
+      showError('Not all dependent projects are involved in the process, please report a bug. The following where left out\n' + joinToString(minus(this.releasePlan_0.getProjectIds(), set), '\n', void 0, void 0, void 0, void 0, Pipeline$setUpProjects$lambda_0));
+    }
+  };
+  function Pipeline$project$lambda$lambda$lambda(closure$project, this$Pipeline) {
+    return function ($receiver) {
+      this$Pipeline.projectId_0($receiver, closure$project.id);
+      return Unit;
+    };
+  }
+  function Pipeline$project$lambda$lambda(closure$project, this$Pipeline) {
+    return function ($receiver) {
+      span($receiver, void 0, Pipeline$project$lambda$lambda$lambda(closure$project, this$Pipeline));
+      return Unit;
+    };
+  }
+  function Pipeline$project$lambda$lambda_0(closure$identifier, closure$project, this$Pipeline) {
+    return function ($receiver) {
+      textFieldReadOnlyWithLabel($receiver, closure$identifier + ':currentVersion', 'Current Version', closure$project.currentVersion, this$Pipeline.menu_0);
+      textFieldWithLabel($receiver, closure$identifier + ':releaseVersion', 'Release Version', closure$project.releaseVersion, this$Pipeline.menu_0);
+      return Unit;
+    };
+  }
+  function Pipeline$project$lambda(closure$project, this$Pipeline) {
+    return function ($receiver) {
+      var hasCommands = !closure$project.commands.isEmpty();
+      set_classes($receiver, setOf(['project', closure$project.isSubmodule ? 'submodule' : '', !hasCommands ? 'withoutCommands' : '', this$Pipeline.releasePlan_0.hasSubmodules_lljhqa$(closure$project.id) ? 'withSubmodules' : '']));
+      var identifier = closure$project.id.identifier;
+      set_id($receiver, identifier);
+      div($receiver, 'title', Pipeline$project$lambda$lambda(closure$project, this$Pipeline));
+      if (!closure$project.isSubmodule) {
+        div($receiver, 'fields', Pipeline$project$lambda$lambda_0(identifier, closure$project, this$Pipeline));
+      }
+      this$Pipeline.commands_0($receiver, closure$project);
+      if (closure$project.isSubmodule) {
+        this$Pipeline.submodules_0($receiver, closure$project.id);
+      }
+      return Unit;
+    };
+  }
+  Pipeline.prototype.project_0 = function ($receiver, project) {
+    div($receiver, void 0, Pipeline$project$lambda(project, this));
+  };
+  Pipeline.prototype.projectId_0 = function ($receiver, id) {
+    if (Kotlin.isType(id, MavenProjectId)) {
+      set_title($receiver, id.identifier);
+      $receiver.unaryPlus_pdl1vz$(id.artifactId);
+    }
+     else {
+      $receiver.unaryPlus_pdl1vz$(id.identifier);
+    }
+  };
+  Pipeline.prototype.projectId_1 = function ($receiver, id) {
+    if (Kotlin.isType(id, MavenProjectId)) {
+      set_title($receiver, id.identifier);
+      $receiver.value = id.artifactId;
+    }
+     else {
+      $receiver.value = id.identifier;
+    }
+  };
+  function Pipeline$commands$lambda$lambda$lambda(closure$commandId, closure$command) {
+    return function ($receiver) {
+      set_id($receiver, closure$commandId + Pipeline$Companion_getInstance().TITLE_SUFFIX);
+      $receiver.unaryPlus_pdl1vz$(ensureNotNull(Kotlin.getKClassFromExpression(closure$command).simpleName));
+      return Unit;
+    };
+  }
+  function Pipeline$commands$lambda$lambda$lambda_0(closure$commandId, closure$project, closure$index, closure$command, this$Pipeline) {
+    return function ($receiver) {
+      this$Pipeline.fieldsForCommand_0($receiver, closure$commandId, closure$project, closure$index, closure$command);
+      return Unit;
+    };
+  }
+  function Pipeline$commands$lambda$lambda(closure$project, closure$index, closure$command, this$Pipeline) {
+    return function ($receiver) {
+      var commandId = Pipeline$Companion_getInstance().getCommandId_xgsuvp$(closure$project, closure$index);
+      set_id($receiver, commandId);
+      set_classes($receiver, setOf(['command', Pipeline$Companion_getInstance().stateToCssClass_0(closure$command.state)]));
+      div($receiver, 'commandTitle', Pipeline$commands$lambda$lambda$lambda(commandId, closure$command));
+      div($receiver, 'fields', Pipeline$commands$lambda$lambda$lambda_0(commandId, closure$project, closure$index, closure$command, this$Pipeline));
+      var div_0 = getUnderlyingHtmlElement($receiver);
+      div_0.state = closure$command.state;
+      if (Kotlin.isType(closure$command, JenkinsCommand)) {
+        div_0.buildUrl = closure$command.buildUrl;
+      }
+      return Unit;
+    };
+  }
+  Pipeline.prototype.commands_0 = function ($receiver, project) {
+    var tmp$, tmp$_0;
+    var index = 0;
+    tmp$ = project.commands.iterator();
+    while (tmp$.hasNext()) {
+      var item = tmp$.next();
+      div($receiver, void 0, Pipeline$commands$lambda$lambda(project, (tmp$_0 = index, index = tmp$_0 + 1 | 0, tmp$_0), item, this));
+    }
+  };
+  function Pipeline$fieldsForCommand$lambda$lambda(closure$idPrefix) {
+    return function ($receiver) {
+      span($receiver);
+      set_id($receiver, closure$idPrefix + ':status.icon');
+      return Unit;
+    };
+  }
+  function Pipeline$fieldsForCommand$lambda(closure$idPrefix, closure$command) {
+    return function ($receiver) {
+      var tmp$;
+      set_id($receiver, closure$idPrefix + Pipeline$Companion_getInstance().STATE_SUFFIX);
+      i($receiver, 'material-icons', Pipeline$fieldsForCommand$lambda$lambda(closure$idPrefix));
+      if (Kotlin.isType(closure$command, JenkinsCommand)) {
+        $receiver.href = (tmp$ = closure$command.buildUrl) != null ? tmp$ : '';
+      }
+      set_title($receiver, Pipeline$Companion_getInstance().stateToTitle_du2eex$(closure$command.state));
+      return Unit;
+    };
+  }
+  Pipeline.prototype.fieldsForCommand_0 = function ($receiver, idPrefix, project, index, command) {
+    var cssClass = Kotlin.isType(command, ReleaseCommand) ? 'release' : '';
+    var isNotDeactivated = !Kotlin.isType(command.state, CommandState$Deactivated);
+    this.toggle_0($receiver, idPrefix + Pipeline$Companion_getInstance().DEACTIVATE_SUFFIX, isNotDeactivated ? 'Click to deactivate command' : 'Click to activate command', isNotDeactivated, command.state === CommandState.Disabled, cssClass);
+    a($receiver, void 0, void 0, 'state', Pipeline$fieldsForCommand$lambda(idPrefix, command));
+    this.contextMenu_0.createContextMenu_1yrdz4$($receiver, idPrefix, project, index);
+    if (Kotlin.isType(command, JenkinsMavenReleasePlugin))
+      this.appendJenkinsMavenReleasePluginField_0($receiver, idPrefix, command);
+    else if (Kotlin.isType(command, JenkinsMultiMavenReleasePlugin))
+      this.appendJenkinsMultiMavenReleasePluginFields_0($receiver, idPrefix, project.id, command);
+    else if (Kotlin.isType(command, JenkinsUpdateDependency))
+      this.appendJenkinsUpdateDependencyField_0($receiver, idPrefix, command);
+    else
+      showError('Unknown command found, cannot display its fields.' + '\n' + command);
+  };
+  Pipeline.prototype.appendJenkinsMavenReleasePluginField_0 = function ($receiver, idPrefix, command) {
+    this.fieldNextDevVersion_0($receiver, idPrefix, command, command.nextDevVersion);
+  };
+  function Pipeline$fieldNextDevVersion$lambda(closure$command) {
+    return function ($receiver) {
+      if (closure$command.state === CommandState.Disabled) {
+        $receiver.disabled = true;
+      }
+      return Unit;
+    };
+  }
+  Pipeline.prototype.fieldNextDevVersion_0 = function ($receiver, idPrefix, command, nextDevVersion) {
+    textFieldWithLabel_0($receiver, idPrefix + Pipeline$Companion_getInstance().NEXT_DEV_VERSION_SUFFIX, 'Next Dev Version', nextDevVersion, this.menu_0, Pipeline$fieldNextDevVersion$lambda(command));
+  };
+  Pipeline.prototype.appendJenkinsMultiMavenReleasePluginFields_0 = function ($receiver, idPrefix, projectId, command) {
+    this.fieldNextDevVersion_0($receiver, idPrefix, command, command.nextDevVersion);
+    this.submodules_0($receiver, projectId);
+  };
+  function Pipeline$submodules$lambda(closure$submodules, this$Pipeline) {
+    return function ($receiver) {
+      var $receiver_0 = closure$submodules;
+      var tmp$;
+      tmp$ = $receiver_0.iterator();
+      while (tmp$.hasNext()) {
+        var element = tmp$.next();
+        var this$Pipeline_0 = this$Pipeline;
+        this$Pipeline_0.project_0($receiver, this$Pipeline_0.releasePlan_0.getProject_lljhqa$(element));
+      }
+      return Unit;
+    };
+  }
+  Pipeline.prototype.submodules_0 = function ($receiver, projectId) {
+    var submodules = this.releasePlan_0.getSubmodules_lljhqa$(projectId);
+    if (submodules.isEmpty())
+      return;
+    div($receiver, 'submodules', Pipeline$submodules$lambda(submodules, this));
+  };
+  function Pipeline$appendJenkinsUpdateDependencyField$lambda(closure$command, this$Pipeline) {
+    return function ($receiver) {
+      this$Pipeline.projectId_1($receiver, closure$command.projectId);
+      return Unit;
+    };
+  }
+  Pipeline.prototype.appendJenkinsUpdateDependencyField_0 = function ($receiver, idPrefix, command) {
+    textFieldReadOnlyWithLabel($receiver, idPrefix + ':groupId', 'Dependency', command.projectId.identifier, this.menu_0, Pipeline$appendJenkinsUpdateDependencyField$lambda(command, this));
+  };
+  function Pipeline$toggle$lambda$lambda(closure$idCheckbox, closure$checked, closure$disabled) {
+    return function ($receiver) {
+      set_id($receiver, closure$idCheckbox);
+      $receiver.checked = (closure$checked && !closure$disabled);
+      $receiver.disabled = closure$disabled;
+      return Unit;
+    };
+  }
+  function Pipeline$toggle$lambda$lambda_0(closure$idCheckbox, closure$title, closure$disabled) {
+    return function ($receiver) {
+      set_id($receiver, closure$idCheckbox + Pipeline$Companion_getInstance().SLIDER_SUFFIX);
+      set_title($receiver, closure$title);
+      if (closure$disabled) {
+        set_title($receiver, Pipeline$Companion_getInstance().STATE_DISABLED);
+      }
+      return Unit;
+    };
+  }
+  function Pipeline$toggle$lambda(closure$checkboxCssClass, closure$idCheckbox, closure$checked, closure$disabled, closure$title) {
+    return function ($receiver) {
+      checkBoxInput($receiver, void 0, void 0, void 0, closure$checkboxCssClass, Pipeline$toggle$lambda$lambda(closure$idCheckbox, closure$checked, closure$disabled));
+      span($receiver, 'slider', Pipeline$toggle$lambda$lambda_0(closure$idCheckbox, closure$title, closure$disabled));
+      return Unit;
+    };
+  }
+  Pipeline.prototype.toggle_0 = function ($receiver, idCheckbox, title, checked, disabled, checkboxCssClass) {
+    if (checkboxCssClass === void 0)
+      checkboxCssClass = '';
+    label($receiver, 'toggle', Pipeline$toggle$lambda(checkboxCssClass, idCheckbox, checked, disabled, title));
+  };
+  function Pipeline$Companion() {
+    Pipeline$Companion_instance = this;
+    this.PIPELINE_HTML_ID_0 = 'pipeline';
+    this.STATE_WAITING_0 = 'Wait for dependent projects to complete.';
+    this.STATE_READY = 'Ready to be queued for execution.';
+    this.STATE_READY_TO_BE_TRIGGER = 'Ready to be re-scheduled';
+    this.STATE_QUEUEING = 'Currently queueing the job.';
+    this.STATE_IN_PROGRESS = 'Job is running.';
+    this.STATE_SUCCEEDED = 'Job completed successfully.';
+    this.STATE_FAILED = 'Job failed - click to navigate to console.';
+    this.STATE_DEACTIVATED_0 = 'Currently deactivated, click to activate';
+    this.STATE_DISABLED = 'Command disabled, cannot be reactivated.';
+    this.DEACTIVATE_SUFFIX = ':deactivate';
+    this.SLIDER_SUFFIX = ':slider';
+    this.NEXT_DEV_VERSION_SUFFIX = ':nextDevVersion';
+    this.STATE_SUFFIX = ':state';
+    this.TITLE_SUFFIX = ':title';
+  }
+  Pipeline$Companion.prototype.getCommandId_xgsuvp$ = function (project, index) {
+    return this.getCommandId_o8feeo$(project.id, index);
+  };
+  Pipeline$Companion.prototype.getCommandId_o8feeo$ = function (projectId, index) {
+    return projectId.identifier + ':' + index;
+  };
+  Pipeline$Companion.prototype.getCommand_xgsuvp$ = function (project, index) {
+    return this.getCommand_o8feeo$(project.id, index);
+  };
+  Pipeline$Companion.prototype.getCommand_o8feeo$ = function (projectId, index) {
+    return elementById(this.getCommandId_o8feeo$(projectId, index));
+  };
+  Pipeline$Companion.prototype.getToggle_xgsuvp$ = function (project, index) {
+    return getCheckbox(this.getCommandId_o8feeo$(project.id, index) + this.DEACTIVATE_SUFFIX);
+  };
+  Pipeline$Companion.prototype.getCommandState_o8feeo$ = function (projectId, index) {
+    return this.getCommandState_61zpoe$(this.getCommandId_o8feeo$(projectId, index));
+  };
+  Pipeline$Companion.prototype.getCommandState_61zpoe$ = function (idPrefix) {
+    var tmp$;
+    return Kotlin.isType(tmp$ = elementById(idPrefix).state, CommandState) ? tmp$ : throwCCE();
+  };
+  Pipeline$Companion.prototype.changeStateOfCommandAndAddBuildUrl_85y8bj$ = function (project, index, newState, title, buildUrl) {
+    this.changeStateOfCommand_q143v3$(project, index, newState, title);
+    var commandId = this.getCommandId_xgsuvp$(project, index);
+    var id = commandId + this.STATE_SUFFIX;
+    var tmp$;
+    var elementByIdOrNull$result;
+    elementByIdOrNull$break: do {
+      var tmp$_0;
+      tmp$_0 = document.getElementById(id);
+      if (tmp$_0 == null) {
+        elementByIdOrNull$result = null;
+        break elementByIdOrNull$break;
+      }
+      var element = tmp$_0;
+      if (!Kotlin.isType(element, HTMLAnchorElement)) {
+        var message = 'element with ' + id + ' found but was wrong type.<br/>Expected type ' + get_js(getKClass(HTMLAnchorElement)).name + '<br/>Found ' + element;
+        throw IllegalArgumentException_init(message.toString());
+      }
+      elementByIdOrNull$result = element;
+    }
+     while (false);
+    tmp$ = elementByIdOrNull$result;
+    if (tmp$ == null) {
+      throw IllegalStateException_init('no element found for id ' + id + ' (expected type ' + get_js(getKClass(HTMLAnchorElement)).name + ')');
+    }
+    tmp$.href = buildUrl;
+    elementById(commandId).buildUrl = buildUrl;
+  };
+  function Pipeline$Companion$changeStateOfCommand$lambda(closure$newState, this$Pipeline$, closure$index, closure$project) {
+    return function (previousState, commandId) {
+      try {
+        return previousState.checkTransitionAllowed_m86w84$(closure$newState);
+      }
+       catch (e) {
+        if (Kotlin.isType(e, IllegalStateException)) {
+          var commandTitle = elementById(commandId + this$Pipeline$.TITLE_SUFFIX);
+          throw new IllegalStateException('Cannot change the state of the command ' + commandTitle.innerText + ' (' + (closure$index + 1 | 0) + '. command) ' + ('of the project ' + closure$project.id.identifier), e);
+        }
+         else
+          throw e;
+      }
+    };
+  }
+  Pipeline$Companion.prototype.changeStateOfCommand_q143v3$ = function (project, index, newState, title) {
+    this.changeStateOfCommand_jnlut6$(project, index, newState, title, Pipeline$Companion$changeStateOfCommand$lambda(newState, this, index, project));
+  };
+  Pipeline$Companion.prototype.changeStateOfCommand_jnlut6$ = function (project, index, newState, title, checkStateTransition) {
+    var tmp$;
+    var commandId = this.getCommandId_xgsuvp$(project, index);
+    var command = elementById(commandId);
+    var dynCommand = command;
+    var previousState = Kotlin.isType(tmp$ = dynCommand.state, CommandState) ? tmp$ : throwCCE();
+    dynCommand.state = checkStateTransition(previousState, commandId);
+    removeClass(command, [this.stateToCssClass_0(previousState)]);
+    addClass(command, [this.stateToCssClass_0(newState)]);
+    elementById(commandId + this.STATE_SUFFIX).title = title;
+  };
+  Pipeline$Companion.prototype.getReleaseState = function () {
+    var tmp$;
+    return Kotlin.isType(tmp$ = elementById(this.PIPELINE_HTML_ID_0).state, ReleaseState) ? tmp$ : throwCCE();
+  };
+  Pipeline$Companion.prototype.changeReleaseState_g1wt0g$ = function (newState) {
+    var pipeline = elementById(this.PIPELINE_HTML_ID_0);
+    pipeline.state = this.getReleaseState().checkTransitionAllowed_g1wt0g$(newState);
+  };
+  Pipeline$Companion.prototype.stateToCssClass_0 = function (state) {
+    if (Kotlin.isType(state, CommandState$Waiting))
+      return 'waiting';
+    else if (equals(state, CommandState.Ready))
+      return 'ready';
+    else if (equals(state, CommandState.ReadyToReTrigger))
+      return 'readyToReTrigger';
+    else if (equals(state, CommandState.Queueing))
+      return 'queueing';
+    else if (equals(state, CommandState.InProgress))
+      return 'inProgress';
+    else if (equals(state, CommandState.Succeeded))
+      return 'succeeded';
+    else if (Kotlin.isType(state, Object.getPrototypeOf(CommandState.Failed).constructor))
+      return 'failed';
+    else if (Kotlin.isType(state, CommandState$Deactivated))
+      return 'deactivated';
+    else if (equals(state, CommandState.Disabled))
+      return 'disabled';
+    else
+      return Kotlin.noWhenBranchMatched();
+  };
+  Pipeline$Companion.prototype.stateToTitle_du2eex$ = function (state) {
+    if (Kotlin.isType(state, CommandState$Waiting))
+      return this.STATE_WAITING_0;
+    else if (equals(state, CommandState.Ready))
+      return this.STATE_READY;
+    else if (equals(state, CommandState.ReadyToReTrigger))
+      return this.STATE_READY_TO_BE_TRIGGER;
+    else if (equals(state, CommandState.Queueing))
+      return this.STATE_QUEUEING;
+    else if (equals(state, CommandState.InProgress))
+      return this.STATE_IN_PROGRESS;
+    else if (equals(state, CommandState.Succeeded))
+      return this.STATE_SUCCEEDED;
+    else if (equals(state, CommandState.Failed))
+      return this.STATE_FAILED;
+    else if (Kotlin.isType(state, CommandState$Deactivated))
+      return this.STATE_DEACTIVATED_0;
+    else if (equals(state, CommandState.Disabled))
+      return this.STATE_DISABLED;
+    else
+      return Kotlin.noWhenBranchMatched();
+  };
+  Pipeline$Companion.$metadata$ = {
+    kind: Kind_OBJECT,
+    simpleName: 'Companion',
+    interfaces: []
+  };
+  var Pipeline$Companion_instance = null;
+  function Pipeline$Companion_getInstance() {
+    if (Pipeline$Companion_instance === null) {
+      new Pipeline$Companion();
+    }
+    return Pipeline$Companion_instance;
+  }
+  Pipeline.$metadata$ = {
+    kind: Kind_CLASS,
+    simpleName: 'Pipeline',
+    interfaces: []
+  };
+  function Toggler(releasePlan, menu) {
+    Toggler$Companion_getInstance();
+    this.releasePlan_0 = releasePlan;
+    this.menu_0 = menu;
+    var tmp$;
+    tmp$ = this.releasePlan_0.getProjects().iterator();
+    while (tmp$.hasNext()) {
+      var element = tmp$.next();
+      this.registerCommandToggleEvents_0(element);
+      this.registerReleaseUncheckEventForDependentsAndSubmodules_0(element);
+    }
+  }
+  function Toggler$registerCommandToggleEvents$lambda$lambda(closure$project, closure$index, this$Toggler) {
+    return function (it) {
+      this$Toggler.toggleCommand_0(closure$project, closure$index, Toggler$Companion_getInstance().EVENT_RELEASE_TOGGLE_UNCHECKED_0);
+      return Unit;
+    };
+  }
+  function Toggler$registerCommandToggleEvents$lambda$lambda_0(this$Toggler) {
+    return function (it) {
+      return this$Toggler.releasePlan_0.getProject_lljhqa$(it);
+    };
+  }
+  function Toggler$registerCommandToggleEvents$lambda$lambda$lambda(closure$toggle, this$Toggler) {
+    return function (it) {
+      this$Toggler.uncheck_0(closure$toggle);
+      return Unit;
+    };
+  }
+  function Toggler$registerCommandToggleEvents$lambda$lambda_1(closure$project, closure$index, this$Toggler) {
+    return function (it) {
+      this$Toggler.toggleCommand_0(closure$project, closure$index, Toggler$Companion_getInstance().EVENT_TOGGLE_UNCHECKED_0);
+      return Unit;
+    };
+  }
+  Toggler.prototype.registerCommandToggleEvents_0 = function (project) {
+    var tmp$, tmp$_0;
+    var index = 0;
+    tmp$ = project.commands.iterator();
+    while (tmp$.hasNext()) {
+      var item = tmp$.next();
+      var index_0 = (tmp$_0 = index, index = tmp$_0 + 1 | 0, tmp$_0);
+      var toggle = Pipeline$Companion_getInstance().getToggle_xgsuvp$(project, index_0);
+      if (Kotlin.isType(item, ReleaseCommand)) {
+        addChangeEventListener(toggle, void 0, Toggler$registerCommandToggleEvents$lambda$lambda(project, index_0, this));
+        this.disallowClickIfNotAllCommandsOrSubmodulesActive_0(project, toggle);
+        var projectAndSubmodules = plus(sequenceOf([project]), map(asSequence(this.releasePlan_0.getSubmodules_lljhqa$(project.id)), Toggler$registerCommandToggleEvents$lambda$lambda_0(this)));
+        var tmp$_1;
+        tmp$_1 = projectAndSubmodules.iterator();
+        while (tmp$_1.hasNext()) {
+          var element = tmp$_1.next();
+          this.registerForProjectEvent_0(element, Toggler$Companion_getInstance().EVENT_TOGGLE_UNCHECKED_0, Toggler$registerCommandToggleEvents$lambda$lambda$lambda(toggle, this));
+        }
+      }
+       else {
+        addChangeEventListener(toggle, void 0, Toggler$registerCommandToggleEvents$lambda$lambda_1(project, index_0, this));
+      }
+      Menu$Companion_getInstance().disableUnDisableForReleaseStartAndEnd_fj1ece$(toggle, elementById(toggle.id + Pipeline$Companion_getInstance().SLIDER_SUFFIX));
+    }
+  };
+  Toggler.prototype.toggleCommand_0 = function (project, index, uncheckedEvent) {
+    var tmp$, tmp$_0;
+    var toggle = Pipeline$Companion_getInstance().getToggle_xgsuvp$(project, index);
+    var command = Pipeline$Companion_getInstance().getCommand_xgsuvp$(project, index);
+    var slider = elementById(toggle.id + Pipeline$Companion_getInstance().SLIDER_SUFFIX);
+    var currentTitle = elementById(Pipeline$Companion_getInstance().getCommandId_xgsuvp$(project, index) + Pipeline$Companion_getInstance().STATE_SUFFIX).title;
+    if (!toggle.checked) {
+      this.dispatchToggleEvent_0(project, toggle, uncheckedEvent);
+      var previous = Kotlin.isType(tmp$ = command.state, CommandState) ? tmp$ : throwCCE();
+      Pipeline$Companion_getInstance().changeStateOfCommand_q143v3$(project, index, new CommandState$Deactivated(previous), currentTitle);
+      slider.title = 'Click to activate command.';
+    }
+     else {
+      var oldState = Kotlin.isType(tmp$_0 = command.state, CommandState$Deactivated) ? tmp$_0 : throwCCE();
+      Pipeline$Companion_getInstance().changeStateOfCommand_q143v3$(project, index, oldState.previous, currentTitle);
+      slider.title = 'Click to deactivate command.';
+    }
+    this.menu_0.activateSaveButton();
+  };
+  function Toggler$disallowClickIfNotAllCommandsOrSubmodulesActive$lambda(closure$toggle, closure$project, this$Toggler) {
+    return function (e) {
+      if (closure$toggle.checked && this$Toggler.notAllCommandsOrSubmodulesActive_0(closure$project, closure$toggle)) {
+        e.preventDefault();
+        showInfo('Cannot reactivate the ReleaseCommand for project ' + closure$project.id.identifier + ' ' + 'because some commands (of submodules) are deactivated.', 4000);
+      }
+      return Unit;
+    };
+  }
+  Toggler.prototype.disallowClickIfNotAllCommandsOrSubmodulesActive_0 = function (project, toggle) {
+    addClickEventListener(toggle, void 0, Toggler$disallowClickIfNotAllCommandsOrSubmodulesActive$lambda(toggle, project, this));
+  };
+  function Toggler$notAllCommandsOrSubmodulesActive$lambda(closure$toggle) {
+    return function (it) {
+      return !equals(it.id, closure$toggle.id);
+    };
+  }
+  Toggler.prototype.notAllCommandsOrSubmodulesActive_0 = function (project, toggle) {
+    return this.notAllCommandsOrSubmodulesActive_1(project, Toggler$notAllCommandsOrSubmodulesActive$lambda(toggle));
+  };
+  Toggler.prototype.notAllCommandsOrSubmodulesActive_1 = function (project, predicate) {
+    return this.notAllCommandsActive_0(project, predicate) || this.notAllSubmodulesActive_0(project);
+  };
+  function Toggler$notAllCommandsActive$lambda(closure$project) {
+    return function (index, f) {
+      return Pipeline$Companion_getInstance().getToggle_xgsuvp$(closure$project, index);
+    };
+  }
+  Toggler.prototype.notAllCommandsActive_0 = function (project, predicate) {
+    var $receiver = filter(mapIndexed(asSequence(project.commands), Toggler$notAllCommandsActive$lambda(project)), predicate);
+    var any$result;
+    any$break: do {
+      var tmp$;
+      tmp$ = $receiver.iterator();
+      while (tmp$.hasNext()) {
+        var element = tmp$.next();
+        if (!element.checked) {
+          any$result = true;
+          break any$break;
+        }
+      }
+      any$result = false;
+    }
+     while (false);
+    return any$result;
+  };
+  function Toggler$notAllSubmodulesActive$lambda$lambda(it) {
+    return true;
+  }
+  Toggler.prototype.notAllSubmodulesActive_0 = function (project) {
+    var $receiver = this.releasePlan_0.getSubmodules_lljhqa$(project.id);
+    var any$result;
+    any$break: do {
+      var tmp$;
+      if (Kotlin.isType($receiver, Collection) && $receiver.isEmpty()) {
+        any$result = false;
+        break any$break;
+      }
+      tmp$ = $receiver.iterator();
+      while (tmp$.hasNext()) {
+        var element = tmp$.next();
+        var submodulesHasCommands = !hasClass(elementById(project.id.identifier), 'withoutCommands');
+        if (submodulesHasCommands && this.notAllCommandsOrSubmodulesActive_1(this.releasePlan_0.getProject_lljhqa$(element), Toggler$notAllSubmodulesActive$lambda$lambda)) {
+          any$result = true;
+          break any$break;
+        }
+      }
+      any$result = false;
+    }
+     while (false);
+    return any$result;
+  };
+  function Toggler$registerReleaseUncheckEventForDependentsAndSubmodules$lambda$lambda$lambda(this$Toggler, closure$dependentId, closure$index) {
+    return function (it) {
+      this$Toggler.uncheck_0(Pipeline$Companion_getInstance().getToggle_xgsuvp$(this$Toggler.releasePlan_0.getProject_lljhqa$(closure$dependentId), closure$index));
+      return Unit;
+    };
+  }
+  Toggler.prototype.registerReleaseUncheckEventForDependentsAndSubmodules_0 = function (project) {
+    if (!project.isSubmodule) {
+      var projectIds = this.releasePlan_0.collectDependentsInclDependentsOfAllSubmodules_lljhqa$(project.id);
+      var tmp$;
+      tmp$ = projectIds.iterator();
+      while (tmp$.hasNext()) {
+        var element = tmp$.next();
+        var projectId = element.component1()
+        , dependentId = element.component2();
+        var $receiver = mapWithIndex_0(this.releasePlan_0.getProject_lljhqa$(dependentId).commands);
+        var destination = ArrayList_init();
+        var tmp$_0;
+        tmp$_0 = $receiver.iterator();
+        while (tmp$_0.hasNext()) {
+          var element_0 = tmp$_0.next();
+          var predicate$result;
+          predicate$break: do {
+            var command = element_0.component2();
+            if (Kotlin.isType(command, ReleaseCommand)) {
+              predicate$result = false;
+              break predicate$break;
+            }
+            var state = command.state;
+            predicate$result = (Kotlin.isType(state, CommandState$Waiting) && state.dependencies.contains_11rb$(projectId));
+          }
+           while (false);
+          if (predicate$result)
+            destination.add_11rb$(element_0);
+        }
+        var tmp$_1;
+        tmp$_1 = destination.iterator();
+        while (tmp$_1.hasNext()) {
+          var element_1 = tmp$_1.next();
+          var index = element_1.component1();
+          this.registerForProjectEvent_0(project, Toggler$Companion_getInstance().EVENT_RELEASE_TOGGLE_UNCHECKED_0, Toggler$registerReleaseUncheckEventForDependentsAndSubmodules$lambda$lambda$lambda(this, dependentId, index));
+        }
+      }
+    }
+  };
+  Toggler.prototype.uncheck_0 = function ($receiver) {
+    this.changeChecked_0($receiver, false);
+  };
+  function Toggler$changeChecked$lambda(closure$toggle) {
+    return function (it) {
+      return closure$toggle.dispatchEvent(new Event('change'));
+    };
+  }
+  Toggler.prototype.changeChecked_0 = function (toggle, checked) {
+    if (toggle.checked === checked)
+      return;
+    toggle.checked = checked;
+    Promise.resolve(0).then(Toggler$changeChecked$lambda(toggle));
+  };
+  Toggler.prototype.dispatchToggleEvent_0 = function (project, toggle, event) {
+    var tmp$ = this.projectElement_0(project);
+    var o = {};
+    o['detail'] = toggle;
+    o['bubbles'] = false;
+    o['cancelable'] = false;
+    o['composed'] = false;
+    tmp$.dispatchEvent(new CustomEvent(event, o));
+  };
+  Toggler.prototype.registerForProjectEvent_0 = function (project, event, callback) {
+    this.projectElement_0(project).addEventListener(event, callback);
+  };
+  Toggler.prototype.projectElement_0 = function (project) {
+    return elementById(project.id.identifier);
+  };
+  function Toggler$Companion() {
+    Toggler$Companion_instance = this;
+    this.EVENT_TOGGLE_UNCHECKED_0 = 'toggle.unchecked';
+    this.EVENT_RELEASE_TOGGLE_UNCHECKED_0 = 'release.toggle.unchecked';
+  }
+  Toggler$Companion.$metadata$ = {
+    kind: Kind_OBJECT,
+    simpleName: 'Companion',
+    interfaces: []
+  };
+  var Toggler$Companion_instance = null;
+  function Toggler$Companion_getInstance() {
+    if (Toggler$Companion_instance === null) {
+      new Toggler$Companion();
+    }
+    return Toggler$Companion_instance;
+  }
+  Toggler.$metadata$ = {
+    kind: Kind_CLASS,
+    simpleName: 'Toggler',
+    interfaces: []
+  };
+  function parseRemoteRegex(releasePlan) {
+    return parseRemoteRegex_0(releasePlan.getConfig_udzor3$(ConfigKey.REMOTE_REGEX));
+  }
+  function parseRemoteRegex_0(regex) {
+    return parseRegex(regex, 59, 'remoteRegex', getCallableRef('checkUrlDefined', function (jenkinsBaseUrl, remoteRegex) {
+      return checkUrlDefined(jenkinsBaseUrl, remoteRegex), Unit;
+    }));
+  }
+  function parseRegexParameters(releasePlan) {
+    return parseRegexParameters_0(releasePlan.getConfig_udzor3$(ConfigKey.REGEX_PARAMS));
+  }
+  function parseRegexParameters_0(regex) {
+    return parseRegex(regex, 36, 'regexParameters', getCallableRef('checkAtLeastOneParameter', function (pair, regexParameters) {
+      return checkAtLeastOneParameter(pair, regexParameters), Unit;
+    }));
+  }
+  function parseRegex$lambda(closure$name, closure$configValue, closure$checkRightSide) {
+    return function (pair) {
+      var index = checkRegexNotEmpty(pair, closure$name, closure$configValue);
+      var startIndex = index + 1 | 0;
+      var rightSide = pair.substring(startIndex);
+      closure$checkRightSide(rightSide, closure$configValue);
+      return to(Regex_init(pair.substring(0, index)), rightSide);
+    };
+  }
+  function parseRegex(configValue, splitChar, name, checkRightSide) {
+    var tmp$;
+    if (configValue.length > 0) {
+      tmp$ = toList(map(splitToSequence(configValue, Kotlin.charArrayOf(splitChar)), parseRegex$lambda(name, configValue, checkRightSide)));
+    }
+     else {
+      tmp$ = emptyList();
+    }
+    return tmp$;
+  }
+  function checkRegexNotEmpty(pair, name, input) {
+    var index = indexOf(pair, 35);
+    if (!(index > 0)) {
+      var message = 'regex requires at least one character.' + '\n' + name + ': ' + input;
+      throw IllegalStateException_init(message.toString());
+    }
+    return index;
+  }
+  var isBlank = Kotlin.kotlin.text.isBlank_gw00vp$;
+  function checkUrlDefined(jenkinsBaseUrl, remoteRegex) {
+    if (!!isBlank(jenkinsBaseUrl)) {
+      var message = 'A remoteRegex requires a related jenkins base url.' + '\r' + 'emoteRegex: ' + remoteRegex;
+      throw IllegalStateException_init(message.toString());
+    }
+  }
+  function checkAtLeastOneParameter(pair, regexParameters) {
+    var index = indexOf(pair, 61);
+    if (!(index > 0)) {
+      var message = 'A regexParam requires at least one parameter.' + '\n' + 'regexParameters: ' + regexParameters;
+      throw IllegalStateException_init(message.toString());
+    }
   }
   function elementById(id) {
     var tmp$;
@@ -816,123 +2809,36 @@
     }
     return element_0;
   }
-  function Downloader(modifiableJson) {
-    this.modifiableJson_0 = modifiableJson;
-  }
-  Downloader.prototype.download = function () {
-    var tmp$;
-    var json = this.modifiableJson_0.getJsonWithAppliedChanges();
-    var a = Kotlin.isType(tmp$ = document.createElement('a'), HTMLElement) ? tmp$ : throwCCE();
-    a.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(json));
-    a.setAttribute('download', 'release.json');
-    a.style.display = 'none';
-    ensureNotNull(document.body).appendChild(a);
-    a.click();
-    ensureNotNull(document.body).removeChild(a);
-  };
-  Downloader.$metadata$ = {
-    kind: Kind_CLASS,
-    simpleName: 'Downloader',
-    interfaces: []
-  };
-  function DryRunJobExecutionDataFactory(jenkinsUrl, releasePlan) {
-    BaseJobExecutionDataFactory.call(this, jenkinsUrl, releasePlan);
-    this.checkConfig_0(releasePlan.config);
-  }
-  DryRunJobExecutionDataFactory.prototype.checkConfig_0 = function (config) {
-    this.requireConfigEntry_nhrt5l$(config, ConfigKey.UPDATE_DEPENDENCY_JOB);
-    this.requireConfigEntry_nhrt5l$(config, ConfigKey.DRY_RUN_JOB);
-  };
-  DryRunJobExecutionDataFactory.prototype.create_awtgy4$ = function (project, command) {
-    var tmp$;
-    if (Kotlin.isType(command, JenkinsUpdateDependency))
-      tmp$ = this.triggerUpdateDependency_0(project, command);
-    else if (Kotlin.isType(command, M2ReleaseCommand))
-      tmp$ = this.triggerRelease_0(project);
-    else
-      throw UnsupportedOperationException_init('We do not (yet) support the command: ' + command);
-    return tmp$;
-  };
-  DryRunJobExecutionDataFactory.prototype.triggerUpdateDependency_0 = function (project, command) {
-    var jobName = 'dry update dependency of ' + project.id.identifier;
-    var params = this.createUpdateDependencyParams_0(project, command);
-    return this.createJobExecutionData_0(jobName, params);
-  };
-  DryRunJobExecutionDataFactory.prototype.triggerRelease_0 = function (project) {
-    var jobName = 'dry release ' + project.id.identifier;
-    var params = this.createReleaseParams_0(project);
-    return this.createJobExecutionData_0(jobName, params);
-  };
-  DryRunJobExecutionDataFactory.prototype.createUpdateDependencyParams_0 = function (project, command) {
-    var tmp$;
-    var dependency = this.releasePlan.getProject_lljhqa$(command.projectId);
-    var dependencyMavenProjectId = Kotlin.isType(tmp$ = dependency.id, MavenProjectId) ? tmp$ : throwCCE();
-    var releaseVersion = '';
-    var groupId = dependencyMavenProjectId.groupId;
-    var artifactId = dependencyMavenProjectId.artifactId;
-    var newVersion = dependency.releaseVersion + '-' + this.releasePlan.releaseId;
-    return this.createParams_0('update', project, releaseVersion, groupId, artifactId, newVersion);
-  };
-  DryRunJobExecutionDataFactory.prototype.createReleaseParams_0 = function (project) {
-    var releaseVersion = project.releaseVersion + '-' + this.releasePlan.releaseId;
-    var groupId = '';
-    var artifactId = '';
-    var newVersion = '';
-    return this.createParams_0('release', project, releaseVersion, groupId, artifactId, newVersion);
-  };
-  DryRunJobExecutionDataFactory.prototype.createParams_0 = function (commandName, project, releaseVersion, groupId, artifactId, newVersion) {
-    return 'command=' + commandName + ('&pathToProject=' + project.relativePath) + ('&releaseId=' + this.releasePlan.releaseId) + ('&releaseVersion=' + releaseVersion) + ('&groupId=' + groupId) + ('&artifactId=' + artifactId) + ('&newVersion=' + newVersion);
-  };
-  DryRunJobExecutionDataFactory.prototype.createJobExecutionData_0 = function (jobName, params) {
-    var jobUrl = this.getJobUrl_udzor3$(ConfigKey.DRY_RUN_JOB);
-    return JobExecutionData$Companion_getInstance().buildWithParameters_6hosri$(jobName, jobUrl, params);
-  };
-  DryRunJobExecutionDataFactory.$metadata$ = {
-    kind: Kind_CLASS,
-    simpleName: 'DryRunJobExecutionDataFactory',
-    interfaces: [BaseJobExecutionDataFactory]
-  };
   function Gui(releasePlan, menu) {
     Gui$Companion_getInstance();
-    this.releasePlan_0 = releasePlan;
     this.menu_0 = menu;
-    this.toggler_0 = new Toggler(this.releasePlan_0, this.menu_0);
-  }
-  function Gui$load$lambda(it) {
-    showWarning(it);
-    return Unit;
-  }
-  function Gui$load$lambda_0(it) {
-    showInfo(it);
-    return Unit;
-  }
-  Gui.prototype.load = function () {
     var tmp$, tmp$_0, tmp$_1;
-    var rootProjectId = this.releasePlan_0.rootProjectId;
+    var rootProjectId = releasePlan.rootProjectId;
     var htmlTitle = (tmp$_1 = (tmp$_0 = Kotlin.isType(tmp$ = rootProjectId, MavenProjectId) ? tmp$ : null) != null ? tmp$_0.artifactId : null) != null ? tmp$_1 : rootProjectId.identifier;
     document.title = 'Release ' + htmlTitle;
-    this.setUpMessages_0(this.releasePlan_0.warnings, 'warnings', Gui$load$lambda);
-    this.setUpMessages_0(this.releasePlan_0.infos, 'infos', Gui$load$lambda_0);
-    this.setUpConfig_0(this.releasePlan_0);
-    this.setUpProjects_0();
-    this.toggler_0.registerToggleEvents();
-    this.setUpCommandsOnContextMenu_0();
-  };
-  function Gui$setUpMessages$lambda(closure$minimized, closure$messages, closure$action) {
+    var tmp$_2;
+    tmp$_2 = releasePlan.warnings.iterator();
+    while (tmp$_2.hasNext()) {
+      var element = tmp$_2.next();
+      showWarning(element);
+    }
+    this.setInfoBubble_0(releasePlan.infos);
+    this.setUpConfig_0(releasePlan);
+    new Pipeline(releasePlan, this.menu_0);
+  }
+  function Gui$setInfoBubble$lambda(closure$minimized, closure$messages) {
     return function (it) {
       closure$minimized.style.display = 'none';
-      var $receiver = closure$messages;
-      var action = closure$action;
       var tmp$;
-      tmp$ = $receiver.iterator();
+      tmp$ = closure$messages.iterator();
       while (tmp$.hasNext()) {
         var element = tmp$.next();
-        action(element);
+        showInfo(element);
       }
       return Unit;
     };
   }
-  function Gui$setUpMessages$lambda_0(closure$messagesDiv) {
+  function Gui$setInfoBubble$lambda_0(closure$messagesDiv) {
     return function (it) {
       var $receiver = asList(document.querySelectorAll('#messages > div'));
       var tmp$;
@@ -944,796 +2850,48 @@
       return Unit;
     };
   }
-  Gui.prototype.setUpMessages_0 = function (messages, id, action) {
+  Gui.prototype.setInfoBubble_0 = function (messages) {
     if (!messages.isEmpty()) {
-      var minimized = elementById(id + 'Minimized');
+      var minimized = elementById('infosMinimized');
       minimized.style.display = 'block';
-      minimized.addEventListener('click', Gui$setUpMessages$lambda(minimized, messages, action));
+      minimized.addEventListener('click', Gui$setInfoBubble$lambda(minimized, messages));
     }
     var messagesDiv = elementById('messages');
-    addClickEventListener(elementById(Gui$Companion_getInstance().HIDE_MESSAGES_HTML_ID), void 0, Gui$setUpMessages$lambda_0(messagesDiv));
+    addClickEventListener(elementById(Gui$Companion_getInstance().HIDE_MESSAGES_HTML_ID), void 0, Gui$setInfoBubble$lambda_0(messagesDiv));
   };
   function Gui$setUpConfig$lambda$lambda(closure$releasePlan, this$Gui) {
     return function ($receiver) {
-      var tmp$, tmp$_0, tmp$_1, tmp$_2, tmp$_3;
-      this$Gui.textFieldWithLabel_0($receiver, Gui$Companion_getInstance().RELEASE_ID_HTML_ID, 'ReleaseId', closure$releasePlan.releaseId);
+      var tmp$, tmp$_0;
+      textFieldWithLabel($receiver, Gui$Companion_getInstance().RELEASE_ID_HTML_ID, 'ReleaseId', closure$releasePlan.releaseId, this$Gui.menu_0);
       var config = closure$releasePlan.config;
-      var $receiver_0 = listOf([ConfigKey.COMMIT_PREFIX, ConfigKey.UPDATE_DEPENDENCY_JOB, ConfigKey.REMOTE_REGEX, ConfigKey.REMOTE_JOB, ConfigKey.DRY_RUN_JOB, ConfigKey.REGEX_PARAMS]);
-      var tmp$_4;
-      tmp$_4 = $receiver_0.iterator();
-      while (tmp$_4.hasNext()) {
-        var element = tmp$_4.next();
-        var tmp$_5;
-        this$Gui.textFieldWithLabel_0($receiver, 'config-' + element.asString(), element.asString(), (tmp$_5 = config.get_11rb$(element)) != null ? tmp$_5 : '');
+      var $receiver_0 = listOf([ConfigKey.COMMIT_PREFIX, ConfigKey.UPDATE_DEPENDENCY_JOB, ConfigKey.REMOTE_REGEX, ConfigKey.DRY_RUN_JOB, ConfigKey.REGEX_PARAMS]);
+      var tmp$_1;
+      tmp$_1 = $receiver_0.iterator();
+      while (tmp$_1.hasNext()) {
+        var element = tmp$_1.next();
+        var this$Gui_0 = this$Gui;
+        var tmp$_2;
+        textFieldWithLabel($receiver, 'config-' + element.asString(), element.asString(), (tmp$_2 = config.get_11rb$(element)) != null ? tmp$_2 : '', this$Gui_0.menu_0);
       }
       var key = ConfigKey.JOB_MAPPING;
-      tmp$ = 'config-' + key.asString();
-      tmp$_0 = key.asString();
-      tmp$_3 = (tmp$_2 = (tmp$_1 = config.get_11rb$(key)) != null ? replace(tmp$_1, '|', '\n') : null) != null ? tmp$_2 : '';
-      this$Gui.textAreaWithLabel_0($receiver, tmp$, tmp$_0, tmp$_3);
+      textAreaWithLabel($receiver, 'config-' + key.asString(), key.asString(), (tmp$_0 = (tmp$ = config.get_11rb$(key)) != null ? replace(tmp$, '|', '\n') : null) != null ? tmp$_0 : '', this$Gui.menu_0);
       return Unit;
     };
   }
   function Gui$setUpConfig$lambda(closure$releasePlan, this$Gui) {
     return function ($receiver) {
-      div($receiver, void 0, Gui$setUpConfig$lambda$lambda(closure$releasePlan, this$Gui));
+      div_0($receiver, void 0, Gui$setUpConfig$lambda$lambda(closure$releasePlan, this$Gui));
       return Unit;
     };
   }
   Gui.prototype.setUpConfig_0 = function (releasePlan) {
     append(elementById('config'), Gui$setUpConfig$lambda(releasePlan, this));
   };
-  function Gui$setUpCommandsOnContextMenu$lambda$lambda$lambda(this$Gui) {
-    return function (it) {
-      this$Gui.hideAllContextMenus_0();
-      return Unit;
-    };
-  }
-  function Gui$setUpCommandsOnContextMenu$lambda$lambda(this$Gui, closure$idPrefix) {
-    return function (event) {
-      var tmp$, tmp$_0;
-      this$Gui.hideAllContextMenus_0();
-      var contextMenu = elementById(closure$idPrefix + Gui$Companion_getInstance().CONTEXT_MENU_SUFFIX);
-      tmp$_0 = Kotlin.isType(tmp$ = event, MouseEvent) ? tmp$ : throwCCE();
-      this$Gui.moveContextMenuPosition_0(tmp$_0, contextMenu);
-      contextMenu.style.visibility = 'visible';
-      window.addEventListener('click', Gui$setUpCommandsOnContextMenu$lambda$lambda$lambda(this$Gui), {once: true});
-      event.preventDefault();
-      event.stopPropagation();
-      return Unit;
-    };
-  }
-  function Gui$setUpCommandsOnContextMenu$lambda(this$Gui) {
-    return function (it) {
-      this$Gui.hideAllContextMenus_0();
-      return Unit;
-    };
-  }
-  Gui.prototype.setUpCommandsOnContextMenu_0 = function () {
-    var $receiver = asList(document.querySelectorAll('.command > .fields > .toggle'));
-    var destination = ArrayList_init(collectionSizeOrDefault($receiver, 10));
-    var tmp$;
-    tmp$ = $receiver.iterator();
-    while (tmp$.hasNext()) {
-      var item = tmp$.next();
-      var tmp$_0 = destination.add_11rb$;
-      var tmp$_1;
-      var toggle = Kotlin.isType(tmp$_1 = item.firstChild, HTMLInputElement) ? tmp$_1 : throwCCE();
-      tmp$_0.call(destination, to(item, substringBefore(toggle.id, Gui$Companion_getInstance().DEACTIVATE_SUFFIX)));
-    }
-    var toggleLabels = destination;
-    var $receiver_0 = asList(document.querySelectorAll('.state'));
-    var destination_0 = ArrayList_init(collectionSizeOrDefault($receiver_0, 10));
-    var tmp$_2;
-    tmp$_2 = $receiver_0.iterator();
-    while (tmp$_2.hasNext()) {
-      var item_0 = tmp$_2.next();
-      var tmp$_3 = destination_0.add_11rb$;
-      var tmp$_4;
-      var a = Kotlin.isType(tmp$_4 = item_0, HTMLAnchorElement) ? tmp$_4 : throwCCE();
-      tmp$_3.call(destination_0, to(a, substringBefore(a.id, Gui$Companion_getInstance().STATE_SUFFIX)));
-    }
-    var stateIcons = destination_0;
-    var tmp$_5;
-    tmp$_5 = toggleLabels.iterator();
-    while (tmp$_5.hasNext()) {
-      var element = tmp$_5.next();
-      var element_0 = element.component1()
-      , idPrefix = element.component2();
-      element_0.addEventListener('contextmenu', Gui$setUpCommandsOnContextMenu$lambda$lambda(this, idPrefix));
-    }
-    var tmp$_0_0;
-    tmp$_0_0 = stateIcons.iterator();
-    while (tmp$_0_0.hasNext()) {
-      var element_0_0 = tmp$_0_0.next();
-      var element_1 = element_0_0.component1()
-      , idPrefix_0 = element_0_0.component2();
-      element_1.addEventListener('contextmenu', Gui$setUpCommandsOnContextMenu$lambda$lambda(this, idPrefix_0));
-    }
-    window.addEventListener('contextmenu', Gui$setUpCommandsOnContextMenu$lambda(this));
-  };
-  Gui.prototype.hideAllContextMenus_0 = function () {
-    var tmp$;
-    tmp$ = asList(document.querySelectorAll('.contextMenu')).iterator();
-    while (tmp$.hasNext()) {
-      var element = tmp$.next();
-      var tmp$_0;
-      (Kotlin.isType(tmp$_0 = element, HTMLElement) ? tmp$_0 : throwCCE()).style.visibility = 'hidden';
-    }
-  };
-  Gui.prototype.moveContextMenuPosition_0 = function (event, contextMenu) {
-    var tmp$, tmp$_0;
-    var menuWidth = contextMenu.offsetWidth;
-    var menuHeight = contextMenu.offsetHeight;
-    var mouseX = event.pageX;
-    var mouseY = event.pageY;
-    if (mouseX + menuWidth > ensureNotNull(document.body).clientWidth + window.scrollX) {
-      tmp$ = mouseX - menuWidth;
-    }
-     else {
-      tmp$ = mouseX;
-    }
-    var x = tmp$;
-    if (mouseY + menuHeight > ensureNotNull(document.body).clientHeight + window.scrollY) {
-      tmp$_0 = mouseY - menuHeight;
-    }
-     else {
-      tmp$_0 = mouseY;
-    }
-    var y = tmp$_0;
-    contextMenu.style.left = x.toString() + 'px';
-    contextMenu.style.top = y.toString() + 'px';
-  };
-  function Gui$setUpProjects$lambda$lambda(closure$project, this$Gui, closure$set, closure$itr, closure$level) {
-    return function ($receiver) {
-      if (!closure$project.isSubmodule) {
-        this$Gui.project_0($receiver, closure$project);
-      }
-      closure$set.add_11rb$(closure$project.id);
-      while (hasNextOnTheSameLevel(closure$itr, closure$level.v)) {
-        var nextProject = closure$itr.next();
-        if (!nextProject.isSubmodule) {
-          this$Gui.project_0($receiver, nextProject);
-        }
-        closure$set.add_11rb$(nextProject.id);
-      }
-      return Unit;
-    };
-  }
-  function Gui$setUpProjects$lambda(this$Gui, closure$set) {
-    return function ($receiver) {
-      var itr = toPeekingIterator(this$Gui.releasePlan_0.iterator());
-      var level = {v: null};
-      while (itr.hasNext()) {
-        var project = itr.next();
-        level.v = project.level;
-        div($receiver, 'level l' + level.v, Gui$setUpProjects$lambda$lambda(project, this$Gui, closure$set, itr, level));
-      }
-      return Unit;
-    };
-  }
-  function Gui$setUpProjects$lambda_0(it) {
-    return it.identifier;
-  }
-  var HashSet_init = Kotlin.kotlin.collections.HashSet_init_287e2$;
-  Gui.prototype.setUpProjects_0 = function () {
-    var set = HashSet_init();
-    var pipeline = elementById(Gui$Companion_getInstance().PIPELINE_HTML_ID_0);
-    pipeline.state = this.releasePlan_0.state;
-    append(pipeline, Gui$setUpProjects$lambda(this, set));
-    var involvedProjects = set.size;
-    showStatus('Projects involved: ' + involvedProjects);
-    if (involvedProjects !== this.releasePlan_0.getNumberOfProjects()) {
-      showError('Not all dependent projects are involved in the process, please report a bug. The following where left out\n' + joinToString(minus(this.releasePlan_0.getProjectIds(), set), '\n', void 0, void 0, void 0, void 0, Gui$setUpProjects$lambda_0));
-    }
-  };
-  function Gui$project$lambda$lambda$lambda(closure$project, this$Gui) {
-    return function ($receiver) {
-      this$Gui.projectId_0($receiver, closure$project.id);
-      return Unit;
-    };
-  }
-  var Collection = Kotlin.kotlin.collections.Collection;
-  function Gui$project$lambda$lambda(closure$hasCommands, closure$identifier, closure$project, this$Gui) {
-    return function ($receiver) {
-      if (closure$hasCommands) {
-        var tmp$ = this$Gui;
-        var tmp$_0 = closure$identifier + Gui$Companion_getInstance().DEACTIVATE_ALL_SUFFIX;
-        var $receiver_0 = closure$project.commands;
-        var any$result;
-        any$break: do {
-          var tmp$_1;
-          if (Kotlin.isType($receiver_0, Collection) && $receiver_0.isEmpty()) {
-            any$result = false;
-            break any$break;
-          }
-          tmp$_1 = $receiver_0.iterator();
-          while (tmp$_1.hasNext()) {
-            var element = tmp$_1.next();
-            if (!Kotlin.isType(element.state, CommandState$Deactivated)) {
-              any$result = true;
-              break any$break;
-            }
-          }
-          any$result = false;
-        }
-         while (false);
-        tmp$.toggle_0($receiver, tmp$_0, 'deactivate all commands', any$result, false);
-      }
-      span($receiver, void 0, Gui$project$lambda$lambda$lambda(closure$project, this$Gui));
-      return Unit;
-    };
-  }
-  function Gui$project$lambda$lambda_0(closure$identifier, closure$project, this$Gui) {
-    return function ($receiver) {
-      this$Gui.textFieldReadOnlyWithLabel_0($receiver, closure$identifier + ':currentVersion', 'Current Version', closure$project.currentVersion);
-      this$Gui.textFieldWithLabel_0($receiver, closure$identifier + ':releaseVersion', 'Release Version', closure$project.releaseVersion);
-      return Unit;
-    };
-  }
-  function Gui$project$lambda(closure$project, this$Gui) {
-    return function ($receiver) {
-      var hasCommands = !closure$project.commands.isEmpty();
-      set_classes($receiver, setOf(['project', closure$project.isSubmodule ? 'submodule' : '', !hasCommands ? 'withoutCommands' : '', this$Gui.releasePlan_0.hasSubmodules_lljhqa$(closure$project.id) ? 'withSubmodules' : '']));
-      var identifier = closure$project.id.identifier;
-      set_id($receiver, identifier);
-      div_0($receiver, 'title', Gui$project$lambda$lambda(hasCommands, identifier, closure$project, this$Gui));
-      if (!closure$project.isSubmodule) {
-        div_0($receiver, 'fields', Gui$project$lambda$lambda_0(identifier, closure$project, this$Gui));
-      }
-      this$Gui.commands_0($receiver, closure$project);
-      if (closure$project.isSubmodule) {
-        this$Gui.submodules_0($receiver, closure$project.id);
-      }
-      return Unit;
-    };
-  }
-  Gui.prototype.project_0 = function ($receiver, project) {
-    div_0($receiver, void 0, Gui$project$lambda(project, this));
-  };
-  Gui.prototype.projectId_0 = function ($receiver, id) {
-    if (Kotlin.isType(id, MavenProjectId)) {
-      set_title($receiver, id.identifier);
-      $receiver.unaryPlus_pdl1vz$(id.artifactId);
-    }
-     else {
-      $receiver.unaryPlus_pdl1vz$(id.identifier);
-    }
-  };
-  Gui.prototype.projectId_1 = function ($receiver, id) {
-    if (Kotlin.isType(id, MavenProjectId)) {
-      set_title($receiver, id.identifier);
-      $receiver.value = id.artifactId;
-    }
-     else {
-      $receiver.value = id.identifier;
-    }
-  };
-  function Gui$commands$lambda$lambda$lambda(closure$commandId, closure$command) {
-    return function ($receiver) {
-      set_id($receiver, closure$commandId + Gui$Companion_getInstance().TITLE_SUFFIX);
-      $receiver.unaryPlus_pdl1vz$(ensureNotNull(Kotlin.getKClassFromExpression(closure$command).simpleName));
-      return Unit;
-    };
-  }
-  function Gui$commands$lambda$lambda$lambda_0(closure$commandId, closure$project, closure$index, closure$command, this$Gui) {
-    return function ($receiver) {
-      this$Gui.fieldsForCommand_0($receiver, closure$commandId, closure$project, closure$index, closure$command);
-      return Unit;
-    };
-  }
-  function Gui$commands$lambda$lambda(closure$project, closure$index, closure$command, this$Gui) {
-    return function ($receiver) {
-      var commandId = Gui$Companion_getInstance().getCommandId_xgsuvp$(closure$project, closure$index);
-      set_id($receiver, commandId);
-      set_classes($receiver, setOf(['command', Gui$Companion_getInstance().stateToCssClass_0(closure$command.state)]));
-      div_0($receiver, 'commandTitle', Gui$commands$lambda$lambda$lambda(commandId, closure$command));
-      div_0($receiver, 'fields', Gui$commands$lambda$lambda$lambda_0(commandId, closure$project, closure$index, closure$command, this$Gui));
-      var div = getUnderlyingHtmlElement($receiver);
-      div.state = closure$command.state;
-      if (Kotlin.isType(closure$command, JenkinsCommand)) {
-        div.buildUrl = closure$command.buildUrl;
-      }
-      return Unit;
-    };
-  }
-  Gui.prototype.commands_0 = function ($receiver, project) {
-    var tmp$, tmp$_0;
-    var index = 0;
-    tmp$ = project.commands.iterator();
-    while (tmp$.hasNext()) {
-      var item = tmp$.next();
-      div_0($receiver, void 0, Gui$commands$lambda$lambda(project, (tmp$_0 = index, index = tmp$_0 + 1 | 0, tmp$_0), item, this));
-    }
-  };
-  function Gui$textFieldWithLabel$lambda($receiver) {
-    return Unit;
-  }
-  Gui.prototype.textFieldWithLabel_0 = function ($receiver, id, label, value) {
-    this.textFieldWithLabel_1($receiver, id, label, value, Gui$textFieldWithLabel$lambda);
-  };
-  function Gui$textFieldReadOnlyWithLabel$lambda($receiver) {
-    return Unit;
-  }
-  function Gui$textFieldReadOnlyWithLabel$lambda_0(closure$inputAct) {
-    return function ($receiver) {
-      $receiver.readonly = true;
-      closure$inputAct($receiver);
-      return Unit;
-    };
-  }
-  Gui.prototype.textFieldReadOnlyWithLabel_0 = function ($receiver, id, label, value, inputAct) {
-    if (inputAct === void 0)
-      inputAct = Gui$textFieldReadOnlyWithLabel$lambda;
-    this.textFieldWithLabel_1($receiver, id, label, value, Gui$textFieldReadOnlyWithLabel$lambda_0(inputAct));
-  };
-  function Gui$textFieldWithLabel$lambda$lambda(closure$id, closure$label) {
-    return function ($receiver) {
-      $receiver.htmlFor = closure$id;
-      $receiver.unaryPlus_pdl1vz$(closure$label);
-      return Unit;
-    };
-  }
-  function Gui$textFieldWithLabel$lambda$lambda$lambda(this$Gui) {
-    return function (it) {
-      this$Gui.menu_0.activateSaveButton();
-      return Unit;
-    };
-  }
-  function Gui$textFieldWithLabel$lambda$lambda_0(closure$id, closure$value, closure$inputAct, this$Gui) {
-    return function ($receiver) {
-      var tmp$;
-      set_id($receiver, closure$id);
-      $receiver.value = closure$value;
-      closure$inputAct($receiver);
-      set_onKeyUpFunction($receiver, Gui$textFieldWithLabel$lambda$lambda$lambda(this$Gui));
-      var input = Kotlin.isType(tmp$ = getUnderlyingHtmlElement($receiver), HTMLInputElement) ? tmp$ : throwCCE();
-      Gui$Companion_getInstance().disableUnDisableForReleaseStartAndEnd_fj1ece$(input, input);
-      return Unit;
-    };
-  }
-  function Gui$textFieldWithLabel$lambda_0(closure$id, closure$label, closure$value, closure$inputAct, this$Gui) {
-    return function ($receiver) {
-      label($receiver, 'fields', Gui$textFieldWithLabel$lambda$lambda(closure$id, closure$label));
-      textInput($receiver, void 0, void 0, void 0, void 0, Gui$textFieldWithLabel$lambda$lambda_0(closure$id, closure$value, closure$inputAct, this$Gui));
-      return Unit;
-    };
-  }
-  Gui.prototype.textFieldWithLabel_1 = function ($receiver, id, label, value, inputAct) {
-    div_0($receiver, void 0, Gui$textFieldWithLabel$lambda_0(id, label, value, inputAct, this));
-  };
-  function Gui$textAreaWithLabel$lambda$lambda(closure$id, closure$label) {
-    return function ($receiver) {
-      $receiver.htmlFor = closure$id;
-      $receiver.unaryPlus_pdl1vz$(closure$label);
-      return Unit;
-    };
-  }
-  function Gui$textAreaWithLabel$lambda$lambda$lambda(this$Gui) {
-    return function (it) {
-      this$Gui.menu_0.activateSaveButton();
-      return Unit;
-    };
-  }
-  function Gui$textAreaWithLabel$lambda$lambda_0(closure$id, closure$value, this$Gui) {
-    return function ($receiver) {
-      var tmp$;
-      set_id($receiver, closure$id);
-      $receiver.unaryPlus_pdl1vz$(closure$value);
-      set_onKeyUpFunction($receiver, Gui$textAreaWithLabel$lambda$lambda$lambda(this$Gui));
-      var htmlTextAreaElement = Kotlin.isType(tmp$ = getUnderlyingHtmlElement($receiver), HTMLTextAreaElement) ? tmp$ : throwCCE();
-      var input = htmlTextAreaElement;
-      Gui$Companion_getInstance().disableUnDisableForReleaseStartAndEnd_fj1ece$(input, htmlTextAreaElement);
-      return Unit;
-    };
-  }
-  function Gui$textAreaWithLabel$lambda(closure$id, closure$label, closure$value, this$Gui) {
-    return function ($receiver) {
-      label($receiver, 'fields', Gui$textAreaWithLabel$lambda$lambda(closure$id, closure$label));
-      textArea($receiver, void 0, void 0, void 0, void 0, Gui$textAreaWithLabel$lambda$lambda_0(closure$id, closure$value, this$Gui));
-      return Unit;
-    };
-  }
-  Gui.prototype.textAreaWithLabel_0 = function ($receiver, id, label, value) {
-    div_0($receiver, void 0, Gui$textAreaWithLabel$lambda(id, label, value, this));
-  };
-  function Gui$fieldsForCommand$lambda$lambda(closure$idPrefix) {
-    return function ($receiver) {
-      span($receiver);
-      set_id($receiver, closure$idPrefix + ':status.icon');
-      return Unit;
-    };
-  }
-  function Gui$fieldsForCommand$lambda(closure$idPrefix, closure$command) {
-    return function ($receiver) {
-      var tmp$;
-      set_id($receiver, closure$idPrefix + Gui$Companion_getInstance().STATE_SUFFIX);
-      i($receiver, 'material-icons', Gui$fieldsForCommand$lambda$lambda(closure$idPrefix));
-      if (Kotlin.isType(closure$command, JenkinsCommand)) {
-        $receiver.href = (tmp$ = closure$command.buildUrl) != null ? tmp$ : '';
-      }
-      set_title($receiver, Gui$Companion_getInstance().stateToTitle_0(closure$command.state));
-      return Unit;
-    };
-  }
-  function Gui$fieldsForCommand$lambda$lambda$lambda($receiver) {
-    span($receiver);
-    return Unit;
-  }
-  function Gui$fieldsForCommand$lambda$lambda$lambda_0($receiver) {
-    $receiver.unaryPlus_pdl1vz$('Set Command to Succeeded');
-    return Unit;
-  }
-  function Gui$fieldsForCommand$lambda$lambda$lambda_1(closure$project, closure$index, this$Gui) {
-    return function (it) {
-      this$Gui.transitionToSucceededIfOk_0(closure$project, closure$index);
-      return Unit;
-    };
-  }
-  function Gui$fieldsForCommand$lambda$lambda_0(closure$project, closure$index, this$Gui) {
-    return function ($receiver) {
-      set_title($receiver, 'Forcibly sets the state of this command to Succeeded, to be used with care.');
-      i($receiver, 'material-icons', Gui$fieldsForCommand$lambda$lambda$lambda);
-      span($receiver, void 0, Gui$fieldsForCommand$lambda$lambda$lambda_0);
-      addClickEventListener(getUnderlyingHtmlElement($receiver), void 0, Gui$fieldsForCommand$lambda$lambda$lambda_1(closure$project, closure$index, this$Gui));
-      return Unit;
-    };
-  }
-  function Gui$fieldsForCommand$lambda_0(closure$idPrefix, closure$project, closure$index, this$Gui) {
-    return function ($receiver) {
-      set_id($receiver, closure$idPrefix + Gui$Companion_getInstance().CONTEXT_MENU_SUFFIX);
-      div_0($receiver, 'succeeded', Gui$fieldsForCommand$lambda$lambda_0(closure$project, closure$index, this$Gui));
-      return Unit;
-    };
-  }
-  Gui.prototype.fieldsForCommand_0 = function ($receiver, idPrefix, project, index, command) {
-    var cssClass = Kotlin.isType(command, ReleaseCommand) ? 'release' : '';
-    var isNotDeactivated = !Kotlin.isType(command.state, CommandState$Deactivated);
-    this.toggle_0($receiver, idPrefix + Gui$Companion_getInstance().DEACTIVATE_SUFFIX, isNotDeactivated ? 'Click to deactivate command' : 'Click to activate command', isNotDeactivated, command.state === CommandState.Disabled, cssClass);
-    a($receiver, void 0, void 0, 'state', Gui$fieldsForCommand$lambda(idPrefix, command));
-    div_0($receiver, 'contextMenu', Gui$fieldsForCommand$lambda_0(idPrefix, project, index, this));
-    if (Kotlin.isType(command, JenkinsMavenReleasePlugin))
-      this.appendJenkinsMavenReleasePluginField_0($receiver, idPrefix, command);
-    else if (Kotlin.isType(command, JenkinsMultiMavenReleasePlugin))
-      this.appendJenkinsMultiMavenReleasePluginFields_0($receiver, idPrefix, project.id, command);
-    else if (Kotlin.isType(command, JenkinsUpdateDependency))
-      this.appendJenkinsUpdateDependencyField_0($receiver, idPrefix, command);
-    else
-      showError('Unknown command found, cannot display its fields.' + '\n' + command);
-  };
-  function Gui$transitionToSucceededIfOk$lambda(closure$project, this$Gui) {
-    return function (setAllToSucceeded) {
-      if (setAllToSucceeded) {
-        this$Gui.transitionAllCommandsToSucceeded_0(closure$project);
-        this$Gui.menu_0.activateSaveButton();
-      }
-      return Unit;
-    };
-  }
-  Gui.prototype.transitionToSucceededIfOk_0 = function (project, index) {
-    if (Kotlin.isType(project.commands.get_za3lpa$(index), ReleaseCommand)) {
-      if (this.notAllOtherCommandsSucceeded_0(project, index)) {
-        var succeeded = getKClass(Object.getPrototypeOf(CommandState.Succeeded).constructor).simpleName;
-        showDialog('You cannot set this command to the state ' + toString(succeeded) + ' because not all other commands of this project have ' + toString(succeeded) + ' yet.' + '\n\n' + ('Do you want to set all other commands forcibly to ' + toString(succeeded) + ' as well?')).then(Gui$transitionToSucceededIfOk$lambda(project, this));
-        return;
-      }
-    }
-    this.transitionToSucceeded_0(project, index);
-    this.menu_0.activateSaveButton();
-  };
-  Gui.prototype.transitionAllCommandsToSucceeded_0 = function (project) {
-    var tmp$, tmp$_0;
-    var index = 0;
-    tmp$ = project.commands.iterator();
-    while (tmp$.hasNext()) {
-      var item = tmp$.next();
-      this.transitionToSucceeded_0(project, (tmp$_0 = index, index = tmp$_0 + 1 | 0, tmp$_0));
-    }
-    var tmp$_1;
-    tmp$_1 = this.releasePlan_0.getSubmodules_lljhqa$(project.id).iterator();
-    while (tmp$_1.hasNext()) {
-      var element = tmp$_1.next();
-      this.transitionAllCommandsToSucceeded_0(this.releasePlan_0.getProject_lljhqa$(element));
-    }
-  };
-  function Gui$transitionToSucceeded$lambda(f, f_0) {
-    return CommandState.Succeeded;
-  }
-  Gui.prototype.transitionToSucceeded_0 = function (project, index) {
-    Gui$Companion_getInstance().changeStateOfCommand_0(project, index, CommandState.Succeeded, Gui$Companion_getInstance().stateToTitle_0(CommandState.Succeeded), Gui$transitionToSucceeded$lambda);
-  };
-  Gui.prototype.notAllOtherCommandsSucceeded_0 = function (project, index) {
-    var $receiver = mapWithIndex(asSequence(project.commands));
-    var any$result;
-    any$break: do {
-      var tmp$;
-      tmp$ = $receiver.iterator();
-      while (tmp$.hasNext()) {
-        var element = tmp$.next();
-        var i = element.component1();
-        if ((index == null || i !== index) && Gui$Companion_getInstance().getCommandState_o8feeo$(project.id, i) !== CommandState.Succeeded) {
-          any$result = true;
-          break any$break;
-        }
-      }
-      any$result = false;
-    }
-     while (false);
-    var tmp$_0 = any$result;
-    if (!tmp$_0) {
-      var $receiver_0 = this.releasePlan_0.getSubmodules_lljhqa$(project.id);
-      var any$result_0;
-      any$break: do {
-        var tmp$_1;
-        if (Kotlin.isType($receiver_0, Collection) && $receiver_0.isEmpty()) {
-          any$result_0 = false;
-          break any$break;
-        }
-        tmp$_1 = $receiver_0.iterator();
-        while (tmp$_1.hasNext()) {
-          var element_0 = tmp$_1.next();
-          if (this.notAllOtherCommandsSucceeded_0(this.releasePlan_0.getProject_lljhqa$(element_0), null)) {
-            any$result_0 = true;
-            break any$break;
-          }
-        }
-        any$result_0 = false;
-      }
-       while (false);
-      tmp$_0 = any$result_0;
-    }
-    return tmp$_0;
-  };
-  Gui.prototype.appendJenkinsMavenReleasePluginField_0 = function ($receiver, idPrefix, command) {
-    this.fieldNextDevVersion_0($receiver, idPrefix, command, command.nextDevVersion);
-  };
-  function Gui$fieldNextDevVersion$lambda(closure$command) {
-    return function ($receiver) {
-      if (closure$command.state === CommandState.Disabled) {
-        $receiver.disabled = true;
-      }
-      return Unit;
-    };
-  }
-  Gui.prototype.fieldNextDevVersion_0 = function ($receiver, idPrefix, command, nextDevVersion) {
-    this.textFieldWithLabel_1($receiver, idPrefix + Gui$Companion_getInstance().NEXT_DEV_VERSION_SUFFIX, 'Next Dev Version', nextDevVersion, Gui$fieldNextDevVersion$lambda(command));
-  };
-  Gui.prototype.appendJenkinsMultiMavenReleasePluginFields_0 = function ($receiver, idPrefix, projectId, command) {
-    this.fieldNextDevVersion_0($receiver, idPrefix, command, command.nextDevVersion);
-    this.submodules_0($receiver, projectId);
-  };
-  function Gui$submodules$lambda(closure$submodules, this$Gui) {
-    return function ($receiver) {
-      var $receiver_0 = closure$submodules;
-      var tmp$;
-      tmp$ = $receiver_0.iterator();
-      while (tmp$.hasNext()) {
-        var element = tmp$.next();
-        var this$Gui_0 = this$Gui;
-        this$Gui_0.project_0($receiver, this$Gui_0.releasePlan_0.getProject_lljhqa$(element));
-      }
-      return Unit;
-    };
-  }
-  Gui.prototype.submodules_0 = function ($receiver, projectId) {
-    var submodules = this.releasePlan_0.getSubmodules_lljhqa$(projectId);
-    if (submodules.isEmpty())
-      return;
-    div_0($receiver, 'submodules', Gui$submodules$lambda(submodules, this));
-  };
-  function Gui$appendJenkinsUpdateDependencyField$lambda(closure$command, this$Gui) {
-    return function ($receiver) {
-      this$Gui.projectId_1($receiver, closure$command.projectId);
-      return Unit;
-    };
-  }
-  Gui.prototype.appendJenkinsUpdateDependencyField_0 = function ($receiver, idPrefix, command) {
-    this.textFieldReadOnlyWithLabel_0($receiver, idPrefix + ':groupId', 'Dependency', command.projectId.identifier, Gui$appendJenkinsUpdateDependencyField$lambda(command, this));
-  };
-  function Gui$toggle$lambda$lambda(closure$idCheckbox, closure$checked, closure$disabled) {
-    return function ($receiver) {
-      set_id($receiver, closure$idCheckbox);
-      $receiver.checked = (closure$checked && !closure$disabled);
-      $receiver.disabled = closure$disabled;
-      return Unit;
-    };
-  }
-  function Gui$toggle$lambda$lambda_0(closure$idCheckbox, closure$title, closure$disabled) {
-    return function ($receiver) {
-      set_id($receiver, closure$idCheckbox + Gui$Companion_getInstance().SLIDER_SUFFIX);
-      set_title($receiver, closure$title);
-      if (closure$disabled) {
-        set_title($receiver, Gui$Companion_getInstance().STATE_DISABLED);
-      }
-      return Unit;
-    };
-  }
-  function Gui$toggle$lambda(closure$checkboxCssClass, closure$idCheckbox, closure$checked, closure$disabled, closure$title) {
-    return function ($receiver) {
-      checkBoxInput($receiver, void 0, void 0, void 0, closure$checkboxCssClass, Gui$toggle$lambda$lambda(closure$idCheckbox, closure$checked, closure$disabled));
-      span($receiver, 'slider', Gui$toggle$lambda$lambda_0(closure$idCheckbox, closure$title, closure$disabled));
-      return Unit;
-    };
-  }
-  Gui.prototype.toggle_0 = function ($receiver, idCheckbox, title, checked, disabled, checkboxCssClass) {
-    if (checkboxCssClass === void 0)
-      checkboxCssClass = '';
-    label($receiver, 'toggle', Gui$toggle$lambda(checkboxCssClass, idCheckbox, checked, disabled, title));
-  };
   function Gui$Companion() {
     Gui$Companion_instance = this;
-    this.PIPELINE_HTML_ID_0 = 'pipeline';
     this.RELEASE_ID_HTML_ID = 'releaseId';
     this.HIDE_MESSAGES_HTML_ID = 'hideMessages';
-    this.DEACTIVATE_SUFFIX = ':deactivate';
-    this.DEACTIVATE_ALL_SUFFIX = ':deactivateAll';
-    this.SLIDER_SUFFIX = ':slider';
-    this.DISABLED_RELEASE_IN_PROGRESS = 'disabled due to release which is in progress.';
-    this.DISABLED_RELEASE_SUCCESS = 'Release successful, use a new pipeline for a new release.';
-    this.NEXT_DEV_VERSION_SUFFIX = ':nextDevVersion';
-    this.STATE_SUFFIX = ':state';
-    this.TITLE_SUFFIX = ':title';
-    this.CONTEXT_MENU_SUFFIX = ':contextMenu';
-    this.STATE_WAITING_0 = 'Wait for dependent projects to complete.';
-    this.STATE_READY = 'Ready to be queued for execution.';
-    this.STATE_READY_TO_BE_TRIGGER = 'Ready to be re-scheduled';
-    this.STATE_QUEUEING = 'Currently queueing the job.';
-    this.STATE_IN_PROGRESS = 'Job is running.';
-    this.STATE_SUCCEEDED = 'Job completed successfully.';
-    this.STATE_FAILED = 'Job completed successfully.';
-    this.STATE_DEACTIVATED_0 = 'Currently deactivated, click to activate';
-    this.STATE_DISABLED = 'Command disabled, cannot be reactivated.';
   }
-  Gui$Companion.prototype.getCommandId_xgsuvp$ = function (project, index) {
-    return this.getCommandId_o8feeo$(project.id, index);
-  };
-  Gui$Companion.prototype.getCommandId_o8feeo$ = function (projectId, index) {
-    return projectId.identifier + ':' + index;
-  };
-  Gui$Companion.prototype.getCommand_xgsuvp$ = function (project, index) {
-    return this.getCommand_o8feeo$(project.id, index);
-  };
-  Gui$Companion.prototype.getCommand_o8feeo$ = function (projectId, index) {
-    return elementById(this.getCommandId_o8feeo$(projectId, index));
-  };
-  Gui$Companion.prototype.getCommandState_o8feeo$ = function (projectId, index) {
-    var tmp$;
-    return Kotlin.isType(tmp$ = this.getCommand_o8feeo$(projectId, index).state, CommandState) ? tmp$ : throwCCE();
-  };
-  function Gui$Companion$disableUnDisableForReleaseStartAndEnd$lambda(closure$input, closure$titleElement, this$Gui$) {
-    return function (it) {
-      closure$input.oldDisabled = closure$input.disabled;
-      closure$input.disabled = true;
-      setTitleSaveOld(closure$titleElement, this$Gui$.DISABLED_RELEASE_IN_PROGRESS);
-      return Unit;
-    };
-  }
-  function Gui$Companion$disableUnDisableForReleaseStartAndEnd$lambda_0(this$Gui$, closure$titleElement, closure$input) {
-    return function (success) {
-      var tmp$;
-      if (success) {
-        closure$titleElement.title = this$Gui$.DISABLED_RELEASE_SUCCESS;
-      }
-       else {
-        closure$input.disabled = typeof (tmp$ = closure$input.oldDisabled) === 'boolean' ? tmp$ : throwCCE();
-        closure$titleElement.title = getOldTitle(closure$titleElement);
-      }
-      return Unit;
-    };
-  }
-  Gui$Companion.prototype.disableUnDisableForReleaseStartAndEnd_fj1ece$ = function (input, titleElement) {
-    Menu$Companion_getInstance().registerForReleaseStartEvent_gbr1zf$(Gui$Companion$disableUnDisableForReleaseStartAndEnd$lambda(input, titleElement, this));
-    Menu$Companion_getInstance().registerForReleaseEndEvent_y8twos$(Gui$Companion$disableUnDisableForReleaseStartAndEnd$lambda_0(this, titleElement, input));
-  };
-  Gui$Companion.prototype.changeStateOfCommandAndAddBuildUrl_85y8bj$ = function (project, index, newState, title, buildUrl) {
-    this.changeStateOfCommand_q143v3$(project, index, newState, title);
-    var commandId = this.getCommandId_xgsuvp$(project, index);
-    var id = commandId + this.STATE_SUFFIX;
-    var tmp$;
-    var elementByIdOrNull$result;
-    elementByIdOrNull$break: do {
-      var tmp$_0;
-      tmp$_0 = document.getElementById(id);
-      if (tmp$_0 == null) {
-        elementByIdOrNull$result = null;
-        break elementByIdOrNull$break;
-      }
-      var element = tmp$_0;
-      if (!Kotlin.isType(element, HTMLAnchorElement)) {
-        var message = 'element with ' + id + ' found but was wrong type.<br/>Expected type ' + get_js(getKClass(HTMLAnchorElement)).name + '<br/>Found ' + element;
-        throw IllegalArgumentException_init(message.toString());
-      }
-      elementByIdOrNull$result = element;
-    }
-     while (false);
-    tmp$ = elementByIdOrNull$result;
-    if (tmp$ == null) {
-      throw IllegalStateException_init('no element found for id ' + id + ' (expected type ' + get_js(getKClass(HTMLAnchorElement)).name + ')');
-    }
-    tmp$.href = buildUrl;
-    elementById(commandId).buildUrl = buildUrl;
-  };
-  function Gui$Companion$changeStateOfCommand$lambda(closure$newState, this$Gui$, closure$index, closure$project) {
-    return function (previousState, commandId) {
-      try {
-        return previousState.checkTransitionAllowed_m86w84$(closure$newState);
-      }
-       catch (e) {
-        if (Kotlin.isType(e, IllegalStateException)) {
-          var commandTitle = elementById(commandId + this$Gui$.TITLE_SUFFIX);
-          throw new IllegalStateException('Cannot change the state of the command ' + commandTitle.innerText + ' (' + (closure$index + 1 | 0) + '. command) ' + ('of the project ' + closure$project.id.identifier), e);
-        }
-         else
-          throw e;
-      }
-    };
-  }
-  Gui$Companion.prototype.changeStateOfCommand_q143v3$ = function (project, index, newState, title) {
-    this.changeStateOfCommand_0(project, index, newState, title, Gui$Companion$changeStateOfCommand$lambda(newState, this, index, project));
-  };
-  Gui$Companion.prototype.changeStateOfCommand_0 = function (project, index, newState, title, checkStateTransition) {
-    var tmp$;
-    var commandId = this.getCommandId_xgsuvp$(project, index);
-    var command = elementById(commandId);
-    var dynCommand = command;
-    var previousState = Kotlin.isType(tmp$ = dynCommand.state, CommandState) ? tmp$ : throwCCE();
-    dynCommand.state = checkStateTransition(previousState, commandId);
-    removeClass(command, [this.stateToCssClass_0(previousState)]);
-    addClass(command, [this.stateToCssClass_0(newState)]);
-    elementById(commandId + this.STATE_SUFFIX).title = title;
-  };
-  Gui$Companion.prototype.stateToCssClass_0 = function (state) {
-    if (Kotlin.isType(state, CommandState$Waiting))
-      return 'waiting';
-    else if (equals(state, CommandState.Ready))
-      return 'ready';
-    else if (equals(state, CommandState.ReadyToReTrigger))
-      return 'readyToReTrigger';
-    else if (equals(state, CommandState.Queueing))
-      return 'queueing';
-    else if (equals(state, CommandState.InProgress))
-      return 'inProgress';
-    else if (equals(state, CommandState.Succeeded))
-      return 'succeeded';
-    else if (Kotlin.isType(state, Object.getPrototypeOf(CommandState.Failed).constructor))
-      return 'failed';
-    else if (Kotlin.isType(state, CommandState$Deactivated))
-      return 'deactivated';
-    else if (equals(state, CommandState.Disabled))
-      return 'disabled';
-    else
-      return Kotlin.noWhenBranchMatched();
-  };
-  Gui$Companion.prototype.getReleaseState = function () {
-    var tmp$;
-    return Kotlin.isType(tmp$ = elementById(Gui$Companion_getInstance().PIPELINE_HTML_ID_0).state, ReleaseState) ? tmp$ : throwCCE();
-  };
-  Gui$Companion.prototype.changeReleaseState_g1wt0g$ = function (newState) {
-    var pipeline = elementById(Gui$Companion_getInstance().PIPELINE_HTML_ID_0);
-    pipeline.state = this.getReleaseState().checkTransitionAllowed_g1wt0g$(newState);
-  };
-  Gui$Companion.prototype.stateToTitle_0 = function (state) {
-    if (Kotlin.isType(state, CommandState$Waiting))
-      return this.STATE_WAITING_0;
-    else if (equals(state, CommandState.Ready))
-      return this.STATE_READY;
-    else if (equals(state, CommandState.ReadyToReTrigger))
-      return this.STATE_READY_TO_BE_TRIGGER;
-    else if (equals(state, CommandState.Queueing))
-      return this.STATE_QUEUEING;
-    else if (equals(state, CommandState.InProgress))
-      return this.STATE_IN_PROGRESS;
-    else if (equals(state, CommandState.Succeeded))
-      return this.STATE_SUCCEEDED;
-    else if (equals(state, CommandState.Failed))
-      return this.STATE_FAILED;
-    else if (Kotlin.isType(state, CommandState$Deactivated))
-      return this.STATE_DEACTIVATED_0;
-    else if (equals(state, CommandState.Disabled))
-      return this.STATE_DISABLED;
-    else
-      return Kotlin.noWhenBranchMatched();
-  };
   Gui$Companion.$metadata$ = {
     kind: Kind_OBJECT,
     simpleName: 'Companion',
@@ -1815,6 +2973,189 @@
     }
     $receiver.title = newTitle;
   }
+  function BaseJobExecutionDataFactory(defaultJenkinsBaseUrl, releasePlan) {
+    this.defaultJenkinsBaseUrl = defaultJenkinsBaseUrl;
+    this.releasePlan = releasePlan;
+  }
+  BaseJobExecutionDataFactory.prototype.requireConfigEntry_nhrt5l$ = function (config, key) {
+    if (!config.containsKey_11rb$(key)) {
+      var message = key.toString() + ' is not defined in settings';
+      throw IllegalArgumentException_init(message.toString());
+    }
+  };
+  BaseJobExecutionDataFactory.prototype.getConfig_udzor3$ = function (key) {
+    return this.releasePlan.getConfig_udzor3$(key);
+  };
+  BaseJobExecutionDataFactory.prototype.getJobUrl_udzor3$ = function (key) {
+    return this.getJobUrl_puj7f4$(this.defaultJenkinsBaseUrl, this.getConfig_udzor3$(key));
+  };
+  BaseJobExecutionDataFactory.prototype.getJobUrl_puj7f4$ = function (jenkinsBaseUrl, jobName) {
+    return jenkinsBaseUrl + '/job/' + jobName;
+  };
+  BaseJobExecutionDataFactory.$metadata$ = {
+    kind: Kind_CLASS,
+    simpleName: 'BaseJobExecutionDataFactory',
+    interfaces: [JobExecutionDataFactory]
+  };
+  function BuilderNumberExtractor() {
+  }
+  BuilderNumberExtractor.$metadata$ = {
+    kind: Kind_INTERFACE,
+    simpleName: 'BuilderNumberExtractor',
+    interfaces: []
+  };
+  function BuildHistoryBasedBuildNumberExtractor(authData, jobExecutionData) {
+    BuildHistoryBasedBuildNumberExtractor$Companion_getInstance();
+    this.authData_0 = authData;
+    this.jobExecutionData_0 = jobExecutionData;
+  }
+  function BuildHistoryBasedBuildNumberExtractor$extract$lambda(closure$init, this$BuildHistoryBasedBuildNumberExtractor) {
+    return function (it) {
+      return this$BuildHistoryBasedBuildNumberExtractor.searchBuildNumber_0(it, closure$init);
+    };
+  }
+  BuildHistoryBasedBuildNumberExtractor.prototype.extract = function () {
+    var headers = createHeaderWithAuthAndCrumb(this.authData_0);
+    var init = createGetRequest(headers);
+    return window.fetch(this.jobExecutionData_0.jobBaseUrl + 'api/xml?xpath=//build/number&wrapper=builds', init).then(getCallableRef('checkStatusOk', function (response) {
+      return checkStatusOk(response);
+    })).then(BuildHistoryBasedBuildNumberExtractor$extract$lambda(init, this));
+  };
+  BuildHistoryBasedBuildNumberExtractor.prototype.searchBuildNumber_0 = function (body, init) {
+    var tmp$;
+    tmp$ = BuildHistoryBasedBuildNumberExtractor$Companion_getInstance().numberRegex_0.find_905azu$(body);
+    if (tmp$ == null) {
+      throw IllegalStateException_init('no job run at ' + this.jobExecutionData_0.jobBaseUrl + ' so far, as consequence we cannot extract a build number.');
+    }
+    var matchResult = tmp$;
+    var parametersRegex = Regex_init(createParameterRegexPattern(this.jobExecutionData_0.identifyingParams));
+    return this.searchBuildNumber_1(matchResult, parametersRegex, init);
+  };
+  function BuildHistoryBasedBuildNumberExtractor$searchBuildNumber$lambda(closure$parametersRegex, closure$buildNumber, closure$matchResult, this$BuildHistoryBasedBuildNumberExtractor, closure$init) {
+    return function (body) {
+      var tmp$;
+      if (closure$parametersRegex.containsMatchIn_6bul2c$(body)) {
+        return closure$buildNumber;
+      }
+       else {
+        tmp$ = closure$matchResult.next();
+        if (tmp$ == null) {
+          throw IllegalStateException_init('No job matches the given identifying parameters at ' + this$BuildHistoryBasedBuildNumberExtractor.jobExecutionData_0.jobBaseUrl + '.' + '\n' + 'Regex used: ' + closure$parametersRegex.pattern);
+        }
+        var newMatchResult = tmp$;
+        return this$BuildHistoryBasedBuildNumberExtractor.searchBuildNumber_1(newMatchResult, closure$parametersRegex, closure$init);
+      }
+    };
+  }
+  BuildHistoryBasedBuildNumberExtractor.prototype.searchBuildNumber_1 = function (matchResult, parametersRegex, init) {
+    var buildNumber = toInt(matchResult.groupValues.get_za3lpa$(1));
+    return window.fetch(this.jobExecutionData_0.jobBaseUrl + buildNumber + '/api/xml', init).then(getCallableRef('checkStatusOk', function (response) {
+      return checkStatusOk(response);
+    })).then(BuildHistoryBasedBuildNumberExtractor$searchBuildNumber$lambda(parametersRegex, buildNumber, matchResult, this, init));
+  };
+  function BuildHistoryBasedBuildNumberExtractor$Companion() {
+    BuildHistoryBasedBuildNumberExtractor$Companion_instance = this;
+    this.numberRegex_0 = Regex_init('<number>([0-9]+)<\/number>');
+  }
+  BuildHistoryBasedBuildNumberExtractor$Companion.$metadata$ = {
+    kind: Kind_OBJECT,
+    simpleName: 'Companion',
+    interfaces: []
+  };
+  var BuildHistoryBasedBuildNumberExtractor$Companion_instance = null;
+  function BuildHistoryBasedBuildNumberExtractor$Companion_getInstance() {
+    if (BuildHistoryBasedBuildNumberExtractor$Companion_instance === null) {
+      new BuildHistoryBasedBuildNumberExtractor$Companion();
+    }
+    return BuildHistoryBasedBuildNumberExtractor$Companion_instance;
+  }
+  BuildHistoryBasedBuildNumberExtractor.$metadata$ = {
+    kind: Kind_CLASS,
+    simpleName: 'BuildHistoryBasedBuildNumberExtractor',
+    interfaces: [BuilderNumberExtractor]
+  };
+  function DryRunJobExecutionDataFactory(defaultJenkinsBaseUrl, releasePlan) {
+    BaseJobExecutionDataFactory.call(this, defaultJenkinsBaseUrl, releasePlan);
+    this.checkConfig_0(releasePlan.config);
+  }
+  DryRunJobExecutionDataFactory.prototype.checkConfig_0 = function (config) {
+    this.requireConfigEntry_nhrt5l$(config, ConfigKey.UPDATE_DEPENDENCY_JOB);
+    this.requireConfigEntry_nhrt5l$(config, ConfigKey.DRY_RUN_JOB);
+  };
+  DryRunJobExecutionDataFactory.prototype.create_awtgy4$ = function (project, command) {
+    var tmp$;
+    if (Kotlin.isType(command, JenkinsUpdateDependency))
+      tmp$ = this.triggerUpdateDependency_0(project, command);
+    else if (Kotlin.isType(command, M2ReleaseCommand))
+      tmp$ = this.triggerRelease_0(project);
+    else
+      throw UnsupportedOperationException_init('We do not (yet) support the command: ' + command);
+    return tmp$;
+  };
+  DryRunJobExecutionDataFactory.prototype.triggerUpdateDependency_0 = function (project, command) {
+    var jobName = 'dry update dependency of ' + project.id.identifier;
+    var tmp$ = this.createUpdateDependencyParams_0(project, command);
+    var params = tmp$.component1()
+    , identifyingParams = tmp$.component2();
+    return this.createJobExecutionData_0(jobName, params, identifyingParams);
+  };
+  DryRunJobExecutionDataFactory.prototype.triggerRelease_0 = function (project) {
+    var jobName = 'dry release ' + project.id.identifier;
+    var tmp$ = this.createReleaseParams_0(project);
+    var params = tmp$.component1()
+    , identifyingParams = tmp$.component2();
+    return this.createJobExecutionData_0(jobName, params, identifyingParams);
+  };
+  DryRunJobExecutionDataFactory.prototype.createUpdateDependencyParams_0 = function (project, command) {
+    var releaseVersion = '';
+    var triple = this.determineGroupIdArtifactIdAndNewVersion_0(command);
+    return to(this.createParams_0('update', project, releaseVersion, triple), mapOf([to('releaseId', this.releasePlan.releaseId), to('groupId', triple.first), to('artifactId', triple.second), to('newVersion', triple.third)]));
+  };
+  DryRunJobExecutionDataFactory.prototype.determineGroupIdArtifactIdAndNewVersion_0 = function (command) {
+    var tmp$;
+    var dependency = this.releasePlan.getProject_lljhqa$(command.projectId);
+    var dependencyMavenProjectId = Kotlin.isType(tmp$ = dependency.id, MavenProjectId) ? tmp$ : throwCCE();
+    var groupId = dependencyMavenProjectId.groupId;
+    var artifactId = dependencyMavenProjectId.artifactId;
+    var newVersion = dependency.releaseVersion + '-' + this.releasePlan.releaseId;
+    return new Triple(groupId, artifactId, newVersion);
+  };
+  DryRunJobExecutionDataFactory.prototype.createReleaseParams_0 = function (project) {
+    var releaseVersion = project.releaseVersion + '-' + this.releasePlan.releaseId;
+    return to(this.createParams_0('release', project, releaseVersion, new Triple('', '', '')), mapOf([to('releaseId', this.releasePlan.releaseId), to('releaseVersion', releaseVersion)]));
+  };
+  DryRunJobExecutionDataFactory.prototype.createParams_0 = function (commandName, project, releaseVersion, groupIdArtifactIdAndNewVersion) {
+    var groupId = groupIdArtifactIdAndNewVersion.component1()
+    , artifactId = groupIdArtifactIdAndNewVersion.component2()
+    , newVersion = groupIdArtifactIdAndNewVersion.component3();
+    var skipCheckout = this.isFirstCommandAndNotSubmodule_0(project) ? 'false' : 'true';
+    return 'command=' + commandName + ('&pathToProject=' + project.relativePath) + ('&skipCheckout=' + skipCheckout) + ('&releaseId=' + this.releasePlan.releaseId) + ('&releaseVersion=' + releaseVersion) + ('&groupId=' + groupId) + ('&artifactId=' + artifactId) + ('&newVersion=' + newVersion);
+  };
+  DryRunJobExecutionDataFactory.prototype.isFirstCommandAndNotSubmodule_0 = function (project) {
+    if (project.isSubmodule)
+      return false;
+    var tmp$, tmp$_0;
+    var index = 0;
+    tmp$ = project.commands.iterator();
+    while (tmp$.hasNext()) {
+      var item = tmp$.next();
+      var index_0 = (tmp$_0 = index, index = tmp$_0 + 1 | 0, tmp$_0);
+      var state = Pipeline$Companion_getInstance().getCommandState_o8feeo$(project.id, index_0);
+      if (state === CommandState.Succeeded || state === CommandState.Failed) {
+        return false;
+      }
+    }
+    return true;
+  };
+  DryRunJobExecutionDataFactory.prototype.createJobExecutionData_0 = function (jobName, params, identifyingParams) {
+    var jobUrl = this.getJobUrl_udzor3$(ConfigKey.DRY_RUN_JOB);
+    return JobExecutionData$Companion_getInstance().buildWithParameters_k99ke9$(jobName, jobUrl, params, identifyingParams);
+  };
+  DryRunJobExecutionDataFactory.$metadata$ = {
+    kind: Kind_CLASS,
+    simpleName: 'DryRunJobExecutionDataFactory',
+    interfaces: [BaseJobExecutionDataFactory]
+  };
   function checkStatusOk(response) {
     var tmp$;
     return Kotlin.isType(tmp$ = checkResponseIgnore(response, null), Promise) ? tmp$ : throwCCE();
@@ -1847,26 +3188,30 @@
   function createFetchInitWithCredentials() {
     var init = {};
     init.credentials = 'include';
+    init.method = 'GET';
     return init;
   }
-  function createHeaderWithAuthAndCrumb(crumbWithId, usernameToken) {
+  function createHeaderWithAuthAndCrumb(authData) {
     var headers = {};
-    addAuthentication(headers, usernameToken);
-    if (crumbWithId != null) {
-      headers[crumbWithId.id] = crumbWithId.crumb;
+    addAuthentication(headers, authData.usernameAndApiToken);
+    if (authData.crumbWithId != null) {
+      headers[authData.crumbWithId.id] = authData.crumbWithId.crumb;
     }
     return headers;
   }
-  function addAuthentication(headers, usernameToken) {
-    var base64UsernameAndToken = window.btoa(usernameToken.username + ':' + usernameToken.token);
+  function addAuthentication(headers, usernameAndApiToken) {
+    var base64UsernameAndToken = window.btoa(usernameAndApiToken.username + ':' + usernameAndApiToken.token);
     headers['Authorization'] = 'Basic ' + base64UsernameAndToken;
   }
-  var get_GET = defineInlineFunction('dep-graph-releaser-gui.ch.loewenfels.depgraph.gui.get_GET_be77oc$', function ($receiver) {
+  var get_GET = defineInlineFunction('dep-graph-releaser-gui.ch.loewenfels.depgraph.gui.jobexecution.get_GET_pcmf85$', function ($receiver) {
     return 'GET';
   });
-  var get_POST = defineInlineFunction('dep-graph-releaser-gui.ch.loewenfels.depgraph.gui.get_POST_be77oc$', function ($receiver) {
+  var get_POST = defineInlineFunction('dep-graph-releaser-gui.ch.loewenfels.depgraph.gui.jobexecution.get_POST_pcmf85$', function ($receiver) {
     return 'POST';
   });
+  function createGetRequest(headers) {
+    return createRequestInit(null, 'GET', headers);
+  }
   function createRequestInit(body, method, headers) {
     var cache = 'no-cache';
     var o = {};
@@ -1890,34 +3235,34 @@
     delete init.window;
     return init;
   }
-  function UsernameToken(username, token) {
+  function UsernameAndApiToken(username, token) {
     this.username = username;
     this.token = token;
   }
-  UsernameToken.$metadata$ = {
+  UsernameAndApiToken.$metadata$ = {
     kind: Kind_CLASS,
-    simpleName: 'UsernameToken',
+    simpleName: 'UsernameAndApiToken',
     interfaces: []
   };
-  UsernameToken.prototype.component1 = function () {
+  UsernameAndApiToken.prototype.component1 = function () {
     return this.username;
   };
-  UsernameToken.prototype.component2 = function () {
+  UsernameAndApiToken.prototype.component2 = function () {
     return this.token;
   };
-  UsernameToken.prototype.copy_puj7f4$ = function (username, token) {
-    return new UsernameToken(username === void 0 ? this.username : username, token === void 0 ? this.token : token);
+  UsernameAndApiToken.prototype.copy_puj7f4$ = function (username, token) {
+    return new UsernameAndApiToken(username === void 0 ? this.username : username, token === void 0 ? this.token : token);
   };
-  UsernameToken.prototype.toString = function () {
-    return 'UsernameToken(username=' + Kotlin.toString(this.username) + (', token=' + Kotlin.toString(this.token)) + ')';
+  UsernameAndApiToken.prototype.toString = function () {
+    return 'UsernameAndApiToken(username=' + Kotlin.toString(this.username) + (', token=' + Kotlin.toString(this.token)) + ')';
   };
-  UsernameToken.prototype.hashCode = function () {
+  UsernameAndApiToken.prototype.hashCode = function () {
     var result = 0;
     result = result * 31 + Kotlin.hashCode(this.username) | 0;
     result = result * 31 + Kotlin.hashCode(this.token) | 0;
     return result;
   };
-  UsernameToken.prototype.equals = function (other) {
+  UsernameAndApiToken.prototype.equals = function (other) {
     return this === other || (other !== null && (typeof other === 'object' && (Object.getPrototypeOf(this) === Object.getPrototypeOf(other) && (Kotlin.equals(this.username, other.username) && Kotlin.equals(this.token, other.token)))));
   };
   function CrumbWithId(id, crumb) {
@@ -1950,14 +3295,43 @@
   CrumbWithId.prototype.equals = function (other) {
     return this === other || (other !== null && (typeof other === 'object' && (Object.getPrototypeOf(this) === Object.getPrototypeOf(other) && (Kotlin.equals(this.id, other.id) && Kotlin.equals(this.crumb, other.crumb)))));
   };
-  function JenkinsJobExecutor(jenkinsUrl, usernameToken) {
-    JenkinsJobExecutor$Companion_getInstance();
-    this.jenkinsUrl_0 = jenkinsUrl;
-    this.usernameToken_0 = usernameToken;
+  function AuthData(usernameAndApiToken, crumbWithId) {
+    this.usernameAndApiToken = usernameAndApiToken;
+    this.crumbWithId = crumbWithId;
   }
-  function JenkinsJobExecutor$trigger$lambda$lambda(closure$jobName, this$JenkinsJobExecutor) {
+  AuthData.$metadata$ = {
+    kind: Kind_CLASS,
+    simpleName: 'AuthData',
+    interfaces: []
+  };
+  AuthData.prototype.component1 = function () {
+    return this.usernameAndApiToken;
+  };
+  AuthData.prototype.component2 = function () {
+    return this.crumbWithId;
+  };
+  AuthData.prototype.copy_cwtkr1$ = function (usernameAndApiToken, crumbWithId) {
+    return new AuthData(usernameAndApiToken === void 0 ? this.usernameAndApiToken : usernameAndApiToken, crumbWithId === void 0 ? this.crumbWithId : crumbWithId);
+  };
+  AuthData.prototype.toString = function () {
+    return 'AuthData(usernameAndApiToken=' + Kotlin.toString(this.usernameAndApiToken) + (', crumbWithId=' + Kotlin.toString(this.crumbWithId)) + ')';
+  };
+  AuthData.prototype.hashCode = function () {
+    var result = 0;
+    result = result * 31 + Kotlin.hashCode(this.usernameAndApiToken) | 0;
+    result = result * 31 + Kotlin.hashCode(this.crumbWithId) | 0;
+    return result;
+  };
+  AuthData.prototype.equals = function (other) {
+    return this === other || (other !== null && (typeof other === 'object' && (Object.getPrototypeOf(this) === Object.getPrototypeOf(other) && (Kotlin.equals(this.usernameAndApiToken, other.usernameAndApiToken) && Kotlin.equals(this.crumbWithId, other.crumbWithId)))));
+  };
+  function JenkinsJobExecutor(usernameTokenRegistry) {
+    JenkinsJobExecutor$Companion_getInstance();
+    this.usernameTokenRegistry_0 = usernameTokenRegistry;
+  }
+  function JenkinsJobExecutor$trigger$lambda$lambda(closure$jobExecutionData, closure$authData, this$JenkinsJobExecutor) {
     return function (response) {
-      return this$JenkinsJobExecutor.checkStatusAndExtractQueuedItemUrl_0(response, closure$jobName);
+      return this$JenkinsJobExecutor.checkStatusAndExtractQueuedItemUrl_0(response, closure$jobExecutionData, closure$authData);
     };
   }
   function JenkinsJobExecutor$trigger$lambda$lambda_0(closure$jobName) {
@@ -1965,25 +3339,24 @@
       throw new Error_0('Could not trigger the job ' + closure$jobName, it);
     };
   }
-  function JenkinsJobExecutor$trigger$lambda$lambda$lambda(closure$crumbWithId, closure$queuedItemUrl, this$JenkinsJobExecutor) {
+  function JenkinsJobExecutor$trigger$lambda$lambda$lambda(closure$nullableQueuedItemUrl, closure$authData, closure$jobExecutionData, this$JenkinsJobExecutor) {
     return function (it) {
-      return this$JenkinsJobExecutor.extractBuildNumber_0(closure$crumbWithId, closure$queuedItemUrl);
+      return this$JenkinsJobExecutor.extractBuildNumber_0(closure$nullableQueuedItemUrl, closure$authData, closure$jobExecutionData);
     };
   }
   function JenkinsJobExecutor$trigger$lambda$lambda$lambda_0(it) {
     return it;
   }
-  function JenkinsJobExecutor$trigger$lambda$lambda_1(closure$verbose, closure$jobName, closure$jobQueuedHook, closure$crumbWithId, this$JenkinsJobExecutor) {
-    return function (queuedItemUrl) {
-      if (closure$verbose) {
-        showInfo('Queued ' + closure$jobName + ' successfully, wait for execution...' + '\n' + 'Queued item URL: ' + queuedItemUrl + 'api/xml', 2000);
-      }
-      return closure$jobQueuedHook(queuedItemUrl + 'api/xml').then(JenkinsJobExecutor$trigger$lambda$lambda$lambda(closure$crumbWithId, queuedItemUrl, this$JenkinsJobExecutor)).then(JenkinsJobExecutor$trigger$lambda$lambda$lambda_0);
+  function JenkinsJobExecutor$trigger$lambda$lambda_1(closure$verbose, closure$jobName, this$JenkinsJobExecutor, closure$jobExecutionData, closure$jobQueuedHook, closure$authData) {
+    return function (nullableQueuedItemUrl) {
+      this$JenkinsJobExecutor.showInfoQueuedItemIfVerbose_0(closure$verbose, nullableQueuedItemUrl, closure$jobName);
+      var queuedItemUrl = nullableQueuedItemUrl != null ? toString(nullableQueuedItemUrl) + 'api/xml/' : closure$jobExecutionData.jobBaseUrl;
+      return closure$jobQueuedHook(queuedItemUrl).then(JenkinsJobExecutor$trigger$lambda$lambda$lambda(nullableQueuedItemUrl, closure$authData, closure$jobExecutionData, this$JenkinsJobExecutor)).then(JenkinsJobExecutor$trigger$lambda$lambda$lambda_0);
     };
   }
-  function JenkinsJobExecutor$trigger$lambda$lambda$lambda_1(closure$crumbWithId, closure$jobExecutionData, closure$buildNumber, closure$pollEverySecond, closure$maxWaitingTimeForCompletenessInSeconds, this$JenkinsJobExecutor) {
+  function JenkinsJobExecutor$trigger$lambda$lambda$lambda_1(closure$authData, closure$jobExecutionData, closure$buildNumber, closure$pollEverySecond, closure$maxWaitingTimeForCompletenessInSeconds, this$JenkinsJobExecutor) {
     return function (it) {
-      return this$JenkinsJobExecutor.pollJobForCompletion_0(closure$crumbWithId, closure$jobExecutionData.jobBaseUrl, closure$buildNumber, closure$pollEverySecond, closure$maxWaitingTimeForCompletenessInSeconds);
+      return this$JenkinsJobExecutor.pollJobForCompletion_0(closure$authData, closure$jobExecutionData.jobBaseUrl, closure$buildNumber, closure$pollEverySecond, closure$maxWaitingTimeForCompletenessInSeconds);
     };
   }
   function JenkinsJobExecutor$trigger$lambda$lambda$lambda_2(closure$buildNumber) {
@@ -1991,15 +3364,15 @@
       return to(closure$buildNumber, result);
     };
   }
-  function JenkinsJobExecutor$trigger$lambda$lambda_2(closure$verbose, closure$jobName, closure$jobStartedHook, closure$crumbWithId, closure$jobExecutionData, closure$pollEverySecond, closure$maxWaitingTimeForCompletenessInSeconds, this$JenkinsJobExecutor) {
+  function JenkinsJobExecutor$trigger$lambda$lambda_2(closure$verbose, closure$jobName, closure$jobStartedHook, closure$authData, closure$jobExecutionData, closure$pollEverySecond, closure$maxWaitingTimeForCompletenessInSeconds, this$JenkinsJobExecutor) {
     return function (buildNumber) {
       if (closure$verbose) {
         showInfo(closure$jobName + ' started with build number ' + buildNumber + ', wait for completion...', 2000);
       }
-      return closure$jobStartedHook(buildNumber).then(JenkinsJobExecutor$trigger$lambda$lambda$lambda_1(closure$crumbWithId, closure$jobExecutionData, buildNumber, closure$pollEverySecond, closure$maxWaitingTimeForCompletenessInSeconds, this$JenkinsJobExecutor)).then(JenkinsJobExecutor$trigger$lambda$lambda$lambda_2(buildNumber));
+      return closure$jobStartedHook(buildNumber).then(JenkinsJobExecutor$trigger$lambda$lambda$lambda_1(closure$authData, closure$jobExecutionData, buildNumber, closure$pollEverySecond, closure$maxWaitingTimeForCompletenessInSeconds, this$JenkinsJobExecutor)).then(JenkinsJobExecutor$trigger$lambda$lambda$lambda_2(buildNumber));
     };
   }
-  function JenkinsJobExecutor$trigger$lambda$lambda_3(closure$jobName, closure$jobExecutionData, closure$crumbWithId) {
+  function JenkinsJobExecutor$trigger$lambda$lambda_3(closure$jobName, closure$jobExecutionData, closure$authData) {
     return function (f) {
       var buildNumber = f.component1()
       , result = f.component2();
@@ -2010,106 +3383,89 @@
         var message = closure$jobName_0 + ' failed, job did not end with status ' + JenkinsJobExecutor$Companion_getInstance().SUCCESS_0 + ' but ' + result + '.' + ('\n' + 'Visit ' + closure$jobExecutionData_0.jobBaseUrl + buildNumber + ' for further information');
         throw IllegalStateException_init(message.toString());
       }
-      return to(closure$crumbWithId, buildNumber);
+      return to(closure$authData, buildNumber);
     };
   }
   function JenkinsJobExecutor$trigger$lambda(closure$jobExecutionData, this$JenkinsJobExecutor, closure$jobName, closure$verbose, closure$jobQueuedHook, closure$jobStartedHook, closure$pollEverySecond, closure$maxWaitingTimeForCompletenessInSeconds) {
-    return function (crumbWithId) {
-      var $receiver = this$JenkinsJobExecutor.triggerJob_0(crumbWithId, closure$jobExecutionData).then(JenkinsJobExecutor$trigger$lambda$lambda(closure$jobName, this$JenkinsJobExecutor)).catch(JenkinsJobExecutor$trigger$lambda$lambda_0(closure$jobName));
-      var onFulfilled = JenkinsJobExecutor$trigger$lambda$lambda_1(closure$verbose, closure$jobName, closure$jobQueuedHook, crumbWithId, this$JenkinsJobExecutor);
+    return function (authData) {
+      var $receiver = this$JenkinsJobExecutor.triggerJob_0(authData, closure$jobExecutionData).then(JenkinsJobExecutor$trigger$lambda$lambda(closure$jobExecutionData, authData, this$JenkinsJobExecutor)).catch(JenkinsJobExecutor$trigger$lambda$lambda_0(closure$jobName));
+      var onFulfilled = JenkinsJobExecutor$trigger$lambda$lambda_1(closure$verbose, closure$jobName, this$JenkinsJobExecutor, closure$jobExecutionData, closure$jobQueuedHook, authData);
       var $receiver_0 = $receiver.then(onFulfilled);
-      var onFulfilled_0 = JenkinsJobExecutor$trigger$lambda$lambda_2(closure$verbose, closure$jobName, closure$jobStartedHook, crumbWithId, closure$jobExecutionData, closure$pollEverySecond, closure$maxWaitingTimeForCompletenessInSeconds, this$JenkinsJobExecutor);
+      var onFulfilled_0 = JenkinsJobExecutor$trigger$lambda$lambda_2(closure$verbose, closure$jobName, closure$jobStartedHook, authData, closure$jobExecutionData, closure$pollEverySecond, closure$maxWaitingTimeForCompletenessInSeconds, this$JenkinsJobExecutor);
       var $receiver_1 = $receiver_0.then(onFulfilled_0);
-      var onFulfilled_1 = JenkinsJobExecutor$trigger$lambda$lambda_3(closure$jobName, closure$jobExecutionData, crumbWithId);
+      var onFulfilled_1 = JenkinsJobExecutor$trigger$lambda$lambda_3(closure$jobName, closure$jobExecutionData, authData);
       return $receiver_1.then(onFulfilled_1);
     };
   }
-  JenkinsJobExecutor.prototype.trigger_shi73r$$default = function (jobExecutionData, jobQueuedHook, jobStartedHook, pollEverySecond, maxWaitingTimeForCompletenessInSeconds, verbose) {
+  JenkinsJobExecutor.prototype.trigger_cuif7q$$default = function (jobExecutionData, jobQueuedHook, jobStartedHook, pollEverySecond, maxWaitingTimeForCompletenessInSeconds, verbose) {
     var jobName = jobExecutionData.jobName;
-    return this.issueCrumb_0(this.jenkinsUrl_0).then(JenkinsJobExecutor$trigger$lambda(jobExecutionData, this, jobName, verbose, jobQueuedHook, jobStartedHook, pollEverySecond, maxWaitingTimeForCompletenessInSeconds));
+    var jenkinsBaseUrl = jobExecutionData.getJenkinsBaseUrl();
+    var usernameToken = this.usernameTokenRegistry_0.forHostOrThrow_61zpoe$(jenkinsBaseUrl);
+    return this.issueCrumb_0(jenkinsBaseUrl, usernameToken).then(JenkinsJobExecutor$trigger$lambda(jobExecutionData, this, jobName, verbose, jobQueuedHook, jobStartedHook, pollEverySecond, maxWaitingTimeForCompletenessInSeconds));
   };
-  function JenkinsJobExecutor$checkStatusAndExtractQueuedItemUrl$lambda(closure$response, closure$jobName) {
+  function JenkinsJobExecutor$checkStatusAndExtractQueuedItemUrl$lambda(closure$jobExecutionData, closure$authData, closure$response) {
     return function (it) {
-      var tmp$;
-      tmp$ = closure$response.headers.get('Location');
-      if (tmp$ == null) {
-        throw IllegalStateException_init('Job ' + closure$jobName + ' queued but Location header not found in response of Jenkins.' + '\nHave you exposed Location with Access-Control-Expose-Headers?');
-      }
-      var queuedItemUrl = tmp$;
-      return endsWith(queuedItemUrl, '/') ? queuedItemUrl : queuedItemUrl + '/';
+      return closure$jobExecutionData.queuedItemUrlExtractor.extract_t4buzv$(closure$authData, closure$response, closure$jobExecutionData);
     };
   }
-  JenkinsJobExecutor.prototype.checkStatusAndExtractQueuedItemUrl_0 = function (response, jobName) {
-    return checkStatusOk(response).then(JenkinsJobExecutor$checkStatusAndExtractQueuedItemUrl$lambda(response, jobName));
+  JenkinsJobExecutor.prototype.checkStatusAndExtractQueuedItemUrl_0 = function (response, jobExecutionData, authData) {
+    return checkStatusOk(response).then(JenkinsJobExecutor$checkStatusAndExtractQueuedItemUrl$lambda(jobExecutionData, authData, response));
+  };
+  JenkinsJobExecutor.prototype.extractBuildNumber_0 = function (nullableQueuedItemUrl, authData, jobExecutionData) {
+    var tmp$;
+    if (nullableQueuedItemUrl != null) {
+      tmp$ = (new QueuedItemBasedBuildNumberExtractor(authData, nullableQueuedItemUrl)).extract();
+    }
+     else {
+      tmp$ = (new BuildHistoryBasedBuildNumberExtractor(authData, jobExecutionData)).extract();
+    }
+    return tmp$;
   };
   function JenkinsJobExecutor$issueCrumb$lambda(it) {
     throw new Error_0('Cannot issue a crumb', it);
   }
-  function JenkinsJobExecutor$issueCrumb$lambda_0(crumbWithId) {
-    if (crumbWithId != null) {
-      var tmp$ = split(crumbWithId, Kotlin.charArrayOf(58));
-      var id = tmp$.get_za3lpa$(0);
-      var crumb = tmp$.get_za3lpa$(1);
-      return new CrumbWithId(id, crumb);
-    }
-     else {
-      return null;
-    }
+  function JenkinsJobExecutor$issueCrumb$lambda_0(closure$usernameAndApiToken) {
+    return function (crumbWithIdString) {
+      var tmp$;
+      if (crumbWithIdString != null) {
+        var tmp$_0 = split(crumbWithIdString, Kotlin.charArrayOf(58));
+        var id = tmp$_0.get_za3lpa$(0);
+        var crumb = tmp$_0.get_za3lpa$(1);
+        tmp$ = new CrumbWithId(id, crumb);
+      }
+       else {
+        tmp$ = null;
+      }
+      var crumbWithId = tmp$;
+      return new AuthData(closure$usernameAndApiToken, crumbWithId);
+    };
   }
-  JenkinsJobExecutor.prototype.issueCrumb_0 = function (jenkinsUrl) {
-    var url = jenkinsUrl + '/crumbIssuer/api/xml?xpath=concat(//crumbRequestField,' + '"' + ':' + '"' + ',//crumb)';
-    var headers = createHeaderWithAuthAndCrumb(null, this.usernameToken_0);
-    var init = createRequestInit(null, 'GET', headers);
+  JenkinsJobExecutor.prototype.issueCrumb_0 = function (jenkinsBaseUrl, usernameAndApiToken) {
+    var url = jenkinsBaseUrl + '/crumbIssuer/api/xml?xpath=concat(//crumbRequestField,' + '"' + ':' + '"' + ',//crumb)';
+    var headers = createHeaderWithAuthAndCrumb(new AuthData(usernameAndApiToken, null));
+    var init = createGetRequest(headers);
     return window.fetch(url, init).then(getCallableRef('checkStatusOkOr404', function (response) {
       return checkStatusOkOr404(response);
-    })).catch(JenkinsJobExecutor$issueCrumb$lambda).then(JenkinsJobExecutor$issueCrumb$lambda_0);
+    })).catch(JenkinsJobExecutor$issueCrumb$lambda).then(JenkinsJobExecutor$issueCrumb$lambda_0(usernameAndApiToken));
   };
-  JenkinsJobExecutor.prototype.triggerJob_0 = function (crumbWithId, jobExecutionData) {
-    var headers = createHeaderWithAuthAndCrumb(crumbWithId, this.usernameToken_0);
+  JenkinsJobExecutor.prototype.triggerJob_0 = function (authData, jobExecutionData) {
+    var headers = createHeaderWithAuthAndCrumb(authData);
     headers['content-type'] = 'application/x-www-form-urlencoded; charset=utf-8';
     var init = createRequestInit(jobExecutionData.body, 'POST', headers);
     return window.fetch(jobExecutionData.jobTriggerUrl, init);
   };
-  function JenkinsJobExecutor$extractBuildNumber$lambda$lambda(closure$queuedItemUrl) {
-    return function (e) {
-      throw IllegalStateException_init('Could not find the build number in the returned body.' + ('\n' + 'Job URL: ' + closure$queuedItemUrl) + ('\n' + 'Regex used: ' + JenkinsJobExecutor$Companion_getInstance().numberRegex_0.pattern) + ('\n' + 'Content: ' + e.body));
-    };
-  }
-  function JenkinsJobExecutor$extractBuildNumber$lambda(closure$crumbWithId, closure$xpathUrl, closure$queuedItemUrl, this$JenkinsJobExecutor) {
-    return function () {
-      return this$JenkinsJobExecutor.pollAndExtract_x0psdq$(closure$crumbWithId, closure$xpathUrl, JenkinsJobExecutor$Companion_getInstance().numberRegex_0, JenkinsJobExecutor$extractBuildNumber$lambda$lambda(closure$queuedItemUrl));
-    };
-  }
-  function JenkinsJobExecutor$extractBuildNumber$lambda_0(it) {
-    return toInt(it);
-  }
-  JenkinsJobExecutor.prototype.extractBuildNumber_0 = function (crumbWithId, queuedItemUrl) {
-    var xpathUrl = queuedItemUrl + 'api/xml?xpath=//executable/number';
-    return sleep(400, JenkinsJobExecutor$extractBuildNumber$lambda(crumbWithId, xpathUrl, queuedItemUrl, this)).then(JenkinsJobExecutor$extractBuildNumber$lambda_0);
+  JenkinsJobExecutor.prototype.showInfoQueuedItemIfVerbose_0 = function (verbose, nullableQueuedItemUrl, jobName) {
+    if (verbose) {
+      if (nullableQueuedItemUrl != null) {
+        showInfo('Queued ' + jobName + ' successfully, wait for execution...' + '\n' + 'Queued item URL: ' + toString(nullableQueuedItemUrl) + 'api/xml', 2000);
+      }
+       else {
+        showInfo(jobName + ' is probably already running (queued item could not be found), trying to fetch execution number from Job history.', 2000);
+      }
+    }
   };
-  function JenkinsJobExecutor$pollAndExtract$lambda(closure$regex) {
-    return function (body) {
-      var matchResult = closure$regex.find_905azu$(body);
-      if (matchResult != null) {
-        return to(true, matchResult.groupValues.get_za3lpa$(1));
-      }
-       else {
-        return to(false, null);
-      }
-    };
-  }
-  function JenkinsJobExecutor$pollAndExtract$lambda_0(closure$errorHandler) {
-    return function (t) {
-      if (Kotlin.isType(t, JenkinsJobExecutor$PollException)) {
-        return closure$errorHandler(t);
-      }
-       else {
-        throw t;
-      }
-    };
-  }
-  JenkinsJobExecutor.prototype.pollAndExtract_x0psdq$ = function (crumbWithId, url, regex, errorHandler) {
-    return this.poll_0(crumbWithId, url, 0, 2, 20, JenkinsJobExecutor$pollAndExtract$lambda(regex)).catch(JenkinsJobExecutor$pollAndExtract$lambda_0(errorHandler));
+  JenkinsJobExecutor.prototype.pollAndExtract_ljfavh$ = function (authData, url, regex, errorHandler) {
+    return Poller_getInstance().pollAndExtract_ljfavh$(authData, url, regex, errorHandler);
   };
   function JenkinsJobExecutor$pollJobForCompletion$lambda$lambda(body) {
     var matchResult = JenkinsJobExecutor$Companion_getInstance().resultRegex_0.matchEntire_6bul2c$(body);
@@ -2120,75 +3476,17 @@
       return to(false, '');
     }
   }
-  function JenkinsJobExecutor$pollJobForCompletion$lambda(closure$crumbWithId, closure$jobUrl, closure$buildNumber, closure$pollEverySecond, closure$maxWaitingTimeInSeconds, this$JenkinsJobExecutor) {
+  function JenkinsJobExecutor$pollJobForCompletion$lambda(closure$authData, closure$jobUrl, closure$buildNumber, closure$pollEverySecond, closure$maxWaitingTimeInSeconds) {
     return function () {
-      return this$JenkinsJobExecutor.poll_0(closure$crumbWithId, closure$jobUrl + closure$buildNumber + '/api/xml?xpath=/*/result', 0, closure$pollEverySecond, closure$maxWaitingTimeInSeconds, JenkinsJobExecutor$pollJobForCompletion$lambda$lambda);
+      var pollData = Poller$Poller$PollData_init(closure$authData, closure$jobUrl + closure$buildNumber + '/api/xml?xpath=/*/result', closure$pollEverySecond, closure$maxWaitingTimeInSeconds, JenkinsJobExecutor$pollJobForCompletion$lambda$lambda);
+      return Poller_getInstance().poll_1vuj9e$(pollData);
     };
   }
-  JenkinsJobExecutor.prototype.pollJobForCompletion_0 = function (crumbWithId, jobUrl, buildNumber, pollEverySecond, maxWaitingTimeInSeconds) {
-    return sleep(pollEverySecond * 500 | 0, JenkinsJobExecutor$pollJobForCompletion$lambda(crumbWithId, jobUrl, buildNumber, pollEverySecond, maxWaitingTimeInSeconds, this));
-  };
-  function JenkinsJobExecutor$poll$lambda$lambda(closure$crumbWithId, closure$pollUrl, closure$numberOfTries, closure$pollEverySecond, closure$maxWaitingTimeInSeconds, closure$action, this$JenkinsJobExecutor) {
-    return function () {
-      return this$JenkinsJobExecutor.poll_0(closure$crumbWithId, closure$pollUrl, closure$numberOfTries + 1 | 0, closure$pollEverySecond, closure$maxWaitingTimeInSeconds, closure$action);
-    };
-  }
-  function JenkinsJobExecutor$poll$lambda(closure$numberOfTries, closure$pollEverySecond, closure$maxWaitingTimeInSeconds, closure$crumbWithId, closure$pollUrl, closure$action, this$JenkinsJobExecutor) {
-    return function (body) {
-      if (Kotlin.imul(closure$numberOfTries, closure$pollEverySecond) >= closure$maxWaitingTimeInSeconds) {
-        throw new JenkinsJobExecutor$PollException('Waited at least ' + closure$maxWaitingTimeInSeconds + ' seconds', body);
-      }
-      var p = sleep(closure$pollEverySecond * 1000 | 0, JenkinsJobExecutor$poll$lambda$lambda(closure$crumbWithId, closure$pollUrl, closure$numberOfTries, closure$pollEverySecond, closure$maxWaitingTimeInSeconds, closure$action, this$JenkinsJobExecutor));
-      return p;
-    };
-  }
-  function JenkinsJobExecutor$poll$lambda_0(closure$action, closure$rePoll) {
-    return function (body) {
-      var tmp$ = closure$action(body);
-      var success = tmp$.component1()
-      , result = tmp$.component2();
-      if (success) {
-        if (result == null) {
-          throw Error_init('Result was null even though success flag during polling was true, please report a bug.');
-        }
-        return result;
-      }
-       else {
-        return closure$rePoll(body);
-      }
-    };
-  }
-  function JenkinsJobExecutor$poll$lambda_1(closure$rePoll) {
-    return function (t) {
-      if (Kotlin.isType(t, Exception)) {
-        return closure$rePoll('');
-      }
-       else {
-        throw t;
-      }
-    };
-  }
-  JenkinsJobExecutor.prototype.poll_0 = function (crumbWithId, pollUrl, numberOfTries, pollEverySecond, maxWaitingTimeInSeconds, action) {
-    var headers = createHeaderWithAuthAndCrumb(crumbWithId, this.usernameToken_0);
-    var init = createRequestInit(null, 'GET', headers);
-    var rePoll = JenkinsJobExecutor$poll$lambda(numberOfTries, pollEverySecond, maxWaitingTimeInSeconds, crumbWithId, pollUrl, action, this);
-    return window.fetch(pollUrl, init).then(getCallableRef('checkStatusOk', function (response) {
-      return checkStatusOk(response);
-    })).then(JenkinsJobExecutor$poll$lambda_0(action, rePoll)).catch(JenkinsJobExecutor$poll$lambda_1(rePoll));
-  };
-  function JenkinsJobExecutor$PollException(message, body) {
-    RuntimeException_init(message, this);
-    this.body = body;
-    this.name = 'JenkinsJobExecutor$PollException';
-  }
-  JenkinsJobExecutor$PollException.$metadata$ = {
-    kind: Kind_CLASS,
-    simpleName: 'PollException',
-    interfaces: [RuntimeException]
+  JenkinsJobExecutor.prototype.pollJobForCompletion_0 = function (authData, jobUrl, buildNumber, pollEverySecond, maxWaitingTimeInSeconds) {
+    return sleep(pollEverySecond * 500 | 0, JenkinsJobExecutor$pollJobForCompletion$lambda(authData, jobUrl, buildNumber, pollEverySecond, maxWaitingTimeInSeconds));
   };
   function JenkinsJobExecutor$Companion() {
     JenkinsJobExecutor$Companion_instance = this;
-    this.numberRegex_0 = Regex_init('<number>([0-9]+)<\/number>');
     this.resultRegex_0 = Regex_init('<result>([A-Z]+)<\/result>');
     this.SUCCESS_0 = 'SUCCESS';
   }
@@ -2209,23 +3507,52 @@
     simpleName: 'JenkinsJobExecutor',
     interfaces: [JobExecutor]
   };
-  function JobExecutionData(jobName, jobBaseUrl, jobTriggerUrl, body) {
+  function createParameterRegexPattern$lambda(f) {
+    var k = f.key;
+    var v = f.value;
+    return '<parameter>[\\S\\s]*?' + ('<name>' + k + '<\/name>[' + '\\' + 'S' + '\\' + 's]*?') + ('<value>' + v + '<\/value>[' + '\\' + 'S' + '\\' + 's]*?') + '<\/parameter>[\\S\\s]*?';
+  }
+  function createParameterRegexPattern(parameters) {
+    return joinToString(parameters.entries, '[\\S\\s]*?', void 0, void 0, void 0, void 0, createParameterRegexPattern$lambda);
+  }
+  function toQueryParameters$lambda(f) {
+    var k = f.key;
+    var v = f.value;
+    return k + '=' + v;
+  }
+  function toQueryParameters(parameters) {
+    return joinToString(parameters.entries, '&', void 0, void 0, void 0, void 0, toQueryParameters$lambda);
+  }
+  function JobExecutionData(jobName, jobBaseUrl, jobTriggerUrl, body, identifyingParams, queuedItemUrlExtractor) {
     JobExecutionData$Companion_getInstance();
     this.jobName = jobName;
     this.jobBaseUrl = jobBaseUrl;
     this.jobTriggerUrl = jobTriggerUrl;
     this.body = body;
+    this.identifyingParams = identifyingParams;
+    this.queuedItemUrlExtractor = queuedItemUrlExtractor;
   }
+  JobExecutionData.prototype.getJenkinsBaseUrl = function () {
+    return substringBefore_0(this.jobBaseUrl, '/job/');
+  };
   function JobExecutionData$Companion() {
     JobExecutionData$Companion_instance = this;
   }
-  JobExecutionData$Companion.prototype.buildWithParameters_6hosri$ = function (jobName, jobBaseUrl, body) {
+  JobExecutionData$Companion.prototype.buildWithParameters_k99ke9$ = function (jobName, jobBaseUrl, body, identifyingParams) {
     var jobBaseUrlWithSlash = this.assureEndsWithSlash_0(jobBaseUrl);
-    return this.create_w74nik$(jobName, jobBaseUrlWithSlash, jobBaseUrlWithSlash + 'buildWithParameters', body);
+    var jobTriggerUrl = jobBaseUrlWithSlash + 'buildWithParameters';
+    return this.create_0(jobName, jobBaseUrlWithSlash, jobTriggerUrl, body, identifyingParams, LocationBasedQueuedItemUrlExtractor_getInstance());
   };
-  JobExecutionData$Companion.prototype.create_w74nik$ = function (jobName, jobBaseUrl, jobTriggerUrl, body) {
+  JobExecutionData$Companion.prototype.m2ReleaseSubmit_x0a6t6$ = function (jobName, jobBaseUrl, body, releaseVersion, nextDevVersion) {
     var jobBaseUrlWithSlash = this.assureEndsWithSlash_0(jobBaseUrl);
-    return new JobExecutionData(jobName, jobBaseUrlWithSlash, jobTriggerUrl, body);
+    var jobTriggerUrl = jobBaseUrlWithSlash + 'm2release/submit';
+    var identifyingParams = mapOf([to('MVN_RELEASE_VERSION', releaseVersion), to('MVN_DEV_VERSION', nextDevVersion)]);
+    var queuedItemUrlExtractor = new RestApiBasedQueuedItemUrlExtractor(identifyingParams);
+    return this.create_0(jobName, jobBaseUrlWithSlash, jobTriggerUrl, body, identifyingParams, queuedItemUrlExtractor);
+  };
+  JobExecutionData$Companion.prototype.create_0 = function (jobName, jobBaseUrl, jobTriggerUrl, body, identifyingParams, queuedItemUrlExtractor) {
+    var jobBaseUrlWithSlash = this.assureEndsWithSlash_0(jobBaseUrl);
+    return new JobExecutionData(jobName, jobBaseUrlWithSlash, jobTriggerUrl, body, identifyingParams, queuedItemUrlExtractor);
   };
   JobExecutionData$Companion.prototype.assureEndsWithSlash_0 = function (jobBaseUrl) {
     return endsWith(jobBaseUrl, '/') ? jobBaseUrl : jobBaseUrl + '/';
@@ -2259,11 +3586,17 @@
   JobExecutionData.prototype.component4 = function () {
     return this.body;
   };
-  JobExecutionData.prototype.copy_w74nik$ = function (jobName, jobBaseUrl, jobTriggerUrl, body) {
-    return new JobExecutionData(jobName === void 0 ? this.jobName : jobName, jobBaseUrl === void 0 ? this.jobBaseUrl : jobBaseUrl, jobTriggerUrl === void 0 ? this.jobTriggerUrl : jobTriggerUrl, body === void 0 ? this.body : body);
+  JobExecutionData.prototype.component5 = function () {
+    return this.identifyingParams;
+  };
+  JobExecutionData.prototype.component6 = function () {
+    return this.queuedItemUrlExtractor;
+  };
+  JobExecutionData.prototype.copy_xs099y$ = function (jobName, jobBaseUrl, jobTriggerUrl, body, identifyingParams, queuedItemUrlExtractor) {
+    return new JobExecutionData(jobName === void 0 ? this.jobName : jobName, jobBaseUrl === void 0 ? this.jobBaseUrl : jobBaseUrl, jobTriggerUrl === void 0 ? this.jobTriggerUrl : jobTriggerUrl, body === void 0 ? this.body : body, identifyingParams === void 0 ? this.identifyingParams : identifyingParams, queuedItemUrlExtractor === void 0 ? this.queuedItemUrlExtractor : queuedItemUrlExtractor);
   };
   JobExecutionData.prototype.toString = function () {
-    return 'JobExecutionData(jobName=' + Kotlin.toString(this.jobName) + (', jobBaseUrl=' + Kotlin.toString(this.jobBaseUrl)) + (', jobTriggerUrl=' + Kotlin.toString(this.jobTriggerUrl)) + (', body=' + Kotlin.toString(this.body)) + ')';
+    return 'JobExecutionData(jobName=' + Kotlin.toString(this.jobName) + (', jobBaseUrl=' + Kotlin.toString(this.jobBaseUrl)) + (', jobTriggerUrl=' + Kotlin.toString(this.jobTriggerUrl)) + (', body=' + Kotlin.toString(this.body)) + (', identifyingParams=' + Kotlin.toString(this.identifyingParams)) + (', queuedItemUrlExtractor=' + Kotlin.toString(this.queuedItemUrlExtractor)) + ')';
   };
   JobExecutionData.prototype.hashCode = function () {
     var result = 0;
@@ -2271,10 +3604,12 @@
     result = result * 31 + Kotlin.hashCode(this.jobBaseUrl) | 0;
     result = result * 31 + Kotlin.hashCode(this.jobTriggerUrl) | 0;
     result = result * 31 + Kotlin.hashCode(this.body) | 0;
+    result = result * 31 + Kotlin.hashCode(this.identifyingParams) | 0;
+    result = result * 31 + Kotlin.hashCode(this.queuedItemUrlExtractor) | 0;
     return result;
   };
   JobExecutionData.prototype.equals = function (other) {
-    return this === other || (other !== null && (typeof other === 'object' && (Object.getPrototypeOf(this) === Object.getPrototypeOf(other) && (Kotlin.equals(this.jobName, other.jobName) && Kotlin.equals(this.jobBaseUrl, other.jobBaseUrl) && Kotlin.equals(this.jobTriggerUrl, other.jobTriggerUrl) && Kotlin.equals(this.body, other.body)))));
+    return this === other || (other !== null && (typeof other === 'object' && (Object.getPrototypeOf(this) === Object.getPrototypeOf(other) && (Kotlin.equals(this.jobName, other.jobName) && Kotlin.equals(this.jobBaseUrl, other.jobBaseUrl) && Kotlin.equals(this.jobTriggerUrl, other.jobTriggerUrl) && Kotlin.equals(this.body, other.body) && Kotlin.equals(this.identifyingParams, other.identifyingParams) && Kotlin.equals(this.queuedItemUrlExtractor, other.queuedItemUrlExtractor)))));
   };
   function JobExecutionDataFactory() {
   }
@@ -2285,509 +3620,611 @@
   };
   function JobExecutor() {
   }
-  JobExecutor.prototype.trigger_shi73r$ = function (jobExecutionData, jobQueuedHook, jobStartedHook, pollEverySecond, maxWaitingTimeForCompletenessInSeconds, verbose, callback$default) {
+  JobExecutor.prototype.trigger_cuif7q$ = function (jobExecutionData, jobQueuedHook, jobStartedHook, pollEverySecond, maxWaitingTimeForCompletenessInSeconds, verbose, callback$default) {
     if (verbose === void 0)
       verbose = true;
-    return callback$default ? callback$default(jobExecutionData, jobQueuedHook, jobStartedHook, pollEverySecond, maxWaitingTimeForCompletenessInSeconds, verbose) : this.trigger_shi73r$$default(jobExecutionData, jobQueuedHook, jobStartedHook, pollEverySecond, maxWaitingTimeForCompletenessInSeconds, verbose);
+    return callback$default ? callback$default(jobExecutionData, jobQueuedHook, jobStartedHook, pollEverySecond, maxWaitingTimeForCompletenessInSeconds, verbose) : this.trigger_cuif7q$$default(jobExecutionData, jobQueuedHook, jobStartedHook, pollEverySecond, maxWaitingTimeForCompletenessInSeconds, verbose);
   };
   JobExecutor.$metadata$ = {
     kind: Kind_INTERFACE,
     simpleName: 'JobExecutor',
     interfaces: []
   };
-  function Menu() {
-    Menu$Companion_getInstance();
-    this.publisher_0 = null;
-    this.typeOfRun_0 = Menu$TypeOfRun$SIMULATION_getInstance();
-    this.addClickEventListenerIfNotDeactivatedNorDisabled_0(this.settingsButton_0, Menu_init$lambda);
-    addClickEventListener(elementById('config:close'), void 0, Menu_init$lambda_0);
+  function LocationBasedQueuedItemUrlExtractor() {
+    LocationBasedQueuedItemUrlExtractor_instance = this;
   }
-  Object.defineProperty(Menu.prototype, 'userButton_0', {
-    get: function () {
-      return elementById('user');
-    }
-  });
-  Object.defineProperty(Menu.prototype, 'userIcon_0', {
-    get: function () {
-      return elementById('user.icon');
-    }
-  });
-  Object.defineProperty(Menu.prototype, 'userName_0', {
-    get: function () {
-      return elementById('user.name');
-    }
-  });
-  Object.defineProperty(Menu.prototype, 'saveButton_0', {
-    get: function () {
-      return elementById('save');
-    }
-  });
-  Object.defineProperty(Menu.prototype, 'downloadButton_0', {
-    get: function () {
-      return elementById('download');
-    }
-  });
-  Object.defineProperty(Menu.prototype, 'dryRunButton_0', {
-    get: function () {
-      return elementById('dryRun');
-    }
-  });
-  Object.defineProperty(Menu.prototype, 'releaseButton_0', {
-    get: function () {
-      return elementById('release');
-    }
-  });
-  Object.defineProperty(Menu.prototype, 'exploreButton_0', {
-    get: function () {
-      return elementById('explore');
-    }
-  });
-  Object.defineProperty(Menu.prototype, 'settingsButton_0', {
-    get: function () {
-      return elementById('settings');
-    }
-  });
-  Menu.prototype.disableButtonsDueToNoPublishUrl = function () {
-    var titleButtons = 'You need to specify publishJob if you want to use other functionality than Download and Explore Release Order.';
-    this.disableButtonsDueToNoAuth_puj7f4$(titleButtons, titleButtons + ('\n' + 'An example: ' + window.location + '&publishJob=jobUrl') + '\nwhere you need to replace jobUrl accordingly.');
-  };
-  Menu.prototype.disableButtonsDueToNoAuth_puj7f4$ = function (titleButtons, info) {
-    showInfo(info);
-    this.userButton_0.title = titleButtons;
-    addClass(this.userButton_0, [Menu$Companion_getInstance().DEACTIVATED_0]);
-    this.userName_0.innerText = 'Anonymous';
-    this.userIcon_0.innerText = 'error';
+  LocationBasedQueuedItemUrlExtractor.prototype.extract_t4buzv$ = function (authData, response, jobExecutionData) {
     var tmp$;
-    tmp$ = listOf([this.saveButton_0, this.dryRunButton_0, this.releaseButton_0]).iterator();
+    tmp$ = response.headers.get('Location');
+    if (tmp$ == null) {
+      throw IllegalStateException_init('Job ' + jobExecutionData.jobName + ' queued but Location header not found in response of Jenkins.' + '\nHave you exposed Location with Access-Control-Expose-Headers?');
+    }
+    return Promise.resolve(tmp$);
+  };
+  LocationBasedQueuedItemUrlExtractor.$metadata$ = {
+    kind: Kind_OBJECT,
+    simpleName: 'LocationBasedQueuedItemUrlExtractor',
+    interfaces: [QueuedItemUrlExtractor]
+  };
+  var LocationBasedQueuedItemUrlExtractor_instance = null;
+  function LocationBasedQueuedItemUrlExtractor_getInstance() {
+    if (LocationBasedQueuedItemUrlExtractor_instance === null) {
+      new LocationBasedQueuedItemUrlExtractor();
+    }
+    return LocationBasedQueuedItemUrlExtractor_instance;
+  }
+  function Poller() {
+    Poller_instance = this;
+  }
+  function Poller$pollAndExtract$lambda(closure$regex) {
+    return function (body) {
+      var matchResult = closure$regex.find_905azu$(body);
+      if (matchResult != null) {
+        return to(true, matchResult.groupValues.get_za3lpa$(1));
+      }
+       else {
+        return to(false, null);
+      }
+    };
+  }
+  function Poller$pollAndExtract$lambda_0(closure$errorHandler) {
+    return function (t) {
+      if (Kotlin.isType(t, PollException)) {
+        return closure$errorHandler(t);
+      }
+       else {
+        throw t;
+      }
+    };
+  }
+  Poller.prototype.pollAndExtract_ljfavh$ = function (authData, url, regex, errorHandler) {
+    var pollData = Poller$Poller$PollData_init(authData, url, 2, 20, Poller$pollAndExtract$lambda(regex));
+    return this.poll_1vuj9e$(pollData).catch(Poller$pollAndExtract$lambda_0(errorHandler));
+  };
+  function Poller$poll$lambda$lambda(closure$pollData, this$Poller) {
+    return function () {
+      return this$Poller.poll_1vuj9e$(closure$pollData.newWithIncreasedNumberOfTimes());
+    };
+  }
+  function Poller$poll$lambda(closure$pollData, this$Poller) {
+    return function (body) {
+      if (Kotlin.imul(closure$pollData.numberOfTries, closure$pollData.pollEverySecond) >= closure$pollData.maxWaitingTimeInSeconds) {
+        throw new PollException('Waited at least ' + closure$pollData.maxWaitingTimeInSeconds + ' seconds', body);
+      }
+      var p = sleep(closure$pollData.pollEverySecond * 1000 | 0, Poller$poll$lambda$lambda(closure$pollData, this$Poller));
+      return p;
+    };
+  }
+  function Poller$poll$lambda_0(closure$pollData, closure$rePoll) {
+    return function (body) {
+      var tmp$ = closure$pollData.action(body);
+      var success = tmp$.component1()
+      , result = tmp$.component2();
+      if (success) {
+        if (result == null) {
+          throw Error_init('Result was null even though success flag during polling was true, please report a bug.');
+        }
+        return result;
+      }
+       else {
+        return closure$rePoll(body);
+      }
+    };
+  }
+  function Poller$poll$lambda_1(closure$rePoll) {
+    return function (t) {
+      if (Kotlin.isType(t, Exception)) {
+        return closure$rePoll('');
+      }
+       else {
+        throw t;
+      }
+    };
+  }
+  Poller.prototype.poll_1vuj9e$ = function (pollData) {
+    var headers = createHeaderWithAuthAndCrumb(pollData.authData);
+    var init = createGetRequest(headers);
+    var rePoll = Poller$poll$lambda(pollData, this);
+    return window.fetch(pollData.pollUrl, init).then(getCallableRef('checkStatusOk', function (response) {
+      return checkStatusOk(response);
+    })).then(Poller$poll$lambda_0(pollData, rePoll)).catch(Poller$poll$lambda_1(rePoll));
+  };
+  function Poller$PollData(authData, pollUrl, pollEverySecond, maxWaitingTimeInSeconds, action, numberOfTries) {
+    this.authData = authData;
+    this.pollUrl = pollUrl;
+    this.pollEverySecond = pollEverySecond;
+    this.maxWaitingTimeInSeconds = maxWaitingTimeInSeconds;
+    this.action = action;
+    this.numberOfTries = numberOfTries;
+  }
+  Poller$PollData.prototype.newWithIncreasedNumberOfTimes = function () {
+    return new Poller$PollData(this.authData, this.pollUrl, this.pollEverySecond, this.maxWaitingTimeInSeconds, this.action, this.numberOfTries + 1 | 0);
+  };
+  Poller$PollData.$metadata$ = {
+    kind: Kind_CLASS,
+    simpleName: 'PollData',
+    interfaces: []
+  };
+  function Poller$Poller$PollData_init(authData, pollUrl, pollEverySecond, maxWaitingTimeInSeconds, action, $this) {
+    $this = $this || Object.create(Poller$PollData.prototype);
+    Poller$PollData.call($this, authData, pollUrl, pollEverySecond, maxWaitingTimeInSeconds, action, 0);
+    return $this;
+  }
+  Poller$PollData.prototype.component1 = function () {
+    return this.authData;
+  };
+  Poller$PollData.prototype.component2 = function () {
+    return this.pollUrl;
+  };
+  Poller$PollData.prototype.component3 = function () {
+    return this.pollEverySecond;
+  };
+  Poller$PollData.prototype.component4 = function () {
+    return this.maxWaitingTimeInSeconds;
+  };
+  Poller$PollData.prototype.component5 = function () {
+    return this.action;
+  };
+  Poller$PollData.prototype.component6 = function () {
+    return this.numberOfTries;
+  };
+  Poller$PollData.prototype.copy_z81843$ = function (authData, pollUrl, pollEverySecond, maxWaitingTimeInSeconds, action, numberOfTries) {
+    return new Poller$PollData(authData === void 0 ? this.authData : authData, pollUrl === void 0 ? this.pollUrl : pollUrl, pollEverySecond === void 0 ? this.pollEverySecond : pollEverySecond, maxWaitingTimeInSeconds === void 0 ? this.maxWaitingTimeInSeconds : maxWaitingTimeInSeconds, action === void 0 ? this.action : action, numberOfTries === void 0 ? this.numberOfTries : numberOfTries);
+  };
+  Poller$PollData.prototype.toString = function () {
+    return 'PollData(authData=' + Kotlin.toString(this.authData) + (', pollUrl=' + Kotlin.toString(this.pollUrl)) + (', pollEverySecond=' + Kotlin.toString(this.pollEverySecond)) + (', maxWaitingTimeInSeconds=' + Kotlin.toString(this.maxWaitingTimeInSeconds)) + (', action=' + Kotlin.toString(this.action)) + (', numberOfTries=' + Kotlin.toString(this.numberOfTries)) + ')';
+  };
+  Poller$PollData.prototype.hashCode = function () {
+    var result = 0;
+    result = result * 31 + Kotlin.hashCode(this.authData) | 0;
+    result = result * 31 + Kotlin.hashCode(this.pollUrl) | 0;
+    result = result * 31 + Kotlin.hashCode(this.pollEverySecond) | 0;
+    result = result * 31 + Kotlin.hashCode(this.maxWaitingTimeInSeconds) | 0;
+    result = result * 31 + Kotlin.hashCode(this.action) | 0;
+    result = result * 31 + Kotlin.hashCode(this.numberOfTries) | 0;
+    return result;
+  };
+  Poller$PollData.prototype.equals = function (other) {
+    return this === other || (other !== null && (typeof other === 'object' && (Object.getPrototypeOf(this) === Object.getPrototypeOf(other) && (Kotlin.equals(this.authData, other.authData) && Kotlin.equals(this.pollUrl, other.pollUrl) && Kotlin.equals(this.pollEverySecond, other.pollEverySecond) && Kotlin.equals(this.maxWaitingTimeInSeconds, other.maxWaitingTimeInSeconds) && Kotlin.equals(this.action, other.action) && Kotlin.equals(this.numberOfTries, other.numberOfTries)))));
+  };
+  Poller.$metadata$ = {
+    kind: Kind_OBJECT,
+    simpleName: 'Poller',
+    interfaces: []
+  };
+  var Poller_instance = null;
+  function Poller_getInstance() {
+    if (Poller_instance === null) {
+      new Poller();
+    }
+    return Poller_instance;
+  }
+  function PollException(message, body) {
+    RuntimeException_init_0(message, this);
+    this.body = body;
+    this.name = 'PollException';
+  }
+  PollException.$metadata$ = {
+    kind: Kind_CLASS,
+    simpleName: 'PollException',
+    interfaces: [RuntimeException]
+  };
+  function QueuedItemBasedBuildNumberExtractor(authData, queuedItemUrl) {
+    QueuedItemBasedBuildNumberExtractor$Companion_getInstance();
+    this.authData_0 = authData;
+    this.queuedItemUrl_0 = queuedItemUrl;
+  }
+  function QueuedItemBasedBuildNumberExtractor$extract$lambda$lambda(this$QueuedItemBasedBuildNumberExtractor) {
+    return function (e) {
+      throw IllegalStateException_init('Could not find the build number in the returned body.' + ('\n' + 'Job URL: ' + this$QueuedItemBasedBuildNumberExtractor.queuedItemUrl_0) + ('\n' + 'Regex used: ' + QueuedItemBasedBuildNumberExtractor$Companion_getInstance().numberRegex_0.pattern) + ('\n' + 'Content: ' + e.body));
+    };
+  }
+  function QueuedItemBasedBuildNumberExtractor$extract$lambda(this$QueuedItemBasedBuildNumberExtractor, closure$xpathUrl) {
+    return function () {
+      return Poller_getInstance().pollAndExtract_ljfavh$(this$QueuedItemBasedBuildNumberExtractor.authData_0, closure$xpathUrl, QueuedItemBasedBuildNumberExtractor$Companion_getInstance().numberRegex_0, QueuedItemBasedBuildNumberExtractor$extract$lambda$lambda(this$QueuedItemBasedBuildNumberExtractor));
+    };
+  }
+  function QueuedItemBasedBuildNumberExtractor$extract$lambda_0(it) {
+    return toInt(it);
+  }
+  QueuedItemBasedBuildNumberExtractor.prototype.extract = function () {
+    var xpathUrl = this.queuedItemUrl_0 + 'api/xml?xpath=//executable/number';
+    return sleep(200, QueuedItemBasedBuildNumberExtractor$extract$lambda(this, xpathUrl)).then(QueuedItemBasedBuildNumberExtractor$extract$lambda_0);
+  };
+  function QueuedItemBasedBuildNumberExtractor$Companion() {
+    QueuedItemBasedBuildNumberExtractor$Companion_instance = this;
+    this.numberRegex_0 = Regex_init('<number>([0-9]+)<\/number>');
+  }
+  QueuedItemBasedBuildNumberExtractor$Companion.$metadata$ = {
+    kind: Kind_OBJECT,
+    simpleName: 'Companion',
+    interfaces: []
+  };
+  var QueuedItemBasedBuildNumberExtractor$Companion_instance = null;
+  function QueuedItemBasedBuildNumberExtractor$Companion_getInstance() {
+    if (QueuedItemBasedBuildNumberExtractor$Companion_instance === null) {
+      new QueuedItemBasedBuildNumberExtractor$Companion();
+    }
+    return QueuedItemBasedBuildNumberExtractor$Companion_instance;
+  }
+  QueuedItemBasedBuildNumberExtractor.$metadata$ = {
+    kind: Kind_CLASS,
+    simpleName: 'QueuedItemBasedBuildNumberExtractor',
+    interfaces: [BuilderNumberExtractor]
+  };
+  function QueuedItemUrlExtractor() {
+  }
+  QueuedItemUrlExtractor.$metadata$ = {
+    kind: Kind_INTERFACE,
+    simpleName: 'QueuedItemUrlExtractor',
+    interfaces: []
+  };
+  function ReleaseJobExecutionDataFactory(defaultJenkinsBaseUrl, releasePlan) {
+    BaseJobExecutionDataFactory.call(this, defaultJenkinsBaseUrl, releasePlan);
+    this.remoteRegex_0 = null;
+    this.regexParametersList_0 = null;
+    this.jobMapping_0 = null;
+    this.checkConfig_0(releasePlan.config);
+    this.remoteRegex_0 = parseRemoteRegex(releasePlan);
+    this.regexParametersList_0 = parseRegexParameters(releasePlan);
+    this.jobMapping_0 = this.parseJobMapping_0();
+  }
+  ReleaseJobExecutionDataFactory.prototype.checkConfig_0 = function (config) {
+    this.requireConfigEntry_nhrt5l$(config, ConfigKey.UPDATE_DEPENDENCY_JOB);
+    this.requireConfigEntry_nhrt5l$(config, ConfigKey.REMOTE_REGEX);
+    this.requireConfigEntry_nhrt5l$(config, ConfigKey.COMMIT_PREFIX);
+  };
+  var mapCapacity = Kotlin.kotlin.collections.mapCapacity_za3lpa$;
+  var coerceAtLeast = Kotlin.kotlin.ranges.coerceAtLeast_dqglrj$;
+  var LinkedHashMap_init = Kotlin.kotlin.collections.LinkedHashMap_init_xf5xz2$;
+  ReleaseJobExecutionDataFactory.prototype.parseJobMapping_0 = function () {
+    var mapping = this.getConfig_udzor3$(ConfigKey.JOB_MAPPING);
+    var $receiver = split_0(mapping, ['|']);
+    var capacity = coerceAtLeast(mapCapacity(collectionSizeOrDefault($receiver, 10)), 16);
+    var destination = LinkedHashMap_init(capacity);
+    var tmp$;
+    tmp$ = $receiver.iterator();
     while (tmp$.hasNext()) {
       var element = tmp$.next();
-      this.disable_0(element, titleButtons);
-    }
-  };
-  Menu.prototype.setVerifiedUser_puj7f4$ = function (username, name) {
-    this.userName_0.innerText = name;
-    this.userIcon_0.innerText = 'verified_user';
-    this.userButton_0.title = 'Logged in as ' + username;
-    removeClass(this.userButton_0, [Menu$Companion_getInstance().DEACTIVATED_0]);
-  };
-  function Menu$initDependencies$lambda(this$Menu) {
-    return function (it) {
-      if (!hasClass(this$Menu.saveButton_0, Menu$Companion_getInstance().DEACTIVATED_0)) {
-        return 'Your changes will be lost, sure you want to leave the page?';
+      var index = indexOf(element, 61);
+      if (!(index > 0)) {
+        var message = 'At least one mapping has no groupId and artifactId defined.' + '\n' + 'jobMapping: ' + mapping;
+        throw IllegalStateException_init(message.toString());
       }
-       else if (Gui$Companion_getInstance().getReleaseState() === ReleaseState.InProgress) {
-        return 'You might lose state changes if you navigate away from this page, sure you want to proceed?';
+      var groupIdAndArtifactId = element.substring(0, index);
+      if (!contains_0(groupIdAndArtifactId, 58)) {
+        var message_0 = 'At least one groupId and artifactId is erroneous, does not contain a `:`.' + '\n' + 'jobMapping: ' + mapping;
+        throw IllegalStateException_init(message_0.toString());
+      }
+      var startIndex = index + 1 | 0;
+      var jobName = element.substring(startIndex);
+      if (!!isBlank(jobName)) {
+        var message_1 = 'At least one groupId and artifactId is erroneous, has no job name defined.' + '\n' + 'jobMapping: ' + mapping;
+        throw IllegalStateException_init(message_1.toString());
+      }
+      var pair = to(groupIdAndArtifactId, jobName);
+      destination.put_xwzc9p$(pair.first, pair.second);
+    }
+    return destination;
+  };
+  ReleaseJobExecutionDataFactory.prototype.getJobName_0 = function (project) {
+    var tmp$, tmp$_0;
+    var mavenProjectId = Kotlin.isType(tmp$ = project.id, MavenProjectId) ? tmp$ : throwCCE();
+    return (tmp$_0 = this.jobMapping_0.get_11rb$(mavenProjectId.identifier)) != null ? tmp$_0 : mavenProjectId.artifactId;
+  };
+  ReleaseJobExecutionDataFactory.prototype.create_awtgy4$ = function (project, command) {
+    var tmp$;
+    if (Kotlin.isType(command, JenkinsUpdateDependency))
+      tmp$ = this.triggerUpdateDependency_0(project, command);
+    else if (Kotlin.isType(command, M2ReleaseCommand))
+      tmp$ = this.triggerRelease_0(project, command);
+    else
+      throw UnsupportedOperationException_init('We do not (yet) support the command: ' + command);
+    return tmp$;
+  };
+  ReleaseJobExecutionDataFactory.prototype.triggerUpdateDependency_0 = function (project, command) {
+    var jobUrl = this.getJobUrl_udzor3$(ConfigKey.UPDATE_DEPENDENCY_JOB);
+    var jobName = 'update dependency of ' + project.id.identifier;
+    var params = this.createUpdateDependencyParams_0(project, command);
+    return JobExecutionData$Companion_getInstance().buildWithParameters_k99ke9$(jobName, jobUrl, toQueryParameters(params), params);
+  };
+  ReleaseJobExecutionDataFactory.prototype.createUpdateDependencyParams_0 = function (project, command) {
+    var tmp$;
+    var dependency = this.releasePlan.getProject_lljhqa$(command.projectId);
+    var dependencyMavenProjectId = Kotlin.isType(tmp$ = dependency.id, MavenProjectId) ? tmp$ : throwCCE();
+    return mapOf([to('pathToProject', project.relativePath), to('&groupId', dependencyMavenProjectId.groupId), to('&artifactId', dependencyMavenProjectId.artifactId), to('&newVersion', dependency.releaseVersion), to('&commitPrefix', this.getConfig_udzor3$(ConfigKey.COMMIT_PREFIX)), to('&releaseId', this.releasePlan.releaseId)]);
+  };
+  ReleaseJobExecutionDataFactory.prototype.triggerRelease_0 = function (project, command) {
+    var tmp$, tmp$_0;
+    var mavenProjectId = Kotlin.isType(tmp$ = project.id, MavenProjectId) ? tmp$ : throwCCE();
+    var jobName = this.getJobName_0(project);
+    var jenkinsBaseUrl = (tmp$_0 = firstOrNull(this.getMatchingEntries_0(this.remoteRegex_0, mavenProjectId))) != null ? tmp$_0 : this.defaultJenkinsBaseUrl;
+    var jobUrl = this.getJobUrl_puj7f4$(jenkinsBaseUrl, jobName);
+    var relevantParams = this.getMatchingEntries_0(this.regexParametersList_0, mavenProjectId);
+    var parameters = new StringBuilder();
+    var itr = asIterable(relevantParams).iterator();
+    if (itr.hasNext()) {
+      var tmp$_1 = split(itr.next(), Kotlin.charArrayOf(61));
+      var name = tmp$_1.get_za3lpa$(0);
+      var value = tmp$_1.get_za3lpa$(1);
+      parameters.append_gw00v9$('{' + '"' + 'name' + '"' + ':' + '"' + name + '"' + ',' + '"' + 'value' + '"' + ':' + '"' + value + '"' + '}');
+    }
+    while (itr.hasNext()) {
+      parameters.append_gw00v9$(',');
+      var tmp$_2 = split(itr.next(), Kotlin.charArrayOf(61));
+      var name_0 = tmp$_2.get_za3lpa$(0);
+      var value_0 = tmp$_2.get_za3lpa$(1);
+      parameters.append_gw00v9$('{' + '"' + 'name' + '"' + ':' + '"' + name_0 + '"' + ',' + '"' + 'value' + '"' + ':' + '"' + value_0 + '"' + '}');
+    }
+    var params = 'releaseVersion=' + project.releaseVersion + ('&developmentVersion=' + command.nextDevVersion) + ('&json={parameter=[' + parameters + ']}');
+    return JobExecutionData$Companion_getInstance().m2ReleaseSubmit_x0a6t6$('release ' + project.id.identifier, jobUrl, params, project.releaseVersion, command.nextDevVersion);
+  };
+  function ReleaseJobExecutionDataFactory$getMatchingEntries$lambda(closure$mavenProjectId) {
+    return function (f) {
+      var regex = f.component1();
+      return regex.matches_6bul2c$(closure$mavenProjectId.identifier);
+    };
+  }
+  function ReleaseJobExecutionDataFactory$getMatchingEntries$lambda_0(it) {
+    return it.second;
+  }
+  ReleaseJobExecutionDataFactory.prototype.getMatchingEntries_0 = function (regex, mavenProjectId) {
+    return map(filter(asSequence(regex), ReleaseJobExecutionDataFactory$getMatchingEntries$lambda(mavenProjectId)), ReleaseJobExecutionDataFactory$getMatchingEntries$lambda_0);
+  };
+  ReleaseJobExecutionDataFactory.$metadata$ = {
+    kind: Kind_CLASS,
+    simpleName: 'ReleaseJobExecutionDataFactory',
+    interfaces: [BaseJobExecutionDataFactory]
+  };
+  function RestApiBasedQueuedItemUrlExtractor(identifyingParams) {
+    this.identifyingParams_0 = identifyingParams;
+  }
+  function RestApiBasedQueuedItemUrlExtractor$extract$lambda(closure$paramsIdentification, closure$jobName, closure$jenkinsBaseUrl) {
+    return function (body) {
+      var queuedItemRegex = Regex_init('<item>[\\S\\s]*?' + closure$paramsIdentification + ('<task>[' + '\\' + 'S' + '\\' + 's]*?<name>' + closure$jobName + '<\/name>[' + '\\' + 'S' + '\\' + 's]*?<\/task>[' + '\\' + 'S' + '\\' + 's]*?') + '<url>([^<]+)<\/url>[\\S\\s]*?' + '<\/item>');
+      var matchResult = queuedItemRegex.find_905azu$(body);
+      if (matchResult != null) {
+        return closure$jenkinsBaseUrl + '/' + matchResult.groupValues.get_za3lpa$(1);
       }
        else {
         return null;
       }
     };
   }
-  Menu.prototype.initDependencies_xts1bw$ = function (releasePlan, downloader, dependencies, modifiableJson) {
-    if (dependencies != null) {
-      this.publisher_0 = dependencies.publisher;
-    }
-    window.onbeforeunload = Menu$initDependencies$lambda(this);
-    this.initSaveAndDownloadButton_0(downloader, dependencies);
-    this.initRunButtons_0(releasePlan, dependencies, modifiableJson);
-    switch (releasePlan.state.name) {
-      case 'Ready':
-        break;
-      case 'InProgress':
-        Menu$Companion_getInstance().dispatchReleaseStart_0();
-        break;
-      case 'Failed':
-      case 'Succeeded':
-        Menu$Companion_getInstance().dispatchReleaseStart_0();
-        Menu$Companion_getInstance().dispatchReleaseEnd_0(releasePlan.state === ReleaseState.Succeeded);
-        break;
-    }
+  RestApiBasedQueuedItemUrlExtractor.prototype.extract_t4buzv$ = function (authData, response, jobExecutionData) {
+    var jenkinsBaseUrl = substringBefore_0(jobExecutionData.jobBaseUrl, '/job/');
+    var t = substringAfter(jobExecutionData.jobBaseUrl, '/job/');
+    var jobName = endsWith(t, '/') ? substringBeforeLast(t, '/') : t;
+    var headers = createHeaderWithAuthAndCrumb(authData);
+    var init = createGetRequest(headers);
+    var paramsIdentification = createParameterRegexPattern(this.identifyingParams_0);
+    return window.fetch(jenkinsBaseUrl + '/queue/api/xml', init).then(getCallableRef('checkStatusOk', function (response) {
+      return checkStatusOk(response);
+    })).then(RestApiBasedQueuedItemUrlExtractor$extract$lambda(paramsIdentification, jobName, jenkinsBaseUrl));
   };
-  function Menu$initSaveAndDownloadButton$lambda$lambda(this$Menu) {
+  RestApiBasedQueuedItemUrlExtractor.$metadata$ = {
+    kind: Kind_CLASS,
+    simpleName: 'RestApiBasedQueuedItemUrlExtractor',
+    interfaces: [QueuedItemUrlExtractor]
+  };
+  function SimulatingJobExecutor() {
+    this.count_0 = 0;
+  }
+  SimulatingJobExecutor.prototype.pollAndExtract_ljfavh$ = function (authData, url, regex, errorHandler) {
+    return Promise.resolve('simulation-only.json');
+  };
+  function SimulatingJobExecutor$trigger$lambda(closure$jobQueuedHook, closure$jobExecutionData, closure$jobName, this$SimulatingJobExecutor) {
+    return function () {
+      closure$jobQueuedHook(closure$jobExecutionData.jobBaseUrl + 'queuingUrl');
+      return this$SimulatingJobExecutor.informIfStepWiseAndNotPublish_0('job ' + closure$jobName + ' queued', closure$jobName);
+    };
+  }
+  function SimulatingJobExecutor$trigger$lambda$lambda(closure$jobStartedHook, closure$jobName, this$SimulatingJobExecutor) {
+    return function () {
+      closure$jobStartedHook(100);
+      return this$SimulatingJobExecutor.informIfStepWiseAndNotPublish_0('job ' + closure$jobName + ' started', closure$jobName);
+    };
+  }
+  function SimulatingJobExecutor$trigger$lambda_0(closure$jobStartedHook, closure$jobName, this$SimulatingJobExecutor) {
     return function (it) {
-      this$Menu.deactivateSaveButton_0();
-      return Unit;
+      return sleep(waitBetweenSteps, SimulatingJobExecutor$trigger$lambda$lambda(closure$jobStartedHook, closure$jobName, this$SimulatingJobExecutor));
     };
   }
-  function Menu$initSaveAndDownloadButton$lambda(closure$dependencies, this$Menu) {
-    return function () {
-      return this$Menu.save_g760o8$(closure$dependencies.jenkinsJobExecutor, true).then(Menu$initSaveAndDownloadButton$lambda$lambda(this$Menu));
-    };
-  }
-  function Menu$initSaveAndDownloadButton$lambda_0(closure$downloader) {
-    return function () {
-      closure$downloader.download();
-      return Unit;
-    };
-  }
-  Menu.prototype.initSaveAndDownloadButton_0 = function (downloader, dependencies) {
-    this.deactivateSaveButton_0();
-    if (dependencies != null) {
-      this.addClickEventListenerIfNotDeactivatedNorDisabled_0(this.saveButton_0, Menu$initSaveAndDownloadButton$lambda(dependencies, this));
-    }
-    this.downloadButton_0.title = 'Download the release.json';
-    removeClass(this.downloadButton_0, [Menu$Companion_getInstance().DEACTIVATED_0]);
-    this.addClickEventListenerIfNotDeactivatedNorDisabled_0(this.downloadButton_0, Menu$initSaveAndDownloadButton$lambda_0(downloader));
-  };
-  function Menu$initRunButtons$lambda(this$Menu, closure$releasePlan, closure$dependencies) {
-    return function () {
-      this$Menu.typeOfRun_0 = Menu$TypeOfRun$DRY_RUN_getInstance();
-      return this$Menu.triggerRelease_0(closure$releasePlan, closure$dependencies, closure$dependencies.jenkinsJobExecutor, closure$dependencies.dryRunExecutionDataFactory);
-    };
-  }
-  function Menu$initRunButtons$lambda_0(this$Menu, closure$releasePlan, closure$dependencies) {
-    return function () {
-      this$Menu.typeOfRun_0 = Menu$TypeOfRun$RELEASE_getInstance();
-      return this$Menu.triggerRelease_0(closure$releasePlan, closure$dependencies, closure$dependencies.jenkinsJobExecutor, closure$dependencies.releaseJobExecutionDataFactory);
-    };
-  }
-  function Menu$initRunButtons$lambda$lambda(closure$dependencies, this$Menu) {
-    return function (it) {
-      this$Menu.publisher_0 = closure$dependencies != null ? closure$dependencies.publisher : null;
-      return Unit;
-    };
-  }
-  function Menu$initRunButtons$lambda_1(this$Menu, closure$nonNullDependencies, closure$releasePlan, closure$dependencies) {
-    return function () {
-      this$Menu.typeOfRun_0 = Menu$TypeOfRun$SIMULATION_getInstance();
-      this$Menu.publisher_0 = closure$nonNullDependencies.publisher;
-      return finally_0(this$Menu.triggerRelease_0(closure$releasePlan, closure$nonNullDependencies, closure$nonNullDependencies.simulatingJobExecutor, closure$nonNullDependencies.releaseJobExecutionDataFactory), Menu$initRunButtons$lambda$lambda(closure$dependencies, this$Menu));
-    };
-  }
-  function Menu$initRunButtons$lambda_2(this$Menu) {
-    return function (it) {
-      var tmp$;
-      tmp$ = listOf([this$Menu.dryRunButton_0, this$Menu.releaseButton_0, this$Menu.exploreButton_0]).iterator();
-      while (tmp$.hasNext()) {
-        var element = tmp$.next();
-        addClass(element, [Menu$Companion_getInstance().DISABLED_0]);
-        element.title = Gui$Companion_getInstance().DISABLED_RELEASE_IN_PROGRESS;
-      }
-      return Unit;
-    };
-  }
-  function Menu$initRunButtons$lambda_3(this$Menu) {
-    return function (success) {
-      var tmp$;
-      if (success) {
-        var tmp$_0;
-        tmp$_0 = listOf([this$Menu.dryRunButton_0, this$Menu.releaseButton_0, this$Menu.exploreButton_0]).iterator();
-        while (tmp$_0.hasNext()) {
-          var element = tmp$_0.next();
-          element.title = Gui$Companion_getInstance().DISABLED_RELEASE_SUCCESS;
-        }
-        showSuccess('Release ended successfully :) you can now close the window.' + '\nUse a new pipeline for a new release.' + '\nPlease report a bug in case some job failed without us noticing it.');
-      }
-       else {
-        showError('Release ended with failure :(' + '\nAt least one job failed. Check errors, fix them and then you can re-trigger the failed jobs, the pipeline respectively, by clicking on the release button.' + '\n(You might have to delete git tags and remove artifacts if they have already been created).');
-        switch (this$Menu.typeOfRun_0.name) {
-          case 'SIMULATION':
-            tmp$ = new Triple('Explore Release Order', this$Menu.exploreButton_0, elementById('explore:text'));
-            break;
-          case 'DRY_RUN':
-            tmp$ = new Triple('Dry Run', this$Menu.dryRunButton_0, elementById('dryRun:text'));
-            break;
-          case 'RELEASE':
-            tmp$ = new Triple('Release', this$Menu.releaseButton_0, elementById('release:text'));
-            break;
-          default:tmp$ = Kotlin.noWhenBranchMatched();
-            break;
-        }
-        var tmp$_1 = tmp$;
-        var processName = tmp$_1.component1()
-        , button = tmp$_1.component2()
-        , buttonText = tmp$_1.component3();
-        buttonText.innerText = 'Re-trigger failed Jobs';
-        button.title = 'Continue with the ' + processName + ' process by re-triggering previously failed jobs.';
-        removeClass(button, [Menu$Companion_getInstance().DISABLED_0]);
-      }
-      return Unit;
-    };
-  }
-  Menu.prototype.initRunButtons_0 = function (releasePlan, dependencies, modifiableJson) {
-    if (dependencies != null) {
-      this.activateDryRunButton_0();
-      this.addClickEventListenerIfNotDeactivatedNorDisabled_0(this.dryRunButton_0, Menu$initRunButtons$lambda(this, releasePlan, dependencies));
-      this.activateReleaseButton_0();
-      this.addClickEventListenerIfNotDeactivatedNorDisabled_0(this.releaseButton_0, Menu$initRunButtons$lambda_0(this, releasePlan, dependencies));
-    }
-    this.activateExploreButton_0();
-    var jenkinsUrl = 'https://github.com/loewenfels/';
-    var nonNullDependencies = dependencies != null ? dependencies : ensureNotNull(App$Companion_getInstance().createDependencies_km5731$(jenkinsUrl, 'https://github.com/loewenfels/dgr-publisher/', new UsernameToken('test', 'test'), modifiableJson, releasePlan, this));
-    this.addClickEventListenerIfNotDeactivatedNorDisabled_0(this.exploreButton_0, Menu$initRunButtons$lambda_1(this, nonNullDependencies, releasePlan, dependencies));
-    Menu$Companion_getInstance().registerForReleaseStartEvent_gbr1zf$(Menu$initRunButtons$lambda_2(this));
-    Menu$Companion_getInstance().registerForReleaseEndEvent_y8twos$(Menu$initRunButtons$lambda_3(this));
-  };
-  function Menu$triggerRelease$lambda(result) {
-    Menu$Companion_getInstance().dispatchReleaseEnd_0(result);
-    return Unit;
-  }
-  function Menu$triggerRelease$lambda_0(t) {
-    Menu$Companion_getInstance().dispatchReleaseEnd_0(false);
-    throw t;
-  }
-  Menu.prototype.triggerRelease_0 = function (releasePlan, dependencies, jobExecutor, jobExecutionDataFactory) {
-    if (Gui$Companion_getInstance().getReleaseState() === ReleaseState.Failed) {
-      this.turnFailedIntoReTrigger_0(releasePlan);
-    }
-    Menu$Companion_getInstance().dispatchReleaseStart_0();
-    return dependencies.releaser.release_x3u2bj$(jobExecutor, jobExecutionDataFactory).then(Menu$triggerRelease$lambda, Menu$triggerRelease$lambda_0);
-  };
-  Menu.prototype.turnFailedIntoReTrigger_0 = function (releasePlan) {
-    var $receiver = releasePlan.iterator();
-    while ($receiver.hasNext()) {
-      var element = $receiver.next();
-      var tmp$, tmp$_0;
-      var index = 0;
-      tmp$ = element.commands.iterator();
-      while (tmp$.hasNext()) {
-        var item = tmp$.next();
-        var index_0 = (tmp$_0 = index, index = tmp$_0 + 1 | 0, tmp$_0);
-        var commandState = Gui$Companion_getInstance().getCommandState_o8feeo$(element.id, index_0);
-        if (commandState === CommandState.Failed) {
-          Gui$Companion_getInstance().changeStateOfCommand_q143v3$(element, index_0, CommandState.ReadyToReTrigger, Gui$Companion_getInstance().STATE_READY_TO_BE_TRIGGER);
-        }
-      }
-    }
-  };
-  function Menu$addClickEventListenerIfNotDeactivatedNorDisabled$lambda(this$addClickEventListenerIfNotDeactivatedNorDisabled, closure$action) {
-    return function (it) {
-      if (hasClass(this$addClickEventListenerIfNotDeactivatedNorDisabled, Menu$Companion_getInstance().DEACTIVATED_0) || hasClass(this$addClickEventListenerIfNotDeactivatedNorDisabled, Menu$Companion_getInstance().DISABLED_0))
-        return Unit;
-      return closure$action();
-    };
-  }
-  Menu.prototype.addClickEventListenerIfNotDeactivatedNorDisabled_0 = function ($receiver, action) {
-    addClickEventListener($receiver, void 0, Menu$addClickEventListenerIfNotDeactivatedNorDisabled$lambda($receiver, action));
-  };
-  Menu.prototype.disable_0 = function ($receiver, reason) {
-    addClass($receiver, [Menu$Companion_getInstance().DISABLED_0]);
-    $receiver.title = reason;
-  };
-  Menu.prototype.isDisabled_0 = function ($receiver) {
-    return hasClass($receiver, Menu$Companion_getInstance().DISABLED_0);
-  };
-  Menu.prototype.deactivate_0 = function ($receiver, reason) {
-    if (this.isDisabled_0(this.saveButton_0))
-      return;
-    addClass($receiver, [Menu$Companion_getInstance().DEACTIVATED_0]);
-    setTitleSaveOld($receiver, reason);
-  };
-  Menu.prototype.deactivateSaveButton_0 = function () {
-    this.deactivate_0(this.saveButton_0, 'Nothing to save, no changes were made');
-    var tmp$;
-    tmp$ = listOf([this.dryRunButton_0, this.releaseButton_0, this.exploreButton_0]).iterator();
-    while (tmp$.hasNext()) {
-      var element = tmp$.next();
-      var oldTitle = getOldTitleOrNull(element);
-      if (oldTitle != null) {
-        element.title = oldTitle;
-        removeClass(element, [Menu$Companion_getInstance().DEACTIVATED_0]);
-      }
-    }
-  };
-  Menu.prototype.activateSaveButton = function () {
-    if (this.isDisabled_0(this.saveButton_0))
-      return;
-    removeClass(this.saveButton_0, [Menu$Companion_getInstance().DEACTIVATED_0]);
-    this.saveButton_0.title = 'Publish changed json file and change location';
-    var saveFirst = 'You need to save your changes first.';
-    var tmp$;
-    tmp$ = listOf([this.dryRunButton_0, this.releaseButton_0, this.exploreButton_0]).iterator();
-    while (tmp$.hasNext()) {
-      var element = tmp$.next();
-      this.deactivate_0(element, saveFirst);
-    }
-  };
-  Menu.prototype.activateDryRunButton_0 = function () {
-    if (this.isDisabled_0(this.dryRunButton_0))
-      return;
-    removeClass(this.dryRunButton_0, [Menu$Companion_getInstance().DEACTIVATED_0]);
-    this.dryRunButton_0.title = 'Start a dry run based on this release plan (no commit will be made, no artifact deployed etc.).';
-  };
-  Menu.prototype.activateReleaseButton_0 = function () {
-    if (this.isDisabled_0(this.releaseButton_0))
-      return;
-    removeClass(this.releaseButton_0, [Menu$Companion_getInstance().DEACTIVATED_0]);
-    this.releaseButton_0.title = 'Start a release based on this release plan.';
-  };
-  Menu.prototype.activateExploreButton_0 = function () {
-    if (this.isDisabled_0(this.exploreButton_0))
-      return;
-    removeClass(this.exploreButton_0, [Menu$Companion_getInstance().DEACTIVATED_0]);
-    this.exploreButton_0.title = 'See in which order the projects are build, actual order may vary due to unequal execution time.';
-  };
-  function Menu$save$lambda(it) {
+  function SimulatingJobExecutor$trigger$lambda$lambda$lambda(it) {
     return true;
   }
-  Menu.prototype.save_g760o8$ = function (jobExecutor, verbose) {
+  function SimulatingJobExecutor$trigger$lambda$lambda_0(this$SimulatingJobExecutor, closure$jobName) {
+    return function () {
+      this$SimulatingJobExecutor.count_0 = this$SimulatingJobExecutor.count_0 + 1 | 0;
+      if (this$SimulatingJobExecutor.count_0 > failAfterSteps) {
+        if (!false) {
+          var this$SimulatingJobExecutor_0 = this$SimulatingJobExecutor;
+          var closure$jobName_0 = closure$jobName;
+          this$SimulatingJobExecutor_0.count_0 = -3;
+          var message = 'simulating a failure for ' + closure$jobName_0;
+          throw IllegalStateException_init(message.toString());
+        }
+      }
+      return this$SimulatingJobExecutor.informIfStepWise_0('job ' + closure$jobName + ' ended').then(SimulatingJobExecutor$trigger$lambda$lambda$lambda);
+    };
+  }
+  function SimulatingJobExecutor$trigger$lambda_1(this$SimulatingJobExecutor, closure$jobName) {
+    return function (it) {
+      return sleep(waitBetweenSteps, SimulatingJobExecutor$trigger$lambda$lambda_0(this$SimulatingJobExecutor, closure$jobName));
+    };
+  }
+  function SimulatingJobExecutor$trigger$lambda_2(it) {
+    return to(new AuthData(new UsernameAndApiToken('simulating-user', 'random-apitoken'), new CrumbWithId('Jenkins-Crumb', 'onlySimulation')), 100);
+  }
+  SimulatingJobExecutor.prototype.trigger_cuif7q$$default = function (jobExecutionData, jobQueuedHook, jobStartedHook, pollEverySecond, maxWaitingTimeForCompletenessInSeconds, verbose) {
+    var jobName = jobExecutionData.jobName;
+    return sleep(100, SimulatingJobExecutor$trigger$lambda(jobQueuedHook, jobExecutionData, jobName, this)).then(SimulatingJobExecutor$trigger$lambda_0(jobStartedHook, jobName, this)).then(SimulatingJobExecutor$trigger$lambda_1(this, jobName)).then(SimulatingJobExecutor$trigger$lambda_2);
+  };
+  SimulatingJobExecutor.prototype.informIfStepWiseAndNotPublish_0 = function (msg, jobName) {
     var tmp$;
-    var publisher = this.publisher_0;
-    if (publisher == null) {
-      this.deactivateSaveButton_0();
-      showThrowableAndThrow(IllegalStateException_init('Save button should not be activate if no publish job url was specified.\nPlease report a bug.'));
-    }
-    var changed = publisher.applyChanges();
-    if (changed) {
-      var publishId = getTextField(Gui$Companion_getInstance().RELEASE_ID_HTML_ID).value;
-      var newFileName = 'release-' + publishId;
-      tmp$ = publisher.publish_lkprpu$(newFileName, verbose, jobExecutor).then(Menu$save$lambda);
+    if (!startsWith(jobName, 'publish')) {
+      tmp$ = this.informIfStepWise_0(msg);
     }
      else {
-      if (verbose)
-        showInfo('Seems like all changes have been reverted manually. Will not save anything.');
-      this.deactivateSaveButton_0();
-      tmp$ = Promise.resolve(false);
+      tmp$ = Promise.resolve(Unit);
     }
     return tmp$;
   };
-  function Menu$Companion() {
-    Menu$Companion_instance = this;
-    this.DEACTIVATED_0 = 'deactivated';
-    this.DISABLED_0 = 'disabled';
-    this.EVENT_RELEASE_START_0 = 'release.start';
-    this.EVENT_RELEASE_END_0 = 'release.end';
+  SimulatingJobExecutor.prototype.informIfStepWise_0 = function (msg) {
+    var tmp$;
+    if (stepWise) {
+      tmp$ = showAlert(msg);
+    }
+     else {
+      tmp$ = Promise.resolve(Unit);
+    }
+    return tmp$;
+  };
+  SimulatingJobExecutor.$metadata$ = {
+    kind: Kind_CLASS,
+    simpleName: 'SimulatingJobExecutor',
+    interfaces: [JobExecutor]
+  };
+  function UrlWithSlashAtTheEnd(url) {
+    UrlWithSlashAtTheEnd$Companion_getInstance();
+    this.url = url;
   }
-  Menu$Companion.prototype.registerForReleaseStartEvent_gbr1zf$ = function (callback) {
-    elementById('menu').addEventListener(Menu$Companion_getInstance().EVENT_RELEASE_START_0, callback);
+  UrlWithSlashAtTheEnd.prototype.plus_61zpoe$ = function (s) {
+    return this.url + s;
   };
-  function Menu$Companion$registerForReleaseEndEvent$lambda(closure$callback) {
-    return function (e) {
-      var tmp$, tmp$_0;
-      var customEvent = Kotlin.isType(tmp$ = e, CustomEvent) ? tmp$ : throwCCE();
-      var success = typeof (tmp$_0 = customEvent.detail) === 'boolean' ? tmp$_0 : throwCCE();
-      closure$callback(success);
-      return Unit;
-    };
+  UrlWithSlashAtTheEnd.prototype.toString = function () {
+    return this.url;
+  };
+  function UrlWithSlashAtTheEnd$Companion() {
+    UrlWithSlashAtTheEnd$Companion_instance = this;
   }
-  Menu$Companion.prototype.registerForReleaseEndEvent_y8twos$ = function (callback) {
-    elementById('menu').addEventListener(Menu$Companion_getInstance().EVENT_RELEASE_END_0, Menu$Companion$registerForReleaseEndEvent$lambda(callback));
+  UrlWithSlashAtTheEnd$Companion.prototype.create_61zpoe$ = function (url) {
+    return new UrlWithSlashAtTheEnd(endsWith(url, '/') ? url : url + '/');
   };
-  Menu$Companion.prototype.dispatchReleaseStart_0 = function () {
-    elementById('menu').dispatchEvent(new Event(this.EVENT_RELEASE_START_0));
-  };
-  Menu$Companion.prototype.dispatchReleaseEnd_0 = function (success) {
-    var tmp$ = elementById('menu');
-    var tmp$_0 = this.EVENT_RELEASE_END_0;
-    var o = {};
-    o['detail'] = success;
-    o['bubbles'] = false;
-    o['cancelable'] = false;
-    o['composed'] = false;
-    tmp$.dispatchEvent(new CustomEvent(tmp$_0, o));
-  };
-  Menu$Companion.$metadata$ = {
+  UrlWithSlashAtTheEnd$Companion.$metadata$ = {
     kind: Kind_OBJECT,
     simpleName: 'Companion',
     interfaces: []
   };
-  var Menu$Companion_instance = null;
-  function Menu$Companion_getInstance() {
-    if (Menu$Companion_instance === null) {
-      new Menu$Companion();
+  var UrlWithSlashAtTheEnd$Companion_instance = null;
+  function UrlWithSlashAtTheEnd$Companion_getInstance() {
+    if (UrlWithSlashAtTheEnd$Companion_instance === null) {
+      new UrlWithSlashAtTheEnd$Companion();
     }
-    return Menu$Companion_instance;
+    return UrlWithSlashAtTheEnd$Companion_instance;
   }
-  function Menu$Dependencies(publisher, releaser, jenkinsJobExecutor, simulatingJobExecutor, releaseJobExecutionDataFactory, dryRunExecutionDataFactory) {
-    this.publisher = publisher;
-    this.releaser = releaser;
-    this.jenkinsJobExecutor = jenkinsJobExecutor;
-    this.simulatingJobExecutor = simulatingJobExecutor;
-    this.releaseJobExecutionDataFactory = releaseJobExecutionDataFactory;
-    this.dryRunExecutionDataFactory = dryRunExecutionDataFactory;
-  }
-  Menu$Dependencies.$metadata$ = {
+  UrlWithSlashAtTheEnd.$metadata$ = {
     kind: Kind_CLASS,
-    simpleName: 'Dependencies',
+    simpleName: 'UrlWithSlashAtTheEnd',
     interfaces: []
   };
-  function Menu$TypeOfRun(name, ordinal) {
-    Enum.call(this);
-    this.name$ = name;
-    this.ordinal$ = ordinal;
+  UrlWithSlashAtTheEnd.prototype.component1 = function () {
+    return this.url;
+  };
+  UrlWithSlashAtTheEnd.prototype.copy_61zpoe$ = function (url) {
+    return new UrlWithSlashAtTheEnd(url === void 0 ? this.url : url);
+  };
+  UrlWithSlashAtTheEnd.prototype.hashCode = function () {
+    var result = 0;
+    result = result * 31 + Kotlin.hashCode(this.url) | 0;
+    return result;
+  };
+  UrlWithSlashAtTheEnd.prototype.equals = function (other) {
+    return this === other || (other !== null && (typeof other === 'object' && (Object.getPrototypeOf(this) === Object.getPrototypeOf(other) && Kotlin.equals(this.url, other.url))));
+  };
+  function UsernameTokenRegistry() {
+    UsernameTokenRegistry_instance = this;
+    this.fullNameRegex_0 = Regex_init('<input[^>]+name="_\\.fullName"[^>]+value="([^"]+)"');
+    this.apiTokenRegex_0 = Regex_init('<input[^>]+name="_\\.apiToken"[^>]+value="([^"]+)"');
+    this.usernameRegex_0 = Regex_init('<a[^>]+href="[^"]*/user/([^"]+)"');
+    this.usernameTokens_0 = HashMap_init();
   }
-  function Menu$TypeOfRun_initFields() {
-    Menu$TypeOfRun_initFields = function () {
+  UsernameTokenRegistry.prototype.forHostOrThrow_61zpoe$ = function (jenkinsBaseUrl) {
+    var tmp$;
+    tmp$ = this.forHost_61zpoe$(jenkinsBaseUrl);
+    if (tmp$ == null) {
+      throw IllegalStateException_init('could not find usernameAndApiToken for ' + jenkinsBaseUrl);
+    }
+    return tmp$;
+  };
+  UsernameTokenRegistry.prototype.forHost_61zpoe$ = function (jenkinsBaseUrl) {
+    return this.usernameTokens_0.get_11rb$(this.urlWithoutEndingSlash_0(jenkinsBaseUrl));
+  };
+  UsernameTokenRegistry.prototype.urlWithoutEndingSlash_0 = function (jenkinsBaseUrl) {
+    var tmp$;
+    if (endsWith(jenkinsBaseUrl, '/')) {
+      var endIndex = jenkinsBaseUrl.length - 1 | 0;
+      tmp$ = jenkinsBaseUrl.substring(0, endIndex);
+    }
+     else {
+      tmp$ = jenkinsBaseUrl;
+    }
+    return tmp$;
+  };
+  UsernameTokenRegistry.prototype.register_61zpoe$ = function (jenkinsBaseUrl) {
+    return this.retrieveUserAndApiTokenAndSaveToken_0(jenkinsBaseUrl);
+  };
+  function UsernameTokenRegistry$retrieveUserAndApiTokenAndSaveToken$lambda(closure$urlWithoutSlash) {
+    return function (t) {
+      showThrowable(new Error_0('Could not retrieve user and API token for ' + closure$urlWithoutSlash, t));
+      return null;
     };
-    Menu$TypeOfRun$SIMULATION_instance = new Menu$TypeOfRun('SIMULATION', 0);
-    Menu$TypeOfRun$DRY_RUN_instance = new Menu$TypeOfRun('DRY_RUN', 1);
-    Menu$TypeOfRun$RELEASE_instance = new Menu$TypeOfRun('RELEASE', 2);
   }
-  var Menu$TypeOfRun$SIMULATION_instance;
-  function Menu$TypeOfRun$SIMULATION_getInstance() {
-    Menu$TypeOfRun_initFields();
-    return Menu$TypeOfRun$SIMULATION_instance;
+  function UsernameTokenRegistry$retrieveUserAndApiTokenAndSaveToken$lambda_0(this$UsernameTokenRegistry, closure$urlWithoutSlash) {
+    return function (body) {
+      if (body == null) {
+        return null;
+      }
+       else {
+        var tmp$ = this$UsernameTokenRegistry.extractNameAndApiToken_0(body);
+        var username = tmp$.component1()
+        , name = tmp$.component2()
+        , apiToken = tmp$.component3();
+        var usernameToken = new UsernameAndApiToken(username, apiToken);
+        var $receiver = this$UsernameTokenRegistry.usernameTokens_0;
+        var key = closure$urlWithoutSlash;
+        $receiver.put_xwzc9p$(key, usernameToken);
+        return to(name, usernameToken);
+      }
+    };
   }
-  var Menu$TypeOfRun$DRY_RUN_instance;
-  function Menu$TypeOfRun$DRY_RUN_getInstance() {
-    Menu$TypeOfRun_initFields();
-    return Menu$TypeOfRun$DRY_RUN_instance;
-  }
-  var Menu$TypeOfRun$RELEASE_instance;
-  function Menu$TypeOfRun$RELEASE_getInstance() {
-    Menu$TypeOfRun_initFields();
-    return Menu$TypeOfRun$RELEASE_instance;
-  }
-  Menu$TypeOfRun.$metadata$ = {
-    kind: Kind_CLASS,
-    simpleName: 'TypeOfRun',
-    interfaces: [Enum]
+  UsernameTokenRegistry.prototype.retrieveUserAndApiTokenAndSaveToken_0 = function (jenkinsBaseUrl) {
+    var urlWithoutSlash = this.urlWithoutEndingSlash_0(jenkinsBaseUrl);
+    return window.fetch(urlWithoutSlash + '/me/configure', createFetchInitWithCredentials()).then(getCallableRef('checkStatusOkOr403', function (response) {
+      return checkStatusOkOr403(response);
+    })).catch(UsernameTokenRegistry$retrieveUserAndApiTokenAndSaveToken$lambda(urlWithoutSlash)).then(UsernameTokenRegistry$retrieveUserAndApiTokenAndSaveToken$lambda_0(this, urlWithoutSlash));
   };
-  function Menu$TypeOfRun$values() {
-    return [Menu$TypeOfRun$SIMULATION_getInstance(), Menu$TypeOfRun$DRY_RUN_getInstance(), Menu$TypeOfRun$RELEASE_getInstance()];
-  }
-  Menu$TypeOfRun.values = Menu$TypeOfRun$values;
-  function Menu$TypeOfRun$valueOf(name) {
-    switch (name) {
-      case 'SIMULATION':
-        return Menu$TypeOfRun$SIMULATION_getInstance();
-      case 'DRY_RUN':
-        return Menu$TypeOfRun$DRY_RUN_getInstance();
-      case 'RELEASE':
-        return Menu$TypeOfRun$RELEASE_getInstance();
-      default:throwISE('No enum constant ch.loewenfels.depgraph.gui.Menu.TypeOfRun.' + name);
+  UsernameTokenRegistry.prototype.extractNameAndApiToken_0 = function (body) {
+    var tmp$, tmp$_0, tmp$_1;
+    tmp$ = this.usernameRegex_0.find_905azu$(body);
+    if (tmp$ == null) {
+      throw IllegalStateException_init('Could not find username');
     }
-  }
-  Menu$TypeOfRun.valueOf_61zpoe$ = Menu$TypeOfRun$valueOf;
-  function Menu_init$lambda() {
-    toggleClass(elementById('config'), 'active');
-    return Unit;
-  }
-  function Menu_init$lambda_0(it) {
-    return removeClass(elementById('config'), ['active']);
-  }
-  Menu.$metadata$ = {
-    kind: Kind_CLASS,
-    simpleName: 'Menu',
+    var usernameMatch = tmp$;
+    tmp$_0 = this.fullNameRegex_0.find_905azu$(body);
+    if (tmp$_0 == null) {
+      throw IllegalStateException_init("Could not find user's name");
+    }
+    var fullNameMatch = tmp$_0;
+    tmp$_1 = this.apiTokenRegex_0.find_905azu$(body);
+    if (tmp$_1 == null) {
+      throw IllegalStateException_init('Could not find API token');
+    }
+    var apiTokenMatch = tmp$_1;
+    return new Triple(usernameMatch.groupValues.get_za3lpa$(1), fullNameMatch.groupValues.get_za3lpa$(1), apiTokenMatch.groupValues.get_za3lpa$(1));
+  };
+  UsernameTokenRegistry.$metadata$ = {
+    kind: Kind_OBJECT,
+    simpleName: 'UsernameTokenRegistry',
     interfaces: []
   };
-  function ModifiableJson(json) {
-    this._json_0 = json;
-  }
-  Object.defineProperty(ModifiableJson.prototype, 'json', {
-    get: function () {
-      return this._json_0;
-    },
-    set: function (value) {
-      this._json_0 = value;
+  var UsernameTokenRegistry_instance = null;
+  function UsernameTokenRegistry_getInstance() {
+    if (UsernameTokenRegistry_instance === null) {
+      new UsernameTokenRegistry();
     }
-  });
-  ModifiableJson.prototype.applyChanges = function () {
-    var tmp$ = ChangeApplier_getInstance().createReleasePlanJsonWithChanges_61zpoe$(this.json);
-    var changed = tmp$.component1()
-    , newJson = tmp$.component2();
-    this.json = newJson;
-    return changed;
-  };
-  ModifiableJson.prototype.getJsonWithAppliedChanges = function () {
-    var newJson = ChangeApplier_getInstance().createReleasePlanJsonWithChanges_61zpoe$(this.json).component2();
-    return newJson;
-  };
-  ModifiableJson.$metadata$ = {
-    kind: Kind_CLASS,
-    simpleName: 'ModifiableJson',
-    interfaces: []
-  };
+    return UsernameTokenRegistry_instance;
+  }
   var msgCounter;
   function showStatus(message) {
     elementById('status').innerText = message;
@@ -2849,7 +4286,7 @@
       set_id($receiver, msgId);
       span($receiver, 'close', showMessageOfType$lambda$lambda(msgId));
       i($receiver, 'material-icons', showMessageOfType$lambda$lambda_0(closure$icon));
-      div_0($receiver, 'text', showMessageOfType$lambda$lambda_1(closure$message));
+      div($receiver, 'text', showMessageOfType$lambda$lambda_1(closure$message));
       if (closure$autoCloseAfterMs != null) {
         window.setTimeout(showMessageOfType$lambda$lambda_2(msgId), closure$autoCloseAfterMs);
       }
@@ -2934,38 +4371,10 @@
     }
   }
   var urlRegex;
-  function showDialog$lambda$lambda$lambda$lambda(closure$box, closure$resolve) {
-    return function (it) {
-      closure$box.remove();
-      closure$resolve(true);
-      return Unit;
-    };
-  }
-  function showDialog$lambda$lambda$lambda(closure$box, closure$resolve) {
-    return function ($receiver) {
-      $receiver.unaryPlus_pdl1vz$('Yes');
-      addClickEventListener(getUnderlyingHtmlElement($receiver), {once: true}, showDialog$lambda$lambda$lambda$lambda(closure$box, closure$resolve));
-      return Unit;
-    };
-  }
-  function showDialog$lambda$lambda$lambda$lambda_0(closure$box, closure$resolve) {
-    return function (it) {
-      closure$box.remove();
-      closure$resolve(false);
-      return Unit;
-    };
-  }
-  function showDialog$lambda$lambda$lambda_0(closure$box, closure$resolve) {
-    return function ($receiver) {
-      $receiver.unaryPlus_pdl1vz$('No');
-      addClickEventListener(getUnderlyingHtmlElement($receiver), {once: true}, showDialog$lambda$lambda$lambda$lambda_0(closure$box, closure$resolve));
-      return Unit;
-    };
-  }
   function showDialog$lambda$lambda(closure$resolve) {
     return function ($receiver, box) {
-      span($receiver, void 0, showDialog$lambda$lambda$lambda(box, closure$resolve));
-      span($receiver, void 0, showDialog$lambda$lambda$lambda_0(box, closure$resolve));
+      modalButton($receiver, 'Yes', box, closure$resolve, true);
+      modalButton($receiver, 'No', box, closure$resolve, false);
       return Unit;
     };
   }
@@ -2978,23 +4387,9 @@
   function showDialog(msg) {
     return new Promise(showDialog$lambda(msg));
   }
-  function showAlert$lambda$lambda$lambda$lambda(closure$box, closure$resolve) {
-    return function (it) {
-      closure$box.remove();
-      closure$resolve(Unit);
-      return Unit;
-    };
-  }
-  function showAlert$lambda$lambda$lambda(closure$box, closure$resolve) {
-    return function ($receiver) {
-      $receiver.unaryPlus_pdl1vz$('OK');
-      addClickEventListener(getUnderlyingHtmlElement($receiver), {once: true}, showAlert$lambda$lambda$lambda$lambda(closure$box, closure$resolve));
-      return Unit;
-    };
-  }
   function showAlert$lambda$lambda(closure$resolve) {
     return function ($receiver, box) {
-      span($receiver, void 0, showAlert$lambda$lambda$lambda(box, closure$resolve));
+      modalButton($receiver, 'OK', box, closure$resolve, Unit);
       return Unit;
     };
   }
@@ -3006,6 +4401,23 @@
   }
   function showAlert(msg) {
     return new Promise(showAlert$lambda(msg));
+  }
+  function modalButton$lambda$lambda(closure$box, closure$resolve, closure$objectToResolve) {
+    return function (it) {
+      closure$box.remove();
+      closure$resolve(closure$objectToResolve);
+      return Unit;
+    };
+  }
+  function modalButton$lambda(closure$buttonText, closure$box, closure$resolve, closure$objectToResolve) {
+    return function ($receiver) {
+      $receiver.unaryPlus_pdl1vz$(closure$buttonText);
+      addClickEventListener(getUnderlyingHtmlElement($receiver), {once: true}, modalButton$lambda$lambda(closure$box, closure$resolve, closure$objectToResolve));
+      return Unit;
+    };
+  }
+  function modalButton($receiver, buttonText, box, resolve, objectToResolve) {
+    span($receiver, void 0, modalButton$lambda(buttonText, box, resolve, objectToResolve));
   }
   function showModal$lambda$lambda$lambda$lambda($receiver) {
     $receiver.unaryPlus_pdl1vz$('help_outline');
@@ -3033,12 +4445,9 @@
   function showModal$lambda$lambda(closure$msg, closure$buttonCreator) {
     return function ($receiver) {
       var box = getUnderlyingHtmlElement($receiver);
-      div_0($receiver, 'text', showModal$lambda$lambda$lambda(closure$msg));
-      div_0($receiver, 'buttons', showModal$lambda$lambda$lambda_0(closure$buttonCreator, box));
-      var top = ensureNotNull(document.body).clientHeight / 3 | 0;
-      var left = (ensureNotNull(document.body).clientWidth / 2 | 0) - (box.offsetWidth / 2 | 0) | 0;
-      box.style.top = top.toString() + 'px';
-      box.style.left = left.toString() + 'px';
+      div($receiver, 'text', showModal$lambda$lambda$lambda(closure$msg));
+      div($receiver, 'buttons', showModal$lambda$lambda$lambda_0(closure$buttonCreator, box));
+      box.style.visibility = 'hidden';
       return Unit;
     };
   }
@@ -3049,1180 +4458,374 @@
     };
   }
   function showModal(msg, buttonCreator) {
-    append(elementById('modals'), showModal$lambda(msg, buttonCreator));
+    var tmp$;
+    var modals = elementById('modals');
+    append(modals, showModal$lambda(msg, buttonCreator));
+    var box = Kotlin.isType(tmp$ = modals.lastChild, HTMLElement) ? tmp$ : throwCCE();
+    var top = ensureNotNull(document.body).clientHeight / 3 | 0;
+    var left = (ensureNotNull(document.body).clientWidth / 2 | 0) - (box.offsetWidth / 2 | 0) | 0;
+    box.style.top = top.toString() + 'px';
+    box.style.left = left.toString() + 'px';
+    box.style.visibility = 'visible';
   }
-  function Publisher(publishJobUrl, modifiableJson) {
-    Publisher$Companion_getInstance();
-    this.publishJobUrl_0 = publishJobUrl;
-    this.modifiableJson_0 = modifiableJson;
+  function ChangeApplier() {
+    ChangeApplier_instance = this;
   }
-  function Publisher$publish$lambda(it) {
-    return Promise.resolve(1);
-  }
-  function Publisher$publish$lambda$lambda(closure$buildNumber) {
-    return function (it) {
-      return to(closure$buildNumber, it);
-    };
-  }
-  function Publisher$publish$lambda_0(closure$jobExecutor, this$Publisher) {
-    return function (f) {
-      var crumbWithId = f.component1()
-      , buildNumber = f.component2();
-      return this$Publisher.extractResultJsonUrl_0(closure$jobExecutor, crumbWithId, this$Publisher.publishJobUrl_0, buildNumber).then(Publisher$publish$lambda$lambda(buildNumber));
-    };
-  }
-  function Publisher$publish$lambda_1(this$Publisher, closure$verbose) {
-    return function (f) {
-      var buildNumber = f.component1()
-      , releaseJsonUrl = f.component2();
-      this$Publisher.changeUrlAndReloadOrAddHint_0(this$Publisher.publishJobUrl_0, buildNumber, releaseJsonUrl, closure$verbose);
-      return Unit;
-    };
-  }
-  function Publisher$publish$lambda_2(it) {
-    changeCursorBackToNormal();
-    return Unit;
-  }
-  Publisher.prototype.publish_lkprpu$ = function (fileName, verbose, jobExecutor) {
-    changeCursorToProgress();
-    var doNothingPromise = Publisher$publish$lambda;
-    var jobExecutionData = JobExecutionData$Companion_getInstance().buildWithParameters_6hosri$('publish ' + fileName + '.json', this.publishJobUrl_0, 'fileName=' + fileName + '&json=' + this.modifiableJson_0.json);
-    return finally_0(jobExecutor.trigger_shi73r$(jobExecutionData, doNothingPromise, doNothingPromise, 2, 20, verbose).then(Publisher$publish$lambda_0(jobExecutor, this)).then(Publisher$publish$lambda_1(this, verbose)), Publisher$publish$lambda_2);
+  ChangeApplier.prototype.createReleasePlanJsonWithChanges_61zpoe$ = function (json) {
+    var releasePlanJson = JSON.parse(json);
+    var changed = this.applyChanges_0(releasePlanJson);
+    var newJson = JSON.stringify(releasePlanJson);
+    return to(changed, newJson);
   };
-  function Publisher$extractResultJsonUrl$lambda(closure$jobUrl) {
-    return function (e) {
-      throw IllegalStateException_init('Could not find the published release.json as artifact.' + ('\n' + 'Job URL: ' + closure$jobUrl) + ('\n' + 'Regex used: ' + Publisher$Companion_getInstance().resultRegex_0.pattern) + ('\n' + 'Content: ' + e.body));
-    };
-  }
-  function Publisher$extractResultJsonUrl$lambda_0(closure$jobUrl, closure$buildNumber) {
-    return function (fileName) {
-      return closure$jobUrl + closure$buildNumber + '/artifact/' + fileName;
-    };
-  }
-  Publisher.prototype.extractResultJsonUrl_0 = function (jobExecutor, crumbWithId, jobUrl, buildNumber) {
-    var xpathUrl = jobUrl + buildNumber + '/api/xml?xpath=//artifact/fileName';
-    return jobExecutor.pollAndExtract_x0psdq$(crumbWithId, xpathUrl, Publisher$Companion_getInstance().resultRegex_0, Publisher$extractResultJsonUrl$lambda(jobUrl)).then(Publisher$extractResultJsonUrl$lambda_0(jobUrl, buildNumber));
+  ChangeApplier.prototype.applyChanges_0 = function (releasePlanJson) {
+    var changed = {v: false};
+    changed.v = changed.v | this.replacePublishIdIfChanged_0(releasePlanJson);
+    changed.v = changed.v | this.replaceReleaseStateIfChanged_0(releasePlanJson);
+    var $receiver = releasePlanJson.projects;
+    var tmp$;
+    for (tmp$ = 0; tmp$ !== $receiver.length; ++tmp$) {
+      var element = $receiver[tmp$];
+      var mavenProjectId = deserializeProjectId(element.id);
+      changed.v = changed.v | this.replaceReleaseVersionIfChanged_0(element, mavenProjectId);
+      var $receiver_0 = element.commands;
+      var tmp$_0, tmp$_0_0;
+      var index = 0;
+      for (tmp$_0 = 0; tmp$_0 !== $receiver_0.length; ++tmp$_0) {
+        var item = $receiver_0[tmp$_0];
+        var index_0 = (tmp$_0_0 = index, index = tmp$_0_0 + 1 | 0, tmp$_0_0);
+        changed.v = changed.v | this.replaceCommandStateIfChanged_0(item, mavenProjectId, index_0) | this.replaceFieldsIfChanged_0(item, mavenProjectId, index_0);
+      }
+    }
+    changed.v = changed.v | this.replaceConfigEntriesIfChanged_0(releasePlanJson);
+    return changed.v;
   };
-  function Publisher$changeUrlAndReloadOrAddHint$lambda(closure$url, closure$successMsg) {
-    return function () {
-      window.location.href = closure$url;
-      closure$successMsg.style.display = 'none';
-      return Unit;
-    };
-  }
-  var iterator = Kotlin.kotlin.text.iterator_gw00vp$;
-  var toBoxedChar = Kotlin.toBoxedChar;
-  Publisher.prototype.changeUrlAndReloadOrAddHint_0 = function (jobUrl, buildNumber, releaseJsonUrl, verbose) {
-    var prefix = window.location.protocol + '//' + window.location.hostname + '/';
-    var isOnSameHost = startsWith(jobUrl, prefix);
-    if (isOnSameHost) {
-      var pipelineUrl = substringBefore_0(window.location.href, 35);
-      var relativeJobUrl = substringAfter(jobUrl, prefix);
-      var tmp$;
-      var count = 0;
-      tmp$ = iterator(substringAfter(pipelineUrl, prefix));
-      while (tmp$.hasNext()) {
-        var element = unboxChar(tmp$.next());
-        if (unboxChar(toBoxedChar(element)) === 47) {
-          count = count + 1 | 0;
+  ChangeApplier.prototype.replacePublishIdIfChanged_0 = function (releasePlanJson) {
+    var changed = false;
+    var input = getTextField(Gui$Companion_getInstance().RELEASE_ID_HTML_ID);
+    if (!equals(releasePlanJson.releaseId, input.value)) {
+      if (!!isBlank(input.value)) {
+        var message = 'An empty or blank ReleaseId is not allowed';
+        throw IllegalStateException_init(message.toString());
+      }
+      releasePlanJson.releaseId = input.value;
+      changed = true;
+    }
+    return changed;
+  };
+  ChangeApplier.prototype.replaceReleaseStateIfChanged_0 = function (releasePlanJson) {
+    var changed = false;
+    var newState = Pipeline$Companion_getInstance().getReleaseState();
+    var currentState = deserializeReleaseState(releasePlanJson);
+    if (currentState !== newState) {
+      releasePlanJson.state = newState.name;
+      changed = true;
+    }
+    return changed;
+  };
+  ChangeApplier.prototype.replaceConfigEntriesIfChanged_0 = function (releasePlanJson) {
+    var changed = {v: false};
+    var $receiver = releasePlanJson.config;
+    var tmp$;
+    for (tmp$ = 0; tmp$ !== $receiver.length; ++tmp$) {
+      var element = $receiver[tmp$];
+      action$break: do {
+        var tmp$_0, tmp$_1, tmp$_2;
+        if (element.length !== 2)
+          break action$break;
+        var input = elementById('config-' + element[0]);
+        if (equals(element[0], ConfigKey.JOB_MAPPING.asString())) {
+          tmp$_2 = replace(replace((Kotlin.isType(tmp$_0 = input, HTMLTextAreaElement) ? tmp$_0 : throwCCE()).value, '\r', ''), '\n', '|');
+        }
+         else {
+          tmp$_2 = (Kotlin.isType(tmp$_1 = input, HTMLInputElement) ? tmp$_1 : throwCCE()).value;
+        }
+        var value = tmp$_2;
+        if (!equals(element[1], value)) {
+          element[1] = value;
+          changed.v = true;
         }
       }
-      var numOfChars = count;
-      var relativeJsonUrl = repeat('../', numOfChars) + substringAfter(releaseJsonUrl, prefix);
-      var url = pipelineUrl + '#' + relativeJsonUrl + App$Companion_getInstance().PUBLISH_JOB + relativeJobUrl;
-      if (verbose) {
-        var successMsg = showSuccess('Publishing successful, going to change to the new location.' + '\nIf this message does not disappear, then it means the switch failed. Please visit the following url manually:' + ('\n' + url));
-        sleep(2000, Publisher$changeUrlAndReloadOrAddHint$lambda(url, successMsg));
+       while (false);
+    }
+    return changed.v;
+  };
+  ChangeApplier.prototype.replaceReleaseVersionIfChanged_0 = function (project, mavenProjectId) {
+    var input = getTextFieldOrNull(mavenProjectId.identifier + ':releaseVersion');
+    if (input != null && !equals(project.releaseVersion, input.value)) {
+      if (!!isBlank(input.value)) {
+        var message = 'An empty or blank Release Version is not allowed';
+        throw IllegalStateException_init(message.toString());
       }
-       else {
-        window.location.href = url;
-      }
+      project.releaseVersion = input.value;
+      return true;
     }
-     else if (verbose) {
-      showWarning('Remote publish server detected. We currently do not support to consume remote release.json.' + '\nYou can save changes and it gets published on the remote server, but we will not change the url accordingly. Thus, please do not reload the page after a save because you would load the old state of the release.json' + ('\n' + 'Alternatively you can download the published release.json from here: ' + jobUrl + buildNumber + ' and adjust the url manually.'));
-    }
+    return false;
   };
-  Publisher.prototype.applyChanges = function () {
-    return this.modifiableJson_0.applyChanges();
-  };
-  function Publisher$Companion() {
-    Publisher$Companion_instance = this;
-    this.resultRegex_0 = Regex_init('<fileName>([^<]+)<\/fileName>');
-  }
-  Publisher$Companion.$metadata$ = {
-    kind: Kind_OBJECT,
-    simpleName: 'Companion',
-    interfaces: []
-  };
-  var Publisher$Companion_instance = null;
-  function Publisher$Companion_getInstance() {
-    if (Publisher$Companion_instance === null) {
-      new Publisher$Companion();
-    }
-    return Publisher$Companion_instance;
-  }
-  Publisher.$metadata$ = {
-    kind: Kind_CLASS,
-    simpleName: 'Publisher',
-    interfaces: []
-  };
-  function ReleaseJobExecutionDataFactory(jenkinsUrl, releasePlan) {
-    BaseJobExecutionDataFactory.call(this, jenkinsUrl, releasePlan);
-    this.regexParametersList_0 = null;
-    this.jobMapping_0 = null;
-    this.checkConfig_0(releasePlan.config);
-    this.regexParametersList_0 = this.parseRegexParameters_0();
-    this.jobMapping_0 = this.parseJobMapping_0();
-  }
-  ReleaseJobExecutionDataFactory.prototype.checkConfig_0 = function (config) {
-    this.requireConfigEntry_nhrt5l$(config, ConfigKey.UPDATE_DEPENDENCY_JOB);
-    this.requireConfigEntry_nhrt5l$(config, ConfigKey.REMOTE_REGEX);
-    this.requireConfigEntry_nhrt5l$(config, ConfigKey.REMOTE_JOB);
-    this.requireConfigEntry_nhrt5l$(config, ConfigKey.COMMIT_PREFIX);
-  };
-  function ReleaseJobExecutionDataFactory$parseRegexParameters$lambda(closure$regexParameters, this$ReleaseJobExecutionDataFactory) {
-    return function (pair) {
-      var index = this$ReleaseJobExecutionDataFactory.checkRegexNotEmpty_0(pair, closure$regexParameters);
-      var startIndex = index + 1 | 0;
-      var parameters = pair.substring(startIndex);
-      this$ReleaseJobExecutionDataFactory.checkAtLeastOneParameter_0(parameters, closure$regexParameters);
-      return to(Regex_init(pair.substring(0, index)), parameters);
-    };
-  }
-  ReleaseJobExecutionDataFactory.prototype.parseRegexParameters_0 = function () {
+  ChangeApplier.prototype.replaceCommandStateIfChanged_0 = function (genericCommand, mavenProjectId, index) {
     var tmp$;
-    var regexParameters = this.getConfig_udzor3$(ConfigKey.REGEX_PARAMS);
-    if (regexParameters.length > 0) {
-      tmp$ = toList_0(map(splitToSequence(regexParameters, ['$']), ReleaseJobExecutionDataFactory$parseRegexParameters$lambda(regexParameters, this)));
+    var command = genericCommand.p;
+    var previousState = deserializeCommandState(command);
+    var newState = Pipeline$Companion_getInstance().getCommandState_o8feeo$(mavenProjectId, index);
+    if (!((tmp$ = Kotlin.getKClassFromExpression(previousState)) != null ? tmp$.equals(Kotlin.getKClassFromExpression(newState)) : null)) {
+      var stateObject = {};
+      stateObject.state = Kotlin.getKClassFromExpression(newState).simpleName;
+      if (Kotlin.isType(newState, CommandState$Deactivated)) {
+        stateObject.previous = command.state;
+      }
+      command.state = stateObject;
+      return true;
     }
-     else {
-      tmp$ = emptyList();
+    if (Kotlin.isType(previousState, CommandState$Waiting) && Kotlin.isType(newState, CommandState$Waiting) && previousState.dependencies.size !== newState.dependencies.size) {
+      var $receiver = newState.dependencies;
+      var destination = ArrayList_init(collectionSizeOrDefault($receiver, 10));
+      var tmp$_0;
+      tmp$_0 = $receiver.iterator();
+      while (tmp$_0.hasNext()) {
+        var item = tmp$_0.next();
+        var tmp$_1 = destination.add_11rb$;
+        var transform$result;
+        if (Kotlin.isType(item, MavenProjectId)) {
+          var entry = {};
+          entry.t = MAVEN_PROJECT_ID;
+          var p = {};
+          p.groupId = item.groupId;
+          p.artifactId = item.artifactId;
+          entry.p = p;
+          transform$result = entry;
+        }
+         else
+          throw UnsupportedOperationException_init(item.toString() + ' is not supported.');
+        tmp$_1.call(destination, transform$result);
+      }
+      var newDependencies = destination;
+      command.state.dependencies = copyToArray(newDependencies);
+    }
+    return false;
+  };
+  ChangeApplier.prototype.replaceFieldsIfChanged_0 = function (command, mavenProjectId, index) {
+    var tmp$;
+    switch (command.t) {
+      case 'ch.loewenfels.depgraph.data.maven.jenkins.JenkinsMavenReleasePlugin':
+      case 'ch.loewenfels.depgraph.data.maven.jenkins.JenkinsMultiMavenReleasePlugin':
+        tmp$ = this.replaceNextVersionIfChanged_0(command.p, mavenProjectId, index) | this.replaceBuildUrlIfChanged_0(command.p, mavenProjectId, index);
+        break;
+      case 'ch.loewenfels.depgraph.data.maven.jenkins.JenkinsUpdateDependency':
+        tmp$ = this.replaceBuildUrlIfChanged_0(command.p, mavenProjectId, index);
+        break;
+      default:throw UnsupportedOperationException_init(command.t + ' is not supported.');
     }
     return tmp$;
   };
-  ReleaseJobExecutionDataFactory.prototype.checkRegexNotEmpty_0 = function (pair, regexParameters) {
-    var index = indexOf(pair, 35);
-    if (!(index > 0)) {
-      var message = 'regex requires at least one character.' + '\n' + 'regexParameters: ' + regexParameters;
-      throw IllegalStateException_init(message.toString());
-    }
-    return index;
-  };
-  ReleaseJobExecutionDataFactory.prototype.checkAtLeastOneParameter_0 = function (pair, regexParameters) {
-    var index = indexOf(pair, 61);
-    if (!(index > 0)) {
-      var message = 'A regexParam requires at least one parameter.' + '\n' + 'regexParameters: ' + regexParameters;
-      throw IllegalStateException_init(message.toString());
-    }
-    return index;
-  };
-  ReleaseJobExecutionDataFactory.prototype.parseJobMapping_0 = function () {
-    var mapping = this.releasePlan.getConfig_udzor3$(ConfigKey.JOB_MAPPING);
-    var $receiver = split_0(mapping, ['|']);
-    var capacity = coerceAtLeast(mapCapacity(collectionSizeOrDefault($receiver, 10)), 16);
-    var destination = LinkedHashMap_init(capacity);
-    var tmp$;
-    tmp$ = $receiver.iterator();
-    while (tmp$.hasNext()) {
-      var element = tmp$.next();
-      var index = indexOf(element, 61);
-      if (!(index > 0)) {
-        var message = 'At least one mapping has no groupId and artifactId defined.' + '\n' + 'jobMapping: ' + mapping;
+  ChangeApplier.prototype.replaceNextVersionIfChanged_0 = function (command, mavenProjectId, index) {
+    var m2Command = command;
+    var input = getTextField(Pipeline$Companion_getInstance().getCommandId_o8feeo$(mavenProjectId, index) + Pipeline$Companion_getInstance().NEXT_DEV_VERSION_SUFFIX);
+    if (!equals(m2Command.nextDevVersion, input.value)) {
+      if (!!isBlank(input.value)) {
+        var message = 'An empty or blank Next Dev Version is not allowed';
         throw IllegalStateException_init(message.toString());
       }
-      var groupIdAndArtifactId = element.substring(0, index);
-      if (!contains_0(groupIdAndArtifactId, 58)) {
-        var message_0 = 'At least one groupId and artifactId is erroneous, does not contain a `:`.' + '\n' + 'jobMapping: ' + mapping;
-        throw IllegalStateException_init(message_0.toString());
+      m2Command.nextDevVersion = input.value;
+      return true;
+    }
+    return false;
+  };
+  ChangeApplier.prototype.replaceBuildUrlIfChanged_0 = function (command, mavenProjectId, index) {
+    var tmp$;
+    var jenkinsCommand = command;
+    var guiCommand = Pipeline$Companion_getInstance().getCommand_o8feeo$(mavenProjectId, index);
+    var newBuildUrl = typeof (tmp$ = guiCommand.buildUrl) === 'string' ? tmp$ : null;
+    if (newBuildUrl != null && !equals(jenkinsCommand.buildUrl, newBuildUrl)) {
+      jenkinsCommand.buildUrl = newBuildUrl;
+      return true;
+    }
+    return false;
+  };
+  ChangeApplier.$metadata$ = {
+    kind: Kind_OBJECT,
+    simpleName: 'ChangeApplier',
+    interfaces: []
+  };
+  var ChangeApplier_instance = null;
+  function ChangeApplier_getInstance() {
+    if (ChangeApplier_instance === null) {
+      new ChangeApplier();
+    }
+    return ChangeApplier_instance;
+  }
+  var MAVEN_PROJECT_ID;
+  var JENKINS_MAVEN_RELEASE_PLUGIN;
+  var JENKINS_MULTI_MAVEN_RELEASE_PLUGIN;
+  var JENKINS_UPDATE_DEPENDENCY;
+  function deserialize(body) {
+    var releasePlanJson = JSON.parse(body);
+    var state = deserializeReleaseState(releasePlanJson);
+    var rootProjectId = deserializeProjectId(releasePlanJson.id);
+    var projects = deserializeProjects(releasePlanJson);
+    var submodules = deserializeMapOfProjectIdAndSetProjectId(releasePlanJson.submodules);
+    var dependents = deserializeMapOfProjectIdAndSetProjectId(releasePlanJson.dependents);
+    var warnings = toList_0(releasePlanJson.warnings);
+    var infos = toList_0(releasePlanJson.infos);
+    var config = deserializeConfig(releasePlanJson.config);
+    return new ReleasePlan(releasePlanJson.releaseId, state, rootProjectId, projects, submodules, dependents, warnings, infos, config);
+  }
+  function deserializeReleaseState(releasePlanJson) {
+    return ReleaseState$valueOf(releasePlanJson.state);
+  }
+  function deserializeProjectId(id) {
+    var tmp$;
+    if (equals(id.t, MAVEN_PROJECT_ID))
+      tmp$ = createMavenProjectId(id);
+    else
+      throw UnsupportedOperationException_init(id.t + ' is not supported.');
+    return tmp$;
+  }
+  function createMavenProjectId(genericId) {
+    var dynamicId = genericId.p;
+    return new MavenProjectId(dynamicId.groupId, dynamicId.artifactId);
+  }
+  function deserializeProjects(releasePlanJson) {
+    var map = HashMap_init();
+    var $receiver = releasePlanJson.projects;
+    var tmp$;
+    for (tmp$ = 0; tmp$ !== $receiver.length; ++tmp$) {
+      var element = $receiver[tmp$];
+      var projectId = deserializeProjectId(element.id);
+      var value = new Project(projectId, element.isSubmodule, element.currentVersion, element.releaseVersion, element.level, deserializeCommands(element.commands), element.relativePath);
+      map.put_xwzc9p$(projectId, value);
+    }
+    return map;
+  }
+  function deserializeCommands(commands) {
+    var destination = ArrayList_init(commands.length);
+    var tmp$;
+    for (tmp$ = 0; tmp$ !== commands.length; ++tmp$) {
+      var item = commands[tmp$];
+      var tmp$_0 = destination.add_11rb$;
+      var transform$result;
+      transform$break: do {
+        switch (item.t) {
+          case 'ch.loewenfels.depgraph.data.maven.jenkins.JenkinsMavenReleasePlugin':
+            transform$result = createJenkinsMavenReleasePlugin(item.p);
+            break transform$break;
+          case 'ch.loewenfels.depgraph.data.maven.jenkins.JenkinsMultiMavenReleasePlugin':
+            transform$result = createJenkinsMultiMavenReleasePlugin(item.p);
+            break transform$break;
+          case 'ch.loewenfels.depgraph.data.maven.jenkins.JenkinsUpdateDependency':
+            transform$result = createJenkinsUpdateDependency(item.p);
+            break transform$break;
+          default:throw UnsupportedOperationException_init(item.t + ' is not supported.');
+        }
       }
-      var startIndex = index + 1 | 0;
-      var jobName = element.substring(startIndex);
-      if (!!isBlank(jobName)) {
-        var message_1 = 'At least one groupId and artifactId is erroneous, has no job name defined.' + '\n' + 'jobMapping: ' + mapping;
-        throw IllegalStateException_init(message_1.toString());
+       while (false);
+      tmp$_0.call(destination, transform$result);
+    }
+    return destination;
+  }
+  function createJenkinsMavenReleasePlugin(command) {
+    var it = command;
+    return new JenkinsMavenReleasePlugin(deserializeCommandState(it), it.nextDevVersion, it.buildUrl);
+  }
+  function createJenkinsMultiMavenReleasePlugin(command) {
+    var it = command;
+    return new JenkinsMultiMavenReleasePlugin(deserializeCommandState(it), it.nextDevVersion, it.buildUrl);
+  }
+  function createJenkinsUpdateDependency(command) {
+    var it = command;
+    var projectId = new MavenProjectId(it.projectId.groupId, it.projectId.artifactId);
+    return new JenkinsUpdateDependency(deserializeCommandState(it), projectId, it.buildUrl);
+  }
+  function deserializeCommandState(it) {
+    var tmp$;
+    var json = it.state;
+    var fixedState = fakeEnumsName(json);
+    var state = fromJson(fixedState);
+    if (Kotlin.isType(state, CommandState$Waiting)) {
+      var realDependencies = Kotlin.isArray(tmp$ = state.dependencies) ? tmp$ : throwCCE();
+      var destination = ArrayList_init(realDependencies.length);
+      var tmp$_0;
+      for (tmp$_0 = 0; tmp$_0 !== realDependencies.length; ++tmp$_0) {
+        var item = realDependencies[tmp$_0];
+        destination.add_11rb$(deserializeProjectId(item));
       }
-      var pair = to(groupIdAndArtifactId, jobName);
+      var deserializedDependencies = toHashSet_0(destination);
+      state.dependencies = deserializedDependencies;
+    }
+    return state;
+  }
+  function fakeEnumsName(json) {
+    var tmp$;
+    var state = JSON.parse(JSON.stringify(json));
+    var tmp = state;
+    while (tmp != null) {
+      tmp.state = {name: tmp.state};
+      if (equals(tmp.state.name, 'Deactivated')) {
+        tmp$ = tmp.previous;
+      }
+       else {
+        tmp$ = null;
+      }
+      tmp = tmp$;
+    }
+    return state;
+  }
+  function deserializeMapOfProjectIdAndSetProjectId(mapJson) {
+    var capacity = coerceAtLeast(mapCapacity(mapJson.length), 16);
+    var destination = LinkedHashMap_init(capacity);
+    var tmp$;
+    for (tmp$ = 0; tmp$ !== mapJson.length; ++tmp$) {
+      var element = mapJson[tmp$];
+      var tmp$_0 = destination.put_xwzc9p$;
+      var tmp$_1 = deserializeProjectId(element.k);
+      var $receiver = element.v;
+      var destination_0 = ArrayList_init($receiver.length);
+      var tmp$_2;
+      for (tmp$_2 = 0; tmp$_2 !== $receiver.length; ++tmp$_2) {
+        var item = $receiver[tmp$_2];
+        destination_0.add_11rb$(deserializeProjectId(item));
+      }
+      tmp$_0.call(destination, tmp$_1, toHashSet_0(destination_0));
+    }
+    return destination;
+  }
+  function deserializeConfig(config) {
+    var capacity = coerceAtLeast(mapCapacity(config.length), 16);
+    var destination = LinkedHashMap_init(capacity);
+    var tmp$;
+    for (tmp$ = 0; tmp$ !== config.length; ++tmp$) {
+      var element = config[tmp$];
+      if (element.length !== 2) {
+        showWarning('corrupt config found, size != 2: ' + element);
+      }
+      var pair = to(ConfigKey.Companion.fromString_61zpoe$(element[0]), element[1]);
       destination.put_xwzc9p$(pair.first, pair.second);
     }
     return destination;
-  };
-  ReleaseJobExecutionDataFactory.prototype.getJobName_0 = function (project) {
-    var tmp$, tmp$_0;
-    var mavenProjectId = Kotlin.isType(tmp$ = project.id, MavenProjectId) ? tmp$ : throwCCE();
-    return (tmp$_0 = this.jobMapping_0.get_11rb$(mavenProjectId.identifier)) != null ? tmp$_0 : mavenProjectId.artifactId;
-  };
-  ReleaseJobExecutionDataFactory.prototype.create_awtgy4$ = function (project, command) {
-    var tmp$;
-    if (Kotlin.isType(command, JenkinsUpdateDependency))
-      tmp$ = this.triggerUpdateDependency_0(project, command);
-    else if (Kotlin.isType(command, M2ReleaseCommand))
-      tmp$ = this.triggerRelease_0(project, command);
-    else
-      throw UnsupportedOperationException_init('We do not (yet) support the command: ' + command);
-    return tmp$;
-  };
-  ReleaseJobExecutionDataFactory.prototype.triggerUpdateDependency_0 = function (project, command) {
-    var jobUrl = this.getJobUrl_udzor3$(ConfigKey.UPDATE_DEPENDENCY_JOB);
-    var jobName = 'update dependency of ' + project.id.identifier;
-    var params = this.createUpdateDependencyParams_0(project, command);
-    return JobExecutionData$Companion_getInstance().buildWithParameters_6hosri$(jobName, jobUrl, params);
-  };
-  ReleaseJobExecutionDataFactory.prototype.createUpdateDependencyParams_0 = function (project, command) {
-    var tmp$;
-    var dependency = this.releasePlan.getProject_lljhqa$(command.projectId);
-    var dependencyMavenProjectId = Kotlin.isType(tmp$ = dependency.id, MavenProjectId) ? tmp$ : throwCCE();
-    return 'pathToProject=' + project.relativePath + ('&groupId=' + dependencyMavenProjectId.groupId) + ('&artifactId=' + dependencyMavenProjectId.artifactId) + ('&newVersion=' + dependency.releaseVersion) + ('&commitPrefix=' + this.getConfig_udzor3$(ConfigKey.COMMIT_PREFIX)) + ('&releaseId=' + this.releasePlan.releaseId);
-  };
-  ReleaseJobExecutionDataFactory.prototype.triggerRelease_0 = function (project, command) {
-    var tmp$ = this.determineJobUrlAndParams_0(project, command);
-    var jobUrl = tmp$.component1()
-    , params = tmp$.component2();
-    return JobExecutionData$Companion_getInstance().buildWithParameters_6hosri$('release ' + project.id.identifier, jobUrl, params);
-  };
-  function ReleaseJobExecutionDataFactory$determineJobUrlAndParams$lambda(closure$mavenProjectId) {
-    return function (f) {
-      var regex = f.component1();
-      return regex.matches_6bul2c$(closure$mavenProjectId.identifier);
-    };
   }
-  function ReleaseJobExecutionDataFactory$determineJobUrlAndParams$lambda_0(it) {
-    return it.second;
+  function ModifiableJson(json) {
+    this._json_0 = json;
   }
-  ReleaseJobExecutionDataFactory.prototype.determineJobUrlAndParams_0 = function (project, command) {
-    var tmp$, tmp$_0;
-    var mavenProjectId = Kotlin.isType(tmp$ = project.id, MavenProjectId) ? tmp$ : throwCCE();
-    var regex = Regex_init(this.getConfig_udzor3$(ConfigKey.REMOTE_REGEX));
-    var relevantParams = map(filter(asSequence(this.regexParametersList_0), ReleaseJobExecutionDataFactory$determineJobUrlAndParams$lambda(mavenProjectId)), ReleaseJobExecutionDataFactory$determineJobUrlAndParams$lambda_0);
-    var params = 'releaseVersion=' + project.releaseVersion + ('&nextDevVersion=' + command.nextDevVersion);
-    var jobName = this.getJobName_0(project);
-    if (regex.matches_6bul2c$(project.id.identifier)) {
-      tmp$_0 = to(this.getJobUrl_udzor3$(ConfigKey.REMOTE_JOB), params + '&jobName=' + jobName + '&parameters=' + joinToString_0(relevantParams, ';'));
+  Object.defineProperty(ModifiableJson.prototype, 'json', {
+    get: function () {
+      return this._json_0;
+    },
+    set: function (value) {
+      this._json_0 = value;
     }
-     else {
-      tmp$_0 = to(this.getJobUrl_61zpoe$(jobName), params + '&' + joinToString_0(relevantParams, '&') + '}');
-    }
-    return tmp$_0;
+  });
+  ModifiableJson.prototype.applyChanges = function () {
+    var tmp$ = ChangeApplier_getInstance().createReleasePlanJsonWithChanges_61zpoe$(this.json);
+    var changed = tmp$.component1()
+    , newJson = tmp$.component2();
+    this.json = newJson;
+    return changed;
   };
-  ReleaseJobExecutionDataFactory.$metadata$ = {
+  ModifiableJson.prototype.getJsonWithAppliedChanges = function () {
+    var newJson = ChangeApplier_getInstance().createReleasePlanJsonWithChanges_61zpoe$(this.json).component2();
+    return newJson;
+  };
+  ModifiableJson.$metadata$ = {
     kind: Kind_CLASS,
-    simpleName: 'ReleaseJobExecutionDataFactory',
-    interfaces: [BaseJobExecutionDataFactory]
-  };
-  function Releaser(jenkinsUrl, modifiableJson, menu) {
-    this.jenkinsUrl_0 = jenkinsUrl;
-    this.modifiableJson_0 = modifiableJson;
-    this.menu_0 = menu;
-  }
-  Releaser.prototype.release_x3u2bj$ = function (jobExecutor, jobExecutionDataFactory) {
-    var releasePlan = deserialize(this.modifiableJson_0.json);
-    this.warnIfNotOnSameHost_0();
-    var project = releasePlan.getRootProject();
-    var paramObject = new Releaser$ParamObject(releasePlan, jobExecutor, jobExecutionDataFactory, project, HashMap_init(), HashMap_init());
-    return this.release_0(paramObject);
-  };
-  Releaser.prototype.warnIfNotOnSameHost_0 = function () {
-    var prefix = window.location.protocol + '//' + window.location.hostname;
-    var isOnSameHost = startsWith(this.jenkinsUrl_0, prefix);
-    if (!isOnSameHost) {
-      showWarning('Remote publish server detected. We currently do not support to consume remote release.json.' + '\nThis means that we publish changes during the release process but will not change the location. Thus, please do not reload the page during the release process.', 8000);
-    }
-  };
-  function Releaser$release$lambda$lambda(closure$newState) {
-    return function (t) {
-      showThrowable(new Error_0('Could not save the release state (changed to ' + closure$newState + ').' + '\nDo not reload if you want to continue using this pipeline and make sure the publisher works as expected.' + '\nMake a change (e.g. change a Release Version) and try to save (will save the changed release state as well) -- do not forget to revert your change and save again.', t));
-      return Unit;
-    };
-  }
-  function Releaser$release$lambda(closure$paramObject, this$Releaser) {
-    return function (it) {
-      var tmp$ = this$Releaser.checkProjectStates_0(closure$paramObject);
-      var result = tmp$.component1()
-      , newState = tmp$.component2();
-      Gui$Companion_getInstance().changeReleaseState_g1wt0g$(newState);
-      this$Releaser.save_0(closure$paramObject, false).catch(Releaser$release$lambda$lambda(newState));
-      return result;
-    };
-  }
-  Releaser.prototype.release_0 = function (paramObject) {
-    Gui$Companion_getInstance().changeReleaseState_g1wt0g$(ReleaseState.InProgress);
-    return this.releaseProject_0(paramObject).then(Releaser$release$lambda(paramObject, this));
-  };
-  Releaser.prototype.checkProjectStates_0 = function (paramObject) {
-    var tmp$;
-    var $receiver = paramObject.projectResults.values;
-    var all$result;
-    all$break: do {
-      var tmp$_0;
-      if (Kotlin.isType($receiver, Collection) && $receiver.isEmpty()) {
-        all$result = true;
-        break all$break;
-      }
-      tmp$_0 = $receiver.iterator();
-      while (tmp$_0.hasNext()) {
-        var element = tmp$_0.next();
-        if (!(element === CommandState.Succeeded || Kotlin.isType(element, CommandState$Deactivated) || element === CommandState.Disabled)) {
-          all$result = false;
-          break all$break;
-        }
-      }
-      all$result = true;
-    }
-     while (false);
-    var result = all$result;
-    if (result) {
-      tmp$ = ReleaseState.Succeeded;
-    }
-     else {
-      this.checkForNoneFailedBug_0(paramObject);
-      tmp$ = ReleaseState.Failed;
-    }
-    var newState = tmp$;
-    return to(result, newState);
-  };
-  function Releaser$checkForNoneFailedBug$lambda(it) {
-    return it.key.identifier;
-  }
-  Releaser.prototype.checkForNoneFailedBug_0 = function (paramObject) {
-    var $receiver = paramObject.projectResults.values;
-    var none$result;
-    none$break: do {
-      var tmp$;
-      if (Kotlin.isType($receiver, Collection) && $receiver.isEmpty()) {
-        none$result = true;
-        break none$break;
-      }
-      tmp$ = $receiver.iterator();
-      while (tmp$.hasNext()) {
-        var element = tmp$.next();
-        if (element === CommandState.Failed) {
-          none$result = false;
-          break none$break;
-        }
-      }
-      none$result = true;
-    }
-     while (false);
-    if (none$result) {
-      var $receiver_0 = paramObject.projectResults.entries;
-      var destination = ArrayList_init();
-      var tmp$_0;
-      tmp$_0 = $receiver_0.iterator();
-      while (tmp$_0.hasNext()) {
-        var element_0 = tmp$_0.next();
-        if (element_0.value !== CommandState.Failed && element_0.value !== CommandState.Succeeded && !Kotlin.isType(element_0.value, CommandState$Deactivated) && element_0.value !== CommandState.Disabled)
-          destination.add_11rb$(element_0);
-      }
-      var erroneousProjects = destination;
-      if (!erroneousProjects.isEmpty()) {
-        showError('Seems like there is a bug since no command failed but not all are succeeded.' + '\nPlease report a bug, the following projects where affected:' + ('\n' + joinToString(erroneousProjects, '\n', void 0, void 0, void 0, void 0, Releaser$checkForNoneFailedBug$lambda)));
-      }
-    }
-  };
-  function Releaser$releaseProject$lambda$lambda(closure$paramObject, this$Releaser) {
-    return function (jobResult) {
-      if (jobResult !== CommandState.Succeeded)
-        return jobResult;
-      return this$Releaser.triggerReleaseCommands_0(closure$paramObject);
-    };
-  }
-  function Releaser$releaseProject$lambda$lambda_0(closure$paramObject, this$Releaser) {
-    return function (jobResult) {
-      var $receiver = closure$paramObject.projectResults;
-      var key = closure$paramObject.project.id;
-      $receiver.put_xwzc9p$(key, jobResult);
-      if (jobResult !== CommandState.Succeeded)
-        return jobResult;
-      var releasePlan = closure$paramObject.releasePlan;
-      var allDependents = releasePlan.collectDependentsInclDependentsOfAllSubmodules_lljhqa$(closure$paramObject.project.id);
-      this$Releaser.updateStateWaiting_0(releasePlan, allDependents);
-      return this$Releaser.releaseDependentProjects_0(allDependents, releasePlan, closure$paramObject);
-    };
-  }
-  function Releaser$releaseProject$lambda$lambda_1(closure$paramObject) {
-    return function (t) {
-      var $receiver = closure$paramObject.projectResults;
-      var key = closure$paramObject.project.id;
-      var value = CommandState.Failed;
-      $receiver.put_xwzc9p$(key, value);
-      if (t !== Releaser$ReleaseFailure_getInstance())
-        throw t;
-      return Unit;
-    };
-  }
-  function Releaser$releaseProject$lambda(closure$paramObject, this$Releaser) {
-    return function () {
-      return this$Releaser.triggerNonReleaseCommandsInclSubmoduleCommands_0(closure$paramObject).then(Releaser$releaseProject$lambda$lambda(closure$paramObject, this$Releaser)).then(Releaser$releaseProject$lambda$lambda_0(closure$paramObject, this$Releaser)).catch(Releaser$releaseProject$lambda$lambda_1(closure$paramObject));
-    };
-  }
-  Releaser.prototype.releaseProject_0 = function (paramObject) {
-    return paramObject.withLockForProject_509nd4$(Releaser$releaseProject$lambda(paramObject, this));
-  };
-  Releaser.prototype.updateStateWaiting_0 = function (releasePlan, allDependents) {
-    var tmp$;
-    tmp$ = allDependents.iterator();
-    while (tmp$.hasNext()) {
-      var element = tmp$.next();
-      var multiOrSubmoduleId = element.component1()
-      , dependentId = element.component2();
-      var dependentProject = releasePlan.getProject_lljhqa$(dependentId);
-      var tmp$_0, tmp$_0_0;
-      var index = 0;
-      tmp$_0 = dependentProject.commands.iterator();
-      while (tmp$_0.hasNext()) {
-        var item = tmp$_0.next();
-        var index_0 = (tmp$_0_0 = index, index = tmp$_0_0 + 1 | 0, tmp$_0_0);
-        var tmp$_1;
-        var state = Gui$Companion_getInstance().getCommandState_o8feeo$(dependentId, index_0);
-        if (Kotlin.isType(state, CommandState$Waiting) && state.dependencies.contains_11rb$(multiOrSubmoduleId)) {
-          (Kotlin.isType(tmp$_1 = state.dependencies, MutableSet) ? tmp$_1 : throwCCE()).remove_11rb$(multiOrSubmoduleId);
-          if (state.dependencies.isEmpty()) {
-            Gui$Companion_getInstance().changeStateOfCommand_q143v3$(dependentProject, index_0, CommandState.Ready, Gui$Companion_getInstance().STATE_READY);
-          }
-        }
-      }
-    }
-  };
-  function Releaser$releaseDependentProjects$lambda(closure$releasePlan) {
-    return function (f) {
-      var dependentId = f.component2();
-      return closure$releasePlan.getProject_lljhqa$(dependentId);
-    };
-  }
-  function Releaser$releaseDependentProjects$lambda_0(it) {
-    return !it.isSubmodule;
-  }
-  Releaser.prototype.releaseDependentProjects_0 = function (allDependents, releasePlan, paramObject) {
-    var $receiver = toHashSet_0(filter(map(asSequence(allDependents), Releaser$releaseDependentProjects$lambda(releasePlan)), Releaser$releaseDependentProjects$lambda_0));
-    var destination = ArrayList_init(collectionSizeOrDefault($receiver, 10));
-    var tmp$;
-    tmp$ = $receiver.iterator();
-    while (tmp$.hasNext()) {
-      var item = tmp$.next();
-      destination.add_11rb$(this.releaseProject_0(Releaser$Releaser$ParamObject_init_0(paramObject, item)));
-    }
-    var promises = destination;
-    return Promise.all(copyToArray(promises));
-  };
-  function Releaser$triggerNonReleaseCommandsInclSubmoduleCommands$lambda(it) {
-    return !Kotlin.isType(it.value, ReleaseCommand);
-  }
-  function Releaser$triggerNonReleaseCommandsInclSubmoduleCommands$lambda_0(closure$paramObject, this$Releaser) {
-    return function (f) {
-      var index = f.component1()
-      , command = f.component2();
-      return this$Releaser.createCommandPromise_0(closure$paramObject, command, index);
-    };
-  }
-  function Releaser$triggerNonReleaseCommandsInclSubmoduleCommands$lambda$lambda(closure$paramObject, this$Releaser) {
-    return function (submoduleId) {
-      return this$Releaser.triggerNonReleaseCommandsInclSubmoduleCommands_0(Releaser$Releaser$ParamObject_init(closure$paramObject, submoduleId));
-    };
-  }
-  function Releaser$triggerNonReleaseCommandsInclSubmoduleCommands$lambda_1(closure$paramObject, this$Releaser) {
-    return function (jobsResults) {
-      var tmp$, tmp$_0, tmp$_1, tmp$_2;
-      tmp$_2 = asSequence(closure$paramObject.releasePlan.getSubmodules_lljhqa$(closure$paramObject.project.id));
-      tmp$_0 = Kotlin.isType(tmp$ = jobsResults, MutableList) ? tmp$ : throwCCE();
-      tmp$_1 = Releaser$triggerNonReleaseCommandsInclSubmoduleCommands$lambda$lambda(closure$paramObject, this$Releaser);
-      return this$Releaser.doSequentially_0(tmp$_2, tmp$_0, tmp$_1);
-    };
-  }
-  function Releaser$triggerNonReleaseCommandsInclSubmoduleCommands$lambda_2(jobsResults) {
-    var tmp$;
-    var firstOrNull$result;
-    firstOrNull$break: do {
-      var tmp$_0;
-      tmp$_0 = jobsResults.iterator();
-      while (tmp$_0.hasNext()) {
-        var element = tmp$_0.next();
-        if (element !== CommandState.Succeeded) {
-          firstOrNull$result = element;
-          break firstOrNull$break;
-        }
-      }
-      firstOrNull$result = null;
-    }
-     while (false);
-    return (tmp$ = firstOrNull$result) != null ? tmp$ : CommandState.Succeeded;
-  }
-  Releaser.prototype.triggerNonReleaseCommandsInclSubmoduleCommands_0 = function (paramObject) {
-    return this.doSequentially_0(filter(mapWithIndex(asSequence(paramObject.project.commands)), Releaser$triggerNonReleaseCommandsInclSubmoduleCommands$lambda), ArrayList_init(), Releaser$triggerNonReleaseCommandsInclSubmoduleCommands$lambda_0(paramObject, this)).then(Releaser$triggerNonReleaseCommandsInclSubmoduleCommands$lambda_1(paramObject, this)).then(Releaser$triggerNonReleaseCommandsInclSubmoduleCommands$lambda_2);
-  };
-  function Releaser$doSequentially$lambda$lambda$lambda(closure$list) {
-    return function (jobResult) {
-      if (jobResult === CommandState.Failed)
-        throw Releaser$ReleaseFailure_getInstance();
-      closure$list.add_11rb$(jobResult);
-      return closure$list;
-    };
-  }
-  function Releaser$doSequentially$lambda$lambda(closure$action, closure$element) {
-    return function (list) {
-      return closure$action(closure$element).then(Releaser$doSequentially$lambda$lambda$lambda(list));
-    };
-  }
-  Releaser.prototype.doSequentially_0 = function ($receiver, initial, action) {
-    var tmp$;
-    var accumulator = Promise.resolve(initial);
-    tmp$ = $receiver.iterator();
-    while (tmp$.hasNext()) {
-      var element = tmp$.next();
-      accumulator = accumulator.then(Releaser$doSequentially$lambda$lambda(action, element));
-    }
-    return accumulator;
-  };
-  function Releaser$triggerReleaseCommands$lambda(it) {
-    return Kotlin.isType(it.value, ReleaseCommand);
-  }
-  function Releaser$triggerReleaseCommands$lambda_0(closure$paramObject, this$Releaser) {
-    return function (f) {
-      var index = f.component1()
-      , command = f.component2();
-      return this$Releaser.createCommandPromise_0(closure$paramObject, command, index);
-    };
-  }
-  function Releaser$triggerReleaseCommands$lambda_1(jobsResults) {
-    var tmp$;
-    var firstOrNull$result;
-    firstOrNull$break: do {
-      var tmp$_0;
-      tmp$_0 = jobsResults.iterator();
-      while (tmp$_0.hasNext()) {
-        var element = tmp$_0.next();
-        if (element !== CommandState.Succeeded) {
-          firstOrNull$result = element;
-          break firstOrNull$break;
-        }
-      }
-      firstOrNull$result = null;
-    }
-     while (false);
-    return (tmp$ = firstOrNull$result) != null ? tmp$ : CommandState.Succeeded;
-  }
-  Releaser.prototype.triggerReleaseCommands_0 = function (paramObject) {
-    return this.doSequentially_0(filter(mapWithIndex(asSequence(paramObject.project.commands)), Releaser$triggerReleaseCommands$lambda), ArrayList_init(), Releaser$triggerReleaseCommands$lambda_0(paramObject, this)).then(Releaser$triggerReleaseCommands$lambda_1);
-  };
-  Releaser.prototype.createCommandPromise_0 = function (paramObject, command, index) {
-    var tmp$;
-    var state = Gui$Companion_getInstance().getCommandState_o8feeo$(paramObject.project.id, index);
-    if (state === CommandState.Ready || state === CommandState.ReadyToReTrigger) {
-      tmp$ = this.triggerCommand_0(paramObject, command, index);
-    }
-     else {
-      tmp$ = Promise.resolve(state);
-    }
-    return tmp$;
-  };
-  Releaser.prototype.triggerCommand_0 = function (paramObject, command, index) {
-    var jobExecutionData = paramObject.jobExecutionDataFactory.create_awtgy4$(paramObject.project, command);
-    return this.triggerJob_0(paramObject, index, jobExecutionData);
-  };
-  function Releaser$triggerJob$lambda(closure$project, closure$index, closure$paramObject, this$Releaser) {
-    return function (queuedItemUrl) {
-      Gui$Companion_getInstance().changeStateOfCommandAndAddBuildUrl_85y8bj$(closure$project, closure$index, CommandState.Queueing, Gui$Companion_getInstance().STATE_QUEUEING, queuedItemUrl);
-      return this$Releaser.save_0(closure$paramObject);
-    };
-  }
-  function Releaser$triggerJob$lambda_0(closure$project, closure$index, closure$jobExecutionData) {
-    return function (buildNumber) {
-      Gui$Companion_getInstance().changeStateOfCommandAndAddBuildUrl_85y8bj$(closure$project, closure$index, CommandState.InProgress, Gui$Companion_getInstance().STATE_IN_PROGRESS, closure$jobExecutionData.jobBaseUrl + buildNumber + '/');
-      return Promise.resolve(1);
-    };
-  }
-  function Releaser$triggerJob$lambda_1(it) {
-    return to(CommandState.Succeeded, Gui$Companion_getInstance().STATE_SUCCEEDED);
-  }
-  function Releaser$triggerJob$lambda_2(closure$jobExecutionData, closure$project, closure$index) {
-    return function (t) {
-      showThrowable(new Error_0('Job ' + closure$jobExecutionData.jobName + ' failed', t));
-      var id = Gui$Companion_getInstance().getCommandId_xgsuvp$(closure$project, closure$index) + Gui$Companion_getInstance().STATE_SUFFIX;
-      var tmp$;
-      var elementByIdOrNull$result;
-      elementByIdOrNull$break: do {
-        var tmp$_0;
-        tmp$_0 = document.getElementById(id);
-        if (tmp$_0 == null) {
-          elementByIdOrNull$result = null;
-          break elementByIdOrNull$break;
-        }
-        var element = tmp$_0;
-        if (!Kotlin.isType(element, HTMLAnchorElement)) {
-          var message = 'element with ' + id + ' found but was wrong type.<br/>Expected type ' + get_js(getKClass(HTMLAnchorElement)).name + '<br/>Found ' + element;
-          throw IllegalArgumentException_init(message.toString());
-        }
-        elementByIdOrNull$result = element;
-      }
-       while (false);
-      tmp$ = elementByIdOrNull$result;
-      if (tmp$ == null) {
-        throw IllegalStateException_init('no element found for id ' + id + ' (expected type ' + get_js(getKClass(HTMLAnchorElement)).name + ')');
-      }
-      var state = tmp$;
-      var suffix = 'console#footer';
-      if (!endsWith(state.href, suffix)) {
-        state.href = state.href + suffix;
-      }
-      return to(CommandState.Failed, Gui$Companion_getInstance().STATE_FAILED);
-    };
-  }
-  function Releaser$triggerJob$lambda_3(closure$project, closure$index) {
-    return function (f) {
-      var state = f.component1()
-      , message = f.component2();
-      Gui$Companion_getInstance().changeStateOfCommand_q143v3$(closure$project, closure$index, state, message);
-      changeCursorBackToNormal();
-      return state;
-    };
-  }
-  Releaser.prototype.triggerJob_0 = function (paramObject, index, jobExecutionData) {
-    var project = paramObject.project;
-    changeCursorToProgress();
-    return paramObject.jobExecutor.trigger_shi73r$(jobExecutionData, Releaser$triggerJob$lambda(project, index, paramObject, this), Releaser$triggerJob$lambda_0(project, index, jobExecutionData), 5, 900, false).then(Releaser$triggerJob$lambda_1, Releaser$triggerJob$lambda_2(jobExecutionData, project, index)).then(Releaser$triggerJob$lambda_3(project, index));
-  };
-  function Releaser$save$lambda(closure$paramObject) {
-    return function (hadChanges) {
-      if (!hadChanges) {
-        showWarning('Could not save changes for project ' + closure$paramObject.project.id.identifier + '. Please report a bug.');
-      }
-      return Unit;
-    };
-  }
-  Releaser.prototype.save_0 = function (paramObject, verbose) {
-    if (verbose === void 0)
-      verbose = false;
-    return this.menu_0.save_g760o8$(paramObject.jobExecutor, verbose).then(Releaser$save$lambda(paramObject));
-  };
-  function Releaser$ParamObject(releasePlan, jobExecutor, jobExecutionDataFactory, project, locks, projectResults) {
-    this.releasePlan = releasePlan;
-    this.jobExecutor = jobExecutor;
-    this.jobExecutionDataFactory = jobExecutionDataFactory;
-    this.project = project;
-    this.locks_0 = locks;
-    this.projectResults = projectResults;
-  }
-  function Releaser$ParamObject$withLockForProject$lambda(this$ParamObject, closure$projectId) {
-    return function (result) {
-      this$ParamObject.locks_0.remove_11rb$(closure$projectId);
-      return result;
-    };
-  }
-  function Releaser$ParamObject$withLockForProject$lambda_0(closure$act, this$ParamObject) {
-    return function (it) {
-      return this$ParamObject.withLockForProject_509nd4$(closure$act);
-    };
-  }
-  Releaser$ParamObject.prototype.withLockForProject_509nd4$ = function (act) {
-    var tmp$;
-    var projectId = this.project.id;
-    var lock = this.locks_0.get_11rb$(projectId);
-    if (lock == null) {
-      var promise = act();
-      this.locks_0.put_xwzc9p$(projectId, promise);
-      tmp$ = promise.then(Releaser$ParamObject$withLockForProject$lambda(this, projectId));
-    }
-     else {
-      tmp$ = lock.then(Releaser$ParamObject$withLockForProject$lambda_0(act, this));
-    }
-    return tmp$;
-  };
-  Releaser$ParamObject.$metadata$ = {
-    kind: Kind_CLASS,
-    simpleName: 'ParamObject',
-    interfaces: []
-  };
-  function Releaser$Releaser$ParamObject_init(paramObject, newProjectId, $this) {
-    $this = $this || Object.create(Releaser$ParamObject.prototype);
-    Releaser$Releaser$ParamObject_init_0(paramObject, paramObject.releasePlan.getProject_lljhqa$(newProjectId), $this);
-    return $this;
-  }
-  function Releaser$Releaser$ParamObject_init_0(paramObject, newProject, $this) {
-    $this = $this || Object.create(Releaser$ParamObject.prototype);
-    Releaser$ParamObject.call($this, paramObject.releasePlan, paramObject.jobExecutor, paramObject.jobExecutionDataFactory, newProject, paramObject.locks_0, paramObject.projectResults);
-    return $this;
-  }
-  Releaser$ParamObject.prototype.component1 = function () {
-    return this.releasePlan;
-  };
-  Releaser$ParamObject.prototype.component2 = function () {
-    return this.jobExecutor;
-  };
-  Releaser$ParamObject.prototype.component3 = function () {
-    return this.jobExecutionDataFactory;
-  };
-  Releaser$ParamObject.prototype.component4 = function () {
-    return this.project;
-  };
-  Releaser$ParamObject.prototype.component5_0 = function () {
-    return this.locks_0;
-  };
-  Releaser$ParamObject.prototype.component6 = function () {
-    return this.projectResults;
-  };
-  Releaser$ParamObject.prototype.copy_wgeqvr$ = function (releasePlan, jobExecutor, jobExecutionDataFactory, project, locks, projectResults) {
-    return new Releaser$ParamObject(releasePlan === void 0 ? this.releasePlan : releasePlan, jobExecutor === void 0 ? this.jobExecutor : jobExecutor, jobExecutionDataFactory === void 0 ? this.jobExecutionDataFactory : jobExecutionDataFactory, project === void 0 ? this.project : project, locks === void 0 ? this.locks_0 : locks, projectResults === void 0 ? this.projectResults : projectResults);
-  };
-  Releaser$ParamObject.prototype.toString = function () {
-    return 'ParamObject(releasePlan=' + Kotlin.toString(this.releasePlan) + (', jobExecutor=' + Kotlin.toString(this.jobExecutor)) + (', jobExecutionDataFactory=' + Kotlin.toString(this.jobExecutionDataFactory)) + (', project=' + Kotlin.toString(this.project)) + (', locks=' + Kotlin.toString(this.locks_0)) + (', projectResults=' + Kotlin.toString(this.projectResults)) + ')';
-  };
-  Releaser$ParamObject.prototype.hashCode = function () {
-    var result = 0;
-    result = result * 31 + Kotlin.hashCode(this.releasePlan) | 0;
-    result = result * 31 + Kotlin.hashCode(this.jobExecutor) | 0;
-    result = result * 31 + Kotlin.hashCode(this.jobExecutionDataFactory) | 0;
-    result = result * 31 + Kotlin.hashCode(this.project) | 0;
-    result = result * 31 + Kotlin.hashCode(this.locks_0) | 0;
-    result = result * 31 + Kotlin.hashCode(this.projectResults) | 0;
-    return result;
-  };
-  Releaser$ParamObject.prototype.equals = function (other) {
-    return this === other || (other !== null && (typeof other === 'object' && (Object.getPrototypeOf(this) === Object.getPrototypeOf(other) && (Kotlin.equals(this.releasePlan, other.releasePlan) && Kotlin.equals(this.jobExecutor, other.jobExecutor) && Kotlin.equals(this.jobExecutionDataFactory, other.jobExecutionDataFactory) && Kotlin.equals(this.project, other.project) && Kotlin.equals(this.locks_0, other.locks_0) && Kotlin.equals(this.projectResults, other.projectResults)))));
-  };
-  function Releaser$ReleaseFailure() {
-    Releaser$ReleaseFailure_instance = this;
-    RuntimeException_init_0(this);
-    this.name = 'Releaser$ReleaseFailure';
-  }
-  Releaser$ReleaseFailure.$metadata$ = {
-    kind: Kind_OBJECT,
-    simpleName: 'ReleaseFailure',
-    interfaces: [RuntimeException]
-  };
-  var Releaser$ReleaseFailure_instance = null;
-  function Releaser$ReleaseFailure_getInstance() {
-    if (Releaser$ReleaseFailure_instance === null) {
-      new Releaser$ReleaseFailure();
-    }
-    return Releaser$ReleaseFailure_instance;
-  }
-  Releaser.$metadata$ = {
-    kind: Kind_CLASS,
-    simpleName: 'Releaser',
-    interfaces: []
-  };
-  function SimulatingJobExecutor() {
-    this.count_0 = 0;
-  }
-  SimulatingJobExecutor.prototype.pollAndExtract_x0psdq$ = function (crumbWithId, url, regex, errorHandler) {
-    return Promise.resolve('simulation-only.json');
-  };
-  function SimulatingJobExecutor$trigger$lambda(closure$jobQueuedHook, closure$jobExecutionData, closure$jobName, this$SimulatingJobExecutor) {
-    return function () {
-      closure$jobQueuedHook(closure$jobExecutionData.jobBaseUrl + 'queuingUrl');
-      return this$SimulatingJobExecutor.informIfStepWiseAndNotPublish_0('job ' + closure$jobName + ' queued', closure$jobName);
-    };
-  }
-  function SimulatingJobExecutor$trigger$lambda$lambda(closure$jobStartedHook, closure$jobName, this$SimulatingJobExecutor) {
-    return function () {
-      closure$jobStartedHook(100);
-      return this$SimulatingJobExecutor.informIfStepWiseAndNotPublish_0('job ' + closure$jobName + ' started', closure$jobName);
-    };
-  }
-  function SimulatingJobExecutor$trigger$lambda_0(closure$jobStartedHook, closure$jobName, this$SimulatingJobExecutor) {
-    return function (it) {
-      return sleep(waitBetweenSteps, SimulatingJobExecutor$trigger$lambda$lambda(closure$jobStartedHook, closure$jobName, this$SimulatingJobExecutor));
-    };
-  }
-  function SimulatingJobExecutor$trigger$lambda$lambda$lambda(it) {
-    return true;
-  }
-  function SimulatingJobExecutor$trigger$lambda$lambda_0(this$SimulatingJobExecutor, closure$jobName) {
-    return function () {
-      this$SimulatingJobExecutor.count_0 = this$SimulatingJobExecutor.count_0 + 1 | 0;
-      if (this$SimulatingJobExecutor.count_0 > failAfterSteps) {
-        if (!false) {
-          var this$SimulatingJobExecutor_0 = this$SimulatingJobExecutor;
-          var closure$jobName_0 = closure$jobName;
-          this$SimulatingJobExecutor_0.count_0 = -3;
-          var message = 'simulating a failure for ' + closure$jobName_0;
-          throw IllegalStateException_init(message.toString());
-        }
-      }
-      return this$SimulatingJobExecutor.informIfStepWise_0('job ' + closure$jobName + ' ended').then(SimulatingJobExecutor$trigger$lambda$lambda$lambda);
-    };
-  }
-  function SimulatingJobExecutor$trigger$lambda_1(this$SimulatingJobExecutor, closure$jobName) {
-    return function (it) {
-      return sleep(waitBetweenSteps, SimulatingJobExecutor$trigger$lambda$lambda_0(this$SimulatingJobExecutor, closure$jobName));
-    };
-  }
-  function SimulatingJobExecutor$trigger$lambda_2(it) {
-    return to(new CrumbWithId('Jenkins-Crumb', 'onlySimulation'), 100);
-  }
-  SimulatingJobExecutor.prototype.trigger_shi73r$$default = function (jobExecutionData, jobQueuedHook, jobStartedHook, pollEverySecond, maxWaitingTimeForCompletenessInSeconds, verbose) {
-    var jobName = jobExecutionData.jobName;
-    return sleep(100, SimulatingJobExecutor$trigger$lambda(jobQueuedHook, jobExecutionData, jobName, this)).then(SimulatingJobExecutor$trigger$lambda_0(jobStartedHook, jobName, this)).then(SimulatingJobExecutor$trigger$lambda_1(this, jobName)).then(SimulatingJobExecutor$trigger$lambda_2);
-  };
-  SimulatingJobExecutor.prototype.informIfStepWiseAndNotPublish_0 = function (msg, jobName) {
-    var tmp$;
-    if (!startsWith(jobName, 'publish')) {
-      tmp$ = this.informIfStepWise_0(msg);
-    }
-     else {
-      tmp$ = Promise.resolve(Unit);
-    }
-    return tmp$;
-  };
-  SimulatingJobExecutor.prototype.informIfStepWise_0 = function (msg) {
-    var tmp$;
-    if (stepWise) {
-      tmp$ = showAlert(msg);
-    }
-     else {
-      tmp$ = Promise.resolve(Unit);
-    }
-    return tmp$;
-  };
-  SimulatingJobExecutor.$metadata$ = {
-    kind: Kind_CLASS,
-    simpleName: 'SimulatingJobExecutor',
-    interfaces: [JobExecutor]
-  };
-  function Toggler(releasePlan, menu) {
-    Toggler$Companion_getInstance();
-    this.releasePlan_0 = releasePlan;
-    this.menu_0 = menu;
-  }
-  Toggler.prototype.registerToggleEvents = function () {
-    var tmp$;
-    tmp$ = this.releasePlan_0.getProjects().iterator();
-    while (tmp$.hasNext()) {
-      var element = tmp$.next();
-      action$break: do {
-        var tmp$_0;
-        tmp$_0 = this.getAllToggle_0(element);
-        if (tmp$_0 == null) {
-          break action$break;
-        }
-        var allToggle = tmp$_0;
-        this.registerAllToggleEvents_0(allToggle, element);
-        this.registerCommandToggleEvents_0(element);
-        this.registerReleaseUncheckEventForDependentsAndSubmodules_0(element);
-      }
-       while (false);
-    }
-  };
-  Toggler.prototype.getAllToggle_0 = function (project) {
-    return this.getAllToggle_1(project.id);
-  };
-  Toggler.prototype.getAllToggle_1 = function (projectId) {
-    var id = projectId.identifier + Gui$Companion_getInstance().DEACTIVATE_ALL_SUFFIX;
-    var elementByIdOrNull$result;
-    elementByIdOrNull$break: do {
-      var tmp$;
-      tmp$ = document.getElementById(id);
-      if (tmp$ == null) {
-        elementByIdOrNull$result = null;
-        break elementByIdOrNull$break;
-      }
-      var element = tmp$;
-      if (!Kotlin.isType(element, HTMLInputElement)) {
-        var message = 'element with ' + id + ' found but was wrong type.<br/>Expected type ' + get_js(getKClass(HTMLInputElement)).name + '<br/>Found ' + element;
-        throw IllegalArgumentException_init(message.toString());
-      }
-      elementByIdOrNull$result = element;
-    }
-     while (false);
-    return elementByIdOrNull$result;
-  };
-  function Toggler$registerAllToggleEvents$lambda(closure$allToggle, closure$project, this$Toggler) {
-    return function (it) {
-      var event = closure$allToggle.checked ? Toggler$Companion_getInstance().EVENT_ALL_TOGGLE_CHECKED_0 : Toggler$Companion_getInstance().EVENT_ALL_TOGGLE_UNCHECKED_0;
-      this$Toggler.dispatchToggleEvent_0(closure$project, closure$allToggle, event);
-      return Unit;
-    };
-  }
-  Toggler.prototype.registerAllToggleEvents_0 = function (allToggle, project) {
-    addChangeEventListener(allToggle, void 0, Toggler$registerAllToggleEvents$lambda(allToggle, project, this));
-    Gui$Companion_getInstance().disableUnDisableForReleaseStartAndEnd_fj1ece$(allToggle, elementById(allToggle.id + Gui$Companion_getInstance().SLIDER_SUFFIX));
-  };
-  function Toggler$registerCommandToggleEvents$lambda$lambda(closure$project, closure$index, this$Toggler) {
-    return function (it) {
-      this$Toggler.toggleCommand_0(closure$project, closure$index, Toggler$Companion_getInstance().EVENT_RELEASE_TOGGLE_UNCHECKED_0);
-      return Unit;
-    };
-  }
-  function Toggler$registerCommandToggleEvents$lambda$lambda_0(this$Toggler) {
-    return function (it) {
-      return this$Toggler.releasePlan_0.getProject_lljhqa$(it);
-    };
-  }
-  function Toggler$registerCommandToggleEvents$lambda$lambda$lambda(closure$toggle, this$Toggler) {
-    return function (it) {
-      this$Toggler.uncheck_0(closure$toggle);
-      return Unit;
-    };
-  }
-  function Toggler$registerCommandToggleEvents$lambda$lambda_1(closure$project, closure$index, this$Toggler) {
-    return function (it) {
-      this$Toggler.toggleCommand_0(closure$project, closure$index, Toggler$Companion_getInstance().EVENT_TOGGLE_UNCHECKED_0);
-      return Unit;
-    };
-  }
-  function Toggler$registerCommandToggleEvents$lambda$lambda_2(closure$project, closure$index, this$Toggler, closure$toggle) {
-    return function (it) {
-      if (this$Toggler.inCorrectStateForToggling_0(closure$project, closure$index)) {
-        this$Toggler.check_0(closure$toggle);
-      }
-      return Unit;
-    };
-  }
-  function Toggler$registerCommandToggleEvents$lambda$lambda_3(closure$project, closure$index, this$Toggler, closure$toggle) {
-    return function (it) {
-      if (this$Toggler.inCorrectStateForToggling_0(closure$project, closure$index)) {
-        this$Toggler.uncheck_0(closure$toggle);
-      }
-      return Unit;
-    };
-  }
-  Toggler.prototype.registerCommandToggleEvents_0 = function (project) {
-    var tmp$, tmp$_0;
-    var index = 0;
-    tmp$ = project.commands.iterator();
-    while (tmp$.hasNext()) {
-      var item = tmp$.next();
-      var index_0 = (tmp$_0 = index, index = tmp$_0 + 1 | 0, tmp$_0);
-      var toggle = this.getToggle_0(project, index_0);
-      if (Kotlin.isType(item, ReleaseCommand)) {
-        addChangeEventListener(toggle, void 0, Toggler$registerCommandToggleEvents$lambda$lambda(project, index_0, this));
-        this.disallowClickIfNotAllCommandsOrSubmodulesActive_0(project, toggle);
-        var projectAndSubmodules = plus(sequenceOf([project]), map(asSequence(this.releasePlan_0.getSubmodules_lljhqa$(project.id)), Toggler$registerCommandToggleEvents$lambda$lambda_0(this)));
-        var tmp$_1;
-        tmp$_1 = projectAndSubmodules.iterator();
-        while (tmp$_1.hasNext()) {
-          var element = tmp$_1.next();
-          this.registerForProjectEvent_0(element, Toggler$Companion_getInstance().EVENT_TOGGLE_UNCHECKED_0, Toggler$registerCommandToggleEvents$lambda$lambda$lambda(toggle, this));
-        }
-      }
-       else {
-        addChangeEventListener(toggle, void 0, Toggler$registerCommandToggleEvents$lambda$lambda_1(project, index_0, this));
-      }
-      Gui$Companion_getInstance().disableUnDisableForReleaseStartAndEnd_fj1ece$(toggle, elementById(toggle.id + Gui$Companion_getInstance().SLIDER_SUFFIX));
-      this.registerForProjectEvent_0(project, Toggler$Companion_getInstance().EVENT_ALL_TOGGLE_CHECKED_0, Toggler$registerCommandToggleEvents$lambda$lambda_2(project, index_0, this, toggle));
-      this.registerForProjectEvent_0(project, Toggler$Companion_getInstance().EVENT_ALL_TOGGLE_UNCHECKED_0, Toggler$registerCommandToggleEvents$lambda$lambda_3(project, index_0, this, toggle));
-    }
-  };
-  Toggler.prototype.inCorrectStateForToggling_0 = function (project, index) {
-    var commandState = Gui$Companion_getInstance().getCommandState_o8feeo$(project.id, index);
-    return commandState === CommandState.Ready || Kotlin.isType(commandState, CommandState$Waiting) || Kotlin.isType(commandState, CommandState$Deactivated) || commandState === CommandState.Failed;
-  };
-  Toggler.prototype.getToggle_0 = function (project, index) {
-    var id = Gui$Companion_getInstance().getCommandId_xgsuvp$(project, index) + Gui$Companion_getInstance().DEACTIVATE_SUFFIX;
-    var tmp$;
-    var elementByIdOrNull$result;
-    elementByIdOrNull$break: do {
-      var tmp$_0;
-      tmp$_0 = document.getElementById(id);
-      if (tmp$_0 == null) {
-        elementByIdOrNull$result = null;
-        break elementByIdOrNull$break;
-      }
-      var element = tmp$_0;
-      if (!Kotlin.isType(element, HTMLInputElement)) {
-        var message = 'element with ' + id + ' found but was wrong type.<br/>Expected type ' + get_js(getKClass(HTMLInputElement)).name + '<br/>Found ' + element;
-        throw IllegalArgumentException_init(message.toString());
-      }
-      elementByIdOrNull$result = element;
-    }
-     while (false);
-    tmp$ = elementByIdOrNull$result;
-    if (tmp$ == null) {
-      throw IllegalStateException_init('no element found for id ' + id + ' (expected type ' + get_js(getKClass(HTMLInputElement)).name + ')');
-    }
-    return tmp$;
-  };
-  Toggler.prototype.toggleCommand_0 = function (project, index, uncheckedEvent) {
-    var tmp$, tmp$_0;
-    var toggle = this.getToggle_0(project, index);
-    var command = Gui$Companion_getInstance().getCommand_xgsuvp$(project, index);
-    var slider = elementById(toggle.id + Gui$Companion_getInstance().SLIDER_SUFFIX);
-    var currentTitle = elementById(Gui$Companion_getInstance().getCommandId_xgsuvp$(project, index) + Gui$Companion_getInstance().STATE_SUFFIX).title;
-    if (!toggle.checked) {
-      this.dispatchToggleEvent_0(project, toggle, uncheckedEvent);
-      var previous = Kotlin.isType(tmp$ = command.state, CommandState) ? tmp$ : throwCCE();
-      Gui$Companion_getInstance().changeStateOfCommand_q143v3$(project, index, new CommandState$Deactivated(previous), currentTitle);
-      slider.title = 'Click to activate command.';
-    }
-     else {
-      var oldState = Kotlin.isType(tmp$_0 = command.state, CommandState$Deactivated) ? tmp$_0 : throwCCE();
-      Gui$Companion_getInstance().changeStateOfCommand_q143v3$(project, index, oldState.previous, currentTitle);
-      slider.title = 'Click to deactivate command.';
-    }
-    this.menu_0.activateSaveButton();
-  };
-  function Toggler$disallowClickIfNotAllCommandsOrSubmodulesActive$lambda(closure$toggle, closure$project, this$Toggler) {
-    return function (e) {
-      if (closure$toggle.checked && this$Toggler.notAllCommandsOrSubmodulesActive_0(closure$project, closure$toggle)) {
-        e.preventDefault();
-        showInfo('Cannot reactivate the ReleaseCommand for project ' + closure$project.id.identifier + ' ' + 'because some commands (of submodules) are deactivated.', 4000);
-      }
-      return Unit;
-    };
-  }
-  Toggler.prototype.disallowClickIfNotAllCommandsOrSubmodulesActive_0 = function (project, toggle) {
-    addClickEventListener(toggle, void 0, Toggler$disallowClickIfNotAllCommandsOrSubmodulesActive$lambda(toggle, project, this));
-  };
-  function Toggler$notAllCommandsOrSubmodulesActive$lambda(closure$toggle) {
-    return function (it) {
-      return !equals(it.id, closure$toggle.id);
-    };
-  }
-  Toggler.prototype.notAllCommandsOrSubmodulesActive_0 = function (project, toggle) {
-    return this.notAllCommandsActive_0(project, Toggler$notAllCommandsOrSubmodulesActive$lambda(toggle)) || this.notAllSubmodulesActive_0(project);
-  };
-  function Toggler$registerReleaseUncheckEventForDependentsAndSubmodules$lambda$lambda$lambda(this$Toggler, closure$dependentId, closure$index) {
-    return function (it) {
-      this$Toggler.uncheck_0(this$Toggler.getToggle_0(this$Toggler.releasePlan_0.getProject_lljhqa$(closure$dependentId), closure$index));
-      return Unit;
-    };
-  }
-  Toggler.prototype.registerReleaseUncheckEventForDependentsAndSubmodules_0 = function (project) {
-    if (!project.isSubmodule) {
-      var projectIds = this.releasePlan_0.collectDependentsInclDependentsOfAllSubmodules_lljhqa$(project.id);
-      var tmp$;
-      tmp$ = projectIds.iterator();
-      while (tmp$.hasNext()) {
-        var element = tmp$.next();
-        var projectId = element.component1()
-        , dependentId = element.component2();
-        var $receiver = mapWithIndex_0(this.releasePlan_0.getProject_lljhqa$(dependentId).commands);
-        var destination = ArrayList_init();
-        var tmp$_0;
-        tmp$_0 = $receiver.iterator();
-        while (tmp$_0.hasNext()) {
-          var element_0 = tmp$_0.next();
-          var predicate$result;
-          predicate$break: do {
-            var command = element_0.component2();
-            if (Kotlin.isType(command, ReleaseCommand)) {
-              predicate$result = false;
-              break predicate$break;
-            }
-            var state = command.state;
-            predicate$result = (Kotlin.isType(state, CommandState$Waiting) && state.dependencies.contains_11rb$(projectId));
-          }
-           while (false);
-          if (predicate$result)
-            destination.add_11rb$(element_0);
-        }
-        var tmp$_1;
-        tmp$_1 = destination.iterator();
-        while (tmp$_1.hasNext()) {
-          var element_1 = tmp$_1.next();
-          var index = element_1.component1();
-          this.registerForProjectEvent_0(project, Toggler$Companion_getInstance().EVENT_RELEASE_TOGGLE_UNCHECKED_0, Toggler$registerReleaseUncheckEventForDependentsAndSubmodules$lambda$lambda$lambda(this, dependentId, index));
-        }
-      }
-    }
-  };
-  Toggler.prototype.uncheck_0 = function ($receiver) {
-    this.changeChecked_0($receiver, false);
-  };
-  Toggler.prototype.check_0 = function ($receiver) {
-    this.changeChecked_0($receiver, true);
-  };
-  function Toggler$changeChecked$lambda(closure$toggle) {
-    return function (it) {
-      return closure$toggle.dispatchEvent(new Event('change'));
-    };
-  }
-  Toggler.prototype.changeChecked_0 = function (toggle, checked) {
-    if (toggle.checked === checked)
-      return;
-    toggle.checked = checked;
-    Promise.resolve(0).then(Toggler$changeChecked$lambda(toggle));
-  };
-  function Toggler$notAllCommandsActive$lambda(closure$project, this$Toggler) {
-    return function (index, f) {
-      return this$Toggler.getCheckbox_0(closure$project.id.identifier, index);
-    };
-  }
-  Toggler.prototype.notAllCommandsActive_0 = function (project, predicate) {
-    var $receiver = filter(mapIndexed(asSequence(project.commands), Toggler$notAllCommandsActive$lambda(project, this)), predicate);
-    var any$result;
-    any$break: do {
-      var tmp$;
-      tmp$ = $receiver.iterator();
-      while (tmp$.hasNext()) {
-        var element = tmp$.next();
-        if (!element.checked) {
-          any$result = true;
-          break any$break;
-        }
-      }
-      any$result = false;
-    }
-     while (false);
-    return any$result;
-  };
-  function Toggler$notAllSubmodulesActive$lambda$lambda(it) {
-    return true;
-  }
-  Toggler.prototype.notAllSubmodulesActive_0 = function (project) {
-    var $receiver = this.releasePlan_0.getSubmodules_lljhqa$(project.id);
-    var any$result;
-    any$break: do {
-      var tmp$;
-      if (Kotlin.isType($receiver, Collection) && $receiver.isEmpty()) {
-        any$result = false;
-        break any$break;
-      }
-      tmp$ = $receiver.iterator();
-      while (tmp$.hasNext()) {
-        var element = tmp$.next();
-        var submodulesHasCommands = document.getElementById(this.getDeactivateAllId_0(project.id)) != null;
-        if (submodulesHasCommands && this.notAllCommandsActive_0(this.releasePlan_0.getProject_lljhqa$(element), Toggler$notAllSubmodulesActive$lambda$lambda)) {
-          any$result = true;
-          break any$break;
-        }
-      }
-      any$result = false;
-    }
-     while (false);
-    return any$result;
-  };
-  Toggler.prototype.getDeactivateAllId_0 = function (projectId) {
-    return projectId.identifier + Gui$Companion_getInstance().DEACTIVATE_ALL_SUFFIX;
-  };
-  Toggler.prototype.getCheckbox_0 = function (identifier, index) {
-    return getCheckbox(identifier + ':' + index + Gui$Companion_getInstance().DEACTIVATE_SUFFIX);
-  };
-  Toggler.prototype.dispatchToggleEvent_0 = function (project, toggle, event) {
-    var tmp$ = this.projectElement_0(project);
-    var o = {};
-    o['detail'] = toggle;
-    o['bubbles'] = false;
-    o['cancelable'] = false;
-    o['composed'] = false;
-    tmp$.dispatchEvent(new CustomEvent(event, o));
-  };
-  Toggler.prototype.registerForProjectEvent_0 = function (project, event, callback) {
-    this.projectElement_0(project).addEventListener(event, callback);
-  };
-  Toggler.prototype.projectElement_0 = function (project) {
-    return elementById(project.id.identifier);
-  };
-  function Toggler$Companion() {
-    Toggler$Companion_instance = this;
-    this.EVENT_TOGGLE_UNCHECKED_0 = 'toggle.unchecked';
-    this.EVENT_RELEASE_TOGGLE_UNCHECKED_0 = 'release.toggle.unchecked';
-    this.EVENT_ALL_TOGGLE_CHECKED_0 = 'all.toggle.checked';
-    this.EVENT_ALL_TOGGLE_UNCHECKED_0 = 'all.toggle.unchecked';
-  }
-  Toggler$Companion.$metadata$ = {
-    kind: Kind_OBJECT,
-    simpleName: 'Companion',
-    interfaces: []
-  };
-  var Toggler$Companion_instance = null;
-  function Toggler$Companion_getInstance() {
-    if (Toggler$Companion_instance === null) {
-      new Toggler$Companion();
-    }
-    return Toggler$Companion_instance;
-  }
-  Toggler.$metadata$ = {
-    kind: Kind_CLASS,
-    simpleName: 'Toggler',
+    simpleName: 'ModifiableJson',
     interfaces: []
   };
   function sleep$lambda(closure$ms) {
@@ -4278,50 +4881,49 @@
   function options() {
     console.log(joinToString(mapOf([to('failAfterSteps', failAfterSteps), to('waitBetweenSteps', waitBetweenSteps), to('stepWise', stepWise)]).entries, '\n', void 0, void 0, void 0, void 0, options$lambda));
   }
-  Object.defineProperty(App, 'Companion', {
-    get: App$Companion_getInstance
-  });
   var package$ch = _.ch || (_.ch = {});
   var package$loewenfels = package$ch.loewenfels || (package$ch.loewenfels = {});
   var package$depgraph = package$loewenfels.depgraph || (package$loewenfels.depgraph = {});
   var package$gui = package$depgraph.gui || (package$depgraph.gui = {});
-  package$gui.App = App;
-  package$gui.BaseJobExecutionDataFactory = BaseJobExecutionDataFactory;
-  Object.defineProperty(package$gui, 'ChangeApplier', {
-    get: ChangeApplier_getInstance
+  var package$actions = package$gui.actions || (package$gui.actions = {});
+  package$actions.Downloader = Downloader;
+  Object.defineProperty(Publisher, 'Companion', {
+    get: Publisher$Companion_getInstance
   });
-  Object.defineProperty(package$gui, 'MAVEN_PROJECT_ID_8be2vx$', {
-    get: function () {
-      return MAVEN_PROJECT_ID;
-    }
-  });
-  Object.defineProperty(package$gui, 'JENKINS_MAVEN_RELEASE_PLUGIN_8be2vx$', {
-    get: function () {
-      return JENKINS_MAVEN_RELEASE_PLUGIN;
-    }
-  });
-  Object.defineProperty(package$gui, 'JENKINS_MULTI_MAVEN_RELEASE_PLUGIN_8be2vx$', {
-    get: function () {
-      return JENKINS_MULTI_MAVEN_RELEASE_PLUGIN;
-    }
-  });
-  Object.defineProperty(package$gui, 'JENKINS_UPDATE_DEPENDENCY_8be2vx$', {
-    get: function () {
-      return JENKINS_UPDATE_DEPENDENCY;
-    }
-  });
-  package$gui.deserialize_61zpoe$ = deserialize;
-  package$gui.deserializeReleaseState_alav3r$ = deserializeReleaseState;
-  package$gui.deserializeProjectId_szevpb$ = deserializeProjectId;
-  package$gui.deserializeProjects_alav3r$ = deserializeProjects;
-  package$gui.deserializeCommands_8qnrty$ = deserializeCommands;
-  package$gui.createJenkinsMavenReleasePlugin_dc558r$ = createJenkinsMavenReleasePlugin;
-  package$gui.createJenkinsMultiMavenReleasePlugin_dc558r$ = createJenkinsMultiMavenReleasePlugin;
-  package$gui.createJenkinsUpdateDependency_dc558r$ = createJenkinsUpdateDependency;
-  package$gui.deserializeCommandState_dc558r$ = deserializeCommandState;
-  package$gui.deserializeMapOfProjectIdAndSetProjectId_esfstb$ = deserializeMapOfProjectIdAndSetProjectId;
-  package$gui.deserializeConfig_bwh3i6$ = deserializeConfig;
+  package$actions.Publisher = Publisher;
   $$importsForInline$$['dep-graph-releaser-gui'] = _;
+  package$actions.Releaser = Releaser;
+  Object.defineProperty(App, 'Companion', {
+    get: App$Companion_getInstance
+  });
+  package$gui.App = App;
+  $$importsForInline$$['kbox-js'] = $module$kbox_js;
+  Object.defineProperty(ContextMenu, 'Companion', {
+    get: ContextMenu$Companion_getInstance
+  });
+  var package$components = package$gui.components || (package$gui.components = {});
+  package$components.ContextMenu = ContextMenu;
+  package$components.textFieldWithLabel_cm1ubu$ = textFieldWithLabel;
+  package$components.textFieldReadOnlyWithLabel_c9gzxl$ = textFieldReadOnlyWithLabel;
+  package$components.textFieldWithLabel_c9gzxl$ = textFieldWithLabel_0;
+  package$components.textAreaWithLabel_cm1ubu$ = textAreaWithLabel;
+  Object.defineProperty(Menu, 'Companion', {
+    get: Menu$Companion_getInstance
+  });
+  Menu.Dependencies = Menu$Dependencies;
+  package$components.Menu = Menu;
+  Object.defineProperty(Pipeline, 'Companion', {
+    get: Pipeline$Companion_getInstance
+  });
+  package$components.Pipeline = Pipeline;
+  Object.defineProperty(Toggler, 'Companion', {
+    get: Toggler$Companion_getInstance
+  });
+  package$components.Toggler = Toggler;
+  package$gui.parseRemoteRegex_429wai$ = parseRemoteRegex;
+  package$gui.parseRemoteRegex_61zpoe$ = parseRemoteRegex_0;
+  package$gui.parseRegexParameters_429wai$ = parseRegexParameters;
+  package$gui.parseRegexParameters_61zpoe$ = parseRegexParameters_0;
   package$gui.elementById_61zpoe$ = elementById;
   package$gui.display_puj7f4$ = display;
   package$gui.getCheckbox_61zpoe$ = getCheckbox;
@@ -4329,9 +4931,6 @@
   package$gui.getTextField_61zpoe$ = getTextField;
   package$gui.getTextFieldOrNull_61zpoe$ = getTextFieldOrNull;
   package$gui.getInputElementOrNull_puj7f4$ = getInputElementOrNull;
-  package$gui.Downloader = Downloader;
-  package$gui.DryRunJobExecutionDataFactory = DryRunJobExecutionDataFactory;
-  $$importsForInline$$['kbox-js'] = $module$kbox_js;
   Object.defineProperty(Gui, 'Companion', {
     get: Gui$Companion_getInstance
   });
@@ -4340,38 +4939,66 @@
   package$gui.addClickEventListener_7wfdf5$ = addClickEventListener;
   package$gui.addChangeEventListener_7wfdf5$ = addChangeEventListener;
   package$gui.toggleClass_9bm2zh$ = toggleClass;
-  package$gui.withErrorHandling_f39uuh$ = withErrorHandling;
   package$gui.getOldTitle_y4uc6z$ = getOldTitle;
   package$gui.getOldTitleOrNull_y4uc6z$ = getOldTitleOrNull;
   package$gui.setTitleSaveOld_9bm2zh$ = setTitleSaveOld;
-  package$gui.checkStatusOk_7ri4uy$ = checkStatusOk;
-  package$gui.checkStatusOkOr403_7ri4uy$ = checkStatusOkOr403;
-  package$gui.checkStatusOkOr404_7ri4uy$ = checkStatusOkOr404;
-  package$gui.createFetchInitWithCredentials = createFetchInitWithCredentials;
-  package$gui.createHeaderWithAuthAndCrumb_rrwa0a$ = createHeaderWithAuthAndCrumb;
-  package$gui.addAuthentication_1njwi7$ = addAuthentication;
-  package$gui.get_GET_be77oc$ = get_GET;
-  package$gui.get_POST_be77oc$ = get_POST;
-  package$gui.createRequestInit_jy6nrn$ = createRequestInit;
-  package$gui.UsernameToken = UsernameToken;
-  package$gui.CrumbWithId = CrumbWithId;
-  JenkinsJobExecutor.PollException = JenkinsJobExecutor$PollException;
+  var package$jobexecution = package$gui.jobexecution || (package$gui.jobexecution = {});
+  package$jobexecution.BaseJobExecutionDataFactory = BaseJobExecutionDataFactory;
+  package$jobexecution.BuilderNumberExtractor = BuilderNumberExtractor;
+  Object.defineProperty(BuildHistoryBasedBuildNumberExtractor, 'Companion', {
+    get: BuildHistoryBasedBuildNumberExtractor$Companion_getInstance
+  });
+  package$jobexecution.BuildHistoryBasedBuildNumberExtractor = BuildHistoryBasedBuildNumberExtractor;
+  package$jobexecution.DryRunJobExecutionDataFactory = DryRunJobExecutionDataFactory;
+  package$jobexecution.checkStatusOk_7ri4uy$ = checkStatusOk;
+  package$jobexecution.checkStatusOkOr403_7ri4uy$ = checkStatusOkOr403;
+  package$jobexecution.checkStatusOkOr404_7ri4uy$ = checkStatusOkOr404;
+  package$jobexecution.createFetchInitWithCredentials = createFetchInitWithCredentials;
+  package$jobexecution.createHeaderWithAuthAndCrumb_lqqujo$ = createHeaderWithAuthAndCrumb;
+  package$jobexecution.addAuthentication_f36nwf$ = addAuthentication;
+  package$jobexecution.get_GET_pcmf85$ = get_GET;
+  package$jobexecution.get_POST_pcmf85$ = get_POST;
+  package$jobexecution.createGetRequest_za3rmp$ = createGetRequest;
+  package$jobexecution.createRequestInit_7hyu12$ = createRequestInit;
+  package$jobexecution.UsernameAndApiToken = UsernameAndApiToken;
+  package$jobexecution.CrumbWithId = CrumbWithId;
+  package$jobexecution.AuthData = AuthData;
   Object.defineProperty(JenkinsJobExecutor, 'Companion', {
     get: JenkinsJobExecutor$Companion_getInstance
   });
-  package$gui.JenkinsJobExecutor = JenkinsJobExecutor;
+  package$jobexecution.JenkinsJobExecutor = JenkinsJobExecutor;
+  package$jobexecution.createParameterRegexPattern_y0zsll$ = createParameterRegexPattern;
+  package$jobexecution.toQueryParameters_y0zsll$ = toQueryParameters;
   Object.defineProperty(JobExecutionData, 'Companion', {
     get: JobExecutionData$Companion_getInstance
   });
-  package$gui.JobExecutionData = JobExecutionData;
-  package$gui.JobExecutionDataFactory = JobExecutionDataFactory;
-  package$gui.JobExecutor = JobExecutor;
-  Object.defineProperty(Menu, 'Companion', {
-    get: Menu$Companion_getInstance
+  package$jobexecution.JobExecutionData = JobExecutionData;
+  package$jobexecution.JobExecutionDataFactory = JobExecutionDataFactory;
+  package$jobexecution.JobExecutor = JobExecutor;
+  Object.defineProperty(package$jobexecution, 'LocationBasedQueuedItemUrlExtractor', {
+    get: LocationBasedQueuedItemUrlExtractor_getInstance
   });
-  Menu.Dependencies = Menu$Dependencies;
-  package$gui.Menu = Menu;
-  package$gui.ModifiableJson = ModifiableJson;
+  Poller.prototype.PollData_init_gpibsa$ = Poller$Poller$PollData_init;
+  Poller.prototype.PollData = Poller$PollData;
+  Object.defineProperty(package$jobexecution, 'Poller', {
+    get: Poller_getInstance
+  });
+  package$jobexecution.PollException = PollException;
+  Object.defineProperty(QueuedItemBasedBuildNumberExtractor, 'Companion', {
+    get: QueuedItemBasedBuildNumberExtractor$Companion_getInstance
+  });
+  package$jobexecution.QueuedItemBasedBuildNumberExtractor = QueuedItemBasedBuildNumberExtractor;
+  package$jobexecution.QueuedItemUrlExtractor = QueuedItemUrlExtractor;
+  package$jobexecution.ReleaseJobExecutionDataFactory = ReleaseJobExecutionDataFactory;
+  package$jobexecution.RestApiBasedQueuedItemUrlExtractor = RestApiBasedQueuedItemUrlExtractor;
+  package$jobexecution.SimulatingJobExecutor = SimulatingJobExecutor;
+  Object.defineProperty(UrlWithSlashAtTheEnd, 'Companion', {
+    get: UrlWithSlashAtTheEnd$Companion_getInstance
+  });
+  package$jobexecution.UrlWithSlashAtTheEnd = UrlWithSlashAtTheEnd;
+  Object.defineProperty(package$jobexecution, 'UsernameTokenRegistry', {
+    get: UsernameTokenRegistry_getInstance
+  });
   package$gui.showStatus_61zpoe$ = showStatus;
   package$gui.showSuccess_4wem9b$ = showSuccess;
   package$gui.showInfo_4wem9b$ = showInfo;
@@ -4382,17 +5009,42 @@
   package$gui.turnThrowableIntoMessage_tcv7n7$ = turnThrowableIntoMessage;
   package$gui.showDialog_61zpoe$ = showDialog;
   package$gui.showAlert_61zpoe$ = showAlert;
-  Object.defineProperty(Publisher, 'Companion', {
-    get: Publisher$Companion_getInstance
+  var package$serialization = package$gui.serialization || (package$gui.serialization = {});
+  Object.defineProperty(package$serialization, 'ChangeApplier', {
+    get: ChangeApplier_getInstance
   });
-  package$gui.Publisher = Publisher;
-  package$gui.ReleaseJobExecutionDataFactory = ReleaseJobExecutionDataFactory;
-  package$gui.Releaser = Releaser;
-  package$gui.SimulatingJobExecutor = SimulatingJobExecutor;
-  Object.defineProperty(Toggler, 'Companion', {
-    get: Toggler$Companion_getInstance
+  Object.defineProperty(package$serialization, 'MAVEN_PROJECT_ID_8be2vx$', {
+    get: function () {
+      return MAVEN_PROJECT_ID;
+    }
   });
-  package$gui.Toggler = Toggler;
+  Object.defineProperty(package$serialization, 'JENKINS_MAVEN_RELEASE_PLUGIN_8be2vx$', {
+    get: function () {
+      return JENKINS_MAVEN_RELEASE_PLUGIN;
+    }
+  });
+  Object.defineProperty(package$serialization, 'JENKINS_MULTI_MAVEN_RELEASE_PLUGIN_8be2vx$', {
+    get: function () {
+      return JENKINS_MULTI_MAVEN_RELEASE_PLUGIN;
+    }
+  });
+  Object.defineProperty(package$serialization, 'JENKINS_UPDATE_DEPENDENCY_8be2vx$', {
+    get: function () {
+      return JENKINS_UPDATE_DEPENDENCY;
+    }
+  });
+  package$serialization.deserialize_61zpoe$ = deserialize;
+  package$serialization.deserializeReleaseState_lpfs1l$ = deserializeReleaseState;
+  package$serialization.deserializeProjectId_mb6gxr$ = deserializeProjectId;
+  package$serialization.deserializeProjects_lpfs1l$ = deserializeProjects;
+  package$serialization.deserializeCommands_1puwd8$ = deserializeCommands;
+  package$serialization.createJenkinsMavenReleasePlugin_dc558r$ = createJenkinsMavenReleasePlugin;
+  package$serialization.createJenkinsMultiMavenReleasePlugin_dc558r$ = createJenkinsMultiMavenReleasePlugin;
+  package$serialization.createJenkinsUpdateDependency_dc558r$ = createJenkinsUpdateDependency;
+  package$serialization.deserializeCommandState_dc558r$ = deserializeCommandState;
+  package$serialization.deserializeMapOfProjectIdAndSetProjectId_sys0ir$ = deserializeMapOfProjectIdAndSetProjectId;
+  package$serialization.deserializeConfig_bwh3i6$ = deserializeConfig;
+  package$serialization.ModifiableJson = ModifiableJson;
   package$gui.sleep_xsjjga$ = sleep;
   package$gui.changeCursorToProgress = changeCursorToProgress;
   package$gui.changeCursorBackToNormal = changeCursorBackToNormal;
@@ -4428,14 +5080,14 @@
     }
   });
   _.options = options;
-  JenkinsJobExecutor.prototype.trigger_shi73r$ = JobExecutor.prototype.trigger_shi73r$;
-  SimulatingJobExecutor.prototype.trigger_shi73r$ = JobExecutor.prototype.trigger_shi73r$;
+  JenkinsJobExecutor.prototype.trigger_cuif7q$ = JobExecutor.prototype.trigger_cuif7q$;
+  SimulatingJobExecutor.prototype.trigger_cuif7q$ = JobExecutor.prototype.trigger_cuif7q$;
+  msgCounter = 0;
+  urlRegex = Regex_init('http(?:s)://[^ ]+');
   MAVEN_PROJECT_ID = 'ch.loewenfels.depgraph.data.maven.MavenProjectId';
   JENKINS_MAVEN_RELEASE_PLUGIN = 'ch.loewenfels.depgraph.data.maven.jenkins.JenkinsMavenReleasePlugin';
   JENKINS_MULTI_MAVEN_RELEASE_PLUGIN = 'ch.loewenfels.depgraph.data.maven.jenkins.JenkinsMultiMavenReleasePlugin';
   JENKINS_UPDATE_DEPENDENCY = 'ch.loewenfels.depgraph.data.maven.jenkins.JenkinsUpdateDependency';
-  msgCounter = 0;
-  urlRegex = Regex_init('http(?:s)://[^ ]+');
   onlyUsedToCallMain = main();
   failAfterSteps = 10000;
   waitBetweenSteps = 500;
