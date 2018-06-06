@@ -43,6 +43,7 @@
   var CommandState = $module$dep_graph_releaser_api_js.ch.loewenfels.depgraph.data.CommandState;
   var CommandState$Deactivated = $module$dep_graph_releaser_api_js.ch.loewenfels.depgraph.data.CommandState.Deactivated;
   var joinToString = Kotlin.kotlin.collections.joinToString_fmv235$;
+  var trimMargin = Kotlin.kotlin.text.trimMargin_rjktp$;
   var CommandState$Waiting = $module$dep_graph_releaser_api_js.ch.loewenfels.depgraph.data.CommandState.Waiting;
   var MutableSet = Kotlin.kotlin.collections.MutableSet;
   var asSequence = Kotlin.kotlin.collections.asSequence_7wnvza$;
@@ -59,6 +60,7 @@
   var equals = Kotlin.equals;
   var substringBefore_0 = Kotlin.kotlin.text.substringBefore_j4ogox$;
   var getCallableRef = Kotlin.getCallableRef;
+  var parseRemoteRegex = $module$dep_graph_releaser_api_js.ch.loewenfels.depgraph.parseRemoteRegex_429wai$;
   var ArrayList_init = Kotlin.kotlin.collections.ArrayList_init_ww73n8$;
   var toString = Kotlin.toString;
   var set_id = $module$kotlinx_html_js.kotlinx.html.set_id_ueiko3$;
@@ -98,39 +100,41 @@
   var sequenceOf = Kotlin.kotlin.sequences.sequenceOf_i5x0yv$;
   var plus = Kotlin.kotlin.sequences.plus_v0iwhp$;
   var mapIndexed = Kotlin.kotlin.sequences.mapIndexed_b7yuyq$;
-  var ConfigKey = $module$dep_graph_releaser_api_js.ch.loewenfels.depgraph.ConfigKey;
-  var splitToSequence = Kotlin.kotlin.text.splitToSequence_o64adg$;
-  var toList = Kotlin.kotlin.sequences.toList_veqyi0$;
-  var emptyList = Kotlin.kotlin.collections.emptyList_287e2$;
-  var indexOf = Kotlin.kotlin.text.indexOf_8eortd$;
   var get_js = Kotlin.kotlin.js.get_js_1yb8b7$;
   var defineInlineFunction = Kotlin.defineInlineFunction;
   var wrapFunction = Kotlin.wrapFunction;
+  var ConfigKey = $module$dep_graph_releaser_api_js.ch.loewenfels.depgraph.ConfigKey;
   var replace = Kotlin.kotlin.text.replace_680rmw$;
   var Kind_INTERFACE = Kotlin.Kind.INTERFACE;
   var toInt = Kotlin.kotlin.text.toInt_pdl1vz$;
   var M2ReleaseCommand = $module$dep_graph_releaser_maven_api_js.ch.loewenfels.depgraph.data.maven.jenkins.M2ReleaseCommand;
   var UnsupportedOperationException_init = Kotlin.kotlin.UnsupportedOperationException_init_pdl1vj$;
+  var withIndex = Kotlin.kotlin.collections.withIndex_7wnvza$;
   var toShort = Kotlin.toShort;
   var split = Kotlin.kotlin.text.split_o64adg$;
+  var regex = $module$dep_graph_releaser_api_js.ch.loewenfels.depgraph.regex;
   var Error_init = Kotlin.kotlin.Error_init_pdl1vj$;
   var Exception = Kotlin.kotlin.Exception;
   var RuntimeException_init_0 = Kotlin.kotlin.RuntimeException_init_pdl1vj$;
   var split_0 = Kotlin.kotlin.text.split_ip8yn$;
+  var indexOf = Kotlin.kotlin.text.indexOf_8eortd$;
   var contains_0 = Kotlin.kotlin.text.contains_sgbm27$;
   var firstOrNull = Kotlin.kotlin.sequences.firstOrNull_veqyi0$;
   var StringBuilder = Kotlin.kotlin.text.StringBuilder;
-  var asIterable = Kotlin.kotlin.sequences.asIterable_veqyi0$;
+  var parseRegexParameters = $module$dep_graph_releaser_api_js.ch.loewenfels.depgraph.parseRegexParameters_429wai$;
   var substringBeforeLast = Kotlin.kotlin.text.substringBeforeLast_j4ogox$;
   var get_create = $module$kotlinx_html_js.kotlinx.html.dom.get_create_4wc2mh$;
   var div_1 = $module$kotlinx_html_js.kotlinx.html.js.div_wkomt5$;
   var get_br = $module$kotlinx_html_js.kotlinx.html.get_br_6s7ubj$;
-  var toList_0 = Kotlin.kotlin.collections.toList_us0mfu$;
+  var unsafe = $module$kotlinx_html_js.kotlinx.html.unsafe_vdrn79$;
+  var asSequence_0 = Kotlin.kotlin.collections.asSequence_us0mfu$;
+  var toList = Kotlin.kotlin.collections.toList_us0mfu$;
   var ReleasePlan = $module$dep_graph_releaser_api_js.ch.loewenfels.depgraph.data.ReleasePlan;
   var ReleaseState$valueOf = $module$dep_graph_releaser_api_js.ch.loewenfels.depgraph.data.ReleaseState.valueOf_61zpoe$;
   var Project = $module$dep_graph_releaser_api_js.ch.loewenfels.depgraph.data.Project;
   var fromJson = $module$dep_graph_releaser_api_js.ch.loewenfels.depgraph.data.serialization.fromJson_v4rmea$;
   var toHashSet_0 = Kotlin.kotlin.collections.toHashSet_7wnvza$;
+  var throwUPAE = Kotlin.throwUPAE;
   Releaser$ReleaseFailure.prototype = Object.create(RuntimeException.prototype);
   Releaser$ReleaseFailure.prototype.constructor = Releaser$ReleaseFailure;
   Menu$TypeOfRun.prototype = Object.create(Enum.prototype);
@@ -141,12 +145,12 @@
   PollException.prototype.constructor = PollException;
   ReleaseJobExecutionDataFactory.prototype = Object.create(BaseJobExecutionDataFactory.prototype);
   ReleaseJobExecutionDataFactory.prototype.constructor = ReleaseJobExecutionDataFactory;
-  function Downloader(modifiableJson) {
-    this.modifiableJson_0 = modifiableJson;
+  function Downloader(modifiableState) {
+    this.modifiableState_0 = modifiableState;
   }
   Downloader.prototype.download = function () {
     var tmp$;
-    var json = this.modifiableJson_0.getJsonWithAppliedChanges();
+    var json = this.modifiableState_0.getJsonWithAppliedChanges();
     var a = Kotlin.isType(tmp$ = document.createElement('a'), HTMLElement) ? tmp$ : throwCCE();
     a.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(json));
     a.setAttribute('download', 'release.json');
@@ -160,11 +164,10 @@
     simpleName: 'Downloader',
     interfaces: []
   };
-  function Publisher(usernameAndApiToken, publishJobUrl, modifiableJson) {
+  function Publisher(publishJobUrl, modifiableState) {
     Publisher$Companion_getInstance();
-    this.usernameAndApiToken_0 = usernameAndApiToken;
     this.publishJobUrl_0 = publishJobUrl;
-    this.modifiableJson_0 = modifiableJson;
+    this.modifiableState_0 = modifiableState;
   }
   function Publisher$publish$lambda(it) {
     return Promise.resolve(1);
@@ -196,13 +199,13 @@
   Publisher.prototype.publish_1kqjf$ = function (fileName, verbose, jobExecutor) {
     changeCursorToProgress();
     var doNothingPromise = Publisher$publish$lambda;
-    var parameters = mapOf([to('fileName', fileName), to('json', this.modifiableJson_0.json)]);
+    var parameters = mapOf([to('fileName', fileName), to('json', this.modifiableState_0.json)]);
     var jobExecutionData = JobExecutionData$Companion_getInstance().buildWithParameters_k99ke9$('publish ' + fileName + '.json', this.publishJobUrl_0, toQueryParameters(parameters), parameters);
     return finally_0(jobExecutor.trigger_cuif7q$(jobExecutionData, doNothingPromise, doNothingPromise, 2, 60, verbose).then(Publisher$publish$lambda_0(jobExecutor, this)).then(Publisher$publish$lambda_1(this, verbose)), Publisher$publish$lambda_2);
   };
   function Publisher$extractResultJsonUrl$lambda(closure$jobUrl) {
     return function (e) {
-      throw IllegalStateException_init('Could not find the published release.json as artifact.' + ('\n' + 'Job URL: ' + closure$jobUrl) + ('\n' + 'Regex used: ' + Publisher$Companion_getInstance().resultRegex_0.pattern) + ('\n' + 'Content: ' + e.body));
+      throw IllegalStateException_init('Could not find the published release.json as artifact of the publish job.' + ('\n' + 'Job URL: ' + closure$jobUrl) + ('\n' + 'Regex used: ' + Publisher$Companion_getInstance().resultRegex_0.pattern) + ('\n' + 'Content: ' + e.body));
     };
   }
   function Publisher$extractResultJsonUrl$lambda_0(closure$jobUrl, closure$buildNumber) {
@@ -212,7 +215,7 @@
   }
   Publisher.prototype.extractResultJsonUrl_0 = function (jobExecutor, authData, jobUrl, buildNumber) {
     var xpathUrl = jobUrl + buildNumber + '/api/xml?xpath=//artifact/fileName';
-    return jobExecutor.pollAndExtract_ljfavh$(authData, xpathUrl, Publisher$Companion_getInstance().resultRegex_0, Publisher$extractResultJsonUrl$lambda(jobUrl)).then(Publisher$extractResultJsonUrl$lambda_0(jobUrl, buildNumber));
+    return jobExecutor.pollAndExtract_4mvdjh$(authData, xpathUrl, Publisher$Companion_getInstance().resultRegex_0, 2, 20, Publisher$extractResultJsonUrl$lambda(jobUrl)).then(Publisher$extractResultJsonUrl$lambda_0(jobUrl, buildNumber));
   };
   function Publisher$changeUrlAndReloadOrAddHint$lambda(closure$url, closure$successMsg) {
     return function () {
@@ -254,7 +257,7 @@
     }
   };
   Publisher.prototype.applyChanges = function () {
-    return this.modifiableJson_0.applyChanges();
+    return this.modifiableState_0.applyChanges();
   };
   function Publisher$Companion() {
     Publisher$Companion_instance = this;
@@ -277,23 +280,22 @@
     simpleName: 'Publisher',
     interfaces: []
   };
-  function Releaser(jenkinsBaseUrl, modifiableJson, menu) {
-    this.jenkinsBaseUrl_0 = jenkinsBaseUrl;
-    this.modifiableJson_0 = modifiableJson;
+  function Releaser(defaultJenkinsBaseUrl, modifiableState, menu) {
+    this.modifiableState_0 = modifiableState;
     this.menu_0 = menu;
+    this.isOnSameHost_0 = false;
+    var prefix = window.location.protocol + '//' + window.location.hostname;
+    this.isOnSameHost_0 = startsWith(defaultJenkinsBaseUrl, prefix);
   }
   var HashMap_init = Kotlin.kotlin.collections.HashMap_init_q3lmfv$;
   Releaser.prototype.release_q42tl1$ = function (jobExecutor, jobExecutionDataFactory) {
-    var releasePlan = deserialize(this.modifiableJson_0.json);
     this.warnIfNotOnSameHost_0();
-    var project = releasePlan.getRootProject();
-    var paramObject = new Releaser$ParamObject(releasePlan, jobExecutor, jobExecutionDataFactory, project, HashMap_init(), HashMap_init());
+    var rootProject = this.modifiableState_0.releasePlan.getRootProject();
+    var paramObject = new Releaser$ParamObject(this.modifiableState_0.releasePlan, jobExecutor, jobExecutionDataFactory, rootProject, HashMap_init(), HashMap_init());
     return this.release_0(paramObject);
   };
   Releaser.prototype.warnIfNotOnSameHost_0 = function () {
-    var prefix = window.location.protocol + '//' + window.location.hostname;
-    var isOnSameHost = startsWith(this.jenkinsBaseUrl_0, prefix);
-    if (!isOnSameHost) {
+    if (!this.isOnSameHost_0) {
       showWarning('Remote publish server detected. We currently do not support to consume remote release.json.' + '\nThis means that we publish changes during the release process but will not change the location. Thus, please do not reload the page during the release process.', 8000);
     }
   };
@@ -385,7 +387,7 @@
       }
       var erroneousProjects = destination;
       if (!erroneousProjects.isEmpty()) {
-        showError('Seems like there is a bug since no command failed but not all are succeeded.' + '\nPlease report a bug, the following projects where affected:' + ('\n' + joinToString(erroneousProjects, '\n', void 0, void 0, void 0, void 0, Releaser$checkForNoneFailedBug$lambda)));
+        showError(trimMargin('\n' + '                        |Seems like there is a bug since no command failed but not all commands are in status Succeeded.' + '\n' + '                        |Please report a bug at ' + GITHUB_NEW_ISSUE + ' - the following projects where affected:' + '\n' + '                        |' + joinToString(erroneousProjects, '\n', void 0, void 0, void 0, void 0, Releaser$checkForNoneFailedBug$lambda) + '\n' + '                    '));
       }
     }
   };
@@ -636,9 +638,8 @@
         throw IllegalStateException_init('no element found for id ' + id + ' (expected type ' + get_js(getKClass(HTMLAnchorElement)).name + ')');
       }
       var state = tmp$_0;
-      var suffix = 'console#footer';
-      if (!endsWith(state.href, suffix)) {
-        tmp$ = state.href + suffix;
+      if (!endsWith(state.href, endOfConsoleUrlSufix)) {
+        tmp$ = state.href + endOfConsoleUrlSufix;
       }
        else {
         tmp$ = state.href;
@@ -660,7 +661,7 @@
   function Releaser$quietSave$lambda(closure$paramObject) {
     return function (hadChanges) {
       if (!hadChanges) {
-        showWarning('Could not save changes for project ' + closure$paramObject.project.id.identifier + '. Please report a bug.');
+        showWarning('Could not save changes for project ' + closure$paramObject.project.id.identifier + '.' + '\nPlease report a bug: https://github.com/loewenfels/dep-graph-releaser/issues/new');
       }
       return Unit;
     };
@@ -837,8 +838,8 @@
   }
   function App$start$lambda$lambda$lambda(this$App, closure$usernameToken, closure$modifiableJson, closure$releasePlan) {
     return function (it) {
-      var dependencies = App$Companion_getInstance().createDependencies_tj5i2h$(this$App.defaultJenkinsBaseUrl_0, this$App.publishJobUrl_0, closure$usernameToken, closure$modifiableJson, closure$releasePlan, this$App.menu_0);
-      this$App.menu_0.initDependencies_3sajqp$(closure$releasePlan, new Downloader(closure$modifiableJson), dependencies, closure$modifiableJson);
+      var dependencies = App$Companion_getInstance().createDependencies_2sg0qe$(this$App.defaultJenkinsBaseUrl_0, this$App.publishJobUrl_0, closure$usernameToken, closure$modifiableJson, this$App.menu_0);
+      this$App.menu_0.initDependencies_ok6lso$(closure$releasePlan, new Downloader(closure$modifiableJson), dependencies, closure$modifiableJson);
       new Gui(closure$releasePlan, this$App.menu_0);
       this$App.switchLoaderPipelineWithPipeline_0();
       return Unit;
@@ -846,10 +847,18 @@
   }
   function App$start$lambda$lambda_0(this$App, closure$usernameToken) {
     return function (body) {
+      var tmp$;
       this$App.switchLoader_0('loaderJson', 'loaderPipeline');
-      var modifiableJson = new ModifiableJson(body);
-      var releasePlan = deserialize(body);
-      return this$App.loadOtherApiTokens_0(releasePlan).then(App$start$lambda$lambda$lambda(this$App, closure$usernameToken, modifiableJson, releasePlan));
+      var modifiableJson = new ModifiableState(this$App.defaultJenkinsBaseUrl_0, body);
+      var releasePlan = modifiableJson.releasePlan;
+      if (closure$usernameToken != null) {
+        tmp$ = this$App.loadOtherApiTokens_0(releasePlan);
+      }
+       else {
+        tmp$ = Promise.resolve(Unit);
+      }
+      var promise = tmp$;
+      return promise.then(App$start$lambda$lambda$lambda(this$App, closure$usernameToken, modifiableJson, releasePlan));
     };
   }
   function App$start$lambda$lambda_1(it) {
@@ -873,8 +882,7 @@
     return function (pair) {
       this$App.updateUserToolTip_0(closure$remoteJenkinsBaseUrl, pair);
       if (pair == null) {
-        this$App.menu_0.setHalfVerified();
-        showWarning('You are not logged in at ' + closure$remoteJenkinsBaseUrl + '.' + '\n' + ('You can perform a Dry Run (runs on ' + toString(this$App.defaultJenkinsBaseUrl_0) + ') but a release involving the remote jenkins will most likely fail.' + '\n' + '\n') + ('Go to the log in: ' + closure$remoteJenkinsBaseUrl + '/login?from=') + toString(window.location));
+        this$App.menu_0.setHalfVerified_f5e6j7$(this$App.defaultJenkinsBaseUrl_0, closure$remoteJenkinsBaseUrl);
       }
       return Unit;
     };
@@ -954,16 +962,14 @@
     App$Companion_instance = this;
     this.PUBLISH_JOB = '&publishJob=';
   }
-  App$Companion.prototype.createDependencies_tj5i2h$ = function (defaultJenkinsBaseUrl, publishJobUrl, usernameAndApiToken, modifiableJson, releasePlan, menu) {
+  App$Companion.prototype.createDependencies_2sg0qe$ = function (defaultJenkinsBaseUrl, publishJobUrl, usernameAndApiToken, modifiableState, menu) {
     var tmp$;
     if (publishJobUrl != null && defaultJenkinsBaseUrl != null && usernameAndApiToken != null) {
-      var publisher = new Publisher(usernameAndApiToken, publishJobUrl, modifiableJson);
-      var releaser = new Releaser(defaultJenkinsBaseUrl, modifiableJson, menu);
+      var publisher = new Publisher(publishJobUrl, modifiableState);
+      var releaser = new Releaser(defaultJenkinsBaseUrl, modifiableState, menu);
       var jenkinsJobExecutor = new JenkinsJobExecutor(UsernameTokenRegistry_getInstance());
       var simulatingJobExecutor = new SimulatingJobExecutor();
-      var releaseJobExecutionDataFactory = new ReleaseJobExecutionDataFactory(defaultJenkinsBaseUrl, releasePlan);
-      var dryRunJobExecutionDataFactory = new DryRunJobExecutionDataFactory(defaultJenkinsBaseUrl, releasePlan);
-      tmp$ = new Menu$Dependencies(publisher, releaser, jenkinsJobExecutor, simulatingJobExecutor, releaseJobExecutionDataFactory, dryRunJobExecutionDataFactory);
+      tmp$ = new Menu$Dependencies(publisher, releaser, jenkinsJobExecutor, simulatingJobExecutor);
     }
      else {
       tmp$ = null;
@@ -1439,9 +1445,12 @@
     this.userIcon_0.innerText = 'verified_user';
     removeClass(this.userButton_0, [Menu$Companion_getInstance().DEACTIVATED_0]);
   };
-  Menu.prototype.setHalfVerified = function () {
-    this.userIcon_0.innerText = 'error';
-    addClass(this.userButton_0, ['warning']);
+  Menu.prototype.setHalfVerified_f5e6j7$ = function (defaultJenkinsBaseUrl, remoteJenkinsBaseUrl) {
+    if (!hasClass(this.userButton_0, Menu$Companion_getInstance().DEACTIVATED_0)) {
+      this.userIcon_0.innerText = 'error';
+      addClass(this.userButton_0, ['warning']);
+      showWarning('You are not logged in at ' + remoteJenkinsBaseUrl + '.' + '\n' + ('You can perform a Dry Run (runs on ' + toString(defaultJenkinsBaseUrl) + ') but a release involving the remote jenkins will most likely fail.' + '\n' + '\n') + ('Go to the log in: ' + remoteJenkinsBaseUrl + '/login?from=') + toString(window.location));
+    }
   };
   Menu.prototype.appendToUserButtonToolTip_buzeal$ = function (url, username, name) {
     var nameSuffix = name != null ? ' (' + toString(name) + ')' : '';
@@ -1460,13 +1469,13 @@
       }
     };
   }
-  Menu.prototype.initDependencies_3sajqp$ = function (releasePlan, downloader, dependencies, modifiableJson) {
+  Menu.prototype.initDependencies_ok6lso$ = function (releasePlan, downloader, dependencies, modifiableState) {
     if (dependencies != null) {
       this.publisher_0 = dependencies.publisher;
     }
     window.onbeforeunload = Menu$initDependencies$lambda(this);
     this.initSaveAndDownloadButton_0(downloader, dependencies);
-    this.initRunButtons_0(releasePlan, dependencies, modifiableJson);
+    this.initRunButtons_0(releasePlan, dependencies, modifiableState);
     switch (releasePlan.state.name) {
       case 'Ready':
         break;
@@ -1506,16 +1515,16 @@
     removeClass(this.downloadButton_0, [Menu$Companion_getInstance().DEACTIVATED_0]);
     this.addClickEventListenerIfNotDeactivatedNorDisabled_0(this.downloadButton_0, Menu$initSaveAndDownloadButton$lambda_0(downloader));
   };
-  function Menu$initRunButtons$lambda(this$Menu, closure$releasePlan, closure$dependencies) {
+  function Menu$initRunButtons$lambda(this$Menu, closure$releasePlan, closure$dependencies, closure$modifiableState) {
     return function () {
       this$Menu.typeOfRun_0 = Menu$TypeOfRun$DRY_RUN_getInstance();
-      return this$Menu.triggerRelease_0(closure$releasePlan, closure$dependencies, closure$dependencies.jenkinsJobExecutor, closure$dependencies.dryRunExecutionDataFactory);
+      return this$Menu.triggerRelease_0(closure$releasePlan, closure$dependencies, closure$dependencies.jenkinsJobExecutor, closure$modifiableState.dryRunExecutionDataFactory);
     };
   }
-  function Menu$initRunButtons$lambda_0(this$Menu, closure$releasePlan, closure$dependencies) {
+  function Menu$initRunButtons$lambda_0(this$Menu, closure$releasePlan, closure$dependencies, closure$modifiableState) {
     return function () {
       this$Menu.typeOfRun_0 = Menu$TypeOfRun$RELEASE_getInstance();
-      return this$Menu.triggerRelease_0(closure$releasePlan, closure$dependencies, closure$dependencies.jenkinsJobExecutor, closure$dependencies.releaseJobExecutionDataFactory);
+      return this$Menu.triggerRelease_0(closure$releasePlan, closure$dependencies, closure$dependencies.jenkinsJobExecutor, closure$modifiableState.releaseJobExecutionDataFactory);
     };
   }
   function Menu$initRunButtons$lambda$lambda(closure$dependencies, this$Menu) {
@@ -1524,11 +1533,11 @@
       return Unit;
     };
   }
-  function Menu$initRunButtons$lambda_1(this$Menu, closure$nonNullDependencies, closure$releasePlan, closure$dependencies) {
+  function Menu$initRunButtons$lambda_1(this$Menu, closure$nonNullDependencies, closure$releasePlan, closure$modifiableState, closure$dependencies) {
     return function () {
       this$Menu.typeOfRun_0 = Menu$TypeOfRun$SIMULATION_getInstance();
       this$Menu.publisher_0 = closure$nonNullDependencies.publisher;
-      return finally_0(this$Menu.triggerRelease_0(closure$releasePlan, closure$nonNullDependencies, closure$nonNullDependencies.simulatingJobExecutor, closure$nonNullDependencies.releaseJobExecutionDataFactory), Menu$initRunButtons$lambda$lambda(closure$dependencies, this$Menu));
+      return finally_0(this$Menu.triggerRelease_0(closure$releasePlan, closure$nonNullDependencies, closure$nonNullDependencies.simulatingJobExecutor, closure$modifiableState.releaseJobExecutionDataFactory), Menu$initRunButtons$lambda$lambda(closure$dependencies, this$Menu));
     };
   }
   function Menu$initRunButtons$lambda_2(this$Menu) {
@@ -1553,10 +1562,10 @@
           var element = tmp$_0.next();
           element.title = Menu$Companion_getInstance().DISABLED_RELEASE_SUCCESS_0;
         }
-        showSuccess('Release ended successfully :) you can now close the window.' + '\nUse a new pipeline for a new release.' + '\nPlease report a bug in case some job failed without us noticing it.');
+        showSuccess(trimMargin('\n                        |Release ended successfully :) you can now close the window.\n                        |Use a new pipeline for a new release (also in case you performed a Dry Run).\n                        |\n                        |Please report a bug at https://github.com/loewenfels/dep-graph-releaser/issues/new in case some job failed without us noticing it.\n                        |Do not forget to star the repository if you like dep-graph-releaser ;-) https://github.com/loewenfels/dep-graph-releaser/\n                        |Last but not least, you might want to visit https://loewenfels.ch to get to know the company pushing this project forward.\n                    '));
       }
        else {
-        showError('Release ended with failure :(' + '\nAt least one job failed. Check errors, fix them and then you can re-trigger the failed jobs, the pipeline respectively, by clicking on the release button.' + '\n(You might have to delete git tags and remove artifacts if they have already been created).');
+        showError(trimMargin('\n                        |Release ended with failure :(\n                        |At least one job failed. Check errors, fix them and then you can re-trigger the failed jobs, the pipeline respectively, by clicking on the release button (you might have to delete git tags and remove artifacts if they have already been created).\n                        |\n                        |Please report a bug at https://github.com/loewenfels/dep-graph-releaser/issues/new in case a job failed due to an error in dep-graph-releaser.\n                    '));
         switch (this$Menu.typeOfRun_0.name) {
           case 'SIMULATION':
             tmp$ = new Triple('Explore Release Order', this$Menu.exploreButton_0, elementById('explore:text'));
@@ -1581,17 +1590,17 @@
       return Unit;
     };
   }
-  Menu.prototype.initRunButtons_0 = function (releasePlan, dependencies, modifiableJson) {
+  Menu.prototype.initRunButtons_0 = function (releasePlan, dependencies, modifiableState) {
     if (dependencies != null) {
       this.activateDryRunButton_0();
-      this.addClickEventListenerIfNotDeactivatedNorDisabled_0(this.dryRunButton_0, Menu$initRunButtons$lambda(this, releasePlan, dependencies));
+      this.addClickEventListenerIfNotDeactivatedNorDisabled_0(this.dryRunButton_0, Menu$initRunButtons$lambda(this, releasePlan, dependencies, modifiableState));
       this.activateReleaseButton_0();
-      this.addClickEventListenerIfNotDeactivatedNorDisabled_0(this.releaseButton_0, Menu$initRunButtons$lambda_0(this, releasePlan, dependencies));
+      this.addClickEventListenerIfNotDeactivatedNorDisabled_0(this.releaseButton_0, Menu$initRunButtons$lambda_0(this, releasePlan, dependencies, modifiableState));
     }
     this.activateExploreButton_0();
     var fakeJenkinsBaseUrl = 'https://github.com/loewenfels/';
-    var nonNullDependencies = dependencies != null ? dependencies : ensureNotNull(App$Companion_getInstance().createDependencies_tj5i2h$(fakeJenkinsBaseUrl, 'https://github.com/loewenfels/dgr-publisher/', new UsernameAndApiToken('test', 'test'), modifiableJson, releasePlan, this));
-    this.addClickEventListenerIfNotDeactivatedNorDisabled_0(this.exploreButton_0, Menu$initRunButtons$lambda_1(this, nonNullDependencies, releasePlan, dependencies));
+    var nonNullDependencies = dependencies != null ? dependencies : ensureNotNull(App$Companion_getInstance().createDependencies_2sg0qe$(fakeJenkinsBaseUrl, 'https://github.com/loewenfels/dgr-publisher/', new UsernameAndApiToken('test', 'test'), modifiableState, this));
+    this.addClickEventListenerIfNotDeactivatedNorDisabled_0(this.exploreButton_0, Menu$initRunButtons$lambda_1(this, nonNullDependencies, releasePlan, modifiableState, dependencies));
     Menu$Companion_getInstance().registerForReleaseStartEvent_gbr1zf$(Menu$initRunButtons$lambda_2(this));
     Menu$Companion_getInstance().registerForReleaseEndEvent_y8twos$(Menu$initRunButtons$lambda_3(this));
   };
@@ -1794,7 +1803,7 @@
     var publisher = this.publisher_0;
     if (publisher == null) {
       this.deactivateSaveButton_0();
-      showThrowableAndThrow(IllegalStateException_init('Save button should not be activate if no publish job url was specified.\nPlease report a bug.'));
+      showThrowableAndThrow(IllegalStateException_init('Save button should not be activate if no publish job url was specified.' + '\nPlease report a bug: https://github.com/loewenfels/dep-graph-releaser/'));
     }
     var changed = publisher.applyChanges();
     if (changed) {
@@ -1884,13 +1893,11 @@
     }
     return Menu$Companion_instance;
   }
-  function Menu$Dependencies(publisher, releaser, jenkinsJobExecutor, simulatingJobExecutor, releaseJobExecutionDataFactory, dryRunExecutionDataFactory) {
+  function Menu$Dependencies(publisher, releaser, jenkinsJobExecutor, simulatingJobExecutor) {
     this.publisher = publisher;
     this.releaser = releaser;
     this.jenkinsJobExecutor = jenkinsJobExecutor;
     this.simulatingJobExecutor = simulatingJobExecutor;
-    this.releaseJobExecutionDataFactory = releaseJobExecutionDataFactory;
-    this.dryRunExecutionDataFactory = dryRunExecutionDataFactory;
   }
   Menu$Dependencies.$metadata$ = {
     kind: Kind_CLASS,
@@ -2006,7 +2013,7 @@
     var involvedProjects = set.size;
     showStatus('Projects involved: ' + involvedProjects);
     if (involvedProjects !== this.releasePlan_0.getNumberOfProjects()) {
-      showError('Not all dependent projects are involved in the process, please report a bug. The following where left out\n' + joinToString(minus(this.releasePlan_0.getProjectIds(), set), '\n', void 0, void 0, void 0, void 0, Pipeline$setUpProjects$lambda_0));
+      showError(trimMargin('\n' + '                |Not all dependent projects are involved in the process.' + '\n' + '                |Please report a bug: ' + GITHUB_NEW_ISSUE + '\n' + '                |The following projects where left out of the analysis:' + '\n' + '                |' + joinToString(minus(this.releasePlan_0.getProjectIds(), set), '\n', void 0, void 0, void 0, void 0, Pipeline$setUpProjects$lambda_0) + '\n' + '            '));
     }
   };
   function Pipeline$project$lambda$lambda$lambda(closure$project, this$Pipeline) {
@@ -2626,63 +2633,6 @@
     simpleName: 'Toggler',
     interfaces: []
   };
-  function parseRemoteRegex(releasePlan) {
-    return parseRemoteRegex_0(releasePlan.getConfig_udzor3$(ConfigKey.REMOTE_REGEX));
-  }
-  function parseRemoteRegex_0(regex) {
-    return parseRegex(regex, 59, 'remoteRegex', getCallableRef('checkUrlDefined', function (jenkinsBaseUrl, remoteRegex) {
-      return checkUrlDefined(jenkinsBaseUrl, remoteRegex), Unit;
-    }));
-  }
-  function parseRegexParameters(releasePlan) {
-    return parseRegexParameters_0(releasePlan.getConfig_udzor3$(ConfigKey.REGEX_PARAMS));
-  }
-  function parseRegexParameters_0(regex) {
-    return parseRegex(regex, 36, 'regexParameters', getCallableRef('checkAtLeastOneParameter', function (pair, regexParameters) {
-      return checkAtLeastOneParameter(pair, regexParameters), Unit;
-    }));
-  }
-  function parseRegex$lambda(closure$name, closure$configValue, closure$checkRightSide) {
-    return function (pair) {
-      var index = checkRegexNotEmpty(pair, closure$name, closure$configValue);
-      var startIndex = index + 1 | 0;
-      var rightSide = pair.substring(startIndex);
-      closure$checkRightSide(rightSide, closure$configValue);
-      return to(Regex_init(pair.substring(0, index)), rightSide);
-    };
-  }
-  function parseRegex(configValue, splitChar, name, checkRightSide) {
-    var tmp$;
-    if (configValue.length > 0) {
-      tmp$ = toList(map(splitToSequence(configValue, Kotlin.charArrayOf(splitChar)), parseRegex$lambda(name, configValue, checkRightSide)));
-    }
-     else {
-      tmp$ = emptyList();
-    }
-    return tmp$;
-  }
-  function checkRegexNotEmpty(pair, name, input) {
-    var index = indexOf(pair, 35);
-    if (!(index > 0)) {
-      var message = 'regex requires at least one character.' + '\n' + name + ': ' + input;
-      throw IllegalStateException_init(message.toString());
-    }
-    return index;
-  }
-  var isBlank = Kotlin.kotlin.text.isBlank_gw00vp$;
-  function checkUrlDefined(jenkinsBaseUrl, remoteRegex) {
-    if (!!isBlank(jenkinsBaseUrl)) {
-      var message = 'A remoteRegex requires a related jenkins base url.' + '\r' + 'emoteRegex: ' + remoteRegex;
-      throw IllegalStateException_init(message.toString());
-    }
-  }
-  function checkAtLeastOneParameter(pair, regexParameters) {
-    var index = indexOf(pair, 61);
-    if (!(index > 0)) {
-      var message = 'A regexParam requires at least one parameter.' + '\n' + 'regexParameters: ' + regexParameters;
-      throw IllegalStateException_init(message.toString());
-    }
-  }
   function elementById(id) {
     var tmp$;
     var elementByIdOrNull$result;
@@ -2954,7 +2904,7 @@
     };
   }
   function withErrorHandling$lambda_0(t) {
-    return showThrowableAndThrow(new Error_0('An unexpected error occurred. Please report a bug with the following information.', t));
+    return showThrowableAndThrow(new Error_0('An unexpected error occurred.\nPlease report a bug with the following information at https://github.com/loewenfels/dep-graph-releaser/issues/new', t));
   }
   function withErrorHandling(event, action) {
     Promise.resolve(1).then(withErrorHandling$lambda(action, event)).catch(withErrorHandling$lambda_0);
@@ -2998,6 +2948,23 @@
     interfaces: [JobExecutionDataFactory]
   };
   function BuilderNumberExtractor() {
+    BuilderNumberExtractor$Companion_getInstance();
+  }
+  function BuilderNumberExtractor$Companion() {
+    BuilderNumberExtractor$Companion_instance = this;
+    this.numberRegex = Regex_init('<number>([0-9]+)<\/number>');
+  }
+  BuilderNumberExtractor$Companion.$metadata$ = {
+    kind: Kind_OBJECT,
+    simpleName: 'Companion',
+    interfaces: []
+  };
+  var BuilderNumberExtractor$Companion_instance = null;
+  function BuilderNumberExtractor$Companion_getInstance() {
+    if (BuilderNumberExtractor$Companion_instance === null) {
+      new BuilderNumberExtractor$Companion();
+    }
+    return BuilderNumberExtractor$Companion_instance;
   }
   BuilderNumberExtractor.$metadata$ = {
     kind: Kind_INTERFACE,
@@ -3005,7 +2972,6 @@
     interfaces: []
   };
   function BuildHistoryBasedBuildNumberExtractor(authData, jobExecutionData) {
-    BuildHistoryBasedBuildNumberExtractor$Companion_getInstance();
     this.authData_0 = authData;
     this.jobExecutionData_0 = jobExecutionData;
   }
@@ -3023,7 +2989,7 @@
   };
   BuildHistoryBasedBuildNumberExtractor.prototype.searchBuildNumber_0 = function (body, init) {
     var tmp$;
-    tmp$ = BuildHistoryBasedBuildNumberExtractor$Companion_getInstance().numberRegex_0.find_905azu$(body);
+    tmp$ = BuilderNumberExtractor$Companion_getInstance().numberRegex.find_905azu$(body);
     if (tmp$ == null) {
       throw IllegalStateException_init('no job run at ' + this.jobExecutionData_0.jobBaseUrl + ' so far, as consequence we cannot extract a build number.');
     }
@@ -3053,22 +3019,6 @@
       return checkStatusOk(response);
     })).then(BuildHistoryBasedBuildNumberExtractor$searchBuildNumber$lambda(parametersRegex, buildNumber, matchResult, this, init));
   };
-  function BuildHistoryBasedBuildNumberExtractor$Companion() {
-    BuildHistoryBasedBuildNumberExtractor$Companion_instance = this;
-    this.numberRegex_0 = Regex_init('<number>([0-9]+)<\/number>');
-  }
-  BuildHistoryBasedBuildNumberExtractor$Companion.$metadata$ = {
-    kind: Kind_OBJECT,
-    simpleName: 'Companion',
-    interfaces: []
-  };
-  var BuildHistoryBasedBuildNumberExtractor$Companion_instance = null;
-  function BuildHistoryBasedBuildNumberExtractor$Companion_getInstance() {
-    if (BuildHistoryBasedBuildNumberExtractor$Companion_instance === null) {
-      new BuildHistoryBasedBuildNumberExtractor$Companion();
-    }
-    return BuildHistoryBasedBuildNumberExtractor$Companion_instance;
-  }
   BuildHistoryBasedBuildNumberExtractor.$metadata$ = {
     kind: Kind_CLASS,
     simpleName: 'BuildHistoryBasedBuildNumberExtractor',
@@ -3128,24 +3078,86 @@
     var groupId = groupIdArtifactIdAndNewVersion.component1()
     , artifactId = groupIdArtifactIdAndNewVersion.component2()
     , newVersion = groupIdArtifactIdAndNewVersion.component3();
-    var skipCheckout = this.isFirstCommandAndNotSubmodule_0(project) ? 'false' : 'true';
+    var skipCheckout = this.isFirstTriggeredCommand_0(project) ? 'false' : 'true';
     return 'command=' + commandName + ('&pathToProject=' + project.relativePath) + ('&skipCheckout=' + skipCheckout) + ('&releaseId=' + this.releasePlan.releaseId) + ('&releaseVersion=' + releaseVersion) + ('&groupId=' + groupId) + ('&artifactId=' + artifactId) + ('&newVersion=' + newVersion);
   };
-  DryRunJobExecutionDataFactory.prototype.isFirstCommandAndNotSubmodule_0 = function (project) {
+  DryRunJobExecutionDataFactory.prototype.isFirstTriggeredCommand_0 = function (project) {
     if (project.isSubmodule)
-      return false;
-    var tmp$, tmp$_0;
-    var index = 0;
-    tmp$ = project.commands.iterator();
-    while (tmp$.hasNext()) {
-      var item = tmp$.next();
-      var index_0 = (tmp$_0 = index, index = tmp$_0 + 1 | 0, tmp$_0);
-      var state = Pipeline$Companion_getInstance().getCommandState_o8feeo$(project.id, index_0);
-      if (state === CommandState.Succeeded || state === CommandState.Failed) {
-        return false;
+      return this.isFirstTriggeredCommand_0(this.searchTopMultiModule_0(project.id));
+    return !this.commandRanOnProjectOrSubmodules_0(project);
+  };
+  DryRunJobExecutionDataFactory.prototype.searchTopMultiModule_0 = function (projectId) {
+    var $receiver = this.releasePlan.getAllSubmodules().entries;
+    var firstOrNull$result;
+    firstOrNull$break: do {
+      var tmp$;
+      tmp$ = $receiver.iterator();
+      while (tmp$.hasNext()) {
+        var element = tmp$.next();
+        var v = element.value;
+        if (v.contains_11rb$(projectId)) {
+          firstOrNull$result = element;
+          break firstOrNull$break;
+        }
       }
+      firstOrNull$result = null;
     }
-    return true;
+     while (false);
+    var it = firstOrNull$result;
+    return it != null ? this.searchTopMultiModule_0(it.key) : this.releasePlan.getProject_lljhqa$(projectId);
+  };
+  DryRunJobExecutionDataFactory.prototype.commandRanOnProjectOrSubmodules_0 = function (project) {
+    var $receiver = withIndex(project.commands);
+    var any$result;
+    any$break: do {
+      var tmp$;
+      if (Kotlin.isType($receiver, Collection) && $receiver.isEmpty()) {
+        any$result = false;
+        break any$break;
+      }
+      tmp$ = $receiver.iterator();
+      while (tmp$.hasNext()) {
+        var element = tmp$.next();
+        var index = element.component1();
+        var state = Pipeline$Companion_getInstance().getCommandState_o8feeo$(project.id, index);
+        if (state === CommandState.Succeeded || state === CommandState.Failed) {
+          any$result = true;
+          break any$break;
+        }
+      }
+      any$result = false;
+    }
+     while (false);
+    var commandAlreadyRan = any$result;
+    var submodules = this.releasePlan.getSubmodules_lljhqa$(project.id);
+    var tmp$_0 = commandAlreadyRan;
+    if (!tmp$_0) {
+      var tmp$_1 = !submodules.isEmpty();
+      if (tmp$_1) {
+        var any$result_0;
+        any$break: do {
+          var tmp$_2;
+          if (Kotlin.isType(submodules, Collection) && submodules.isEmpty()) {
+            any$result_0 = false;
+            break any$break;
+          }
+          tmp$_2 = submodules.iterator();
+          while (tmp$_2.hasNext()) {
+            var element_0 = tmp$_2.next();
+            if (this.commandRanOnProjectOrSubmodules_0(this.releasePlan.getProject_lljhqa$(element_0))) {
+              any$result_0 = true;
+              break any$break;
+            }
+          }
+          any$result_0 = false;
+        }
+         while (false);
+        tmp$_1 = any$result_0;
+      }
+      tmp$_0 = tmp$_1;
+    }
+    commandAlreadyRan = tmp$_0;
+    return commandAlreadyRan;
   };
   DryRunJobExecutionDataFactory.prototype.createJobExecutionData_0 = function (jobName, params, identifyingParams) {
     var jobUrl = this.getJobUrl_udzor3$(ConfigKey.DRY_RUN_JOB);
@@ -3350,7 +3362,7 @@
   function JenkinsJobExecutor$trigger$lambda$lambda_1(closure$verbose, closure$jobName, this$JenkinsJobExecutor, closure$jobExecutionData, closure$jobQueuedHook, closure$authData) {
     return function (nullableQueuedItemUrl) {
       this$JenkinsJobExecutor.showInfoQueuedItemIfVerbose_0(closure$verbose, nullableQueuedItemUrl, closure$jobName);
-      var queuedItemUrl = nullableQueuedItemUrl != null ? toString(nullableQueuedItemUrl) + 'api/xml/' : closure$jobExecutionData.jobBaseUrl;
+      var queuedItemUrl = this$JenkinsJobExecutor.getQueuedItemUrlOrJobUrlAsFallback_0(nullableQueuedItemUrl, closure$jobExecutionData);
       return closure$jobQueuedHook(queuedItemUrl).then(JenkinsJobExecutor$trigger$lambda$lambda$lambda(nullableQueuedItemUrl, closure$authData, closure$jobExecutionData, this$JenkinsJobExecutor)).then(JenkinsJobExecutor$trigger$lambda$lambda$lambda_0);
     };
   }
@@ -3380,7 +3392,7 @@
       if (!value) {
         var closure$jobName_0 = closure$jobName;
         var closure$jobExecutionData_0 = closure$jobExecutionData;
-        var message = closure$jobName_0 + ' failed, job did not end with status ' + JenkinsJobExecutor$Companion_getInstance().SUCCESS_0 + ' but ' + result + '.' + ('\n' + 'Visit ' + closure$jobExecutionData_0.jobBaseUrl + buildNumber + ' for further information');
+        var message = closure$jobName_0 + ' failed, job did not end with status ' + JenkinsJobExecutor$Companion_getInstance().SUCCESS_0 + ' but ' + result + '.' + ('\n' + 'Visit ' + closure$jobExecutionData_0.jobBaseUrl + buildNumber + '/' + endOfConsoleUrlSufix + ' for further information');
         throw IllegalStateException_init(message.toString());
       }
       return to(closure$authData, buildNumber);
@@ -3402,6 +3414,9 @@
     var jenkinsBaseUrl = jobExecutionData.getJenkinsBaseUrl();
     var usernameToken = this.usernameTokenRegistry_0.forHostOrThrow_61zpoe$(jenkinsBaseUrl);
     return this.issueCrumb_0(jenkinsBaseUrl, usernameToken).then(JenkinsJobExecutor$trigger$lambda(jobExecutionData, this, jobName, verbose, jobQueuedHook, jobStartedHook, pollEverySecond, maxWaitingTimeForCompletenessInSeconds));
+  };
+  JenkinsJobExecutor.prototype.getQueuedItemUrlOrJobUrlAsFallback_0 = function (nullableQueuedItemUrl, jobExecutionData) {
+    return nullableQueuedItemUrl != null ? toString(nullableQueuedItemUrl) + 'api/xml/' : jobExecutionData.jobBaseUrl;
   };
   function JenkinsJobExecutor$checkStatusAndExtractQueuedItemUrl$lambda(closure$jobExecutionData, closure$authData, closure$response) {
     return function (it) {
@@ -3464,26 +3479,19 @@
       }
     }
   };
-  JenkinsJobExecutor.prototype.pollAndExtract_ljfavh$ = function (authData, url, regex, errorHandler) {
-    return Poller_getInstance().pollAndExtract_ljfavh$(authData, url, regex, errorHandler);
+  JenkinsJobExecutor.prototype.pollAndExtract_4mvdjh$ = function (authData, url, regex, pollEverySecond, maxWaitingTimeInSeconds, errorHandler) {
+    return Poller_getInstance().pollAndExtract_4mvdjh$(authData, url, regex, pollEverySecond, maxWaitingTimeInSeconds, errorHandler);
   };
-  function JenkinsJobExecutor$pollJobForCompletion$lambda$lambda(body) {
-    var matchResult = JenkinsJobExecutor$Companion_getInstance().resultRegex_0.matchEntire_6bul2c$(body);
-    if (matchResult != null) {
-      return to(true, matchResult.groupValues.get_za3lpa$(1));
-    }
-     else {
-      return to(false, '');
-    }
+  function JenkinsJobExecutor$pollJobForCompletion$lambda$lambda(e) {
+    throw e;
   }
-  function JenkinsJobExecutor$pollJobForCompletion$lambda(closure$authData, closure$jobUrl, closure$buildNumber, closure$pollEverySecond, closure$maxWaitingTimeInSeconds) {
+  function JenkinsJobExecutor$pollJobForCompletion$lambda(closure$authData, closure$jobUrl, closure$buildNumber, closure$pollEverySecond, closure$maxWaitingTimeInSeconds, this$JenkinsJobExecutor) {
     return function () {
-      var pollData = Poller$Poller$PollData_init(closure$authData, closure$jobUrl + closure$buildNumber + '/api/xml?xpath=/*/result', closure$pollEverySecond, closure$maxWaitingTimeInSeconds, JenkinsJobExecutor$pollJobForCompletion$lambda$lambda);
-      return Poller_getInstance().poll_1vuj9e$(pollData);
+      return this$JenkinsJobExecutor.pollAndExtract_4mvdjh$(closure$authData, closure$jobUrl + closure$buildNumber + '/api/xml', JenkinsJobExecutor$Companion_getInstance().resultRegex_0, closure$pollEverySecond, closure$maxWaitingTimeInSeconds, JenkinsJobExecutor$pollJobForCompletion$lambda$lambda);
     };
   }
   JenkinsJobExecutor.prototype.pollJobForCompletion_0 = function (authData, jobUrl, buildNumber, pollEverySecond, maxWaitingTimeInSeconds) {
-    return sleep(pollEverySecond * 500 | 0, JenkinsJobExecutor$pollJobForCompletion$lambda(authData, jobUrl, buildNumber, pollEverySecond, maxWaitingTimeInSeconds));
+    return sleep(pollEverySecond * 500 | 0, JenkinsJobExecutor$pollJobForCompletion$lambda(authData, jobUrl, buildNumber, pollEverySecond, maxWaitingTimeInSeconds, this));
   };
   function JenkinsJobExecutor$Companion() {
     JenkinsJobExecutor$Companion_instance = this;
@@ -3510,10 +3518,10 @@
   function createParameterRegexPattern$lambda(f) {
     var k = f.key;
     var v = f.value;
-    return '<parameter>[\\S\\s]*?' + ('<name>' + k + '<\/name>[' + '\\' + 'S' + '\\' + 's]*?') + ('<value>' + v + '<\/value>[' + '\\' + 'S' + '\\' + 's]*?') + '<\/parameter>[\\S\\s]*?';
+    return '<parameter>[\\S\\s]*?' + ('<name>' + k + '<\/name>' + regex.noneOrSomeChars) + ('<value>' + v + '<\/value>' + regex.noneOrSomeChars) + '<\/parameter>[\\S\\s]*?';
   }
   function createParameterRegexPattern(parameters) {
-    return joinToString(parameters.entries, '[\\S\\s]*?', void 0, void 0, void 0, void 0, createParameterRegexPattern$lambda);
+    return joinToString(parameters.entries, regex.noneOrSomeChars, void 0, void 0, void 0, void 0, createParameterRegexPattern$lambda);
   }
   function toQueryParameters$lambda(f) {
     var k = f.key;
@@ -3523,6 +3531,7 @@
   function toQueryParameters(parameters) {
     return joinToString(parameters.entries, '&', void 0, void 0, void 0, void 0, toQueryParameters$lambda);
   }
+  var endOfConsoleUrlSufix;
   function JobExecutionData(jobName, jobBaseUrl, jobTriggerUrl, body, identifyingParams, queuedItemUrlExtractor) {
     JobExecutionData$Companion_getInstance();
     this.jobName = jobName;
@@ -3677,13 +3686,12 @@
       }
     };
   }
-  Poller.prototype.pollAndExtract_ljfavh$ = function (authData, url, regex, errorHandler) {
-    var pollData = Poller$Poller$PollData_init(authData, url, 2, 20, Poller$pollAndExtract$lambda(regex));
-    return this.poll_1vuj9e$(pollData).catch(Poller$pollAndExtract$lambda_0(errorHandler));
+  Poller.prototype.pollAndExtract_4mvdjh$ = function (authData, url, regex, pollEverySecond, maxWaitingTimeInSeconds, errorHandler) {
+    return this.poll_0(Poller$Poller$PollData_init(authData, url, pollEverySecond, maxWaitingTimeInSeconds, Poller$pollAndExtract$lambda(regex))).catch(Poller$pollAndExtract$lambda_0(errorHandler));
   };
   function Poller$poll$lambda$lambda(closure$pollData, this$Poller) {
     return function () {
-      return this$Poller.poll_1vuj9e$(closure$pollData.newWithIncreasedNumberOfTimes());
+      return this$Poller.poll_0(closure$pollData.newWithIncreasedNumberOfTimes());
     };
   }
   function Poller$poll$lambda(closure$pollData, this$Poller) {
@@ -3702,7 +3710,7 @@
       , result = tmp$.component2();
       if (success) {
         if (result == null) {
-          throw Error_init('Result was null even though success flag during polling was true, please report a bug.');
+          throw Error_init('Result was null even though success flag during polling was true.' + '\nPlease report a bug: https://github.com/loewenfels/dep-graph-releaser/issues/new');
         }
         return result;
       }
@@ -3721,7 +3729,7 @@
       }
     };
   }
-  Poller.prototype.poll_1vuj9e$ = function (pollData) {
+  Poller.prototype.poll_0 = function (pollData) {
     var headers = createHeaderWithAuthAndCrumb(pollData.authData);
     var init = createGetRequest(headers);
     var rePoll = Poller$poll$lambda(pollData, this);
@@ -3810,43 +3818,25 @@
     interfaces: [RuntimeException]
   };
   function QueuedItemBasedBuildNumberExtractor(authData, queuedItemUrl) {
-    QueuedItemBasedBuildNumberExtractor$Companion_getInstance();
     this.authData_0 = authData;
     this.queuedItemUrl_0 = queuedItemUrl;
   }
   function QueuedItemBasedBuildNumberExtractor$extract$lambda$lambda(this$QueuedItemBasedBuildNumberExtractor) {
     return function (e) {
-      throw IllegalStateException_init('Could not find the build number in the returned body.' + ('\n' + 'Job URL: ' + this$QueuedItemBasedBuildNumberExtractor.queuedItemUrl_0) + ('\n' + 'Regex used: ' + QueuedItemBasedBuildNumberExtractor$Companion_getInstance().numberRegex_0.pattern) + ('\n' + 'Content: ' + e.body));
+      throw IllegalStateException_init('Extracting the build number via the queued item failed (max waiting time reached). Could not find the build number in the returned body.' + ('\n' + 'Job URL: ' + this$QueuedItemBasedBuildNumberExtractor.queuedItemUrl_0) + ('\n' + 'Regex used: ' + BuilderNumberExtractor$Companion_getInstance().numberRegex.pattern) + ('\n' + 'Content: ' + e.body));
     };
   }
-  function QueuedItemBasedBuildNumberExtractor$extract$lambda(this$QueuedItemBasedBuildNumberExtractor, closure$xpathUrl) {
+  function QueuedItemBasedBuildNumberExtractor$extract$lambda(this$QueuedItemBasedBuildNumberExtractor) {
     return function () {
-      return Poller_getInstance().pollAndExtract_ljfavh$(this$QueuedItemBasedBuildNumberExtractor.authData_0, closure$xpathUrl, QueuedItemBasedBuildNumberExtractor$Companion_getInstance().numberRegex_0, QueuedItemBasedBuildNumberExtractor$extract$lambda$lambda(this$QueuedItemBasedBuildNumberExtractor));
+      return Poller_getInstance().pollAndExtract_4mvdjh$(this$QueuedItemBasedBuildNumberExtractor.authData_0, this$QueuedItemBasedBuildNumberExtractor.queuedItemUrl_0 + 'api/xml', BuilderNumberExtractor$Companion_getInstance().numberRegex, 2, 20, QueuedItemBasedBuildNumberExtractor$extract$lambda$lambda(this$QueuedItemBasedBuildNumberExtractor));
     };
   }
   function QueuedItemBasedBuildNumberExtractor$extract$lambda_0(it) {
     return toInt(it);
   }
   QueuedItemBasedBuildNumberExtractor.prototype.extract = function () {
-    var xpathUrl = this.queuedItemUrl_0 + 'api/xml?xpath=//executable/number';
-    return sleep(200, QueuedItemBasedBuildNumberExtractor$extract$lambda(this, xpathUrl)).then(QueuedItemBasedBuildNumberExtractor$extract$lambda_0);
+    return sleep(200, QueuedItemBasedBuildNumberExtractor$extract$lambda(this)).then(QueuedItemBasedBuildNumberExtractor$extract$lambda_0);
   };
-  function QueuedItemBasedBuildNumberExtractor$Companion() {
-    QueuedItemBasedBuildNumberExtractor$Companion_instance = this;
-    this.numberRegex_0 = Regex_init('<number>([0-9]+)<\/number>');
-  }
-  QueuedItemBasedBuildNumberExtractor$Companion.$metadata$ = {
-    kind: Kind_OBJECT,
-    simpleName: 'Companion',
-    interfaces: []
-  };
-  var QueuedItemBasedBuildNumberExtractor$Companion_instance = null;
-  function QueuedItemBasedBuildNumberExtractor$Companion_getInstance() {
-    if (QueuedItemBasedBuildNumberExtractor$Companion_instance === null) {
-      new QueuedItemBasedBuildNumberExtractor$Companion();
-    }
-    return QueuedItemBasedBuildNumberExtractor$Companion_instance;
-  }
   QueuedItemBasedBuildNumberExtractor.$metadata$ = {
     kind: Kind_CLASS,
     simpleName: 'QueuedItemBasedBuildNumberExtractor',
@@ -3874,6 +3864,7 @@
     this.requireConfigEntry_nhrt5l$(config, ConfigKey.REMOTE_REGEX);
     this.requireConfigEntry_nhrt5l$(config, ConfigKey.COMMIT_PREFIX);
   };
+  var isBlank = Kotlin.kotlin.text.isBlank_gw00vp$;
   var mapCapacity = Kotlin.kotlin.collections.mapCapacity_za3lpa$;
   var coerceAtLeast = Kotlin.kotlin.ranges.coerceAtLeast_dqglrj$;
   var LinkedHashMap_init = Kotlin.kotlin.collections.LinkedHashMap_init_xf5xz2$;
@@ -3942,7 +3933,7 @@
     var jobUrl = this.getJobUrl_puj7f4$(jenkinsBaseUrl, jobName);
     var relevantParams = this.getMatchingEntries_0(this.regexParametersList_0, mavenProjectId);
     var parameters = new StringBuilder();
-    var itr = asIterable(relevantParams).iterator();
+    var itr = relevantParams.iterator();
     if (itr.hasNext()) {
       var tmp$_1 = split(itr.next(), Kotlin.charArrayOf(61));
       var name = tmp$_1.get_za3lpa$(0);
@@ -3981,7 +3972,7 @@
   }
   function RestApiBasedQueuedItemUrlExtractor$extract$lambda(closure$paramsIdentification, closure$jobName, closure$jenkinsBaseUrl) {
     return function (body) {
-      var queuedItemRegex = Regex_init('<item>[\\S\\s]*?' + closure$paramsIdentification + ('<task>[' + '\\' + 'S' + '\\' + 's]*?<name>' + closure$jobName + '<\/name>[' + '\\' + 'S' + '\\' + 's]*?<\/task>[' + '\\' + 'S' + '\\' + 's]*?') + '<url>([^<]+)<\/url>[\\S\\s]*?' + '<\/item>');
+      var queuedItemRegex = Regex_init('<item>[\\S\\s]*?' + closure$paramsIdentification + ('<task>' + regex.noneOrSomeChars + '<name>' + closure$jobName + '<\/name>' + regex.noneOrSomeChars + '<\/task>' + regex.noneOrSomeChars) + '<url>([^<]+)<\/url>[\\S\\s]*?' + '<\/item>');
       var matchResult = queuedItemRegex.find_905azu$(body);
       if (matchResult != null) {
         return closure$jenkinsBaseUrl + '/' + matchResult.groupValues.get_za3lpa$(1);
@@ -4010,7 +4001,7 @@
   function SimulatingJobExecutor() {
     this.count_0 = 0;
   }
-  SimulatingJobExecutor.prototype.pollAndExtract_ljfavh$ = function (authData, url, regex, errorHandler) {
+  SimulatingJobExecutor.prototype.pollAndExtract_4mvdjh$ = function (authData, url, regex, pollEverySecond, maxWaitingTimeInSeconds, errorHandler) {
     return Promise.resolve('simulation-only.json');
   };
   function SimulatingJobExecutor$trigger$lambda(closure$jobQueuedHook, closure$jobExecutionData, closure$jobName, this$SimulatingJobExecutor) {
@@ -4054,7 +4045,7 @@
     };
   }
   function SimulatingJobExecutor$trigger$lambda_2(it) {
-    return to(new AuthData(new UsernameAndApiToken('simulating-user', 'random-apitoken'), new CrumbWithId('Jenkins-Crumb', 'onlySimulation')), 100);
+    return to(new AuthData(new UsernameAndApiToken('simulating-user', 'random-api-token'), new CrumbWithId('Jenkins-Crumb', 'onlySimulation')), 100);
   }
   SimulatingJobExecutor.prototype.trigger_cuif7q$$default = function (jobExecutionData, jobQueuedHook, jobStartedHook, pollEverySecond, maxWaitingTimeForCompletenessInSeconds, verbose) {
     var jobName = jobExecutionData.jobName;
@@ -4085,6 +4076,9 @@
     simpleName: 'SimulatingJobExecutor',
     interfaces: [JobExecutor]
   };
+  var GITHUB_REPO;
+  var GITHUB_NEW_ISSUE;
+  var LOEWENFELS_URL;
   function UrlWithSlashAtTheEnd(url) {
     UrlWithSlashAtTheEnd$Companion_getInstance();
     this.url = url;
@@ -4269,7 +4263,7 @@
   }
   function showMessageOfType$lambda$lambda_1(closure$message) {
     return function ($receiver) {
-      convertNewLinesToBrAndParseUrls($receiver, closure$message);
+      convertNewLinesToBrTabToTwoSpacesAndParseUrls($receiver, closure$message);
       return Unit;
     };
   }
@@ -4301,7 +4295,24 @@
     return div;
   }
   function closeMessage(msgId) {
-    elementById(msgId).remove();
+    var tmp$;
+    var elementByIdOrNull$result;
+    elementByIdOrNull$break: do {
+      var tmp$_0;
+      tmp$_0 = document.getElementById(msgId);
+      if (tmp$_0 == null) {
+        elementByIdOrNull$result = null;
+        break elementByIdOrNull$break;
+      }
+      var element = tmp$_0;
+      if (!Kotlin.isType(element, HTMLElement)) {
+        var message = 'element with ' + msgId + ' found but was wrong type.<br/>Expected type ' + get_js(getKClass(HTMLElement)).name + '<br/>Found ' + element;
+        throw IllegalArgumentException_init(message.toString());
+      }
+      elementByIdOrNull$result = element;
+    }
+     while (false);
+    (tmp$ = elementByIdOrNull$result) != null ? (tmp$.remove(), Unit) : null;
   }
   function showThrowableAndThrow(t) {
     showThrowable(t);
@@ -4321,34 +4332,47 @@
     return sb.toString();
   }
   function appendThrowable($receiver, t) {
-    var tmp$;
-    var stack = typeof (tmp$ = t.stack) === 'string' ? tmp$ : null;
-    if (stack != null) {
-      $receiver.append_gw00v9$(stack);
+    var tmp$, tmp$_0, tmp$_1;
+    var nullableStack = typeof (tmp$ = t.stack) === 'string' ? tmp$ : null;
+    if (nullableStack != null) {
+      var stackWithHead = nullableStack;
+      var firstNewLine = indexOf(stackWithHead, 10);
+      if (firstNewLine >= 0) {
+        var endIndex = firstNewLine + 1 | 0;
+        $receiver.append_gw00v9$(stackWithHead.substring(0, endIndex)).append_s8itvh$(10);
+        var startIndex = firstNewLine + 1 | 0;
+        tmp$_0 = stackWithHead.substring(startIndex);
+      }
+       else {
+        tmp$_0 = stackWithHead;
+      }
+      var stack = tmp$_0;
+      tmp$_1 = $receiver.append_gw00v9$(replace(stack, '   ', '\t'));
     }
      else {
-      $receiver.append_gw00v9$(get_js(Kotlin.getKClassFromExpression(t)).name + ': ' + toString(t.message));
+      tmp$_1 = $receiver.append_gw00v9$(get_js(Kotlin.getKClassFromExpression(t)).name + ': ' + toString(t.message));
     }
+    return tmp$_1;
   }
-  function convertNewLinesToBrAndParseUrls($receiver, message) {
+  function convertNewLinesToBrTabToTwoSpacesAndParseUrls($receiver, message) {
     var tmp$;
     if (message.length === 0)
       return;
     var messages = split_0(message, ['\n']);
-    convertUrlToLinks($receiver, messages.get_za3lpa$(0));
+    convertTabToTwoSpacesAndUrlToLinks($receiver, messages.get_za3lpa$(0));
     tmp$ = messages.size;
     for (var i = 1; i < tmp$; i++) {
       get_br($receiver);
-      convertUrlToLinks($receiver, messages.get_za3lpa$(i));
+      convertTabToTwoSpacesAndUrlToLinks($receiver, messages.get_za3lpa$(i));
     }
   }
-  function convertUrlToLinks$lambda(closure$match) {
+  function convertTabToTwoSpacesAndUrlToLinks$lambda(closure$match) {
     return function ($receiver) {
       $receiver.unaryPlus_pdl1vz$(closure$match.value);
       return Unit;
     };
   }
-  function convertUrlToLinks($receiver, message) {
+  function convertTabToTwoSpacesAndUrlToLinks($receiver, message) {
     var matchResult = urlRegex.find_905azu$(message);
     if (matchResult != null) {
       var index = 0;
@@ -4356,19 +4380,37 @@
         var match = ensureNotNull(matchResult);
         var startIndex = index;
         var endIndex = match.range.start;
-        $receiver.unaryPlus_pdl1vz$(message.substring(startIndex, endIndex));
-        a($receiver, match.value, void 0, void 0, convertUrlToLinks$lambda(match));
+        convertTabToTwoSpaces($receiver, message.substring(startIndex, endIndex));
+        a($receiver, match.value, void 0, void 0, convertTabToTwoSpacesAndUrlToLinks$lambda(match));
         index = match.range.endInclusive + 1 | 0;
         matchResult = match.next();
       }
        while (matchResult != null);
       var startIndex_0 = index;
-      var endIndex_0 = message.length;
-      $receiver.unaryPlus_pdl1vz$(message.substring(startIndex_0, endIndex_0));
+      convertTabToTwoSpaces($receiver, message.substring(startIndex_0));
     }
      else {
-      $receiver.unaryPlus_pdl1vz$(message);
+      convertTabToTwoSpaces($receiver, message);
     }
+  }
+  function convertTabToTwoSpaces$lambda($receiver) {
+    $receiver.unaryPlus_pdl1vz$('&nbsp;&nbsp;');
+    return Unit;
+  }
+  function convertTabToTwoSpaces($receiver, content) {
+    var currentIndex = 0;
+    do {
+      var index = indexOf(content, 9, currentIndex);
+      if (index < 0)
+        break;
+      var startIndex = currentIndex;
+      $receiver.unaryPlus_pdl1vz$(content.substring(startIndex, index));
+      unsafe($receiver, convertTabToTwoSpaces$lambda);
+      currentIndex = index + 1 | 0;
+    }
+     while (true);
+    var startIndex_0 = currentIndex;
+    $receiver.unaryPlus_pdl1vz$(content.substring(startIndex_0));
   }
   var urlRegex;
   function showDialog$lambda$lambda(closure$resolve) {
@@ -4471,13 +4513,13 @@
   function ChangeApplier() {
     ChangeApplier_instance = this;
   }
-  ChangeApplier.prototype.createReleasePlanJsonWithChanges_61zpoe$ = function (json) {
+  ChangeApplier.prototype.createReleasePlanJsonWithChanges_gkmix8$ = function (releasePlan, json) {
     var releasePlanJson = JSON.parse(json);
-    var changed = this.applyChanges_0(releasePlanJson);
+    var changed = this.applyChanges_0(releasePlan, releasePlanJson);
     var newJson = JSON.stringify(releasePlanJson);
     return to(changed, newJson);
   };
-  ChangeApplier.prototype.applyChanges_0 = function (releasePlanJson) {
+  ChangeApplier.prototype.applyChanges_0 = function (releasePlan, releasePlanJson) {
     var changed = {v: false};
     changed.v = changed.v | this.replacePublishIdIfChanged_0(releasePlanJson);
     changed.v = changed.v | this.replaceReleaseStateIfChanged_0(releasePlanJson);
@@ -4486,7 +4528,7 @@
     for (tmp$ = 0; tmp$ !== $receiver.length; ++tmp$) {
       var element = $receiver[tmp$];
       var mavenProjectId = deserializeProjectId(element.id);
-      changed.v = changed.v | this.replaceReleaseVersionIfChanged_0(element, mavenProjectId);
+      changed.v = changed.v | this.replaceReleaseVersionIfChanged_0(releasePlan, releasePlanJson, element, mavenProjectId);
       var $receiver_0 = element.commands;
       var tmp$_0, tmp$_0_0;
       var index = 0;
@@ -4549,7 +4591,7 @@
     }
     return changed.v;
   };
-  ChangeApplier.prototype.replaceReleaseVersionIfChanged_0 = function (project, mavenProjectId) {
+  ChangeApplier.prototype.replaceReleaseVersionIfChanged_0 = function (releasePlan, releasePlanJson, project, mavenProjectId) {
     var input = getTextFieldOrNull(mavenProjectId.identifier + ':releaseVersion');
     if (input != null && !equals(project.releaseVersion, input.value)) {
       if (!!isBlank(input.value)) {
@@ -4557,9 +4599,39 @@
         throw IllegalStateException_init(message.toString());
       }
       project.releaseVersion = input.value;
+      this.updateReleaseVersionOfSubmodules_0(releasePlan, releasePlanJson, mavenProjectId, input.value);
       return true;
     }
     return false;
+  };
+  function ChangeApplier$updateReleaseVersionOfSubmodules$lambda$lambda(it) {
+    return to(it, deserializeProjectId(it.id));
+  }
+  var NoSuchElementException_init = Kotlin.kotlin.NoSuchElementException;
+  ChangeApplier.prototype.updateReleaseVersionOfSubmodules_0 = function (releasePlan, releasePlanJson, mavenProjectId, releaseVersion) {
+    var tmp$;
+    tmp$ = releasePlan.getSubmodules_lljhqa$(mavenProjectId).iterator();
+    while (tmp$.hasNext()) {
+      var element = tmp$.next();
+      var $receiver = map(asSequence_0(releasePlanJson.projects), ChangeApplier$updateReleaseVersionOfSubmodules$lambda$lambda);
+      var first$result;
+      first$break: do {
+        var tmp$_0;
+        tmp$_0 = $receiver.iterator();
+        while (tmp$_0.hasNext()) {
+          var element_0 = tmp$_0.next();
+          if (equals(element_0.second, element)) {
+            first$result = element_0;
+            break first$break;
+          }
+        }
+        throw new NoSuchElementException_init('Sequence contains no element matching the predicate.');
+      }
+       while (false);
+      var $receiver_0 = first$result;
+      $receiver_0.first.releaseVersion = releaseVersion;
+      this.updateReleaseVersionOfSubmodules_0(releasePlan, releasePlanJson, $receiver_0.second, releaseVersion);
+    }
   };
   ChangeApplier.prototype.replaceCommandStateIfChanged_0 = function (genericCommand, mavenProjectId, index) {
     var tmp$;
@@ -4607,7 +4679,7 @@
     switch (command.t) {
       case 'ch.loewenfels.depgraph.data.maven.jenkins.JenkinsMavenReleasePlugin':
       case 'ch.loewenfels.depgraph.data.maven.jenkins.JenkinsMultiMavenReleasePlugin':
-        tmp$ = this.replaceNextVersionIfChanged_0(command.p, mavenProjectId, index) | this.replaceBuildUrlIfChanged_0(command.p, mavenProjectId, index);
+        tmp$ = this.replaceNextDevVersionIfChanged_0(command.p, mavenProjectId, index) | this.replaceBuildUrlIfChanged_0(command.p, mavenProjectId, index);
         break;
       case 'ch.loewenfels.depgraph.data.maven.jenkins.JenkinsUpdateDependency':
         tmp$ = this.replaceBuildUrlIfChanged_0(command.p, mavenProjectId, index);
@@ -4616,7 +4688,7 @@
     }
     return tmp$;
   };
-  ChangeApplier.prototype.replaceNextVersionIfChanged_0 = function (command, mavenProjectId, index) {
+  ChangeApplier.prototype.replaceNextDevVersionIfChanged_0 = function (command, mavenProjectId, index) {
     var m2Command = command;
     var input = getTextField(Pipeline$Companion_getInstance().getCommandId_o8feeo$(mavenProjectId, index) + Pipeline$Companion_getInstance().NEXT_DEV_VERSION_SUFFIX);
     if (!equals(m2Command.nextDevVersion, input.value)) {
@@ -4663,8 +4735,8 @@
     var projects = deserializeProjects(releasePlanJson);
     var submodules = deserializeMapOfProjectIdAndSetProjectId(releasePlanJson.submodules);
     var dependents = deserializeMapOfProjectIdAndSetProjectId(releasePlanJson.dependents);
-    var warnings = toList_0(releasePlanJson.warnings);
-    var infos = toList_0(releasePlanJson.infos);
+    var warnings = toList(releasePlanJson.warnings);
+    var infos = toList(releasePlanJson.infos);
     var config = deserializeConfig(releasePlanJson.config);
     return new ReleasePlan(releasePlanJson.releaseId, state, rootProjectId, projects, submodules, dependents, warnings, infos, config);
   }
@@ -4801,10 +4873,18 @@
     }
     return destination;
   }
-  function ModifiableJson(json) {
+  function ModifiableState(defaultJenkinsBaseUrl, json) {
+    this.defaultJenkinsBaseUrl_0 = null;
+    this._json_0 = null;
+    this._releaseJobExecutionDataFactory_wfsf9f$_0 = this._releaseJobExecutionDataFactory_wfsf9f$_0;
+    this._dryRunExecutionDataFactory_4eld0t$_0 = this._dryRunExecutionDataFactory_4eld0t$_0;
+    this._releasePlan_qec5av$_0 = this._releasePlan_qec5av$_0;
+    var fakeJenkinsBaseUrl = 'https://github.com/loewenfels/';
+    this.defaultJenkinsBaseUrl_0 = defaultJenkinsBaseUrl != null ? defaultJenkinsBaseUrl : fakeJenkinsBaseUrl;
     this._json_0 = json;
+    this.initJsonDependentFields_0();
   }
-  Object.defineProperty(ModifiableJson.prototype, 'json', {
+  Object.defineProperty(ModifiableState.prototype, 'json', {
     get: function () {
       return this._json_0;
     },
@@ -4812,20 +4892,80 @@
       this._json_0 = value;
     }
   });
-  ModifiableJson.prototype.applyChanges = function () {
-    var tmp$ = ChangeApplier_getInstance().createReleasePlanJsonWithChanges_61zpoe$(this.json);
+  Object.defineProperty(ModifiableState.prototype, '_releaseJobExecutionDataFactory_0', {
+    get: function () {
+      if (this._releaseJobExecutionDataFactory_wfsf9f$_0 == null)
+        return throwUPAE('_releaseJobExecutionDataFactory');
+      return this._releaseJobExecutionDataFactory_wfsf9f$_0;
+    },
+    set: function (_releaseJobExecutionDataFactory) {
+      this._releaseJobExecutionDataFactory_wfsf9f$_0 = _releaseJobExecutionDataFactory;
+    }
+  });
+  Object.defineProperty(ModifiableState.prototype, 'releaseJobExecutionDataFactory', {
+    get: function () {
+      return this._releaseJobExecutionDataFactory_0;
+    },
+    set: function (value) {
+      this._releaseJobExecutionDataFactory_0 = value;
+    }
+  });
+  Object.defineProperty(ModifiableState.prototype, '_dryRunExecutionDataFactory_0', {
+    get: function () {
+      if (this._dryRunExecutionDataFactory_4eld0t$_0 == null)
+        return throwUPAE('_dryRunExecutionDataFactory');
+      return this._dryRunExecutionDataFactory_4eld0t$_0;
+    },
+    set: function (_dryRunExecutionDataFactory) {
+      this._dryRunExecutionDataFactory_4eld0t$_0 = _dryRunExecutionDataFactory;
+    }
+  });
+  Object.defineProperty(ModifiableState.prototype, 'dryRunExecutionDataFactory', {
+    get: function () {
+      return this._dryRunExecutionDataFactory_0;
+    },
+    set: function (value) {
+      this._dryRunExecutionDataFactory_0 = value;
+    }
+  });
+  Object.defineProperty(ModifiableState.prototype, '_releasePlan_0', {
+    get: function () {
+      if (this._releasePlan_qec5av$_0 == null)
+        return throwUPAE('_releasePlan');
+      return this._releasePlan_qec5av$_0;
+    },
+    set: function (_releasePlan) {
+      this._releasePlan_qec5av$_0 = _releasePlan;
+    }
+  });
+  Object.defineProperty(ModifiableState.prototype, 'releasePlan', {
+    get: function () {
+      return this._releasePlan_0;
+    },
+    set: function (value) {
+      this._releasePlan_0 = value;
+    }
+  });
+  ModifiableState.prototype.initJsonDependentFields_0 = function () {
+    this._releasePlan_0 = deserialize(this._json_0);
+    this._releaseJobExecutionDataFactory_0 = new ReleaseJobExecutionDataFactory(this.defaultJenkinsBaseUrl_0, this.releasePlan);
+    this._dryRunExecutionDataFactory_0 = new DryRunJobExecutionDataFactory(this.defaultJenkinsBaseUrl_0, this.releasePlan);
+  };
+  ModifiableState.prototype.applyChanges = function () {
+    var tmp$ = ChangeApplier_getInstance().createReleasePlanJsonWithChanges_gkmix8$(this.releasePlan, this.json);
     var changed = tmp$.component1()
     , newJson = tmp$.component2();
     this.json = newJson;
+    this.initJsonDependentFields_0();
     return changed;
   };
-  ModifiableJson.prototype.getJsonWithAppliedChanges = function () {
-    var newJson = ChangeApplier_getInstance().createReleasePlanJsonWithChanges_61zpoe$(this.json).component2();
+  ModifiableState.prototype.getJsonWithAppliedChanges = function () {
+    var newJson = ChangeApplier_getInstance().createReleasePlanJsonWithChanges_gkmix8$(this.releasePlan, this.json).component2();
     return newJson;
   };
-  ModifiableJson.$metadata$ = {
+  ModifiableState.$metadata$ = {
     kind: Kind_CLASS,
-    simpleName: 'ModifiableJson',
+    simpleName: 'ModifiableState',
     interfaces: []
   };
   function sleep$lambda(closure$ms) {
@@ -4920,10 +5060,6 @@
     get: Toggler$Companion_getInstance
   });
   package$components.Toggler = Toggler;
-  package$gui.parseRemoteRegex_429wai$ = parseRemoteRegex;
-  package$gui.parseRemoteRegex_61zpoe$ = parseRemoteRegex_0;
-  package$gui.parseRegexParameters_429wai$ = parseRegexParameters;
-  package$gui.parseRegexParameters_61zpoe$ = parseRegexParameters_0;
   package$gui.elementById_61zpoe$ = elementById;
   package$gui.display_puj7f4$ = display;
   package$gui.getCheckbox_61zpoe$ = getCheckbox;
@@ -4944,10 +5080,10 @@
   package$gui.setTitleSaveOld_9bm2zh$ = setTitleSaveOld;
   var package$jobexecution = package$gui.jobexecution || (package$gui.jobexecution = {});
   package$jobexecution.BaseJobExecutionDataFactory = BaseJobExecutionDataFactory;
-  package$jobexecution.BuilderNumberExtractor = BuilderNumberExtractor;
-  Object.defineProperty(BuildHistoryBasedBuildNumberExtractor, 'Companion', {
-    get: BuildHistoryBasedBuildNumberExtractor$Companion_getInstance
+  Object.defineProperty(BuilderNumberExtractor, 'Companion', {
+    get: BuilderNumberExtractor$Companion_getInstance
   });
+  package$jobexecution.BuilderNumberExtractor = BuilderNumberExtractor;
   package$jobexecution.BuildHistoryBasedBuildNumberExtractor = BuildHistoryBasedBuildNumberExtractor;
   package$jobexecution.DryRunJobExecutionDataFactory = DryRunJobExecutionDataFactory;
   package$jobexecution.checkStatusOk_7ri4uy$ = checkStatusOk;
@@ -4969,6 +5105,11 @@
   package$jobexecution.JenkinsJobExecutor = JenkinsJobExecutor;
   package$jobexecution.createParameterRegexPattern_y0zsll$ = createParameterRegexPattern;
   package$jobexecution.toQueryParameters_y0zsll$ = toQueryParameters;
+  Object.defineProperty(package$jobexecution, 'endOfConsoleUrlSufix', {
+    get: function () {
+      return endOfConsoleUrlSufix;
+    }
+  });
   Object.defineProperty(JobExecutionData, 'Companion', {
     get: JobExecutionData$Companion_getInstance
   });
@@ -4984,14 +5125,26 @@
     get: Poller_getInstance
   });
   package$jobexecution.PollException = PollException;
-  Object.defineProperty(QueuedItemBasedBuildNumberExtractor, 'Companion', {
-    get: QueuedItemBasedBuildNumberExtractor$Companion_getInstance
-  });
   package$jobexecution.QueuedItemBasedBuildNumberExtractor = QueuedItemBasedBuildNumberExtractor;
   package$jobexecution.QueuedItemUrlExtractor = QueuedItemUrlExtractor;
   package$jobexecution.ReleaseJobExecutionDataFactory = ReleaseJobExecutionDataFactory;
   package$jobexecution.RestApiBasedQueuedItemUrlExtractor = RestApiBasedQueuedItemUrlExtractor;
   package$jobexecution.SimulatingJobExecutor = SimulatingJobExecutor;
+  Object.defineProperty(package$jobexecution, 'GITHUB_REPO', {
+    get: function () {
+      return GITHUB_REPO;
+    }
+  });
+  Object.defineProperty(package$jobexecution, 'GITHUB_NEW_ISSUE', {
+    get: function () {
+      return GITHUB_NEW_ISSUE;
+    }
+  });
+  Object.defineProperty(package$jobexecution, 'LOEWENFELS_URL', {
+    get: function () {
+      return LOEWENFELS_URL;
+    }
+  });
   Object.defineProperty(UrlWithSlashAtTheEnd, 'Companion', {
     get: UrlWithSlashAtTheEnd$Companion_getInstance
   });
@@ -5044,7 +5197,7 @@
   package$serialization.deserializeCommandState_dc558r$ = deserializeCommandState;
   package$serialization.deserializeMapOfProjectIdAndSetProjectId_sys0ir$ = deserializeMapOfProjectIdAndSetProjectId;
   package$serialization.deserializeConfig_bwh3i6$ = deserializeConfig;
-  package$serialization.ModifiableJson = ModifiableJson;
+  package$serialization.ModifiableState = ModifiableState;
   package$gui.sleep_xsjjga$ = sleep;
   package$gui.changeCursorToProgress = changeCursorToProgress;
   package$gui.changeCursorBackToNormal = changeCursorBackToNormal;
@@ -5082,6 +5235,10 @@
   _.options = options;
   JenkinsJobExecutor.prototype.trigger_cuif7q$ = JobExecutor.prototype.trigger_cuif7q$;
   SimulatingJobExecutor.prototype.trigger_cuif7q$ = JobExecutor.prototype.trigger_cuif7q$;
+  endOfConsoleUrlSufix = 'console/#footer';
+  GITHUB_REPO = 'https://github.com/loewenfels/dep-graph-releaser/';
+  GITHUB_NEW_ISSUE = 'https://github.com/loewenfels/dep-graph-releaser/issues/new';
+  LOEWENFELS_URL = 'https://loewenfels.ch';
   msgCounter = 0;
   urlRegex = Regex_init('http(?:s)://[^ ]+');
   MAVEN_PROJECT_ID = 'ch.loewenfels.depgraph.data.maven.MavenProjectId';

@@ -6,6 +6,10 @@ this['kbox-js'] = function (_, Kotlin) {
   var $$importsForInline$$ = _.$$importsForInline$$ || (_.$$importsForInline$$ = {});
   var defineInlineFunction = Kotlin.defineInlineFunction;
   var wrapFunction = Kotlin.wrapFunction;
+  var equals = Kotlin.equals;
+  var joinToString = Kotlin.kotlin.collections.joinToString_fmv235$;
+  var toString = Kotlin.toString;
+  var IllegalStateException_init = Kotlin.kotlin.IllegalStateException_init_pdl1vj$;
   var mapIndexed = Kotlin.kotlin.sequences.mapIndexed_b7yuyq$;
   var ensureNotNull = Kotlin.ensureNotNull;
   var Kind_CLASS = Kotlin.Kind.CLASS;
@@ -79,6 +83,16 @@ this['kbox-js'] = function (_, Kotlin) {
     }
   });
   var appendToStringBuilder_3 = defineInlineFunction('kbox-js.ch.tutteli.kbox.appendToStringBuilder_910eph$', function ($receiver, sb, separator, append) {
+    var itr = $receiver.iterator();
+    if (itr.hasNext()) {
+      append(itr.next());
+    }
+    while (itr.hasNext()) {
+      sb.append_gw00v9$(separator);
+      append(itr.next());
+    }
+  });
+  var appendToStringBuilder_4 = defineInlineFunction('kbox-js.ch.tutteli.kbox.appendToStringBuilder_29uhhf$', function ($receiver, sb, separator, append) {
     var itr = $receiver.iterator();
     if (itr.hasNext()) {
       append(itr.next());
@@ -436,7 +450,7 @@ this['kbox-js'] = function (_, Kotlin) {
     else
       return elseBlock();
   });
-  var joinToString = defineInlineFunction('kbox-js.ch.tutteli.kbox.joinToString_z0mrh4$', wrapFunction(function () {
+  var joinToString_0 = defineInlineFunction('kbox-js.ch.tutteli.kbox.joinToString_z0mrh4$', wrapFunction(function () {
     var asList = Kotlin.kotlin.collections.asList_us0mfu$;
     var StringBuilder_init = Kotlin.kotlin.text.StringBuilder_init_za3lpa$;
     return function ($receiver, separator, append) {
@@ -459,7 +473,7 @@ this['kbox-js'] = function (_, Kotlin) {
       return sb.toString();
     };
   }));
-  var joinToString_0 = defineInlineFunction('kbox-js.ch.tutteli.kbox.joinToString_aac1vq$', wrapFunction(function () {
+  var joinToString_1 = defineInlineFunction('kbox-js.ch.tutteli.kbox.joinToString_aac1vq$', wrapFunction(function () {
     var asList = Kotlin.kotlin.collections.asList_us0mfu$;
     var StringBuilder_init = Kotlin.kotlin.text.StringBuilder_init_za3lpa$;
     return function ($receiver, separator, lastSeparator, append) {
@@ -482,7 +496,7 @@ this['kbox-js'] = function (_, Kotlin) {
       return sb.toString();
     };
   }));
-  var joinToString_1 = defineInlineFunction('kbox-js.ch.tutteli.kbox.joinToString_ozw64r$', wrapFunction(function () {
+  var joinToString_2 = defineInlineFunction('kbox-js.ch.tutteli.kbox.joinToString_ozw64r$', wrapFunction(function () {
     var StringBuilder_init = Kotlin.kotlin.text.StringBuilder;
     return function ($receiver, separator, append) {
       var sb = new StringBuilder_init();
@@ -497,7 +511,7 @@ this['kbox-js'] = function (_, Kotlin) {
       return sb.toString();
     };
   }));
-  var joinToString_2 = defineInlineFunction('kbox-js.ch.tutteli.kbox.joinToString_scvx2b$', wrapFunction(function () {
+  var joinToString_3 = defineInlineFunction('kbox-js.ch.tutteli.kbox.joinToString_scvx2b$', wrapFunction(function () {
     var StringBuilder_init = Kotlin.kotlin.text.StringBuilder_init_za3lpa$;
     return function ($receiver, separator, lastSeparator, append) {
       var sb = StringBuilder_init($receiver.size * 4 | 0);
@@ -518,7 +532,22 @@ this['kbox-js'] = function (_, Kotlin) {
       return sb.toString();
     };
   }));
-  var joinToString_3 = defineInlineFunction('kbox-js.ch.tutteli.kbox.joinToString_b5nhi7$', wrapFunction(function () {
+  var joinToString_4 = defineInlineFunction('kbox-js.ch.tutteli.kbox.joinToString_b5nhi7$', wrapFunction(function () {
+    var StringBuilder_init = Kotlin.kotlin.text.StringBuilder;
+    return function ($receiver, separator, append) {
+      var sb = new StringBuilder_init();
+      var itr = $receiver.iterator();
+      if (itr.hasNext()) {
+        append(itr.next(), sb);
+      }
+      while (itr.hasNext()) {
+        sb.append_gw00v9$(separator);
+        append(itr.next(), sb);
+      }
+      return sb.toString();
+    };
+  }));
+  var joinToString_5 = defineInlineFunction('kbox-js.ch.tutteli.kbox.joinToString_euw1ht$', wrapFunction(function () {
     var StringBuilder_init = Kotlin.kotlin.text.StringBuilder;
     return function ($receiver, separator, append) {
       var sb = new StringBuilder_init();
@@ -534,10 +563,19 @@ this['kbox-js'] = function (_, Kotlin) {
     };
   }));
   var LinkedHashSet_init = Kotlin.kotlin.collections.LinkedHashSet_init_287e2$;
-  function mapParents($receiver, child) {
+  function mapParents($receiver, child, failIfCyclic) {
+    if (failIfCyclic === void 0)
+      failIfCyclic = false;
     var set = LinkedHashSet_init();
     var parent = $receiver.get_11rb$(child);
     while (parent != null) {
+      if (equals(parent, child) || set.contains_11rb$(parent)) {
+        if (failIfCyclic) {
+          var steps = set.isEmpty() ? '->' : joinToString(set, ' -> ', '-> ', ' ->');
+          throw IllegalStateException_init('cycle detected: ' + child + ' ' + steps + ' ' + toString(parent));
+        }
+        break;
+      }
       set.add_11rb$(parent);
       parent = $receiver.get_11rb$(parent);
     }
@@ -688,6 +726,7 @@ this['kbox-js'] = function (_, Kotlin) {
   package$kbox.appendToStringBuilder_ic12ii$ = appendToStringBuilder_0;
   package$kbox.appendToStringBuilder_910eph$ = appendToStringBuilder_3;
   package$kbox.appendToStringBuilder_76lgll$ = appendToStringBuilder_1;
+  package$kbox.appendToStringBuilder_29uhhf$ = appendToStringBuilder_4;
   package$kbox.forEachIn_bl86ll$ = forEachIn;
   package$kbox.forEachIn_cdudal$ = forEachIn_0;
   package$kbox.forEachIn_o7dffm$ = forEachIn_1;
@@ -708,12 +747,13 @@ this['kbox-js'] = function (_, Kotlin) {
   package$kbox.forThisAndForEachIn_3jqtyy$ = forThisAndForEachIn_7;
   package$kbox.ifWithinBound_he0xn9$ = ifWithinBound;
   package$kbox.ifWithinBound_t8wkhe$ = ifWithinBound_0;
-  package$kbox.joinToString_scvx2b$ = joinToString_2;
-  package$kbox.joinToString_z0mrh4$ = joinToString;
-  package$kbox.joinToString_aac1vq$ = joinToString_0;
-  package$kbox.joinToString_b5nhi7$ = joinToString_3;
-  package$kbox.joinToString_ozw64r$ = joinToString_1;
-  package$kbox.mapParents_ipxi88$ = mapParents;
+  package$kbox.joinToString_scvx2b$ = joinToString_3;
+  package$kbox.joinToString_z0mrh4$ = joinToString_0;
+  package$kbox.joinToString_aac1vq$ = joinToString_1;
+  package$kbox.joinToString_b5nhi7$ = joinToString_4;
+  package$kbox.joinToString_ozw64r$ = joinToString_2;
+  package$kbox.joinToString_euw1ht$ = joinToString_5;
+  package$kbox.mapParents_vk0q5f$ = mapParents;
   package$kbox.mapRemaining_s72g0g$ = mapRemaining;
   package$kbox.mapRemainingWithCounter_h4g43w$ = mapRemainingWithCounter;
   package$kbox.mapWithIndex_4b5429$ = mapWithIndex;

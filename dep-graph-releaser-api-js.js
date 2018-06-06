@@ -8,6 +8,15 @@ this['dep-graph-releaser-api-js'] = function (_, Kotlin) {
   var Enum = Kotlin.kotlin.Enum;
   var Kind_CLASS = Kotlin.Kind.CLASS;
   var throwISE = Kotlin.throwISE;
+  var Unit = Kotlin.kotlin.Unit;
+  var getCallableRef = Kotlin.getCallableRef;
+  var splitToSequence = Kotlin.kotlin.text.splitToSequence_o64adg$;
+  var Regex_init = Kotlin.kotlin.text.Regex_init_61zpoe$;
+  var to = Kotlin.kotlin.to_ujzrz7$;
+  var map = Kotlin.kotlin.sequences.map_z5avom$;
+  var toList = Kotlin.kotlin.sequences.toList_veqyi0$;
+  var emptyList = Kotlin.kotlin.collections.emptyList_287e2$;
+  var indexOf = Kotlin.kotlin.text.indexOf_8eortd$;
   var Kind_INTERFACE = Kotlin.Kind.INTERFACE;
   var getKClass = Kotlin.getKClass;
   var toString = Kotlin.toString;
@@ -15,11 +24,8 @@ this['dep-graph-releaser-api-js'] = function (_, Kotlin) {
   var joinToString = Kotlin.kotlin.collections.joinToString_cgipc5$;
   var IllegalArgumentException_init = Kotlin.kotlin.IllegalArgumentException_init_pdl1vj$;
   var mutableListOf = Kotlin.kotlin.collections.mutableListOf_i5x0yv$;
-  var to = Kotlin.kotlin.to_ujzrz7$;
   var asSequence = Kotlin.kotlin.collections.asSequence_7wnvza$;
   var filter = Kotlin.kotlin.sequences.filter_euau3h$;
-  var map = Kotlin.kotlin.sequences.map_z5avom$;
-  var Unit = Kotlin.kotlin.Unit;
   var Iterator = Kotlin.kotlin.collections.Iterator;
   var NoSuchElementException = Kotlin.kotlin.NoSuchElementException;
   var last = Kotlin.kotlin.collections.last_2p1efm$;
@@ -158,9 +164,66 @@ this['dep-graph-releaser-api-js'] = function (_, Kotlin) {
     }
   }
   ConfigKey.valueOf_61zpoe$ = ConfigKey$valueOf;
-  function Command() {
+  function parseRemoteRegex(releasePlan) {
+    return parseRemoteRegex_0(releasePlan.getConfig_udzor3$(ConfigKey$REMOTE_REGEX_getInstance()));
+  }
+  function parseRemoteRegex_0(regex) {
+    return parseRegex(regex, 59, 'remoteRegex', getCallableRef('checkUrlDefined', function (jenkinsBaseUrl, remoteRegex) {
+      return checkUrlDefined(jenkinsBaseUrl, remoteRegex), Unit;
+    }));
+  }
+  function parseRegexParameters(releasePlan) {
+    return parseRegexParameters_0(releasePlan.getConfig_udzor3$(ConfigKey$REGEX_PARAMS_getInstance()));
+  }
+  function parseRegexParameters_0(regex) {
+    return parseRegex(regex, 36, 'regexParameters', getCallableRef('checkAtLeastOneParameter', function (pair, regexParameters) {
+      return checkAtLeastOneParameter(pair, regexParameters), Unit;
+    }));
+  }
+  function parseRegex$lambda(closure$name, closure$configValue, closure$checkRightSide) {
+    return function (pair) {
+      var index = checkRegexNotEmpty(pair, closure$name, closure$configValue);
+      var startIndex = index + 1 | 0;
+      var rightSide = pair.substring(startIndex);
+      closure$checkRightSide(rightSide, closure$configValue);
+      return to(Regex_init(pair.substring(0, index)), rightSide);
+    };
+  }
+  function parseRegex(configValue, splitChar, name, checkRightSide) {
+    var tmp$;
+    if (configValue.length > 0) {
+      tmp$ = toList(map(splitToSequence(configValue, Kotlin.charArrayOf(splitChar)), parseRegex$lambda(name, configValue, checkRightSide)));
+    }
+     else {
+      tmp$ = emptyList();
+    }
+    return tmp$;
   }
   var IllegalStateException_init = Kotlin.kotlin.IllegalStateException_init_pdl1vj$;
+  function checkRegexNotEmpty(pair, name, input) {
+    var index = indexOf(pair, 35);
+    if (!(index > 0)) {
+      var message = 'regex requires at least one character.' + '\n' + name + ': ' + input;
+      throw IllegalStateException_init(message.toString());
+    }
+    return index;
+  }
+  var isBlank = Kotlin.kotlin.text.isBlank_gw00vp$;
+  function checkUrlDefined(jenkinsBaseUrl, remoteRegex) {
+    if (!!isBlank(jenkinsBaseUrl)) {
+      var message = 'A remoteRegex requires a related jenkins base url.' + '\r' + 'emoteRegex: ' + remoteRegex;
+      throw IllegalStateException_init(message.toString());
+    }
+  }
+  function checkAtLeastOneParameter(pair, regexParameters) {
+    var index = indexOf(pair, 61);
+    if (!(index > 0)) {
+      var message = 'A regexParam requires at least one parameter.' + '\n' + 'regexParameters: ' + regexParameters;
+      throw IllegalStateException_init(message.toString());
+    }
+  }
+  function Command() {
+  }
   Command.prototype.asDeactivated = function () {
     if (!!Kotlin.isType(this.state, CommandState$Deactivated)) {
       var message = 'Cannot deactivate an already deactivated command: ' + this;
@@ -698,7 +761,6 @@ this['dep-graph-releaser-api-js'] = function (_, Kotlin) {
     ReleasePlan.call($this, releasePlan.releaseId, releasePlan.state, releasePlan.rootProjectId, projects, releasePlan.submodules_0, releasePlan.dependents_0, releasePlan.warnings, releasePlan.infos, releasePlan.config);
     return $this;
   }
-  var emptyList = Kotlin.kotlin.collections.emptyList_287e2$;
   var emptyMap = Kotlin.kotlin.collections.emptyMap_q3lmfv$;
   function ReleasePlan_init_0(publishId, rootProjectId, projects, submodulesOfProject, dependents, $this) {
     $this = $this || Object.create(ReleasePlan.prototype);
@@ -1070,6 +1132,8 @@ this['dep-graph-releaser-api-js'] = function (_, Kotlin) {
   function hasNextOnTheSameLevel($receiver, level) {
     return $receiver.hasNext() && level === $receiver.peek().level;
   }
+  var noneOrSomeChars;
+  var someChars;
   Object.defineProperty(ConfigKey, 'COMMIT_PREFIX', {
     get: ConfigKey$COMMIT_PREFIX_getInstance
   });
@@ -1095,6 +1159,10 @@ this['dep-graph-releaser-api-js'] = function (_, Kotlin) {
   var package$loewenfels = package$ch.loewenfels || (package$ch.loewenfels = {});
   var package$depgraph = package$loewenfels.depgraph || (package$loewenfels.depgraph = {});
   package$depgraph.ConfigKey = ConfigKey;
+  package$depgraph.parseRemoteRegex_429wai$ = parseRemoteRegex;
+  package$depgraph.parseRemoteRegex_61zpoe$ = parseRemoteRegex_0;
+  package$depgraph.parseRegexParameters_429wai$ = parseRegexParameters;
+  package$depgraph.parseRegexParameters_61zpoe$ = parseRegexParameters_0;
   var package$data = package$depgraph.data || (package$depgraph.data = {});
   package$data.Command = Command;
   CommandState.Waiting = CommandState$Waiting;
@@ -1180,8 +1248,21 @@ this['dep-graph-releaser-api-js'] = function (_, Kotlin) {
   package$serialization.fromJson_v4rmea$ = fromJson;
   package$depgraph.LevelIterator = LevelIterator;
   package$depgraph.hasNextOnTheSameLevel_r88oei$ = hasNextOnTheSameLevel;
+  var package$regex = package$depgraph.regex || (package$depgraph.regex = {});
+  Object.defineProperty(package$regex, 'noneOrSomeChars', {
+    get: function () {
+      return noneOrSomeChars;
+    }
+  });
+  Object.defineProperty(package$regex, 'someChars', {
+    get: function () {
+      return someChars;
+    }
+  });
   ReleaseCommand.prototype.asDeactivated = Command.prototype.asDeactivated;
   ReleaseCommand.prototype.asDisabled = Command.prototype.asDisabled;
+  noneOrSomeChars = '[\\S\\s]*?';
+  someChars = '[\\S\\s]+?';
   Kotlin.defineModule('dep-graph-releaser-api-js', _);
   return _;
 }(typeof this['dep-graph-releaser-api-js'] === 'undefined' ? {} : this['dep-graph-releaser-api-js'], kotlin);
