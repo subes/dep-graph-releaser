@@ -26,6 +26,7 @@
   var $$importsForInline$$ = _.$$importsForInline$$ || (_.$$importsForInline$$ = {});
   var throwCCE = Kotlin.throwCCE;
   var ensureNotNull = Kotlin.ensureNotNull;
+  var Kind_OBJECT = Kotlin.Kind.OBJECT;
   var Kind_CLASS = Kotlin.Kind.CLASS;
   var to = Kotlin.kotlin.to_ujzrz7$;
   var mapOf = Kotlin.kotlin.collections.mapOf_qfcya0$;
@@ -37,7 +38,6 @@
   var unboxChar = Kotlin.unboxChar;
   var repeat = Kotlin.kotlin.text.repeat_94bcnn$;
   var Regex_init = Kotlin.kotlin.text.Regex_init_61zpoe$;
-  var Kind_OBJECT = Kotlin.Kind.OBJECT;
   var ReleaseState = $module$dep_graph_releaser_api_js.ch.loewenfels.depgraph.data.ReleaseState;
   var Error_0 = Kotlin.kotlin.Error;
   var CommandState = $module$dep_graph_releaser_api_js.ch.loewenfels.depgraph.data.CommandState;
@@ -76,9 +76,13 @@
   var set_onKeyUpFunction = $module$kotlinx_html_js.kotlinx.html.js.set_onKeyUpFunction_pszlq2$;
   var textInput = $module$kotlinx_html_js.kotlinx.html.textInput_ap9uf6$;
   var textArea = $module$kotlinx_html_js.kotlinx.html.textArea_b1tfd9$;
-  var listOf = Kotlin.kotlin.collections.listOf_i5x0yv$;
   var hasClass = Kotlin.kotlin.dom.hasClass_46n0ku$;
+  var listOf = Kotlin.kotlin.collections.listOf_i5x0yv$;
   var Triple = Kotlin.kotlin.Triple;
+  var ConfigKey = $module$dep_graph_releaser_api_js.ch.loewenfels.depgraph.ConfigKey;
+  var generateEclipsePsf = $module$dep_graph_releaser_api_js.ch.loewenfels.depgraph.generateEclipsePsf_xx51qy$;
+  var generateGitCloneCommands = $module$dep_graph_releaser_api_js.ch.loewenfels.depgraph.generateGitCloneCommands_xx51qy$;
+  var generateListOfDependentsWithoutSubmoduleAndExcluded = $module$dep_graph_releaser_api_js.ch.loewenfels.depgraph.generateListOfDependentsWithoutSubmoduleAndExcluded_4w9fpd$;
   var mapWithIndex_0 = $module$kbox_js.ch.tutteli.kbox.mapWithIndex_7wnvza$;
   var Enum = Kotlin.kotlin.Enum;
   var throwISE = Kotlin.throwISE;
@@ -103,7 +107,6 @@
   var get_js = Kotlin.kotlin.js.get_js_1yb8b7$;
   var defineInlineFunction = Kotlin.defineInlineFunction;
   var wrapFunction = Kotlin.wrapFunction;
-  var ConfigKey = $module$dep_graph_releaser_api_js.ch.loewenfels.depgraph.ConfigKey;
   var replace = Kotlin.kotlin.text.replace_680rmw$;
   var Kind_INTERFACE = Kotlin.Kind.INTERFACE;
   var toInt = Kotlin.kotlin.text.toInt_pdl1vz$;
@@ -146,19 +149,38 @@
   ReleaseJobExecutionDataFactory.prototype = Object.create(BaseJobExecutionDataFactory.prototype);
   ReleaseJobExecutionDataFactory.prototype.constructor = ReleaseJobExecutionDataFactory;
   function Downloader(modifiableState) {
+    Downloader$Companion_getInstance();
     this.modifiableState_0 = modifiableState;
   }
   Downloader.prototype.download = function () {
-    var tmp$;
     var json = this.modifiableState_0.getJsonWithAppliedChanges();
+    Downloader$Companion_getInstance().download_puj7f4$('release.json', json);
+  };
+  function Downloader$Companion() {
+    Downloader$Companion_instance = this;
+  }
+  Downloader$Companion.prototype.download_puj7f4$ = function (fileName, content) {
+    var tmp$;
     var a = Kotlin.isType(tmp$ = document.createElement('a'), HTMLElement) ? tmp$ : throwCCE();
-    a.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(json));
-    a.setAttribute('download', 'release.json');
+    a.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(content));
+    a.setAttribute('download', fileName);
     a.style.display = 'none';
     ensureNotNull(document.body).appendChild(a);
     a.click();
     ensureNotNull(document.body).removeChild(a);
   };
+  Downloader$Companion.$metadata$ = {
+    kind: Kind_OBJECT,
+    simpleName: 'Companion',
+    interfaces: []
+  };
+  var Downloader$Companion_instance = null;
+  function Downloader$Companion_getInstance() {
+    if (Downloader$Companion_instance === null) {
+      new Downloader$Companion();
+    }
+    return Downloader$Companion_instance;
+  }
   Downloader.$metadata$ = {
     kind: Kind_CLASS,
     simpleName: 'Downloader',
@@ -836,10 +858,10 @@
   function App$start$lambda$lambda(it) {
     throw new Error_0('Could not load json.', it);
   }
-  function App$start$lambda$lambda$lambda(this$App, closure$usernameToken, closure$modifiableJson, closure$releasePlan) {
+  function App$start$lambda$lambda$lambda(this$App, closure$usernameToken, closure$modifiableState, closure$releasePlan) {
     return function (it) {
-      var dependencies = App$Companion_getInstance().createDependencies_2sg0qe$(this$App.defaultJenkinsBaseUrl_0, this$App.publishJobUrl_0, closure$usernameToken, closure$modifiableJson, this$App.menu_0);
-      this$App.menu_0.initDependencies_ok6lso$(closure$releasePlan, new Downloader(closure$modifiableJson), dependencies, closure$modifiableJson);
+      var dependencies = App$Companion_getInstance().createDependencies_2sg0qe$(this$App.defaultJenkinsBaseUrl_0, this$App.publishJobUrl_0, closure$usernameToken, closure$modifiableState, this$App.menu_0);
+      this$App.menu_0.initDependencies_sr97fq$(new Downloader(closure$modifiableState), dependencies, closure$modifiableState);
       new Gui(closure$releasePlan, this$App.menu_0);
       this$App.switchLoaderPipelineWithPipeline_0();
       return Unit;
@@ -849,8 +871,8 @@
     return function (body) {
       var tmp$;
       this$App.switchLoader_0('loaderJson', 'loaderPipeline');
-      var modifiableJson = new ModifiableState(this$App.defaultJenkinsBaseUrl_0, body);
-      var releasePlan = modifiableJson.releasePlan;
+      var modifiableState = new ModifiableState(this$App.defaultJenkinsBaseUrl_0, body);
+      var releasePlan = modifiableState.releasePlan;
       if (closure$usernameToken != null) {
         tmp$ = this$App.loadOtherApiTokens_0(releasePlan);
       }
@@ -858,7 +880,7 @@
         tmp$ = Promise.resolve(Unit);
       }
       var promise = tmp$;
-      return promise.then(App$start$lambda$lambda$lambda(this$App, closure$usernameToken, modifiableJson, releasePlan));
+      return promise.then(App$start$lambda$lambda$lambda(this$App, closure$usernameToken, modifiableState, releasePlan));
     };
   }
   function App$start$lambda$lambda_1(it) {
@@ -1375,8 +1397,7 @@
     Menu$Companion_getInstance();
     this.publisher_0 = null;
     this.typeOfRun_0 = Menu$TypeOfRun$SIMULATION_getInstance();
-    this.addClickEventListenerIfNotDeactivatedNorDisabled_0(this.settingsButton_0, Menu_init$lambda);
-    addClickEventListener(elementById('config:close'), void 0, Menu_init$lambda_0);
+    this.setUpMenuLayers_0([new Triple(this.toolsButton_0, 'toolbox', to(Menu$Companion_getInstance().TOOLS_INACTIVE_TITLE_0, 'Close the toolbox.')), new Triple(this.settingsButton_0, 'config', to(Menu$Companion_getInstance().SETTINGS_INACTIVE_TITLE_0, 'Close Settings.'))]);
   }
   Object.defineProperty(Menu.prototype, 'userButton_0', {
     get: function () {
@@ -1418,13 +1439,72 @@
       return elementById('explore');
     }
   });
+  Object.defineProperty(Menu.prototype, 'toolsButton_0', {
+    get: function () {
+      return elementById('tools');
+    }
+  });
   Object.defineProperty(Menu.prototype, 'settingsButton_0', {
     get: function () {
       return elementById('settings');
     }
   });
+  Object.defineProperty(Menu.prototype, 'eclipsePsfButton_0', {
+    get: function () {
+      return elementById('eclipsePsf');
+    }
+  });
+  Object.defineProperty(Menu.prototype, 'gitCloneCommandsButton_0', {
+    get: function () {
+      return elementById('gitCloneCommands');
+    }
+  });
+  Object.defineProperty(Menu.prototype, 'listDependentsButton_0', {
+    get: function () {
+      return elementById('listDependents');
+    }
+  });
+  function Menu$setUpMenuLayers$lambda$lambda(closure$pairs, closure$id, closure$inactiveAndActiveTitle, closure$button) {
+    return function () {
+      var $receiver = closure$pairs;
+      var tmp$;
+      for (tmp$ = 0; tmp$ !== $receiver.length; ++tmp$) {
+        var element = $receiver[tmp$];
+        var closure$id_0 = closure$id;
+        var otherId = element.component2();
+        if (!equals(closure$id_0, otherId)) {
+          removeClass(elementById(otherId), ['active']);
+        }
+      }
+      var layer = elementById(closure$id);
+      if (hasClass(layer, 'active')) {
+        closure$button.title = closure$inactiveAndActiveTitle.first;
+      }
+       else {
+        closure$button.title = closure$inactiveAndActiveTitle.second;
+      }
+      toggleClass(layer, 'active');
+      return Unit;
+    };
+  }
+  function Menu$setUpMenuLayers$lambda$lambda_0(closure$id) {
+    return function (it) {
+      return removeClass(elementById(closure$id), ['active']);
+    };
+  }
+  Menu.prototype.setUpMenuLayers_0 = function (pairs) {
+    var tmp$;
+    for (tmp$ = 0; tmp$ !== pairs.length; ++tmp$) {
+      var element = pairs[tmp$];
+      var button = element.component1()
+      , id = element.component2()
+      , inactiveAndActiveTitle = element.component3();
+      this.addClickEventListenerIfNotDeactivatedNorDisabled_0(button, Menu$setUpMenuLayers$lambda$lambda(pairs, id, inactiveAndActiveTitle, button));
+      addClickEventListener(elementById(id + ':close'), void 0, Menu$setUpMenuLayers$lambda$lambda_0(id));
+    }
+  };
   Menu.prototype.disableButtonsDueToNoPublishUrl = function () {
-    var titleButtons = 'You need to specify publishJob if you want to use other functionality than Download and Explore Release Order.';
+    var titleButtons = 'You need to specify &publishJob if you want to use other functionality than Download and Explore Release Order.';
     this.disableButtonsDueToNoAuth_puj7f4$(titleButtons, titleButtons + ('\n' + 'An example: ' + window.location + '&publishJob=jobUrl') + '\nwhere you need to replace jobUrl accordingly.');
   };
   Menu.prototype.disableButtonsDueToNoAuth_puj7f4$ = function (titleButtons, info) {
@@ -1469,13 +1549,17 @@
       }
     };
   }
-  Menu.prototype.initDependencies_ok6lso$ = function (releasePlan, downloader, dependencies, modifiableState) {
+  Menu.prototype.initDependencies_sr97fq$ = function (downloader, dependencies, modifiableState) {
     if (dependencies != null) {
       this.publisher_0 = dependencies.publisher;
     }
     window.onbeforeunload = Menu$initDependencies$lambda(this);
     this.initSaveAndDownloadButton_0(downloader, dependencies);
-    this.initRunButtons_0(releasePlan, dependencies, modifiableState);
+    this.initRunButtons_0(dependencies, modifiableState);
+    this.activateToolsButton_0();
+    this.activateSettingsButton_0();
+    this.initExportButtons_0(modifiableState);
+    var releasePlan = modifiableState.releasePlan;
     switch (releasePlan.state.name) {
       case 'Ready':
         break;
@@ -1515,16 +1599,16 @@
     removeClass(this.downloadButton_0, [Menu$Companion_getInstance().DEACTIVATED_0]);
     this.addClickEventListenerIfNotDeactivatedNorDisabled_0(this.downloadButton_0, Menu$initSaveAndDownloadButton$lambda_0(downloader));
   };
-  function Menu$initRunButtons$lambda(this$Menu, closure$releasePlan, closure$dependencies, closure$modifiableState) {
+  function Menu$initRunButtons$lambda(this$Menu, closure$modifiableState, closure$dependencies) {
     return function () {
       this$Menu.typeOfRun_0 = Menu$TypeOfRun$DRY_RUN_getInstance();
-      return this$Menu.triggerRelease_0(closure$releasePlan, closure$dependencies, closure$dependencies.jenkinsJobExecutor, closure$modifiableState.dryRunExecutionDataFactory);
+      return this$Menu.triggerRelease_0(closure$modifiableState.releasePlan, closure$dependencies, closure$dependencies.jenkinsJobExecutor, closure$modifiableState.dryRunExecutionDataFactory);
     };
   }
-  function Menu$initRunButtons$lambda_0(this$Menu, closure$releasePlan, closure$dependencies, closure$modifiableState) {
+  function Menu$initRunButtons$lambda_0(this$Menu, closure$modifiableState, closure$dependencies) {
     return function () {
       this$Menu.typeOfRun_0 = Menu$TypeOfRun$RELEASE_getInstance();
-      return this$Menu.triggerRelease_0(closure$releasePlan, closure$dependencies, closure$dependencies.jenkinsJobExecutor, closure$modifiableState.releaseJobExecutionDataFactory);
+      return this$Menu.triggerRelease_0(closure$modifiableState.releasePlan, closure$dependencies, closure$dependencies.jenkinsJobExecutor, closure$modifiableState.releaseJobExecutionDataFactory);
     };
   }
   function Menu$initRunButtons$lambda$lambda(closure$dependencies, this$Menu) {
@@ -1533,11 +1617,11 @@
       return Unit;
     };
   }
-  function Menu$initRunButtons$lambda_1(this$Menu, closure$nonNullDependencies, closure$releasePlan, closure$modifiableState, closure$dependencies) {
+  function Menu$initRunButtons$lambda_1(this$Menu, closure$nonNullDependencies, closure$modifiableState, closure$dependencies) {
     return function () {
       this$Menu.typeOfRun_0 = Menu$TypeOfRun$SIMULATION_getInstance();
       this$Menu.publisher_0 = closure$nonNullDependencies.publisher;
-      return finally_0(this$Menu.triggerRelease_0(closure$releasePlan, closure$nonNullDependencies, closure$nonNullDependencies.simulatingJobExecutor, closure$modifiableState.releaseJobExecutionDataFactory), Menu$initRunButtons$lambda$lambda(closure$dependencies, this$Menu));
+      return finally_0(this$Menu.triggerRelease_0(closure$modifiableState.releasePlan, closure$nonNullDependencies, closure$nonNullDependencies.simulatingJobExecutor, closure$modifiableState.releaseJobExecutionDataFactory), Menu$initRunButtons$lambda$lambda(closure$dependencies, this$Menu));
     };
   }
   function Menu$initRunButtons$lambda_2(this$Menu) {
@@ -1562,10 +1646,10 @@
           var element = tmp$_0.next();
           element.title = Menu$Companion_getInstance().DISABLED_RELEASE_SUCCESS_0;
         }
-        showSuccess(trimMargin('\n                        |Release ended successfully :) you can now close the window.\n                        |Use a new pipeline for a new release (also in case you performed a Dry Run).\n                        |\n                        |Please report a bug at https://github.com/loewenfels/dep-graph-releaser/issues/new in case some job failed without us noticing it.\n                        |Do not forget to star the repository if you like dep-graph-releaser ;-) https://github.com/loewenfels/dep-graph-releaser/\n                        |Last but not least, you might want to visit https://loewenfels.ch to get to know the company pushing this project forward.\n                    '));
+        showSuccess(trimMargin('\n                    |Release ended successfully :) you can now close the window.\n                    |Use a new pipeline for a new release (also in case you performed a Dry Run).\n                    |\n                    |Please report a bug at https://github.com/loewenfels/dep-graph-releaser/issues/new in case some job failed without us noticing it.\n                    |Do not forget to star the repository if you like dep-graph-releaser ;-) https://github.com/loewenfels/dep-graph-releaser/\n                    |Last but not least, you might want to visit https://loewenfels.ch to get to know the company pushing this project forward.\n                    '));
       }
        else {
-        showError(trimMargin('\n                        |Release ended with failure :(\n                        |At least one job failed. Check errors, fix them and then you can re-trigger the failed jobs, the pipeline respectively, by clicking on the release button (you might have to delete git tags and remove artifacts if they have already been created).\n                        |\n                        |Please report a bug at https://github.com/loewenfels/dep-graph-releaser/issues/new in case a job failed due to an error in dep-graph-releaser.\n                    '));
+        showError(trimMargin('\n                    |Release ended with failure :(\n                    |At least one job failed. Check errors, fix them and then you can re-trigger the failed jobs, the pipeline respectively, by clicking on the release button (you might have to delete git tags and remove artifacts if they have already been created).\n                    |\n                    |Please report a bug at https://github.com/loewenfels/dep-graph-releaser/issues/new in case a job failed due to an error in dep-graph-releaser.\n                    '));
         switch (this$Menu.typeOfRun_0.name) {
           case 'SIMULATION':
             tmp$ = new Triple('Explore Release Order', this$Menu.exploreButton_0, elementById('explore:text'));
@@ -1590,19 +1674,51 @@
       return Unit;
     };
   }
-  Menu.prototype.initRunButtons_0 = function (releasePlan, dependencies, modifiableState) {
+  Menu.prototype.initRunButtons_0 = function (dependencies, modifiableState) {
     if (dependencies != null) {
       this.activateDryRunButton_0();
-      this.addClickEventListenerIfNotDeactivatedNorDisabled_0(this.dryRunButton_0, Menu$initRunButtons$lambda(this, releasePlan, dependencies, modifiableState));
+      this.addClickEventListenerIfNotDeactivatedNorDisabled_0(this.dryRunButton_0, Menu$initRunButtons$lambda(this, modifiableState, dependencies));
       this.activateReleaseButton_0();
-      this.addClickEventListenerIfNotDeactivatedNorDisabled_0(this.releaseButton_0, Menu$initRunButtons$lambda_0(this, releasePlan, dependencies, modifiableState));
+      this.addClickEventListenerIfNotDeactivatedNorDisabled_0(this.releaseButton_0, Menu$initRunButtons$lambda_0(this, modifiableState, dependencies));
     }
     this.activateExploreButton_0();
     var fakeJenkinsBaseUrl = 'https://github.com/loewenfels/';
     var nonNullDependencies = dependencies != null ? dependencies : ensureNotNull(App$Companion_getInstance().createDependencies_2sg0qe$(fakeJenkinsBaseUrl, 'https://github.com/loewenfels/dgr-publisher/', new UsernameAndApiToken('test', 'test'), modifiableState, this));
-    this.addClickEventListenerIfNotDeactivatedNorDisabled_0(this.exploreButton_0, Menu$initRunButtons$lambda_1(this, nonNullDependencies, releasePlan, modifiableState, dependencies));
+    this.addClickEventListenerIfNotDeactivatedNorDisabled_0(this.exploreButton_0, Menu$initRunButtons$lambda_1(this, nonNullDependencies, modifiableState, dependencies));
     Menu$Companion_getInstance().registerForReleaseStartEvent_gbr1zf$(Menu$initRunButtons$lambda_2(this));
     Menu$Companion_getInstance().registerForReleaseEndEvent_y8twos$(Menu$initRunButtons$lambda_3(this));
+  };
+  function Menu$initExportButtons$lambda(closure$modifiableState) {
+    return function () {
+      var releasePlan = closure$modifiableState.releasePlan;
+      var psfContent = generateEclipsePsf(releasePlan, Regex_init(releasePlan.getConfig_udzor3$(ConfigKey.RELATIVE_PATH_EXCLUDE_PROJECT_REGEX)), Regex_init(releasePlan.getConfig_udzor3$(ConfigKey.RELATIVE_PATH_TO_GIT_REPO_REGEX)), releasePlan.getConfig_udzor3$(ConfigKey.RELATIVE_PATH_TO_GIT_REPO_REPLACEMENT));
+      Downloader$Companion_getInstance().download_puj7f4$('customImport.psf', psfContent);
+      return Unit;
+    };
+  }
+  function Menu$initExportButtons$lambda_0(closure$modifiableState) {
+    return function () {
+      var releasePlan = closure$modifiableState.releasePlan;
+      var gitCloneCommands = generateGitCloneCommands(releasePlan, Regex_init(releasePlan.getConfig_udzor3$(ConfigKey.RELATIVE_PATH_EXCLUDE_PROJECT_REGEX)), Regex_init(releasePlan.getConfig_udzor3$(ConfigKey.RELATIVE_PATH_TO_GIT_REPO_REGEX)), releasePlan.getConfig_udzor3$(ConfigKey.RELATIVE_PATH_TO_GIT_REPO_REPLACEMENT));
+      var title = 'Copy the following git clone commands and paste them into a terminal/command prompt';
+      return showOutput(title, gitCloneCommands);
+    };
+  }
+  function Menu$initExportButtons$lambda_1(closure$modifiableState) {
+    return function () {
+      var releasePlan = closure$modifiableState.releasePlan;
+      var list = generateListOfDependentsWithoutSubmoduleAndExcluded(releasePlan, Regex_init(releasePlan.getConfig_udzor3$(ConfigKey.RELATIVE_PATH_EXCLUDE_PROJECT_REGEX)));
+      var title = 'The following projects are (indirect) dependents of ' + releasePlan.rootProjectId.identifier;
+      return showOutput(title, list);
+    };
+  }
+  Menu.prototype.initExportButtons_0 = function (modifiableState) {
+    this.activateButton_0(this.eclipsePsfButton_0, 'Download an eclipse psf-file to import all projects into eclipse.');
+    this.activateButton_0(this.gitCloneCommandsButton_0, 'Show git clone commands to clone the involved projects.');
+    this.activateButton_0(this.listDependentsButton_0, 'List direct and indirect dependent projects (identifiers) of the root project.');
+    this.addClickEventListenerIfNotDeactivatedNorDisabled_0(this.eclipsePsfButton_0, Menu$initExportButtons$lambda(modifiableState));
+    this.addClickEventListenerIfNotDeactivatedNorDisabled_0(this.gitCloneCommandsButton_0, Menu$initExportButtons$lambda_0(modifiableState));
+    this.addClickEventListenerIfNotDeactivatedNorDisabled_0(this.listDependentsButton_0, Menu$initExportButtons$lambda_1(modifiableState));
   };
   function Menu$triggerRelease$lambda(result) {
     Menu$Companion_getInstance().dispatchReleaseEnd_0(result);
@@ -1778,22 +1894,25 @@
     }
   };
   Menu.prototype.activateDryRunButton_0 = function () {
-    if (this.isDisabled_0(this.dryRunButton_0))
-      return;
-    removeClass(this.dryRunButton_0, [Menu$Companion_getInstance().DEACTIVATED_0]);
-    this.dryRunButton_0.title = 'Start a dry run based on this release plan (no commit will be made, no artifact deployed etc.).';
+    this.activateButton_0(this.dryRunButton_0, 'Start a dry run based on this release plan (no commit will be made, no artifact deployed etc.).');
   };
   Menu.prototype.activateReleaseButton_0 = function () {
-    if (this.isDisabled_0(this.releaseButton_0))
-      return;
-    removeClass(this.releaseButton_0, [Menu$Companion_getInstance().DEACTIVATED_0]);
-    this.releaseButton_0.title = 'Start a release based on this release plan.';
+    this.activateButton_0(this.releaseButton_0, 'Start a release based on this release plan.');
   };
   Menu.prototype.activateExploreButton_0 = function () {
-    if (this.isDisabled_0(this.exploreButton_0))
+    this.activateButton_0(this.exploreButton_0, 'See in which order the projects are build, actual order may vary due to unequal execution time.');
+  };
+  Menu.prototype.activateToolsButton_0 = function () {
+    this.activateButton_0(this.toolsButton_0, Menu$Companion_getInstance().TOOLS_INACTIVE_TITLE_0);
+  };
+  Menu.prototype.activateSettingsButton_0 = function () {
+    this.activateButton_0(this.settingsButton_0, Menu$Companion_getInstance().SETTINGS_INACTIVE_TITLE_0);
+  };
+  Menu.prototype.activateButton_0 = function (button, newTitle) {
+    if (this.isDisabled_0(button))
       return;
-    removeClass(this.exploreButton_0, [Menu$Companion_getInstance().DEACTIVATED_0]);
-    this.exploreButton_0.title = 'See in which order the projects are build, actual order may vary due to unequal execution time.';
+    removeClass(button, [Menu$Companion_getInstance().DEACTIVATED_0]);
+    button.title = newTitle;
   };
   function Menu$save$lambda(it) {
     return true;
@@ -1827,6 +1946,8 @@
     this.EVENT_RELEASE_END_0 = 'release.end';
     this.DISABLED_RELEASE_IN_PROGRESS_0 = 'disabled due to release which is in progress.';
     this.DISABLED_RELEASE_SUCCESS_0 = 'Release successful, use a new pipeline for a new release.';
+    this.TOOLS_INACTIVE_TITLE_0 = 'Open the toolbox to see further available features.';
+    this.SETTINGS_INACTIVE_TITLE_0 = 'Open Settings.';
   }
   Menu$Companion.prototype.registerForReleaseStartEvent_gbr1zf$ = function (callback) {
     elementById('menu').addEventListener(this.EVENT_RELEASE_START_0, callback);
@@ -1952,13 +2073,6 @@
     }
   }
   Menu$TypeOfRun.valueOf_61zpoe$ = Menu$TypeOfRun$valueOf;
-  function Menu_init$lambda() {
-    toggleClass(elementById('config'), 'active');
-    return Unit;
-  }
-  function Menu_init$lambda_0(it) {
-    return removeClass(elementById('config'), ['active']);
-  }
   Menu.$metadata$ = {
     kind: Kind_CLASS,
     simpleName: 'Menu',
@@ -2814,7 +2928,7 @@
       var tmp$, tmp$_0;
       textFieldWithLabel($receiver, Gui$Companion_getInstance().RELEASE_ID_HTML_ID, 'ReleaseId', closure$releasePlan.releaseId, this$Gui.menu_0);
       var config = closure$releasePlan.config;
-      var $receiver_0 = listOf([ConfigKey.COMMIT_PREFIX, ConfigKey.UPDATE_DEPENDENCY_JOB, ConfigKey.REMOTE_REGEX, ConfigKey.DRY_RUN_JOB, ConfigKey.REGEX_PARAMS]);
+      var $receiver_0 = listOf([ConfigKey.COMMIT_PREFIX, ConfigKey.UPDATE_DEPENDENCY_JOB, ConfigKey.DRY_RUN_JOB, ConfigKey.REMOTE_REGEX, ConfigKey.RELATIVE_PATH_EXCLUDE_PROJECT_REGEX, ConfigKey.RELATIVE_PATH_TO_GIT_REPO_REGEX, ConfigKey.RELATIVE_PATH_TO_GIT_REPO_REPLACEMENT, ConfigKey.REGEX_PARAMS]);
       var tmp$_1;
       tmp$_1 = $receiver_0.iterator();
       while (tmp$_1.hasNext()) {
@@ -2904,7 +3018,8 @@
     };
   }
   function withErrorHandling$lambda_0(t) {
-    return showThrowableAndThrow(new Error_0('An unexpected error occurred.\nPlease report a bug with the following information at https://github.com/loewenfels/dep-graph-releaser/issues/new', t));
+    var message = 'An unexpected error occurred.' + '\nPlease report a bug with the following information at https://github.com/loewenfels/dep-graph-releaser/issues/new';
+    return showThrowableAndThrow(new Error_0(message, t));
   }
   function withErrorHandling(event, action) {
     Promise.resolve(1).then(withErrorHandling$lambda(action, event)).catch(withErrorHandling$lambda_0);
@@ -4444,6 +4559,51 @@
   function showAlert(msg) {
     return new Promise(showAlert$lambda(msg));
   }
+  function showOutput$lambda$lambda$lambda$lambda($receiver) {
+    $receiver.unaryPlus_pdl1vz$('list_alt');
+    return Unit;
+  }
+  function showOutput$lambda$lambda$lambda$lambda_0(closure$title) {
+    return function ($receiver) {
+      $receiver.unaryPlus_pdl1vz$(closure$title);
+      return Unit;
+    };
+  }
+  function showOutput$lambda$lambda$lambda$lambda_1(closure$output) {
+    return function ($receiver) {
+      $receiver.unaryPlus_pdl1vz$(closure$output);
+      return Unit;
+    };
+  }
+  function showOutput$lambda$lambda$lambda(closure$title, closure$output) {
+    return function ($receiver) {
+      i($receiver, 'material-icons', showOutput$lambda$lambda$lambda$lambda);
+      span($receiver, void 0, showOutput$lambda$lambda$lambda$lambda_0(closure$title));
+      textArea($receiver, void 0, void 0, void 0, void 0, showOutput$lambda$lambda$lambda$lambda_1(closure$output));
+      return Unit;
+    };
+  }
+  function showOutput$lambda$lambda(closure$title, closure$output) {
+    return function ($receiver) {
+      div($receiver, 'output', showOutput$lambda$lambda$lambda(closure$title, closure$output));
+      return Unit;
+    };
+  }
+  function showOutput$lambda$lambda_0(closure$resolve) {
+    return function ($receiver, box) {
+      modalButton($receiver, 'OK', box, closure$resolve, Unit);
+      return Unit;
+    };
+  }
+  function showOutput$lambda(closure$title, closure$output) {
+    return function (resolve, f) {
+      showModal_0(showOutput$lambda$lambda(closure$title, closure$output), showOutput$lambda$lambda_0(resolve));
+      return Unit;
+    };
+  }
+  function showOutput(title, output) {
+    return new Promise(showOutput$lambda(title, output));
+  }
   function modalButton$lambda$lambda(closure$box, closure$resolve, closure$objectToResolve) {
     return function (it) {
       closure$box.remove();
@@ -4461,20 +4621,29 @@
   function modalButton($receiver, buttonText, box, resolve, objectToResolve) {
     span($receiver, void 0, modalButton$lambda(buttonText, box, resolve, objectToResolve));
   }
-  function showModal$lambda$lambda$lambda$lambda($receiver) {
+  function showModal$lambda$lambda($receiver) {
     $receiver.unaryPlus_pdl1vz$('help_outline');
     return Unit;
   }
-  function showModal$lambda$lambda$lambda$lambda_0(closure$msg) {
+  function showModal$lambda$lambda_0(closure$msg) {
     return function ($receiver) {
       $receiver.unaryPlus_pdl1vz$(closure$msg);
       return Unit;
     };
   }
-  function showModal$lambda$lambda$lambda(closure$msg) {
+  function showModal$lambda(closure$msg) {
     return function ($receiver) {
-      i($receiver, 'material-icons', showModal$lambda$lambda$lambda$lambda);
-      span($receiver, void 0, showModal$lambda$lambda$lambda$lambda_0(closure$msg));
+      i($receiver, 'material-icons', showModal$lambda$lambda);
+      span($receiver, void 0, showModal$lambda$lambda_0(closure$msg));
+      return Unit;
+    };
+  }
+  function showModal(msg, buttonCreator) {
+    showModal_0(showModal$lambda(msg), buttonCreator);
+  }
+  function showModal$lambda$lambda$lambda(closure$contentCreator) {
+    return function ($receiver) {
+      closure$contentCreator($receiver);
       return Unit;
     };
   }
@@ -4484,28 +4653,28 @@
       return Unit;
     };
   }
-  function showModal$lambda$lambda(closure$msg, closure$buttonCreator) {
+  function showModal$lambda$lambda_1(closure$contentCreator, closure$buttonCreator) {
     return function ($receiver) {
       var box = getUnderlyingHtmlElement($receiver);
-      div($receiver, 'text', showModal$lambda$lambda$lambda(closure$msg));
+      div($receiver, 'text', showModal$lambda$lambda$lambda(closure$contentCreator));
       div($receiver, 'buttons', showModal$lambda$lambda$lambda_0(closure$buttonCreator, box));
       box.style.visibility = 'hidden';
       return Unit;
     };
   }
-  function showModal$lambda(closure$msg, closure$buttonCreator) {
+  function showModal$lambda_0(closure$contentCreator, closure$buttonCreator) {
     return function ($receiver) {
-      div_1($receiver, 'box', showModal$lambda$lambda(closure$msg, closure$buttonCreator));
+      div_1($receiver, 'box', showModal$lambda$lambda_1(closure$contentCreator, closure$buttonCreator));
       return Unit;
     };
   }
-  function showModal(msg, buttonCreator) {
+  function showModal_0(contentCreator, buttonCreator) {
     var tmp$;
     var modals = elementById('modals');
-    append(modals, showModal$lambda(msg, buttonCreator));
+    append(modals, showModal$lambda_0(contentCreator, buttonCreator));
     var box = Kotlin.isType(tmp$ = modals.lastChild, HTMLElement) ? tmp$ : throwCCE();
-    var top = ensureNotNull(document.body).clientHeight / 3 | 0;
-    var left = (ensureNotNull(document.body).clientWidth / 2 | 0) - (box.offsetWidth / 2 | 0) | 0;
+    var top = window.innerHeight / 2.5 - (box.offsetHeight / 2 | 0);
+    var left = (window.innerWidth / 2 | 0) - (box.offsetWidth / 2 | 0) | 0;
     box.style.top = top.toString() + 'px';
     box.style.left = left.toString() + 'px';
     box.style.visibility = 'visible';
@@ -5021,6 +5190,9 @@
   function options() {
     console.log(joinToString(mapOf([to('failAfterSteps', failAfterSteps), to('waitBetweenSteps', waitBetweenSteps), to('stepWise', stepWise)]).entries, '\n', void 0, void 0, void 0, void 0, options$lambda));
   }
+  Object.defineProperty(Downloader, 'Companion', {
+    get: Downloader$Companion_getInstance
+  });
   var package$ch = _.ch || (_.ch = {});
   var package$loewenfels = package$ch.loewenfels || (package$ch.loewenfels = {});
   var package$depgraph = package$loewenfels.depgraph || (package$loewenfels.depgraph = {});
@@ -5162,6 +5334,7 @@
   package$gui.turnThrowableIntoMessage_tcv7n7$ = turnThrowableIntoMessage;
   package$gui.showDialog_61zpoe$ = showDialog;
   package$gui.showAlert_61zpoe$ = showAlert;
+  package$gui.showOutput_puj7f4$ = showOutput;
   var package$serialization = package$gui.serialization || (package$gui.serialization = {});
   Object.defineProperty(package$serialization, 'ChangeApplier', {
     get: ChangeApplier_getInstance

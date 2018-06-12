@@ -1,8 +1,12 @@
 if (typeof kotlin === 'undefined') {
   throw new Error("Error loading module 'dep-graph-releaser-api-js'. Its dependency 'kotlin' was not found. Please, check whether 'kotlin' is loaded prior to 'dep-graph-releaser-api-js'.");
 }
-this['dep-graph-releaser-api-js'] = function (_, Kotlin) {
+if (typeof this['kbox-js'] === 'undefined') {
+  throw new Error("Error loading module 'dep-graph-releaser-api-js'. Its dependency 'kbox-js' was not found. Please, check whether 'kbox-js' is loaded prior to 'dep-graph-releaser-api-js'.");
+}
+this['dep-graph-releaser-api-js'] = function (_, Kotlin, $module$kbox_js) {
   'use strict';
+  var $$importsForInline$$ = _.$$importsForInline$$ || (_.$$importsForInline$$ = {});
   var equals = Kotlin.equals;
   var Kind_OBJECT = Kotlin.Kind.OBJECT;
   var Enum = Kotlin.kotlin.Enum;
@@ -27,6 +31,12 @@ this['dep-graph-releaser-api-js'] = function (_, Kotlin) {
   var asSequence = Kotlin.kotlin.collections.asSequence_7wnvza$;
   var filter = Kotlin.kotlin.sequences.filter_euau3h$;
   var Iterator = Kotlin.kotlin.collections.Iterator;
+  var asSequence_0 = Kotlin.kotlin.sequences.asSequence_35ci02$;
+  var drop = Kotlin.kotlin.sequences.drop_wuwhe2$;
+  var sorted = Kotlin.kotlin.sequences.sorted_gtzq52$;
+  var joinToString_0 = Kotlin.kotlin.sequences.joinToString_853xkz$;
+  var trimMargin = Kotlin.kotlin.text.trimMargin_rjktp$;
+  var StringBuilder = Kotlin.kotlin.text.StringBuilder;
   var NoSuchElementException = Kotlin.kotlin.NoSuchElementException;
   var last = Kotlin.kotlin.collections.last_2p1efm$;
   var linkedMapOf = Kotlin.kotlin.collections.linkedMapOf_qfcya0$;
@@ -65,10 +75,13 @@ this['dep-graph-releaser-api-js'] = function (_, Kotlin) {
     };
     ConfigKey$COMMIT_PREFIX_instance = new ConfigKey('COMMIT_PREFIX', 0, 'commitPrefix');
     ConfigKey$UPDATE_DEPENDENCY_JOB_instance = new ConfigKey('UPDATE_DEPENDENCY_JOB', 1, 'updateDependencyJob');
-    ConfigKey$REMOTE_REGEX_instance = new ConfigKey('REMOTE_REGEX', 2, 'remoteRegex');
-    ConfigKey$DRY_RUN_JOB_instance = new ConfigKey('DRY_RUN_JOB', 3, 'dryRunJob');
-    ConfigKey$REGEX_PARAMS_instance = new ConfigKey('REGEX_PARAMS', 4, 'regexParams');
-    ConfigKey$JOB_MAPPING_instance = new ConfigKey('JOB_MAPPING', 5, 'jobMapping');
+    ConfigKey$DRY_RUN_JOB_instance = new ConfigKey('DRY_RUN_JOB', 2, 'dryRunJob');
+    ConfigKey$REMOTE_REGEX_instance = new ConfigKey('REMOTE_REGEX', 3, 'remoteRegex');
+    ConfigKey$RELATIVE_PATH_EXCLUDE_PROJECT_REGEX_instance = new ConfigKey('RELATIVE_PATH_EXCLUDE_PROJECT_REGEX', 4, 'relativePathExcludeProjectsRegex');
+    ConfigKey$RELATIVE_PATH_TO_GIT_REPO_REGEX_instance = new ConfigKey('RELATIVE_PATH_TO_GIT_REPO_REGEX', 5, 'relativePathToGitRepoRegex');
+    ConfigKey$RELATIVE_PATH_TO_GIT_REPO_REPLACEMENT_instance = new ConfigKey('RELATIVE_PATH_TO_GIT_REPO_REPLACEMENT', 6, 'relativePathToGitRepoReplacement');
+    ConfigKey$REGEX_PARAMS_instance = new ConfigKey('REGEX_PARAMS', 7, 'regexParams');
+    ConfigKey$JOB_MAPPING_instance = new ConfigKey('JOB_MAPPING', 8, 'jobMapping');
     ConfigKey$Companion_getInstance();
   }
   var ConfigKey$COMMIT_PREFIX_instance;
@@ -81,15 +94,30 @@ this['dep-graph-releaser-api-js'] = function (_, Kotlin) {
     ConfigKey_initFields();
     return ConfigKey$UPDATE_DEPENDENCY_JOB_instance;
   }
+  var ConfigKey$DRY_RUN_JOB_instance;
+  function ConfigKey$DRY_RUN_JOB_getInstance() {
+    ConfigKey_initFields();
+    return ConfigKey$DRY_RUN_JOB_instance;
+  }
   var ConfigKey$REMOTE_REGEX_instance;
   function ConfigKey$REMOTE_REGEX_getInstance() {
     ConfigKey_initFields();
     return ConfigKey$REMOTE_REGEX_instance;
   }
-  var ConfigKey$DRY_RUN_JOB_instance;
-  function ConfigKey$DRY_RUN_JOB_getInstance() {
+  var ConfigKey$RELATIVE_PATH_EXCLUDE_PROJECT_REGEX_instance;
+  function ConfigKey$RELATIVE_PATH_EXCLUDE_PROJECT_REGEX_getInstance() {
     ConfigKey_initFields();
-    return ConfigKey$DRY_RUN_JOB_instance;
+    return ConfigKey$RELATIVE_PATH_EXCLUDE_PROJECT_REGEX_instance;
+  }
+  var ConfigKey$RELATIVE_PATH_TO_GIT_REPO_REGEX_instance;
+  function ConfigKey$RELATIVE_PATH_TO_GIT_REPO_REGEX_getInstance() {
+    ConfigKey_initFields();
+    return ConfigKey$RELATIVE_PATH_TO_GIT_REPO_REGEX_instance;
+  }
+  var ConfigKey$RELATIVE_PATH_TO_GIT_REPO_REPLACEMENT_instance;
+  function ConfigKey$RELATIVE_PATH_TO_GIT_REPO_REPLACEMENT_getInstance() {
+    ConfigKey_initFields();
+    return ConfigKey$RELATIVE_PATH_TO_GIT_REPO_REPLACEMENT_instance;
   }
   var ConfigKey$REGEX_PARAMS_instance;
   function ConfigKey$REGEX_PARAMS_getInstance() {
@@ -143,7 +171,7 @@ this['dep-graph-releaser-api-js'] = function (_, Kotlin) {
     interfaces: [Enum]
   };
   function ConfigKey$values() {
-    return [ConfigKey$COMMIT_PREFIX_getInstance(), ConfigKey$UPDATE_DEPENDENCY_JOB_getInstance(), ConfigKey$REMOTE_REGEX_getInstance(), ConfigKey$DRY_RUN_JOB_getInstance(), ConfigKey$REGEX_PARAMS_getInstance(), ConfigKey$JOB_MAPPING_getInstance()];
+    return [ConfigKey$COMMIT_PREFIX_getInstance(), ConfigKey$UPDATE_DEPENDENCY_JOB_getInstance(), ConfigKey$DRY_RUN_JOB_getInstance(), ConfigKey$REMOTE_REGEX_getInstance(), ConfigKey$RELATIVE_PATH_EXCLUDE_PROJECT_REGEX_getInstance(), ConfigKey$RELATIVE_PATH_TO_GIT_REPO_REGEX_getInstance(), ConfigKey$RELATIVE_PATH_TO_GIT_REPO_REPLACEMENT_getInstance(), ConfigKey$REGEX_PARAMS_getInstance(), ConfigKey$JOB_MAPPING_getInstance()];
   }
   ConfigKey.values = ConfigKey$values;
   function ConfigKey$valueOf(name) {
@@ -152,10 +180,16 @@ this['dep-graph-releaser-api-js'] = function (_, Kotlin) {
         return ConfigKey$COMMIT_PREFIX_getInstance();
       case 'UPDATE_DEPENDENCY_JOB':
         return ConfigKey$UPDATE_DEPENDENCY_JOB_getInstance();
-      case 'REMOTE_REGEX':
-        return ConfigKey$REMOTE_REGEX_getInstance();
       case 'DRY_RUN_JOB':
         return ConfigKey$DRY_RUN_JOB_getInstance();
+      case 'REMOTE_REGEX':
+        return ConfigKey$REMOTE_REGEX_getInstance();
+      case 'RELATIVE_PATH_EXCLUDE_PROJECT_REGEX':
+        return ConfigKey$RELATIVE_PATH_EXCLUDE_PROJECT_REGEX_getInstance();
+      case 'RELATIVE_PATH_TO_GIT_REPO_REGEX':
+        return ConfigKey$RELATIVE_PATH_TO_GIT_REPO_REGEX_getInstance();
+      case 'RELATIVE_PATH_TO_GIT_REPO_REPLACEMENT':
+        return ConfigKey$RELATIVE_PATH_TO_GIT_REPO_REPLACEMENT_getInstance();
       case 'REGEX_PARAMS':
         return ConfigKey$REGEX_PARAMS_getInstance();
       case 'JOB_MAPPING':
@@ -1082,6 +1116,55 @@ this['dep-graph-releaser-api-js'] = function (_, Kotlin) {
   function throwIllegal(fieldName, stateName) {
     throw IllegalArgumentException_init(fieldName + ' must be defined for state ' + stateName);
   }
+  function generateListOfDependentsWithoutSubmoduleAndExcluded$lambda(it) {
+    return it.id.identifier;
+  }
+  function generateListOfDependentsWithoutSubmoduleAndExcluded(releasePlan, excludeRegex) {
+    return joinToString_0(sorted(map(projectsWithoutSubmodulesAndExcluded(drop(asSequence_0(releasePlan.iterator()), 1), excludeRegex), generateListOfDependentsWithoutSubmoduleAndExcluded$lambda)), '\n');
+  }
+  function generateGitCloneCommands$lambda(it) {
+    return 'git clone ' + it;
+  }
+  function generateGitCloneCommands(releasePlan, excludeRegex, relativePathTransformerRegex, relativePathTransformerReplacement) {
+    return joinToString_0(gitRepoUrlsOfProjects(releasePlan, excludeRegex, relativePathTransformerRegex, relativePathTransformerReplacement), '\n', void 0, void 0, void 0, void 0, generateGitCloneCommands$lambda);
+  }
+  function generateEclipsePsf(releasePlan, excludeRegex, relativePathTransformerRegex, relativePathTransformerReplacement) {
+    var sb = new StringBuilder(trimMargin('<?xml version="1.0" encoding="UTF-8"?>\n        |<psf version="2.0">\n        |  <provider id="org.eclipse.egit.core.GitProvider">\n        |\n        '));
+    var itr = gitRepoUrlsOfProjects(releasePlan, excludeRegex, relativePathTransformerRegex, relativePathTransformerReplacement).iterator();
+    if (itr.hasNext()) {
+      var gitRepoUrl = itr.next();
+      sb.append_gw00v9$('    <project reference="1.0,').append_gw00v9$(gitRepoUrl).append_gw00v9$(',master,."/>');
+    }
+    while (itr.hasNext()) {
+      sb.append_gw00v9$('\n');
+      var gitRepoUrl_0 = itr.next();
+      sb.append_gw00v9$('    <project reference="1.0,').append_gw00v9$(gitRepoUrl_0).append_gw00v9$(',master,."/>');
+    }
+    sb.append_gw00v9$('\n  <\/provider>\n<\/psf>');
+    return sb.toString();
+  }
+  function gitRepoUrlsOfProjects$lambda(closure$relativePathTransformerRegex, closure$relativePathTransformerReplacement) {
+    return function (it) {
+      return turnIntoGitRepoUrl(it, closure$relativePathTransformerRegex, closure$relativePathTransformerReplacement);
+    };
+  }
+  function gitRepoUrlsOfProjects(releasePlan, excludeRegex, relativePathTransformerRegex, relativePathTransformerReplacement) {
+    return sorted(map(projectsWithoutSubmodulesAndExcluded(asSequence_0(releasePlan.iterator()), excludeRegex), gitRepoUrlsOfProjects$lambda(relativePathTransformerRegex, relativePathTransformerReplacement)));
+  }
+  function projectsWithoutSubmodulesAndExcluded$lambda(it) {
+    return !it.isSubmodule;
+  }
+  function projectsWithoutSubmodulesAndExcluded$lambda_0(closure$excludeRegex) {
+    return function (it) {
+      return !closure$excludeRegex.matches_6bul2c$(it.relativePath);
+    };
+  }
+  function projectsWithoutSubmodulesAndExcluded(sequence, excludeRegex) {
+    return filter(filter(sequence, projectsWithoutSubmodulesAndExcluded$lambda), projectsWithoutSubmodulesAndExcluded$lambda_0(excludeRegex));
+  }
+  function turnIntoGitRepoUrl($receiver, relativePathTransformerRegex, relativePathTransformerReplacement) {
+    return relativePathTransformerRegex.replace_x2uqeu$($receiver.relativePath, relativePathTransformerReplacement);
+  }
   function LevelIterator(startingPoint) {
     this.startingPoint_0 = startingPoint;
     this.itemsToVisit_0 = mutableListOf([linkedMapOf([this.startingPoint_0])]);
@@ -1140,11 +1223,20 @@ this['dep-graph-releaser-api-js'] = function (_, Kotlin) {
   Object.defineProperty(ConfigKey, 'UPDATE_DEPENDENCY_JOB', {
     get: ConfigKey$UPDATE_DEPENDENCY_JOB_getInstance
   });
+  Object.defineProperty(ConfigKey, 'DRY_RUN_JOB', {
+    get: ConfigKey$DRY_RUN_JOB_getInstance
+  });
   Object.defineProperty(ConfigKey, 'REMOTE_REGEX', {
     get: ConfigKey$REMOTE_REGEX_getInstance
   });
-  Object.defineProperty(ConfigKey, 'DRY_RUN_JOB', {
-    get: ConfigKey$DRY_RUN_JOB_getInstance
+  Object.defineProperty(ConfigKey, 'RELATIVE_PATH_EXCLUDE_PROJECT_REGEX', {
+    get: ConfigKey$RELATIVE_PATH_EXCLUDE_PROJECT_REGEX_getInstance
+  });
+  Object.defineProperty(ConfigKey, 'RELATIVE_PATH_TO_GIT_REPO_REGEX', {
+    get: ConfigKey$RELATIVE_PATH_TO_GIT_REPO_REGEX_getInstance
+  });
+  Object.defineProperty(ConfigKey, 'RELATIVE_PATH_TO_GIT_REPO_REPLACEMENT', {
+    get: ConfigKey$RELATIVE_PATH_TO_GIT_REPO_REPLACEMENT_getInstance
   });
   Object.defineProperty(ConfigKey, 'REGEX_PARAMS', {
     get: ConfigKey$REGEX_PARAMS_getInstance
@@ -1246,6 +1338,10 @@ this['dep-graph-releaser-api-js'] = function (_, Kotlin) {
   package$serialization.CommandStateJson_init_cka4jb$ = CommandStateJson_init_1;
   package$serialization.CommandStateJson = CommandStateJson;
   package$serialization.fromJson_v4rmea$ = fromJson;
+  package$depgraph.generateListOfDependentsWithoutSubmoduleAndExcluded_4w9fpd$ = generateListOfDependentsWithoutSubmoduleAndExcluded;
+  package$depgraph.generateGitCloneCommands_xx51qy$ = generateGitCloneCommands;
+  $$importsForInline$$['kbox-js'] = $module$kbox_js;
+  package$depgraph.generateEclipsePsf_xx51qy$ = generateEclipsePsf;
   package$depgraph.LevelIterator = LevelIterator;
   package$depgraph.hasNextOnTheSameLevel_r88oei$ = hasNextOnTheSameLevel;
   var package$regex = package$depgraph.regex || (package$depgraph.regex = {});
@@ -1265,4 +1361,4 @@ this['dep-graph-releaser-api-js'] = function (_, Kotlin) {
   someChars = '[\\S\\s]+?';
   Kotlin.defineModule('dep-graph-releaser-api-js', _);
   return _;
-}(typeof this['dep-graph-releaser-api-js'] === 'undefined' ? {} : this['dep-graph-releaser-api-js'], kotlin);
+}(typeof this['dep-graph-releaser-api-js'] === 'undefined' ? {} : this['dep-graph-releaser-api-js'], kotlin, this['kbox-js']);
