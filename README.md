@@ -1,7 +1,7 @@
 [![Download](https://api.bintray.com/packages/loewenfels/oss/dep-graph-releaser/images/download.svg) ](https://bintray.com/loewenfels/oss/dep-graph-releaser/_latestVersion)
 [![EUPL](https://img.shields.io/badge/license-EUPL%201.2-brightgreen.svg)](https://joinup.ec.europa.eu/collection/eupl/eupl-text-11-12)
-[![Build Status](https://travis-ci.org/loewenfels/dep-graph-releaser.svg?branch=master)](https://travis-ci.org/loewenfels/dep-graph-releaser/branches)
-[![Coverage](https://codecov.io/github/loewenfels/dep-graph-releaser/coverage.svg?branch=master)](https://codecov.io/github/loewenfels/dep-graph-releaser?branch=master)
+[![Build Status](https://travis-ci.org/loewenfels/dep-graph-releaser.svg?tags=v0.6.1)](https://travis-ci.org/loewenfels/dep-graph-releaser/branches)
+[![Coverage](https://codecov.io/github/loewenfels/dep-graph-releaser/coverage.svg?tags=v0.6.1)](https://codecov.io/github/loewenfels/dep-graph-releaser?tags=v0.6.1)
 
 # Dependent Graph Releaser
 Dependent Graph Releaser is a tool which helps you with releasing a project and its dependent projects.
