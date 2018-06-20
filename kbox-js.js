@@ -291,149 +291,149 @@ this['kbox-js'] = function (_, Kotlin) {
       }
     };
   }));
-  var forThisAndForEachIn = defineInlineFunction('kbox-js.ch.tutteli.kbox.forThisAndForEachIn_rg995e$', function ($receiver, iterable, action) {
-    action($receiver);
+  var forElementAndForEachIn = defineInlineFunction('kbox-js.ch.tutteli.kbox.forElementAndForEachIn_itn93f$', function (element, iterable, action) {
+    action(element);
     var tmp$;
     for (tmp$ = 0; tmp$ !== iterable.length; ++tmp$) {
-      var element = iterable[tmp$];
-      action(element);
-    }
-  });
-  var forThisAndForEachIn_0 = defineInlineFunction('kbox-js.ch.tutteli.kbox.forThisAndForEachIn_97au7i$', function ($receiver, arr1, arr2, action) {
-    action($receiver);
-    var tmp$;
-    for (tmp$ = 0; tmp$ !== arr1.length; ++tmp$) {
-      var element = arr1[tmp$];
-      action(element);
-    }
-    var tmp$_0;
-    for (tmp$_0 = 0; tmp$_0 !== arr2.length; ++tmp$_0) {
-      var element_0 = arr2[tmp$_0];
+      var element_0 = iterable[tmp$];
       action(element_0);
     }
   });
-  var forThisAndForEachIn_1 = defineInlineFunction('kbox-js.ch.tutteli.kbox.forThisAndForEachIn_gotknx$', wrapFunction(function () {
-    return function ($receiver, arr1, arr2, arrays, action) {
-      action($receiver);
+  var forElementAndForEachIn_0 = defineInlineFunction('kbox-js.ch.tutteli.kbox.forElementAndForEachIn_p7xmc1$', function (element, arr1, arr2, action) {
+    action(element);
+    var tmp$;
+    for (tmp$ = 0; tmp$ !== arr1.length; ++tmp$) {
+      var element_0 = arr1[tmp$];
+      action(element_0);
+    }
+    var tmp$_0;
+    for (tmp$_0 = 0; tmp$_0 !== arr2.length; ++tmp$_0) {
+      var element_1 = arr2[tmp$_0];
+      action(element_1);
+    }
+  });
+  var forElementAndForEachIn_1 = defineInlineFunction('kbox-js.ch.tutteli.kbox.forElementAndForEachIn_y1owsg$', wrapFunction(function () {
+    return function (element, arr1, arr2, arrays, action) {
+      action(element);
       var tmp$;
       for (tmp$ = 0; tmp$ !== arr1.length; ++tmp$) {
-        var element = arr1[tmp$];
-        action(element);
+        var element_0 = arr1[tmp$];
+        action(element_0);
       }
       var tmp$_0;
       for (tmp$_0 = 0; tmp$_0 !== arr2.length; ++tmp$_0) {
-        var element_0 = arr2[tmp$_0];
-        action(element_0);
+        var element_1 = arr2[tmp$_0];
+        action(element_1);
       }
       var tmp$_1;
       for (tmp$_1 = 0; tmp$_1 !== arrays.length; ++tmp$_1) {
-        var element_1 = arrays[tmp$_1];
+        var element_2 = arrays[tmp$_1];
         var tmp$_2;
-        for (tmp$_2 = 0; tmp$_2 !== element_1.length; ++tmp$_2) {
-          var element_2 = element_1[tmp$_2];
-          action(element_2);
+        for (tmp$_2 = 0; tmp$_2 !== element_2.length; ++tmp$_2) {
+          var element_3 = element_2[tmp$_2];
+          action(element_3);
         }
       }
     };
   }));
-  var forThisAndForEachIn_2 = defineInlineFunction('kbox-js.ch.tutteli.kbox.forThisAndForEachIn_rurr6x$', function ($receiver, iterable, action) {
-    action($receiver);
+  var forElementAndForEachIn_2 = defineInlineFunction('kbox-js.ch.tutteli.kbox.forElementAndForEachIn_5ufcwc$', function (element, iterable, action) {
+    action(element);
     var tmp$;
     tmp$ = iterable.iterator();
     while (tmp$.hasNext()) {
-      var element = tmp$.next();
-      action(element);
+      var element_0 = tmp$.next();
+      action(element_0);
     }
   });
-  var forThisAndForEachIn_3 = defineInlineFunction('kbox-js.ch.tutteli.kbox.forThisAndForEachIn_ujsfh8$', function ($receiver, iterable1, iterable2, action) {
-    action($receiver);
+  var forElementAndForEachIn_3 = defineInlineFunction('kbox-js.ch.tutteli.kbox.forElementAndForEachIn_8gu1q7$', function (element, iterable1, iterable2, action) {
+    action(element);
     var tmp$;
     tmp$ = iterable1.iterator();
     while (tmp$.hasNext()) {
-      var element = tmp$.next();
-      action(element);
+      var element_0 = tmp$.next();
+      action(element_0);
     }
     var tmp$_0;
     tmp$_0 = iterable2.iterator();
     while (tmp$_0.hasNext()) {
-      var element_0 = tmp$_0.next();
-      action(element_0);
+      var element_1 = tmp$_0.next();
+      action(element_1);
     }
   });
-  var forThisAndForEachIn_4 = defineInlineFunction('kbox-js.ch.tutteli.kbox.forThisAndForEachIn_tyj73g$', wrapFunction(function () {
-    return function ($receiver, iterable1, iterable2, iterables, action) {
-      action($receiver);
+  var forElementAndForEachIn_4 = defineInlineFunction('kbox-js.ch.tutteli.kbox.forElementAndForEachIn_b0m5xl$', wrapFunction(function () {
+    return function (element, iterable1, iterable2, iterables, action) {
+      action(element);
       var tmp$;
       tmp$ = iterable1.iterator();
       while (tmp$.hasNext()) {
-        var element = tmp$.next();
-        action(element);
+        var element_0 = tmp$.next();
+        action(element_0);
       }
       var tmp$_0;
       tmp$_0 = iterable2.iterator();
       while (tmp$_0.hasNext()) {
-        var element_0 = tmp$_0.next();
-        action(element_0);
+        var element_1 = tmp$_0.next();
+        action(element_1);
       }
       var tmp$_1;
       for (tmp$_1 = 0; tmp$_1 !== iterables.length; ++tmp$_1) {
-        var element_1 = iterables[tmp$_1];
+        var element_2 = iterables[tmp$_1];
         var tmp$_2;
-        tmp$_2 = element_1.iterator();
+        tmp$_2 = element_2.iterator();
         while (tmp$_2.hasNext()) {
-          var element_2 = tmp$_2.next();
-          action(element_2);
+          var element_3 = tmp$_2.next();
+          action(element_3);
         }
       }
     };
   }));
-  var forThisAndForEachIn_5 = defineInlineFunction('kbox-js.ch.tutteli.kbox.forThisAndForEachIn_v3a4px$', function ($receiver, sequence, action) {
-    action($receiver);
+  var forElementAndForEachIn_5 = defineInlineFunction('kbox-js.ch.tutteli.kbox.forElementAndForEachIn_2ilipq$', function (element, sequence, action) {
+    action(element);
     var tmp$;
     tmp$ = sequence.iterator();
     while (tmp$.hasNext()) {
-      var element = tmp$.next();
-      action(element);
+      var element_0 = tmp$.next();
+      action(element_0);
     }
   });
-  var forThisAndForEachIn_6 = defineInlineFunction('kbox-js.ch.tutteli.kbox.forThisAndForEachIn_gtsg3k$', function ($receiver, sequence1, sequence2, action) {
-    action($receiver);
+  var forElementAndForEachIn_6 = defineInlineFunction('kbox-js.ch.tutteli.kbox.forElementAndForEachIn_hmxn31$', function (element, sequence1, sequence2, action) {
+    action(element);
     var tmp$;
     tmp$ = sequence1.iterator();
     while (tmp$.hasNext()) {
-      var element = tmp$.next();
-      action(element);
+      var element_0 = tmp$.next();
+      action(element_0);
     }
     var tmp$_0;
     tmp$_0 = sequence2.iterator();
     while (tmp$_0.hasNext()) {
-      var element_0 = tmp$_0.next();
-      action(element_0);
+      var element_1 = tmp$_0.next();
+      action(element_1);
     }
   });
-  var forThisAndForEachIn_7 = defineInlineFunction('kbox-js.ch.tutteli.kbox.forThisAndForEachIn_3jqtyy$', wrapFunction(function () {
-    return function ($receiver, sequence1, sequence2, sequences, action) {
-      action($receiver);
+  var forElementAndForEachIn_7 = defineInlineFunction('kbox-js.ch.tutteli.kbox.forElementAndForEachIn_khlzxl$', wrapFunction(function () {
+    return function (element, sequence1, sequence2, sequences, action) {
+      action(element);
       var tmp$;
       tmp$ = sequence1.iterator();
       while (tmp$.hasNext()) {
-        var element = tmp$.next();
-        action(element);
+        var element_0 = tmp$.next();
+        action(element_0);
       }
       var tmp$_0;
       tmp$_0 = sequence2.iterator();
       while (tmp$_0.hasNext()) {
-        var element_0 = tmp$_0.next();
-        action(element_0);
+        var element_1 = tmp$_0.next();
+        action(element_1);
       }
       var tmp$_1;
       for (tmp$_1 = 0; tmp$_1 !== sequences.length; ++tmp$_1) {
-        var element_1 = sequences[tmp$_1];
+        var element_2 = sequences[tmp$_1];
         var tmp$_2;
-        tmp$_2 = element_1.iterator();
+        tmp$_2 = element_2.iterator();
         while (tmp$_2.hasNext()) {
-          var element_2 = tmp$_2.next();
-          action(element_2);
+          var element_3 = tmp$_2.next();
+          action(element_3);
         }
       }
     };
@@ -736,15 +736,15 @@ this['kbox-js'] = function (_, Kotlin) {
   package$kbox.forEachIn_aoy8fd$ = forEachIn_5;
   package$kbox.forEachIn_cdffny$ = forEachIn_6;
   package$kbox.forEachIn_ieikpg$ = forEachIn_7;
-  package$kbox.forThisAndForEachIn_rg995e$ = forThisAndForEachIn;
-  package$kbox.forThisAndForEachIn_97au7i$ = forThisAndForEachIn_0;
-  package$kbox.forThisAndForEachIn_gotknx$ = forThisAndForEachIn_1;
-  package$kbox.forThisAndForEachIn_rurr6x$ = forThisAndForEachIn_2;
-  package$kbox.forThisAndForEachIn_ujsfh8$ = forThisAndForEachIn_3;
-  package$kbox.forThisAndForEachIn_tyj73g$ = forThisAndForEachIn_4;
-  package$kbox.forThisAndForEachIn_v3a4px$ = forThisAndForEachIn_5;
-  package$kbox.forThisAndForEachIn_gtsg3k$ = forThisAndForEachIn_6;
-  package$kbox.forThisAndForEachIn_3jqtyy$ = forThisAndForEachIn_7;
+  package$kbox.forElementAndForEachIn_itn93f$ = forElementAndForEachIn;
+  package$kbox.forElementAndForEachIn_p7xmc1$ = forElementAndForEachIn_0;
+  package$kbox.forElementAndForEachIn_y1owsg$ = forElementAndForEachIn_1;
+  package$kbox.forElementAndForEachIn_5ufcwc$ = forElementAndForEachIn_2;
+  package$kbox.forElementAndForEachIn_8gu1q7$ = forElementAndForEachIn_3;
+  package$kbox.forElementAndForEachIn_b0m5xl$ = forElementAndForEachIn_4;
+  package$kbox.forElementAndForEachIn_2ilipq$ = forElementAndForEachIn_5;
+  package$kbox.forElementAndForEachIn_hmxn31$ = forElementAndForEachIn_6;
+  package$kbox.forElementAndForEachIn_khlzxl$ = forElementAndForEachIn_7;
   package$kbox.ifWithinBound_he0xn9$ = ifWithinBound;
   package$kbox.ifWithinBound_t8wkhe$ = ifWithinBound_0;
   package$kbox.joinToString_scvx2b$ = joinToString_3;

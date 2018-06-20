@@ -459,9 +459,9 @@ this['dep-graph-releaser-api-js'] = function (_, Kotlin, $module$kbox_js) {
       throw IllegalStateException_init(message_0.toString());
     }
     if (equals(newState, CommandState$ReadyToReTrigger_getInstance()))
-      this.checkNewState_fityb6$_0(newState, [getKClass(CommandState$Failed)]);
+      this.checkNewStateIsAfter_jb7wuq$_0(newState, [getKClass(CommandState$Failed)]);
     else if (equals(newState, CommandState$Ready_getInstance())) {
-      this.checkNewState_fityb6$_0(newState, [getKClass(CommandState$Waiting)]);
+      this.checkNewStateIsAfter_jb7wuq$_0(newState, [getKClass(CommandState$Waiting)]);
       if (Kotlin.isType(this, CommandState$Waiting)) {
         if (!this.dependencies.isEmpty()) {
           var message_1 = 'Can only change from ' + toString(getKClass(CommandState$Waiting).simpleName) + ' to ' + toString(getKClass(CommandState$Ready).simpleName) + ' ' + 'if there are not any dependencies left which we need to wait for.' + ('\n' + 'State was: ' + getToStringRepresentation(this));
@@ -470,26 +470,26 @@ this['dep-graph-releaser-api-js'] = function (_, Kotlin, $module$kbox_js) {
       }
     }
      else if (equals(newState, CommandState$Queueing_getInstance()))
-      this.checkNewState_fityb6$_0(newState, [getKClass(CommandState$Ready), getKClass(CommandState$ReadyToReTrigger)]);
+      this.checkNewStateIsAfter_jb7wuq$_0(newState, [getKClass(CommandState$Ready), getKClass(CommandState$ReadyToReTrigger)]);
     else if (equals(newState, CommandState$InProgress_getInstance()))
-      this.checkNewState_fityb6$_0(newState, [getKClass(CommandState$Queueing)]);
+      this.checkNewStateIsAfter_jb7wuq$_0(newState, [getKClass(CommandState$Queueing)]);
     else if (equals(newState, CommandState$Succeeded_getInstance()))
-      this.checkNewState_fityb6$_0(newState, [getKClass(CommandState$InProgress)]);
+      this.checkNewStateIsAfter_jb7wuq$_0(newState, [getKClass(CommandState$InProgress)]);
     return newState;
   };
-  function CommandState$checkNewState$lambda(closure$newState, this$CommandState) {
+  function CommandState$checkNewStateIsAfter$lambda(closure$newState, this$CommandState) {
     return function () {
       return 'Cannot transition to ' + toString(Kotlin.getKClassFromExpression(closure$newState).simpleName) + ' because ' + ('current state is ' + toString(getKClass(CommandState$Deactivated).simpleName) + ', can only transition to its previous state.') + ('\n' + 'Deactivated.previous was: ' + getToStringRepresentation(this$CommandState.previous));
     };
   }
-  function CommandState$checkNewState$lambda$lambda(it) {
+  function CommandState$checkNewStateIsAfter$lambda$lambda(it) {
     return ensureNotNull(Kotlin.getKClassFromExpression(it).simpleName);
   }
-  CommandState.prototype.checkNewState_fityb6$_0 = function (newState, requiredState) {
+  CommandState.prototype.checkNewStateIsAfter_jb7wuq$_0 = function (newState, requiredState) {
     var tmp$;
     if (Kotlin.isType(this, CommandState$Deactivated)) {
       if (!((tmp$ = Kotlin.getKClassFromExpression(newState)) != null ? tmp$.equals(Kotlin.getKClassFromExpression(this.previous)) : null)) {
-        var message = CommandState$checkNewState$lambda(newState, this)();
+        var message = CommandState$checkNewStateIsAfter$lambda(newState, this)();
         throw IllegalStateException_init(message.toString());
       }
     }
@@ -513,7 +513,7 @@ this['dep-graph-releaser-api-js'] = function (_, Kotlin, $module$kbox_js) {
           tmp$_1 = Kotlin.getKClassFromExpression(requiredState[0]).simpleName;
         }
          else {
-          tmp$_1 = 'one of: ' + joinToString(requiredState, void 0, void 0, void 0, void 0, void 0, CommandState$checkNewState$lambda$lambda);
+          tmp$_1 = 'one of: ' + joinToString(requiredState, void 0, void 0, void 0, void 0, void 0, CommandState$checkNewStateIsAfter$lambda$lambda);
         }
         var states = tmp$_1;
         var message_0 = 'Cannot transition to ' + toString(Kotlin.getKClassFromExpression(newState).simpleName) + ' because state is not ' + toString(states) + '.' + ('\n' + 'State was: ' + getToStringRepresentation(this));
@@ -886,18 +886,13 @@ this['dep-graph-releaser-api-js'] = function (_, Kotlin, $module$kbox_js) {
   ReleaseState.prototype.checkTransitionAllowed_g1wt0g$ = function (newState) {
     switch (newState.name) {
       case 'Ready':
-        if (!false) {
-          this.getErrorMessage_ownq0r$_0(newState, 'there is no way to transition to ' + toString(Kotlin.getKClassFromExpression(ReleaseState$Ready_getInstance()).simpleName));
-          var message = Unit;
-          throw IllegalStateException_init(message.toString());
-        }
-
+        this.checkNewState_s9yn6r$_0(newState, ReleaseState$Succeeded_getInstance());
         break;
       case 'InProgress':
         if (!(this === ReleaseState$Ready_getInstance() || this === ReleaseState$Failed_getInstance())) {
           this.getErrorMessage_ownq0r$_0(newState, 'state was neither ' + toString(Kotlin.getKClassFromExpression(ReleaseState$Ready_getInstance()).simpleName) + ' nor ' + toString(Kotlin.getKClassFromExpression(ReleaseState$Failed_getInstance()).simpleName));
-          var message_0 = Unit;
-          throw IllegalStateException_init(message_0.toString());
+          var message = Unit;
+          throw IllegalStateException_init(message.toString());
         }
 
         break;
@@ -1122,15 +1117,18 @@ this['dep-graph-releaser-api-js'] = function (_, Kotlin, $module$kbox_js) {
   function generateListOfDependentsWithoutSubmoduleAndExcluded(releasePlan, excludeRegex) {
     return joinToString_0(sorted(map(projectsWithoutSubmodulesAndExcluded(drop(asSequence_0(releasePlan.iterator()), 1), excludeRegex), generateListOfDependentsWithoutSubmoduleAndExcluded$lambda)), '\n');
   }
+  function generateGitCloneCommands(releasePlan, excludeRegex, relativePathTransformerRegex, relativePathTransformerReplacement) {
+    return generateGitCloneCommands_0(asSequence_0(releasePlan.iterator()), excludeRegex, relativePathTransformerRegex, relativePathTransformerReplacement);
+  }
   function generateGitCloneCommands$lambda(it) {
     return 'git clone ' + it;
   }
-  function generateGitCloneCommands(releasePlan, excludeRegex, relativePathTransformerRegex, relativePathTransformerReplacement) {
-    return joinToString_0(gitRepoUrlsOfProjects(releasePlan, excludeRegex, relativePathTransformerRegex, relativePathTransformerReplacement), '\n', void 0, void 0, void 0, void 0, generateGitCloneCommands$lambda);
+  function generateGitCloneCommands_0(projectsAsSequence, excludeRegex, relativePathTransformerRegex, relativePathTransformerReplacement) {
+    return joinToString_0(gitRepoUrlsOfProjects(projectsAsSequence, excludeRegex, relativePathTransformerRegex, relativePathTransformerReplacement), '\n', void 0, void 0, void 0, void 0, generateGitCloneCommands$lambda);
   }
   function generateEclipsePsf(releasePlan, excludeRegex, relativePathTransformerRegex, relativePathTransformerReplacement) {
     var sb = new StringBuilder(trimMargin('<?xml version="1.0" encoding="UTF-8"?>\n        |<psf version="2.0">\n        |  <provider id="org.eclipse.egit.core.GitProvider">\n        |\n        '));
-    var itr = gitRepoUrlsOfProjects(releasePlan, excludeRegex, relativePathTransformerRegex, relativePathTransformerReplacement).iterator();
+    var itr = gitRepoUrlsOfProjects(asSequence_0(releasePlan.iterator()), excludeRegex, relativePathTransformerRegex, relativePathTransformerReplacement).iterator();
     if (itr.hasNext()) {
       var gitRepoUrl = itr.next();
       sb.append_gw00v9$('    <project reference="1.0,').append_gw00v9$(gitRepoUrl).append_gw00v9$(',master,."/>');
@@ -1148,8 +1146,8 @@ this['dep-graph-releaser-api-js'] = function (_, Kotlin, $module$kbox_js) {
       return turnIntoGitRepoUrl(it, closure$relativePathTransformerRegex, closure$relativePathTransformerReplacement);
     };
   }
-  function gitRepoUrlsOfProjects(releasePlan, excludeRegex, relativePathTransformerRegex, relativePathTransformerReplacement) {
-    return sorted(map(projectsWithoutSubmodulesAndExcluded(asSequence_0(releasePlan.iterator()), excludeRegex), gitRepoUrlsOfProjects$lambda(relativePathTransformerRegex, relativePathTransformerReplacement)));
+  function gitRepoUrlsOfProjects(projectsAsSequence, excludeRegex, relativePathTransformerRegex, relativePathTransformerReplacement) {
+    return sorted(map(projectsWithoutSubmodulesAndExcluded(projectsAsSequence, excludeRegex), gitRepoUrlsOfProjects$lambda(relativePathTransformerRegex, relativePathTransformerReplacement)));
   }
   function projectsWithoutSubmodulesAndExcluded$lambda(it) {
     return !it.isSubmodule;
@@ -1340,8 +1338,10 @@ this['dep-graph-releaser-api-js'] = function (_, Kotlin, $module$kbox_js) {
   package$serialization.fromJson_v4rmea$ = fromJson;
   package$depgraph.generateListOfDependentsWithoutSubmoduleAndExcluded_4w9fpd$ = generateListOfDependentsWithoutSubmoduleAndExcluded;
   package$depgraph.generateGitCloneCommands_xx51qy$ = generateGitCloneCommands;
+  package$depgraph.generateGitCloneCommands_z81nd8$ = generateGitCloneCommands_0;
   $$importsForInline$$['kbox-js'] = $module$kbox_js;
   package$depgraph.generateEclipsePsf_xx51qy$ = generateEclipsePsf;
+  package$depgraph.turnIntoGitRepoUrl_gfn6d5$ = turnIntoGitRepoUrl;
   package$depgraph.LevelIterator = LevelIterator;
   package$depgraph.hasNextOnTheSameLevel_r88oei$ = hasNextOnTheSameLevel;
   var package$regex = package$depgraph.regex || (package$depgraph.regex = {});
