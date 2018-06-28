@@ -332,24 +332,24 @@ class JenkinsReleasePlanCreator(
     }
 
     private fun reportCyclicDependencies(paramObject: ParamObject, warnings: MutableList<String>) {
-        paramObject.cyclicDependents.mapTo(warnings, { (projectId, dependentEntry) ->
+        paramObject.cyclicDependents.mapTo(warnings) { (projectId, dependentEntry) ->
             val sb = StringBuilder()
             sb.append("Project ").append(projectId.identifier).append(" has one or more cyclic dependencies. ")
                 .append("The corresponding relation (first ->) was ignored, you need to address this circumstance manually:\n")
             appendCyclicDependents(sb, projectId, dependentEntry.values)
             sb.toString()
-        })
+        }
     }
 
     private fun reportInterModuleCyclicDependencies(paramObject: ParamObject, infos: MutableList<String>) {
-        paramObject.interModuleCyclicDependents.mapTo(infos, { (projectId, dependentEntry) ->
+        paramObject.interModuleCyclicDependents.mapTo(infos) { (projectId, dependentEntry) ->
             val sb = StringBuilder()
             sb.append("Project ").append(projectId.identifier)
                 .append(" has one or more inter module cyclic dependencies. ")
-                .append("Might be handled by the Release Command depending what relation they have and depending on where they are defined. Yet, it might also fail; in any case you should reconsider your design:\n")
+                .append("Might be handled by the Release Command depending what relation they have and depending on where they are defined. Yet, it might also fail:\n")
             appendCyclicDependents(sb, projectId, dependentEntry.values)
             sb.toString()
-        })
+        }
     }
 
     private fun appendCyclicDependents(
