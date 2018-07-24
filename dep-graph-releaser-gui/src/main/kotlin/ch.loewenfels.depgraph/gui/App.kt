@@ -1,8 +1,6 @@
 package ch.loewenfels.depgraph.gui
 
 import ch.loewenfels.depgraph.data.*
-import ch.loewenfels.depgraph.data.maven.jenkins.M2ReleaseCommand
-import ch.loewenfels.depgraph.data.serialization.CommandStateJson
 import ch.loewenfels.depgraph.gui.actions.Downloader
 import ch.loewenfels.depgraph.gui.actions.Publisher
 import ch.loewenfels.depgraph.gui.actions.Releaser
@@ -11,9 +9,6 @@ import ch.loewenfels.depgraph.gui.components.Menu
 import ch.loewenfels.depgraph.gui.jobexecution.*
 import ch.loewenfels.depgraph.gui.recovery.recover
 import ch.loewenfels.depgraph.gui.serialization.ModifiableState
-import ch.loewenfels.depgraph.gui.serialization.ProjectJson
-import ch.loewenfels.depgraph.gui.serialization.ReleasePlanJson
-import ch.loewenfels.depgraph.gui.serialization.deserializeProjectId
 import ch.loewenfels.depgraph.parseRemoteRegex
 import org.w3c.fetch.Response
 import kotlin.browser.window
@@ -82,7 +77,7 @@ class App {
                     promise
                 }.then { modifiableState ->
                     Loader.updateToLoadPipeline()
-                    Gui(modifiableState, menu)
+                    ContentContainer(modifiableState, menu)
                     val dependencies = createDependencies(
                         defaultJenkinsBaseUrl, publishJobUrl, modifiableState, menu
                     )

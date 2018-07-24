@@ -13,7 +13,7 @@ import kotlinx.html.dom.append
 import org.w3c.dom.asList
 import kotlin.browser.document
 
-class Gui(modifiableState: ModifiableState, private val menu: Menu) {
+class ContentContainer(modifiableState: ModifiableState, private val menu: Menu) {
 
     init {
         val releasePlan = modifiableState.releasePlan

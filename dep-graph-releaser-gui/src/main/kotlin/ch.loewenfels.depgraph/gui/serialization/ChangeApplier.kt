@@ -6,7 +6,7 @@ import ch.loewenfels.depgraph.data.maven.MavenProjectId
 import ch.loewenfels.depgraph.data.maven.jenkins.JenkinsCommand
 import ch.loewenfels.depgraph.data.maven.jenkins.M2ReleaseCommand
 import ch.loewenfels.depgraph.data.serialization.toJson
-import ch.loewenfels.depgraph.gui.Gui
+import ch.loewenfels.depgraph.gui.ContentContainer
 import ch.loewenfels.depgraph.gui.components.Pipeline
 import ch.loewenfels.depgraph.gui.elementById
 import ch.loewenfels.depgraph.gui.getTextField
@@ -47,7 +47,7 @@ object ChangeApplier {
 
     private fun replacePublishIdIfChanged(releasePlanJson: ReleasePlanJson): Boolean {
         var changed = false
-        val input = getTextField(Gui.RELEASE_ID_HTML_ID)
+        val input = getTextField(ContentContainer.RELEASE_ID_HTML_ID)
         if (releasePlanJson.releaseId != input.value) {
             check(input.value.isNotBlank()) {
                 "An empty or blank ReleaseId is not allowed"

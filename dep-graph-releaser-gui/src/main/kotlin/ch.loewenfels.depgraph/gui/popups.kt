@@ -41,7 +41,7 @@ private fun showMessageOfType(type: String, icon: String, message: String, autoC
             window.setTimeout({ closeMessage(msgId) }, autoCloseAfterMs)
         }
     }
-    val hideMessagesButton = elementById(Gui.HIDE_MESSAGES_HTML_ID)
+    val hideMessagesButton = elementById(ContentContainer.HIDE_MESSAGES_HTML_ID)
     messages.insertBefore(div, hideMessagesButton.nextSibling)
     return div
 }

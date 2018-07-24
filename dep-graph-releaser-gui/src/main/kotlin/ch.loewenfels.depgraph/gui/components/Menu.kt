@@ -6,7 +6,7 @@ import ch.loewenfels.depgraph.generateEclipsePsf
 import ch.loewenfels.depgraph.generateGitCloneCommands
 import ch.loewenfels.depgraph.generateListOfDependentsWithoutSubmoduleAndExcluded
 import ch.loewenfels.depgraph.gui.*
-import ch.loewenfels.depgraph.gui.Gui.Companion.RELEASE_ID_HTML_ID
+import ch.loewenfels.depgraph.gui.ContentContainer.Companion.RELEASE_ID_HTML_ID
 import ch.loewenfels.depgraph.gui.actions.Downloader
 import ch.loewenfels.depgraph.gui.actions.Publisher
 import ch.loewenfels.depgraph.gui.actions.Releaser
@@ -325,7 +325,7 @@ class Menu(
             }
             Pipeline.changeReleaseState(ReleaseState.READY)
             dispatchProcessReset()
-            elementById<HTMLInputElement>(Gui.RELEASE_ID_HTML_ID).value = randomPublishId()
+            elementById<HTMLInputElement>(ContentContainer.RELEASE_ID_HTML_ID).value = randomPublishId()
             resetButtons()
             startOverButton.style.display = "none"
             save(dependencies.jenkinsJobExecutor, verbose = true).then {
@@ -573,7 +573,7 @@ class Menu(
 
         val changed = publisher.applyChanges()
         return if (changed) {
-            val publishId = getTextField(Gui.RELEASE_ID_HTML_ID).value
+            val publishId = getTextField(ContentContainer.RELEASE_ID_HTML_ID).value
             val newFileName = "release-$publishId"
             publisher.publish(newFileName, verbose, jobExecutor)
                 .then { true }
