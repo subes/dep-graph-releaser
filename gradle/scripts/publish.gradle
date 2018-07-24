@@ -11,9 +11,9 @@ description = publish_description
 
 buildscript {
     ext{
-        publish_license_name = findProperty('publish_license_name') ?: 'Apache-2.0'
-        publish_license_description =  findProperty('publish_license_description') ?: 'The Apache Software License, Version 2.0'
-        publish_license_url = findProperty('publish_license_url') ?: 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+        publish_license_name = findProperty('publish_license_name') ?: 'EUPL-1.2'
+        publish_license_description =  findProperty('publish_license_description') ?: 'European Union Public Licence, Version 1.2'
+        publish_license_url = findProperty('publish_license_url') ?: 'https://joinup.ec.europa.eu/collection/eupl/eupl-text-11-12'
         publish_license_distribution = findProperty('publish_license_distribution') ?: 'repo'
 
         publish_dev_id = findProperty('publish_dev_id') ?: 'robstoll'
@@ -115,4 +115,5 @@ tasks.withType(Jar) { task ->
             'Implementation-URL': publish_vcsUrl, \
             'Implementation-Kotlin-Version': kotlin_version
     }
+    task.from("$rootProject.projectDir/LICENSE")
 }
