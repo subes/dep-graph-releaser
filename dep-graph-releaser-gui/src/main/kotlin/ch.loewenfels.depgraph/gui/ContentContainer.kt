@@ -24,12 +24,6 @@ class ContentContainer(modifiableState: ModifiableState, private val menu: Menu)
         setInfoBubble(releasePlan.infos)
         setUpConfig(releasePlan)
         Pipeline(modifiableState, menu)
-
-        //TODO we should check if releasePlant.state is inProgress. In such a case it might be that command states
-        // have changed already and we need to update the state let's say the browser crashes during release and we
-        // have already triggered a job and know it is queued in this case we should check if it is no longer queued
-        // but already started etc.
-        //TODO also for state failed, might be that it failed because maxWaitingTime was over
     }
 
     private fun setInfoBubble(messages: List<String>) {
