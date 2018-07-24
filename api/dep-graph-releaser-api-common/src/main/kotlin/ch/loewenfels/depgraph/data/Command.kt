@@ -71,7 +71,7 @@ sealed class CommandState {
         check(this !== Disabled) { "Cannot transition to any state if current state is ${Disabled::class.simpleName}." }
         check(this::class != newState::class) {
             "Cannot transition to the same state as the current." +
-                //TODO use $this insteadof $getToStringRepresentation(...) once https://youtrack.jetbrains.com/issue/KT-23970 is fixed
+                //TODO use $this instead of $getToStringRepresentation(...) once https://youtrack.jetbrains.com/issue/KT-23970 is fixed
                 "\nCurrent: ${this.getToStringRepresentation()}" +
                 "\nNew: ${newState.getToStringRepresentation()}"
         }
@@ -85,7 +85,7 @@ sealed class CommandState {
                     check(this.dependencies.isEmpty()) {
                         "Can only change from ${Waiting::class.simpleName} to ${Ready::class.simpleName} " +
                             "if there are not any dependencies left which we need to wait for." +
-                            //TODO use $this insteadof $getToStringRepresentation(...) once https://youtrack.jetbrains.com/issue/KT-23970 is fixed
+                            //TODO use $this instead of $getToStringRepresentation(...) once https://youtrack.jetbrains.com/issue/KT-23970 is fixed
                             "\nState was: ${this.getToStringRepresentation()}"
                     }
                 }
@@ -121,7 +121,7 @@ sealed class CommandState {
                     "one of: ${requiredState.joinToString { it.simpleName!! }}"
                 }
                 "Cannot transition to ${newState::class.simpleName} because state is not $states." +
-                    //TODO use $this insteadof $getToStringRepresentation(...) once https://youtrack.jetbrains.com/issue/KT-23970 is fixed
+                    //TODO use $this instead of $getToStringRepresentation(...) once https://youtrack.jetbrains.com/issue/KT-23970 is fixed
                     "\nState was: ${this.getToStringRepresentation()}"
             }
         }
