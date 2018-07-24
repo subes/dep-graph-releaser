@@ -58,35 +58,44 @@ private fun recoverCommandStates(
         val lazyProjectJson by lazy {
             releasePlanJson.projects.single { deserializeProjectId(it.id) == project.id }
         }
-        val promises = project.commands.mapIndexed { index, command ->
-            when (command.state) {
-            //TODO we need also to check if a job is queueing or already finished if the state is Ready.
-            // It could be that we trigger a job and then the browser crashed (or the user closed the page)
-            // before we had a chance to publish the new state => We could introduce a state Triggered but
-            // this would mean we need one more publish per job which is bad. This brings me to another idea,
-            // we could get rid of the save after state queueing if we implement recovery from state ready.
-            // Nah... then we wouldn't save anything anymore which is bad as well (we have to save from time
-            // to time :D). But I think there is potential here to reduce the number of publishes per pipeline.
-                is CommandState.Ready -> Promise.resolve(Unit)
-                is CommandState.Queueing -> recoverStateQueueing(
-                    modifiableState, jenkinsBaseUrl, project, command, lazyProjectJson, index
-                )
-                is CommandState.InProgress -> recoverStateTo(lazyProjectJson, index, CommandStateJson.State.RE_POLLING)
-
-                is CommandState.Waiting,
-                is CommandState.ReadyToReTrigger,
-                is CommandState.StillQueueing,
-                is CommandState.RePolling,
-                is CommandState.Succeeded,
-                is CommandState.Failed,
-                is CommandState.Deactivated,
-                is CommandState.Disabled -> Promise.resolve(Unit)
-            }
-        }
+        val promises = mapCommandStates(project, modifiableState, jenkinsBaseUrl, lazyProjectJson)
         Promise.all(promises.toTypedArray())
     }
     return Promise.all(promises.toList().toTypedArray()).then {
         releasePlanJson
+    }
+}
+
+private fun mapCommandStates(
+    project: Project,
+    modifiableState: ModifiableState,
+    jenkinsBaseUrl: String,
+    lazyProjectJson: ProjectJson
+): List<Promise<Any?>> {
+    return project.commands.mapIndexed { index, command ->
+        when (command.state) {
+        //TODO we need also to check if a job is queueing or already finished if the state is Ready.
+        // It could be that we trigger a job and then the browser crashed (or the user closed the page)
+        // before we had a chance to publish the new state => We could introduce a state Triggered but
+        // this would mean we need one more publish per job which is bad. This brings me to another idea,
+        // we could get rid of the save after state queueing if we implement recovery from state ready.
+        // Nah... then we wouldn't save anything anymore which is bad as well (we have to save from time
+        // to time :D). But I think there is potential here to reduce the number of publishes per pipeline.
+            is CommandState.Ready -> Promise.resolve(Unit)
+            is CommandState.Queueing -> recoverStateQueueing(
+                modifiableState, jenkinsBaseUrl, project, command, lazyProjectJson, index
+            )
+            is CommandState.InProgress -> recoverStateTo(lazyProjectJson, index, CommandStateJson.State.RE_POLLING)
+
+            is CommandState.Waiting,
+            is CommandState.ReadyToReTrigger,
+            is CommandState.StillQueueing,
+            is CommandState.RePolling,
+            is CommandState.Succeeded,
+            is CommandState.Failed,
+            is CommandState.Deactivated,
+            is CommandState.Disabled -> Promise.resolve(Unit)
+        }
     }
 }
 
@@ -103,37 +112,22 @@ private fun recoverStateQueueing(
     lazyProjectJson: ProjectJson,
     index: Int
 ): Promise<*> {
-    return if (command is JenkinsCommand) {
-        val usernameAndApiToken = UsernameTokenRegistry.forHostOrThrow(jenkinsBaseUrl)
-        issueCrumb(jenkinsBaseUrl, usernameAndApiToken).then { authData ->
-            val jobExecutionData = recoverJobExecutionData(modifiableState, project, command)
-            val nullableQueuedItemUrl = command.buildUrl
-            extractBuildNumber(nullableQueuedItemUrl, authData, jobExecutionData).then { recoveredBuildNumber ->
-                when (recoveredBuildNumber) {
-                    is RecoveredBuildNumber.Determined -> {
-                        updateBuildUrlAndTransitionToRePolling(
-                            jobExecutionData, lazyProjectJson, index, recoveredBuildNumber
-                        )
-                    }
-                    is RecoveredBuildNumber.StillQueueing -> recoverStateTo(
-                        lazyProjectJson, index, CommandStateJson.State.STILL_QUEUEING
-                    )
-                    is RecoveredBuildNumber.Undetermined -> throw IllegalStateException(
-                        "we should either have a build number or know that the job is still queueing by now." +
-                            "\nJob name: ${jobExecutionData.jobName}" +
-                            "\nJobUrl: ${jobExecutionData.jobBaseUrl}"
-                    )
-                }
-            }.catch { t ->
-                showThrowable(IllegalStateException("job ${jobExecutionData.jobName} could not be recovered", t))
-                recoverStateTo(lazyProjectJson, index, CommandStateJson.State.FAILED)
-            }
-        }
-    } else {
+    if (command !is JenkinsCommand) {
         throw UnsupportedOperationException(
             "We do not know how to recover a command of type ${command::class.simpleName}." +
                 "\nCommand: $command"
         )
+    }
+
+    val usernameAndApiToken = UsernameTokenRegistry.forHostOrThrow(jenkinsBaseUrl)
+    return issueCrumb(jenkinsBaseUrl, usernameAndApiToken).then { authData ->
+        val jobExecutionData = recoverJobExecutionData(modifiableState, project, command)
+        val nullableQueuedItemUrl = command.buildUrl
+        recoverToQueueingOrRePolling(nullableQueuedItemUrl, authData, jobExecutionData, lazyProjectJson, index)
+            .catch { t ->
+                showThrowable(IllegalStateException("job ${jobExecutionData.jobName} could not be recovered", t))
+                recoverStateTo(lazyProjectJson, index, CommandStateJson.State.FAILED)
+            }
     }
 }
 
@@ -141,10 +135,9 @@ private fun updateBuildUrlAndTransitionToRePolling(
     jobExecutionData: JobExecutionData,
     lazyProjectJson: ProjectJson,
     index: Int,
-    recoveredBuildNumber: RecoveredBuildNumber.Determined
+    buildNumber: Int
 ): Promise<*> {
-    val newBuildUrl = jobExecutionData.jobBaseUrl + recoveredBuildNumber.buildNumber
-    lazyProjectJson.commands[index].p.asDynamic().buildUrl = newBuildUrl
+    lazyProjectJson.commands[index].p.asDynamic().buildUrl = jobExecutionData.jobBaseUrl + buildNumber
     return recoverStateTo(lazyProjectJson, index, CommandStateJson.State.RE_POLLING)
 }
 
@@ -160,19 +153,28 @@ private fun recoverJobExecutionData(
     return jobExecutionDataFactory.create(project, command)
 }
 
-private fun extractBuildNumber(
+private fun recoverToQueueingOrRePolling(
     nullableQueuedItemUrl: String?,
     authData: AuthData,
-    jobExecutionData: JobExecutionData
-): Promise<Promise<RecoveredBuildNumber>> {
+    jobExecutionData: JobExecutionData,
+    lazyProjectJson: ProjectJson,
+    index: Int
+): Promise<Promise<*>> {
     return recoverBuildNumberFromQueue(nullableQueuedItemUrl, authData).then { recoveredBuildNumber ->
         when (recoveredBuildNumber) {
-            is RecoveredBuildNumber.Determined,
-            is RecoveredBuildNumber.StillQueueing -> Promise.resolve(recoveredBuildNumber)
+            is RecoveredBuildNumber.Determined -> updateBuildUrlAndTransitionToRePolling(
+                jobExecutionData, lazyProjectJson, index, recoveredBuildNumber.buildNumber
+            )
+            is RecoveredBuildNumber.StillQueueing -> recoverStateTo(
+                lazyProjectJson, index, CommandStateJson.State.STILL_QUEUEING
+            )
             is RecoveredBuildNumber.Undetermined -> {
                 BuildHistoryBasedBuildNumberExtractor(authData, jobExecutionData)
-                    .extract()
-                    .then { RecoveredBuildNumber.Determined(it) }
+                    .extract().then { buildNumber ->
+                        updateBuildUrlAndTransitionToRePolling(
+                            jobExecutionData, lazyProjectJson, index, buildNumber
+                        )
+                    }
             }
         }
     }
