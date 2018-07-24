@@ -323,7 +323,7 @@ class Releaser(
             "${Pipeline.getCommandId(project, index)}${Pipeline.STATE_SUFFIX}"
         )
         val href = if (!state.href.endsWith(endOfConsoleUrlSuffix)) {
-            state.href + endOfConsoleUrlSuffix
+            state.href + "/" + endOfConsoleUrlSuffix
         } else {
             state.href
         }
