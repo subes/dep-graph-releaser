@@ -41,7 +41,7 @@ object Loader {
     }
 
     fun updateToLoadingJson() {
-        updateLoader("Loading Json") {
+        updateLoader("Loading release.json") {
             getDefaultLoadingMessage()
         }
     }
