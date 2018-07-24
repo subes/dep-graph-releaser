@@ -8,7 +8,7 @@
 
     <dependencies>
         <dependency>
-            <groupId>ch.loewenfels</groupId>
+            <groupId>ch.loewenfels.depgraph</groupId>
             <artifactId>dep-graph-releaser-runner</artifactId>
             <version>${project.version}</version>
         </dependency>

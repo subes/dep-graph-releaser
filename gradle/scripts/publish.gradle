@@ -23,7 +23,7 @@ buildscript {
         publish_repo = findProperty('publish_repo') ?: 'oss'
         publish_organisation = findProperty('publish_organisation') ?: 'loewenfels'
         publish_pkg_name = findProperty('publish_pkg_name') ?: publish_artifactId
-        publish_groupId = findProperty('publish_groupId') ?: 'ch.loewenfels'
+        publish_groupId = findProperty('publish_groupId') ?: 'ch.loewenfels.depgraph'
         publish_vendor = findProperty('publish_vendor') ?: 'Löwenfels Partner AG'
     }
 
