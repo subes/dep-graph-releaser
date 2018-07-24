@@ -9,9 +9,9 @@
     <script type="text/javascript" src="kotlin.js"></script>
     <script type="text/javascript" src="kotlinx-html-js.js"></script>
     <script type="text/javascript" src="kbox-js.js"></script>
-    <script type="text/javascript" src="dep-graph-releaser-api-js.js?v=0.6.2"></script>
-    <script type="text/javascript" src="dep-graph-releaser-maven-api-js.js?v=0.6.2"></script>
-    <script type="text/javascript" src="dep-graph-releaser-gui.js?v=0.6.2"></script>
+    <script type="text/javascript" src="dep-graph-releaser-api-js.js?v=0.7.0"></script>
+    <script type="text/javascript" src="dep-graph-releaser-maven-api-js.js?v=0.7.0"></script>
+    <script type="text/javascript" src="dep-graph-releaser-gui.js?v=0.7.0"></script>
 </head>
 <body>
     <div id="gui">
@@ -48,6 +48,12 @@
                 <i class="material-icons">settings</i>
                 <span class="text">Settings</span>
             </span>
+            <span id="startOver" class="button deactivated" title="Cannot start over; most probably javascript was not loaded correctly">
+                <i class="material-icons">replay</i>
+                <span class="text">Start Over</span>
+            </span>
+
+
         </div>
         <div id="toolbox" class="menuLayer">
             <span id="toolbox:close" class="close" title="Close Toolbox"></span>
@@ -70,41 +76,15 @@
         </div>
         <div id="pipeline"></div>
     </div>
-    <div id="loaderJs" class="loader">
-        <p>Loading Javascript...</p>
+    <div id="loader" class="loader">
+        <p><i class="material-icons waiting">check_box_outline_blank</i><span>Loading Javascript...</span></p>
         <p>
             If you keep seeing this after a few seconds, then either an error occurred (see bottom of the page) and if not then most probably Content Security Policy blocked this site from
             loading the javascript file.<br/>
             You can verify it by opening the developer console (F12 in many browsers)
         </p>
     </div>
-    <div id="loaderApiToken" class="loader">
-        <p><i class="material-icons">check_box</i> Loading Javascript successful </p>
-        <p><i class="material-icons waiting">check_box_outline_blank</i> Retrieving API Token...</p>
-        <p>
-            If you keep seeing this after a few seconds, then either an error occurred (see bottom of the page) and if not then most probably CORS was not successful and a request was
-            blocked by the server.<br/>
-            You can verify it by opening the developer console (F12 in many browsers)
-        </p>
-        <p>
-            In case you only want to see the resulting pipeline without release functionality, then please remove <code>&publishUrl=...</code> from the current URL.
-        </p>
-    </div>
-    <div id="loaderJson" class="loader">
-        <p><i class="material-icons">check_box</i> Loading Javascript successful </p>
-        <p><i class="material-icons">check_box</i> Retrieving API Token successful</p>
-        <p><i class="material-icons waiting">check_box_outline_blank</i> Loading Json...</p>
-        <p>Should disappear after a few seconds, otherwise either an error occurred (see bottom of the page) and if not then most likely the request silently failed.<br/>
-            You can verify it by opening the developer console (F12 in many browsers)</p>
-    </div>
-    <div id="loaderPipeline" class="loader">
-        <p><i class="material-icons">check_box</i> Loading Javascript successful </p>
-        <p><i class="material-icons">check_box</i> Retrieving API Token successful</p>
-        <p><i class="material-icons">check_box</i> Loading Json successful</p>
-        <p><i class="material-icons waiting">check_box_outline_blank</i> Loading Pipeline and other API Tokens...</p>
-        <p>Should disappear after a few seconds, otherwise most likely an error occurred (see bottom of the page).</p>
-    </div>
-    <div id="poweredBy"><a href="https://github.com/loewenfels/dep-graph-releaser/tree/v0.6.2">dep-graph-release v0.6.2</a> is powered by <a href="https://www.loewenfels.ch">Löwenfels Partner AG</a></div>
+    <div id="poweredBy"><a href="https://github.com/loewenfels/dep-graph-releaser/tree/v0.7.0">dep-graph-release v0.7.0</a> is powered by <a href="https://www.loewenfels.ch">Löwenfels Partner AG</a></div>
     <div id="status"></div>
     <div id="messages">
         <span class="button" id="hideMessages">

@@ -1,7 +1,15 @@
-if (typeof kotlin === 'undefined') {
-  throw new Error("Error loading module 'kbox-js'. Its dependency 'kotlin' was not found. Please, check whether 'kotlin' is loaded prior to 'kbox-js'.");
-}
-this['kbox-js'] = function (_, Kotlin) {
+(function (root, factory) {
+  if (typeof define === 'function' && define.amd)
+    define(['exports', 'kotlin'], factory);
+  else if (typeof exports === 'object')
+    factory(module.exports, require('kotlin'));
+  else {
+    if (typeof kotlin === 'undefined') {
+      throw new Error("Error loading module 'kbox-js'. Its dependency 'kotlin' was not found. Please, check whether 'kotlin' is loaded prior to 'kbox-js'.");
+    }
+    root['kbox-js'] = factory(typeof this['kbox-js'] === 'undefined' ? {} : this['kbox-js'], kotlin);
+  }
+}(this, function (_, Kotlin) {
   'use strict';
   var $$importsForInline$$ = _.$$importsForInline$$ || (_.$$importsForInline$$ = {});
   var defineInlineFunction = Kotlin.defineInlineFunction;
@@ -497,9 +505,9 @@ this['kbox-js'] = function (_, Kotlin) {
     };
   }));
   var joinToString_2 = defineInlineFunction('kbox-js.ch.tutteli.kbox.joinToString_ozw64r$', wrapFunction(function () {
-    var StringBuilder_init = Kotlin.kotlin.text.StringBuilder;
+    var StringBuilder_init = Kotlin.kotlin.text.StringBuilder_init;
     return function ($receiver, separator, append) {
-      var sb = new StringBuilder_init();
+      var sb = StringBuilder_init();
       var itr = $receiver.iterator();
       if (itr.hasNext()) {
         append(itr.next(), sb);
@@ -533,9 +541,9 @@ this['kbox-js'] = function (_, Kotlin) {
     };
   }));
   var joinToString_4 = defineInlineFunction('kbox-js.ch.tutteli.kbox.joinToString_b5nhi7$', wrapFunction(function () {
-    var StringBuilder_init = Kotlin.kotlin.text.StringBuilder;
+    var StringBuilder_init = Kotlin.kotlin.text.StringBuilder_init;
     return function ($receiver, separator, append) {
-      var sb = new StringBuilder_init();
+      var sb = StringBuilder_init();
       var itr = $receiver.iterator();
       if (itr.hasNext()) {
         append(itr.next(), sb);
@@ -548,9 +556,9 @@ this['kbox-js'] = function (_, Kotlin) {
     };
   }));
   var joinToString_5 = defineInlineFunction('kbox-js.ch.tutteli.kbox.joinToString_euw1ht$', wrapFunction(function () {
-    var StringBuilder_init = Kotlin.kotlin.text.StringBuilder;
+    var StringBuilder_init = Kotlin.kotlin.text.StringBuilder_init;
     return function ($receiver, separator, append) {
-      var sb = new StringBuilder_init();
+      var sb = StringBuilder_init();
       var itr = $receiver.iterator();
       if (itr.hasNext()) {
         append(itr.next(), sb);
@@ -581,15 +589,16 @@ this['kbox-js'] = function (_, Kotlin) {
     }
     return set;
   }
+  var ArrayList_init_0 = Kotlin.kotlin.collections.ArrayList_init_287e2$;
   function mapRemaining($receiver, transform) {
-    var mutableList = ArrayList_init();
+    var mutableList = ArrayList_init_0();
     while ($receiver.hasNext()) {
       mutableList.add_11rb$(transform($receiver.next()));
     }
     return mutableList;
   }
   function mapRemainingWithCounter($receiver, transform) {
-    var mutableList = ArrayList_init();
+    var mutableList = ArrayList_init_0();
     var counter = 0;
     while ($receiver.hasNext()) {
       mutableList.add_11rb$(transform(counter, $receiver.next()));
@@ -767,4 +776,6 @@ this['kbox-js'] = function (_, Kotlin) {
   package$kbox.PeekingIterator = PeekingIterator;
   Kotlin.defineModule('kbox-js', _);
   return _;
-}(typeof this['kbox-js'] === 'undefined' ? {} : this['kbox-js'], kotlin);
+}));
+
+//# sourceMappingURL=kbox-js.js.map

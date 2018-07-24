@@ -1,10 +1,18 @@
-if (typeof kotlin === 'undefined') {
-  throw new Error("Error loading module 'dep-graph-releaser-maven-api-js'. Its dependency 'kotlin' was not found. Please, check whether 'kotlin' is loaded prior to 'dep-graph-releaser-maven-api-js'.");
-}
-if (typeof this['dep-graph-releaser-api-js'] === 'undefined') {
-  throw new Error("Error loading module 'dep-graph-releaser-maven-api-js'. Its dependency 'dep-graph-releaser-api-js' was not found. Please, check whether 'dep-graph-releaser-api-js' is loaded prior to 'dep-graph-releaser-maven-api-js'.");
-}
-this['dep-graph-releaser-maven-api-js'] = function (_, Kotlin, $module$dep_graph_releaser_api_js) {
+(function (root, factory) {
+  if (typeof define === 'function' && define.amd)
+    define(['exports', 'kotlin', 'dep-graph-releaser-api-js'], factory);
+  else if (typeof exports === 'object')
+    factory(module.exports, require('kotlin'), require('dep-graph-releaser-api-js'));
+  else {
+    if (typeof kotlin === 'undefined') {
+      throw new Error("Error loading module 'dep-graph-releaser-maven-api-js'. Its dependency 'kotlin' was not found. Please, check whether 'kotlin' is loaded prior to 'dep-graph-releaser-maven-api-js'.");
+    }
+    if (typeof this['dep-graph-releaser-api-js'] === 'undefined') {
+      throw new Error("Error loading module 'dep-graph-releaser-maven-api-js'. Its dependency 'dep-graph-releaser-api-js' was not found. Please, check whether 'dep-graph-releaser-api-js' is loaded prior to 'dep-graph-releaser-maven-api-js'.");
+    }
+    root['dep-graph-releaser-maven-api-js'] = factory(typeof this['dep-graph-releaser-maven-api-js'] === 'undefined' ? {} : this['dep-graph-releaser-maven-api-js'], kotlin, this['dep-graph-releaser-api-js']);
+  }
+}(this, function (_, Kotlin, $module$dep_graph_releaser_api_js) {
   'use strict';
   var Kind_INTERFACE = Kotlin.Kind.INTERFACE;
   var Command = $module$dep_graph_releaser_api_js.ch.loewenfels.depgraph.data.Command;
@@ -248,4 +256,6 @@ this['dep-graph-releaser-maven-api-js'] = function (_, Kotlin, $module$dep_graph
   JenkinsUpdateDependency.prototype.asDisabled = JenkinsCommand.prototype.asDisabled;
   Kotlin.defineModule('dep-graph-releaser-maven-api-js', _);
   return _;
-}(typeof this['dep-graph-releaser-maven-api-js'] === 'undefined' ? {} : this['dep-graph-releaser-maven-api-js'], kotlin, this['dep-graph-releaser-api-js']);
+}));
+
+//# sourceMappingURL=dep-graph-releaser-maven-api-js.js.map

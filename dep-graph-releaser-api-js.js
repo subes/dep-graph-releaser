@@ -1,10 +1,18 @@
-if (typeof kotlin === 'undefined') {
-  throw new Error("Error loading module 'dep-graph-releaser-api-js'. Its dependency 'kotlin' was not found. Please, check whether 'kotlin' is loaded prior to 'dep-graph-releaser-api-js'.");
-}
-if (typeof this['kbox-js'] === 'undefined') {
-  throw new Error("Error loading module 'dep-graph-releaser-api-js'. Its dependency 'kbox-js' was not found. Please, check whether 'kbox-js' is loaded prior to 'dep-graph-releaser-api-js'.");
-}
-this['dep-graph-releaser-api-js'] = function (_, Kotlin, $module$kbox_js) {
+(function (root, factory) {
+  if (typeof define === 'function' && define.amd)
+    define(['exports', 'kotlin', 'kbox-js'], factory);
+  else if (typeof exports === 'object')
+    factory(module.exports, require('kotlin'), require('kbox-js'));
+  else {
+    if (typeof kotlin === 'undefined') {
+      throw new Error("Error loading module 'dep-graph-releaser-api-js'. Its dependency 'kotlin' was not found. Please, check whether 'kotlin' is loaded prior to 'dep-graph-releaser-api-js'.");
+    }
+    if (typeof this['kbox-js'] === 'undefined') {
+      throw new Error("Error loading module 'dep-graph-releaser-api-js'. Its dependency 'kbox-js' was not found. Please, check whether 'kbox-js' is loaded prior to 'dep-graph-releaser-api-js'.");
+    }
+    root['dep-graph-releaser-api-js'] = factory(typeof this['dep-graph-releaser-api-js'] === 'undefined' ? {} : this['dep-graph-releaser-api-js'], kotlin, this['kbox-js']);
+  }
+}(this, function (_, Kotlin, $module$kbox_js) {
   'use strict';
   var $$importsForInline$$ = _.$$importsForInline$$ || (_.$$importsForInline$$ = {});
   var equals = Kotlin.equals;
@@ -50,8 +58,12 @@ this['dep-graph-releaser-api-js'] = function (_, Kotlin, $module$kbox_js) {
   CommandState$ReadyToReTrigger.prototype.constructor = CommandState$ReadyToReTrigger;
   CommandState$Queueing.prototype = Object.create(CommandState.prototype);
   CommandState$Queueing.prototype.constructor = CommandState$Queueing;
+  CommandState$StillQueueing.prototype = Object.create(CommandState.prototype);
+  CommandState$StillQueueing.prototype.constructor = CommandState$StillQueueing;
   CommandState$InProgress.prototype = Object.create(CommandState.prototype);
   CommandState$InProgress.prototype.constructor = CommandState$InProgress;
+  CommandState$RePolling.prototype = Object.create(CommandState.prototype);
+  CommandState$RePolling.prototype.constructor = CommandState$RePolling;
   CommandState$Succeeded.prototype = Object.create(CommandState.prototype);
   CommandState$Succeeded.prototype.constructor = CommandState$Succeeded;
   CommandState$Failed.prototype = Object.create(CommandState.prototype);
@@ -64,6 +76,8 @@ this['dep-graph-releaser-api-js'] = function (_, Kotlin, $module$kbox_js) {
   ReleaseState.prototype.constructor = ReleaseState;
   CommandStateJson$State.prototype = Object.create(Enum.prototype);
   CommandStateJson$State.prototype.constructor = CommandStateJson$State;
+  TypeOfRun.prototype = Object.create(Enum.prototype);
+  TypeOfRun.prototype.constructor = TypeOfRun;
   function ConfigKey(name, ordinal, key) {
     Enum.call(this);
     this.key_c1gzzu$_0 = key;
@@ -82,6 +96,7 @@ this['dep-graph-releaser-api-js'] = function (_, Kotlin, $module$kbox_js) {
     ConfigKey$RELATIVE_PATH_TO_GIT_REPO_REPLACEMENT_instance = new ConfigKey('RELATIVE_PATH_TO_GIT_REPO_REPLACEMENT', 6, 'relativePathToGitRepoReplacement');
     ConfigKey$REGEX_PARAMS_instance = new ConfigKey('REGEX_PARAMS', 7, 'regexParams');
     ConfigKey$JOB_MAPPING_instance = new ConfigKey('JOB_MAPPING', 8, 'jobMapping');
+    ConfigKey$INITIAL_RELEASE_JSON_instance = new ConfigKey('INITIAL_RELEASE_JSON', 9, 'initialJson');
     ConfigKey$Companion_getInstance();
   }
   var ConfigKey$COMMIT_PREFIX_instance;
@@ -129,6 +144,11 @@ this['dep-graph-releaser-api-js'] = function (_, Kotlin, $module$kbox_js) {
     ConfigKey_initFields();
     return ConfigKey$JOB_MAPPING_instance;
   }
+  var ConfigKey$INITIAL_RELEASE_JSON_instance;
+  function ConfigKey$INITIAL_RELEASE_JSON_getInstance() {
+    ConfigKey_initFields();
+    return ConfigKey$INITIAL_RELEASE_JSON_instance;
+  }
   ConfigKey.prototype.asString = function () {
     return this.key_c1gzzu$_0;
   };
@@ -171,7 +191,7 @@ this['dep-graph-releaser-api-js'] = function (_, Kotlin, $module$kbox_js) {
     interfaces: [Enum]
   };
   function ConfigKey$values() {
-    return [ConfigKey$COMMIT_PREFIX_getInstance(), ConfigKey$UPDATE_DEPENDENCY_JOB_getInstance(), ConfigKey$DRY_RUN_JOB_getInstance(), ConfigKey$REMOTE_REGEX_getInstance(), ConfigKey$RELATIVE_PATH_EXCLUDE_PROJECT_REGEX_getInstance(), ConfigKey$RELATIVE_PATH_TO_GIT_REPO_REGEX_getInstance(), ConfigKey$RELATIVE_PATH_TO_GIT_REPO_REPLACEMENT_getInstance(), ConfigKey$REGEX_PARAMS_getInstance(), ConfigKey$JOB_MAPPING_getInstance()];
+    return [ConfigKey$COMMIT_PREFIX_getInstance(), ConfigKey$UPDATE_DEPENDENCY_JOB_getInstance(), ConfigKey$DRY_RUN_JOB_getInstance(), ConfigKey$REMOTE_REGEX_getInstance(), ConfigKey$RELATIVE_PATH_EXCLUDE_PROJECT_REGEX_getInstance(), ConfigKey$RELATIVE_PATH_TO_GIT_REPO_REGEX_getInstance(), ConfigKey$RELATIVE_PATH_TO_GIT_REPO_REPLACEMENT_getInstance(), ConfigKey$REGEX_PARAMS_getInstance(), ConfigKey$JOB_MAPPING_getInstance(), ConfigKey$INITIAL_RELEASE_JSON_getInstance()];
   }
   ConfigKey.values = ConfigKey$values;
   function ConfigKey$valueOf(name) {
@@ -194,6 +214,8 @@ this['dep-graph-releaser-api-js'] = function (_, Kotlin, $module$kbox_js) {
         return ConfigKey$REGEX_PARAMS_getInstance();
       case 'JOB_MAPPING':
         return ConfigKey$JOB_MAPPING_getInstance();
+      case 'INITIAL_RELEASE_JSON':
+        return ConfigKey$INITIAL_RELEASE_JSON_getInstance();
       default:throwISE('No enum constant ch.loewenfels.depgraph.ConfigKey.' + name);
     }
   }
@@ -353,6 +375,22 @@ this['dep-graph-releaser-api-js'] = function (_, Kotlin, $module$kbox_js) {
     }
     return CommandState$Queueing_instance;
   }
+  function CommandState$StillQueueing() {
+    CommandState$StillQueueing_instance = this;
+    CommandState.call(this);
+  }
+  CommandState$StillQueueing.$metadata$ = {
+    kind: Kind_OBJECT,
+    simpleName: 'StillQueueing',
+    interfaces: [CommandState]
+  };
+  var CommandState$StillQueueing_instance = null;
+  function CommandState$StillQueueing_getInstance() {
+    if (CommandState$StillQueueing_instance === null) {
+      new CommandState$StillQueueing();
+    }
+    return CommandState$StillQueueing_instance;
+  }
   function CommandState$InProgress() {
     CommandState$InProgress_instance = this;
     CommandState.call(this);
@@ -368,6 +406,22 @@ this['dep-graph-releaser-api-js'] = function (_, Kotlin, $module$kbox_js) {
       new CommandState$InProgress();
     }
     return CommandState$InProgress_instance;
+  }
+  function CommandState$RePolling() {
+    CommandState$RePolling_instance = this;
+    CommandState.call(this);
+  }
+  CommandState$RePolling.$metadata$ = {
+    kind: Kind_OBJECT,
+    simpleName: 'RePolling',
+    interfaces: [CommandState]
+  };
+  var CommandState$RePolling_instance = null;
+  function CommandState$RePolling_getInstance() {
+    if (CommandState$RePolling_instance === null) {
+      new CommandState$RePolling();
+    }
+    return CommandState$RePolling_instance;
   }
   function CommandState$Succeeded() {
     CommandState$Succeeded_instance = this;
@@ -449,7 +503,7 @@ this['dep-graph-releaser-api-js'] = function (_, Kotlin, $module$kbox_js) {
     };
   }
   CommandState.prototype.checkTransitionAllowed_m86w84$ = function (newState) {
-    var tmp$;
+    var tmp$, tmp$_0;
     if (!(this !== CommandState$Disabled_getInstance())) {
       var message = 'Cannot transition to any state if current state is ' + toString(getKClass(CommandState$Disabled).simpleName) + '.';
       throw IllegalStateException_init(message.toString());
@@ -458,9 +512,9 @@ this['dep-graph-releaser-api-js'] = function (_, Kotlin, $module$kbox_js) {
       var message_0 = CommandState$checkTransitionAllowed$lambda(this, newState)();
       throw IllegalStateException_init(message_0.toString());
     }
-    if (equals(newState, CommandState$ReadyToReTrigger_getInstance()))
-      this.checkNewStateIsAfter_jb7wuq$_0(newState, [getKClass(CommandState$Failed)]);
-    else if (equals(newState, CommandState$Ready_getInstance())) {
+    if (Kotlin.isType(newState, CommandState$ReadyToReTrigger))
+      tmp$_0 = this.checkNewStateIsAfter_jb7wuq$_0(newState, [getKClass(CommandState$Failed)]);
+    else if (Kotlin.isType(newState, CommandState$Ready)) {
       this.checkNewStateIsAfter_jb7wuq$_0(newState, [getKClass(CommandState$Waiting)]);
       if (Kotlin.isType(this, CommandState$Waiting)) {
         if (!this.dependencies.isEmpty()) {
@@ -468,14 +522,23 @@ this['dep-graph-releaser-api-js'] = function (_, Kotlin, $module$kbox_js) {
           throw IllegalStateException_init(message_1.toString());
         }
       }
+      tmp$_0 = newState;
     }
-     else if (equals(newState, CommandState$Queueing_getInstance()))
-      this.checkNewStateIsAfter_jb7wuq$_0(newState, [getKClass(CommandState$Ready), getKClass(CommandState$ReadyToReTrigger)]);
-    else if (equals(newState, CommandState$InProgress_getInstance()))
-      this.checkNewStateIsAfter_jb7wuq$_0(newState, [getKClass(CommandState$Queueing)]);
-    else if (equals(newState, CommandState$Succeeded_getInstance()))
-      this.checkNewStateIsAfter_jb7wuq$_0(newState, [getKClass(CommandState$InProgress)]);
-    return newState;
+     else if (Kotlin.isType(newState, CommandState$Queueing))
+      tmp$_0 = this.checkNewStateIsAfter_jb7wuq$_0(newState, [getKClass(CommandState$Ready), getKClass(CommandState$ReadyToReTrigger)]);
+    else if (Kotlin.isType(newState, CommandState$StillQueueing))
+      tmp$_0 = this.checkNewStateIsAfter_jb7wuq$_0(newState, [getKClass(CommandState$Queueing)]);
+    else if (Kotlin.isType(newState, CommandState$InProgress))
+      tmp$_0 = this.checkNewStateIsAfter_jb7wuq$_0(newState, [getKClass(CommandState$Queueing)]);
+    else if (Kotlin.isType(newState, CommandState$RePolling))
+      tmp$_0 = this.checkNewStateIsAfter_jb7wuq$_0(newState, [getKClass(CommandState$InProgress)]);
+    else if (Kotlin.isType(newState, CommandState$Succeeded))
+      tmp$_0 = this.checkNewStateIsAfter_jb7wuq$_0(newState, [getKClass(CommandState$InProgress), getKClass(CommandState$RePolling)]);
+    else if (Kotlin.isType(newState, CommandState$Waiting) || Kotlin.isType(newState, CommandState$Failed) || Kotlin.isType(newState, CommandState$Deactivated) || Kotlin.isType(newState, CommandState$Disabled))
+      tmp$_0 = newState;
+    else
+      tmp$_0 = Kotlin.noWhenBranchMatched();
+    return tmp$_0;
   };
   function CommandState$checkNewStateIsAfter$lambda(closure$newState, this$CommandState) {
     return function () {
@@ -483,7 +546,7 @@ this['dep-graph-releaser-api-js'] = function (_, Kotlin, $module$kbox_js) {
     };
   }
   function CommandState$checkNewStateIsAfter$lambda$lambda(it) {
-    return ensureNotNull(Kotlin.getKClassFromExpression(it).simpleName);
+    return ensureNotNull(it.simpleName);
   }
   CommandState.prototype.checkNewStateIsAfter_jb7wuq$_0 = function (newState, requiredState) {
     var tmp$;
@@ -510,7 +573,7 @@ this['dep-graph-releaser-api-js'] = function (_, Kotlin, $module$kbox_js) {
       if (!any$result) {
         var tmp$_1;
         if (requiredState.length === 1) {
-          tmp$_1 = Kotlin.getKClassFromExpression(requiredState[0]).simpleName;
+          tmp$_1 = requiredState[0].simpleName;
         }
          else {
           tmp$_1 = 'one of: ' + joinToString(requiredState, void 0, void 0, void 0, void 0, void 0, CommandState$checkNewStateIsAfter$lambda$lambda);
@@ -520,6 +583,7 @@ this['dep-graph-releaser-api-js'] = function (_, Kotlin, $module$kbox_js) {
         throw IllegalStateException_init(message_0.toString());
       }
     }
+    return newState;
   };
   CommandState.$metadata$ = {
     kind: Kind_CLASS,
@@ -644,9 +708,10 @@ this['dep-graph-releaser-api-js'] = function (_, Kotlin, $module$kbox_js) {
     simpleName: 'ReleaseCommand',
     interfaces: [Command]
   };
-  function ReleasePlan(releaseId, state, rootProjectId, projects, submodules, dependents, warnings, infos, config) {
+  function ReleasePlan(releaseId, state, typeOfRun, rootProjectId, projects, submodules, dependents, warnings, infos, config) {
     this.releaseId = releaseId;
     this.state = state;
+    this.typeOfRun = typeOfRun;
     this.rootProjectId = rootProjectId;
     this.projects_0 = projects;
     this.submodules_0 = submodules;
@@ -729,9 +794,6 @@ this['dep-graph-releaser-api-js'] = function (_, Kotlin, $module$kbox_js) {
   ReleasePlan.prototype.getNumberOfProjects = function () {
     return this.projects_0.size;
   };
-  ReleasePlan.prototype.getAllProjects = function () {
-    return this.projects_0;
-  };
   ReleasePlan.prototype.getNumberOfDependents = function () {
     return this.dependents_0.size;
   };
@@ -792,13 +854,7 @@ this['dep-graph-releaser-api-js'] = function (_, Kotlin, $module$kbox_js) {
   };
   function ReleasePlan_init(releasePlan, projects, $this) {
     $this = $this || Object.create(ReleasePlan.prototype);
-    ReleasePlan.call($this, releasePlan.releaseId, releasePlan.state, releasePlan.rootProjectId, projects, releasePlan.submodules_0, releasePlan.dependents_0, releasePlan.warnings, releasePlan.infos, releasePlan.config);
-    return $this;
-  }
-  var emptyMap = Kotlin.kotlin.collections.emptyMap_q3lmfv$;
-  function ReleasePlan_init_0(publishId, rootProjectId, projects, submodulesOfProject, dependents, $this) {
-    $this = $this || Object.create(ReleasePlan.prototype);
-    ReleasePlan.call($this, publishId, ReleaseState$Ready_getInstance(), rootProjectId, projects, submodulesOfProject, dependents, emptyList(), emptyList(), emptyMap());
+    ReleasePlan.call($this, releasePlan.releaseId, releasePlan.state, releasePlan.typeOfRun, releasePlan.rootProjectId, projects, releasePlan.submodules_0, releasePlan.dependents_0, releasePlan.warnings, releasePlan.infos, releasePlan.config);
     return $this;
   }
   ReleasePlan.prototype.component1 = function () {
@@ -808,36 +864,40 @@ this['dep-graph-releaser-api-js'] = function (_, Kotlin, $module$kbox_js) {
     return this.state;
   };
   ReleasePlan.prototype.component3 = function () {
+    return this.typeOfRun;
+  };
+  ReleasePlan.prototype.component4 = function () {
     return this.rootProjectId;
   };
-  ReleasePlan.prototype.component4_0 = function () {
+  ReleasePlan.prototype.component5_0 = function () {
     return this.projects_0;
   };
-  ReleasePlan.prototype.component5_0 = function () {
+  ReleasePlan.prototype.component6_0 = function () {
     return this.submodules_0;
   };
-  ReleasePlan.prototype.component6_0 = function () {
+  ReleasePlan.prototype.component7_0 = function () {
     return this.dependents_0;
   };
-  ReleasePlan.prototype.component7 = function () {
+  ReleasePlan.prototype.component8 = function () {
     return this.warnings;
   };
-  ReleasePlan.prototype.component8 = function () {
+  ReleasePlan.prototype.component9 = function () {
     return this.infos;
   };
-  ReleasePlan.prototype.component9 = function () {
+  ReleasePlan.prototype.component10 = function () {
     return this.config;
   };
-  ReleasePlan.prototype.copy_wzjb64$ = function (releaseId, state, rootProjectId, projects, submodules, dependents, warnings, infos, config) {
-    return new ReleasePlan(releaseId === void 0 ? this.releaseId : releaseId, state === void 0 ? this.state : state, rootProjectId === void 0 ? this.rootProjectId : rootProjectId, projects === void 0 ? this.projects_0 : projects, submodules === void 0 ? this.submodules_0 : submodules, dependents === void 0 ? this.dependents_0 : dependents, warnings === void 0 ? this.warnings : warnings, infos === void 0 ? this.infos : infos, config === void 0 ? this.config : config);
+  ReleasePlan.prototype.copy_5udup0$ = function (releaseId, state, typeOfRun, rootProjectId, projects, submodules, dependents, warnings, infos, config) {
+    return new ReleasePlan(releaseId === void 0 ? this.releaseId : releaseId, state === void 0 ? this.state : state, typeOfRun === void 0 ? this.typeOfRun : typeOfRun, rootProjectId === void 0 ? this.rootProjectId : rootProjectId, projects === void 0 ? this.projects_0 : projects, submodules === void 0 ? this.submodules_0 : submodules, dependents === void 0 ? this.dependents_0 : dependents, warnings === void 0 ? this.warnings : warnings, infos === void 0 ? this.infos : infos, config === void 0 ? this.config : config);
   };
   ReleasePlan.prototype.toString = function () {
-    return 'ReleasePlan(releaseId=' + Kotlin.toString(this.releaseId) + (', state=' + Kotlin.toString(this.state)) + (', rootProjectId=' + Kotlin.toString(this.rootProjectId)) + (', projects=' + Kotlin.toString(this.projects_0)) + (', submodules=' + Kotlin.toString(this.submodules_0)) + (', dependents=' + Kotlin.toString(this.dependents_0)) + (', warnings=' + Kotlin.toString(this.warnings)) + (', infos=' + Kotlin.toString(this.infos)) + (', config=' + Kotlin.toString(this.config)) + ')';
+    return 'ReleasePlan(releaseId=' + Kotlin.toString(this.releaseId) + (', state=' + Kotlin.toString(this.state)) + (', typeOfRun=' + Kotlin.toString(this.typeOfRun)) + (', rootProjectId=' + Kotlin.toString(this.rootProjectId)) + (', projects=' + Kotlin.toString(this.projects_0)) + (', submodules=' + Kotlin.toString(this.submodules_0)) + (', dependents=' + Kotlin.toString(this.dependents_0)) + (', warnings=' + Kotlin.toString(this.warnings)) + (', infos=' + Kotlin.toString(this.infos)) + (', config=' + Kotlin.toString(this.config)) + ')';
   };
   ReleasePlan.prototype.hashCode = function () {
     var result = 0;
     result = result * 31 + Kotlin.hashCode(this.releaseId) | 0;
     result = result * 31 + Kotlin.hashCode(this.state) | 0;
+    result = result * 31 + Kotlin.hashCode(this.typeOfRun) | 0;
     result = result * 31 + Kotlin.hashCode(this.rootProjectId) | 0;
     result = result * 31 + Kotlin.hashCode(this.projects_0) | 0;
     result = result * 31 + Kotlin.hashCode(this.submodules_0) | 0;
@@ -848,7 +908,7 @@ this['dep-graph-releaser-api-js'] = function (_, Kotlin, $module$kbox_js) {
     return result;
   };
   ReleasePlan.prototype.equals = function (other) {
-    return this === other || (other !== null && (typeof other === 'object' && (Object.getPrototypeOf(this) === Object.getPrototypeOf(other) && (Kotlin.equals(this.releaseId, other.releaseId) && Kotlin.equals(this.state, other.state) && Kotlin.equals(this.rootProjectId, other.rootProjectId) && Kotlin.equals(this.projects_0, other.projects_0) && Kotlin.equals(this.submodules_0, other.submodules_0) && Kotlin.equals(this.dependents_0, other.dependents_0) && Kotlin.equals(this.warnings, other.warnings) && Kotlin.equals(this.infos, other.infos) && Kotlin.equals(this.config, other.config)))));
+    return this === other || (other !== null && (typeof other === 'object' && (Object.getPrototypeOf(this) === Object.getPrototypeOf(other) && (Kotlin.equals(this.releaseId, other.releaseId) && Kotlin.equals(this.state, other.state) && Kotlin.equals(this.typeOfRun, other.typeOfRun) && Kotlin.equals(this.rootProjectId, other.rootProjectId) && Kotlin.equals(this.projects_0, other.projects_0) && Kotlin.equals(this.submodules_0, other.submodules_0) && Kotlin.equals(this.dependents_0, other.dependents_0) && Kotlin.equals(this.warnings, other.warnings) && Kotlin.equals(this.infos, other.infos) && Kotlin.equals(this.config, other.config)))));
   };
   function ReleaseState(name, ordinal) {
     Enum.call(this);
@@ -858,52 +918,65 @@ this['dep-graph-releaser-api-js'] = function (_, Kotlin, $module$kbox_js) {
   function ReleaseState_initFields() {
     ReleaseState_initFields = function () {
     };
-    ReleaseState$Ready_instance = new ReleaseState('Ready', 0);
-    ReleaseState$InProgress_instance = new ReleaseState('InProgress', 1);
-    ReleaseState$Succeeded_instance = new ReleaseState('Succeeded', 2);
-    ReleaseState$Failed_instance = new ReleaseState('Failed', 3);
+    ReleaseState$READY_instance = new ReleaseState('READY', 0);
+    ReleaseState$IN_PROGRESS_instance = new ReleaseState('IN_PROGRESS', 1);
+    ReleaseState$SUCCEEDED_instance = new ReleaseState('SUCCEEDED', 2);
+    ReleaseState$FAILED_instance = new ReleaseState('FAILED', 3);
+    ReleaseState$WATCHING_instance = new ReleaseState('WATCHING', 4);
   }
-  var ReleaseState$Ready_instance;
-  function ReleaseState$Ready_getInstance() {
+  var ReleaseState$READY_instance;
+  function ReleaseState$READY_getInstance() {
     ReleaseState_initFields();
-    return ReleaseState$Ready_instance;
+    return ReleaseState$READY_instance;
   }
-  var ReleaseState$InProgress_instance;
-  function ReleaseState$InProgress_getInstance() {
+  var ReleaseState$IN_PROGRESS_instance;
+  function ReleaseState$IN_PROGRESS_getInstance() {
     ReleaseState_initFields();
-    return ReleaseState$InProgress_instance;
+    return ReleaseState$IN_PROGRESS_instance;
   }
-  var ReleaseState$Succeeded_instance;
-  function ReleaseState$Succeeded_getInstance() {
+  var ReleaseState$SUCCEEDED_instance;
+  function ReleaseState$SUCCEEDED_getInstance() {
     ReleaseState_initFields();
-    return ReleaseState$Succeeded_instance;
+    return ReleaseState$SUCCEEDED_instance;
   }
-  var ReleaseState$Failed_instance;
-  function ReleaseState$Failed_getInstance() {
+  var ReleaseState$FAILED_instance;
+  function ReleaseState$FAILED_getInstance() {
     ReleaseState_initFields();
-    return ReleaseState$Failed_instance;
+    return ReleaseState$FAILED_instance;
+  }
+  var ReleaseState$WATCHING_instance;
+  function ReleaseState$WATCHING_getInstance() {
+    ReleaseState_initFields();
+    return ReleaseState$WATCHING_instance;
   }
   ReleaseState.prototype.checkTransitionAllowed_g1wt0g$ = function (newState) {
+    var tmp$;
     switch (newState.name) {
-      case 'Ready':
-        this.checkNewState_s9yn6r$_0(newState, ReleaseState$Succeeded_getInstance());
+      case 'READY':
+        tmp$ = this.checkNewState_s9yn6r$_0(newState, ReleaseState$SUCCEEDED_getInstance());
         break;
-      case 'InProgress':
-        if (!(this === ReleaseState$Ready_getInstance() || this === ReleaseState$Failed_getInstance())) {
-          this.getErrorMessage_ownq0r$_0(newState, 'state was neither ' + toString(Kotlin.getKClassFromExpression(ReleaseState$Ready_getInstance()).simpleName) + ' nor ' + toString(Kotlin.getKClassFromExpression(ReleaseState$Failed_getInstance()).simpleName));
+      case 'IN_PROGRESS':
+        if (!(this === ReleaseState$READY_getInstance() || this === ReleaseState$FAILED_getInstance())) {
+          this.getErrorMessage_ownq0r$_0(newState, 'state was neither ' + toString(Kotlin.getKClassFromExpression(ReleaseState$READY_getInstance()).simpleName) + ' nor ' + toString(Kotlin.getKClassFromExpression(ReleaseState$FAILED_getInstance()).simpleName));
           var message = Unit;
           throw IllegalStateException_init(message.toString());
         }
 
+        tmp$ = newState;
         break;
-      case 'Succeeded':
-        this.checkNewState_s9yn6r$_0(newState, ReleaseState$InProgress_getInstance());
+      case 'SUCCEEDED':
+        tmp$ = this.checkNewState_s9yn6r$_0(newState, ReleaseState$IN_PROGRESS_getInstance());
         break;
-      case 'Failed':
-        this.checkNewState_s9yn6r$_0(newState, ReleaseState$InProgress_getInstance());
+      case 'FAILED':
+        tmp$ = this.checkNewState_s9yn6r$_0(newState, ReleaseState$IN_PROGRESS_getInstance());
+        break;
+      case 'WATCHING':
+        tmp$ = newState;
+        break;
+      default:tmp$ = Kotlin.noWhenBranchMatched();
         break;
     }
-    return newState;
+    return tmp$;
   };
   ReleaseState.prototype.checkNewState_s9yn6r$_0 = function (newState, expectedState) {
     if (!(this === expectedState)) {
@@ -911,6 +984,7 @@ this['dep-graph-releaser-api-js'] = function (_, Kotlin, $module$kbox_js) {
       var message = Unit;
       throw IllegalStateException_init(message.toString());
     }
+    return newState;
   };
   ReleaseState.prototype.getErrorMessage_ownq0r$_0 = function (newState, reason) {
     'Cannot transition to ' + toString(Kotlin.getKClassFromExpression(newState).simpleName) + ' because ' + reason + '.' + ('\n' + 'State was: ' + getToStringRepresentation(this));
@@ -921,19 +995,21 @@ this['dep-graph-releaser-api-js'] = function (_, Kotlin, $module$kbox_js) {
     interfaces: [Enum]
   };
   function ReleaseState$values() {
-    return [ReleaseState$Ready_getInstance(), ReleaseState$InProgress_getInstance(), ReleaseState$Succeeded_getInstance(), ReleaseState$Failed_getInstance()];
+    return [ReleaseState$READY_getInstance(), ReleaseState$IN_PROGRESS_getInstance(), ReleaseState$SUCCEEDED_getInstance(), ReleaseState$FAILED_getInstance(), ReleaseState$WATCHING_getInstance()];
   }
   ReleaseState.values = ReleaseState$values;
   function ReleaseState$valueOf(name) {
     switch (name) {
-      case 'Ready':
-        return ReleaseState$Ready_getInstance();
-      case 'InProgress':
-        return ReleaseState$InProgress_getInstance();
-      case 'Succeeded':
-        return ReleaseState$Succeeded_getInstance();
-      case 'Failed':
-        return ReleaseState$Failed_getInstance();
+      case 'READY':
+        return ReleaseState$READY_getInstance();
+      case 'IN_PROGRESS':
+        return ReleaseState$IN_PROGRESS_getInstance();
+      case 'SUCCEEDED':
+        return ReleaseState$SUCCEEDED_getInstance();
+      case 'FAILED':
+        return ReleaseState$FAILED_getInstance();
+      case 'WATCHING':
+        return ReleaseState$WATCHING_getInstance();
       default:throwISE('No enum constant ch.loewenfels.depgraph.data.ReleaseState.' + name);
     }
   }
@@ -951,60 +1027,72 @@ this['dep-graph-releaser-api-js'] = function (_, Kotlin, $module$kbox_js) {
   function CommandStateJson$State_initFields() {
     CommandStateJson$State_initFields = function () {
     };
-    CommandStateJson$State$Waiting_instance = new CommandStateJson$State('Waiting', 0);
-    CommandStateJson$State$Ready_instance = new CommandStateJson$State('Ready', 1);
-    CommandStateJson$State$ReadyToReTrigger_instance = new CommandStateJson$State('ReadyToReTrigger', 2);
-    CommandStateJson$State$Queueing_instance = new CommandStateJson$State('Queueing', 3);
-    CommandStateJson$State$InProgress_instance = new CommandStateJson$State('InProgress', 4);
-    CommandStateJson$State$Succeeded_instance = new CommandStateJson$State('Succeeded', 5);
-    CommandStateJson$State$Failed_instance = new CommandStateJson$State('Failed', 6);
-    CommandStateJson$State$Deactivated_instance = new CommandStateJson$State('Deactivated', 7);
-    CommandStateJson$State$Disabled_instance = new CommandStateJson$State('Disabled', 8);
+    CommandStateJson$State$WAITING_instance = new CommandStateJson$State('WAITING', 0);
+    CommandStateJson$State$READY_instance = new CommandStateJson$State('READY', 1);
+    CommandStateJson$State$READY_TO_RE_TRIGGER_instance = new CommandStateJson$State('READY_TO_RE_TRIGGER', 2);
+    CommandStateJson$State$QUEUEING_instance = new CommandStateJson$State('QUEUEING', 3);
+    CommandStateJson$State$STILL_QUEUEING_instance = new CommandStateJson$State('STILL_QUEUEING', 4);
+    CommandStateJson$State$IN_PROGRESS_instance = new CommandStateJson$State('IN_PROGRESS', 5);
+    CommandStateJson$State$RE_POLLING_instance = new CommandStateJson$State('RE_POLLING', 6);
+    CommandStateJson$State$SUCCEEDED_instance = new CommandStateJson$State('SUCCEEDED', 7);
+    CommandStateJson$State$FAILED_instance = new CommandStateJson$State('FAILED', 8);
+    CommandStateJson$State$DEACTIVATED_instance = new CommandStateJson$State('DEACTIVATED', 9);
+    CommandStateJson$State$DISABLED_instance = new CommandStateJson$State('DISABLED', 10);
   }
-  var CommandStateJson$State$Waiting_instance;
-  function CommandStateJson$State$Waiting_getInstance() {
+  var CommandStateJson$State$WAITING_instance;
+  function CommandStateJson$State$WAITING_getInstance() {
     CommandStateJson$State_initFields();
-    return CommandStateJson$State$Waiting_instance;
+    return CommandStateJson$State$WAITING_instance;
   }
-  var CommandStateJson$State$Ready_instance;
-  function CommandStateJson$State$Ready_getInstance() {
+  var CommandStateJson$State$READY_instance;
+  function CommandStateJson$State$READY_getInstance() {
     CommandStateJson$State_initFields();
-    return CommandStateJson$State$Ready_instance;
+    return CommandStateJson$State$READY_instance;
   }
-  var CommandStateJson$State$ReadyToReTrigger_instance;
-  function CommandStateJson$State$ReadyToReTrigger_getInstance() {
+  var CommandStateJson$State$READY_TO_RE_TRIGGER_instance;
+  function CommandStateJson$State$READY_TO_RE_TRIGGER_getInstance() {
     CommandStateJson$State_initFields();
-    return CommandStateJson$State$ReadyToReTrigger_instance;
+    return CommandStateJson$State$READY_TO_RE_TRIGGER_instance;
   }
-  var CommandStateJson$State$Queueing_instance;
-  function CommandStateJson$State$Queueing_getInstance() {
+  var CommandStateJson$State$QUEUEING_instance;
+  function CommandStateJson$State$QUEUEING_getInstance() {
     CommandStateJson$State_initFields();
-    return CommandStateJson$State$Queueing_instance;
+    return CommandStateJson$State$QUEUEING_instance;
   }
-  var CommandStateJson$State$InProgress_instance;
-  function CommandStateJson$State$InProgress_getInstance() {
+  var CommandStateJson$State$STILL_QUEUEING_instance;
+  function CommandStateJson$State$STILL_QUEUEING_getInstance() {
     CommandStateJson$State_initFields();
-    return CommandStateJson$State$InProgress_instance;
+    return CommandStateJson$State$STILL_QUEUEING_instance;
   }
-  var CommandStateJson$State$Succeeded_instance;
-  function CommandStateJson$State$Succeeded_getInstance() {
+  var CommandStateJson$State$IN_PROGRESS_instance;
+  function CommandStateJson$State$IN_PROGRESS_getInstance() {
     CommandStateJson$State_initFields();
-    return CommandStateJson$State$Succeeded_instance;
+    return CommandStateJson$State$IN_PROGRESS_instance;
   }
-  var CommandStateJson$State$Failed_instance;
-  function CommandStateJson$State$Failed_getInstance() {
+  var CommandStateJson$State$RE_POLLING_instance;
+  function CommandStateJson$State$RE_POLLING_getInstance() {
     CommandStateJson$State_initFields();
-    return CommandStateJson$State$Failed_instance;
+    return CommandStateJson$State$RE_POLLING_instance;
   }
-  var CommandStateJson$State$Deactivated_instance;
-  function CommandStateJson$State$Deactivated_getInstance() {
+  var CommandStateJson$State$SUCCEEDED_instance;
+  function CommandStateJson$State$SUCCEEDED_getInstance() {
     CommandStateJson$State_initFields();
-    return CommandStateJson$State$Deactivated_instance;
+    return CommandStateJson$State$SUCCEEDED_instance;
   }
-  var CommandStateJson$State$Disabled_instance;
-  function CommandStateJson$State$Disabled_getInstance() {
+  var CommandStateJson$State$FAILED_instance;
+  function CommandStateJson$State$FAILED_getInstance() {
     CommandStateJson$State_initFields();
-    return CommandStateJson$State$Disabled_instance;
+    return CommandStateJson$State$FAILED_instance;
+  }
+  var CommandStateJson$State$DEACTIVATED_instance;
+  function CommandStateJson$State$DEACTIVATED_getInstance() {
+    CommandStateJson$State_initFields();
+    return CommandStateJson$State$DEACTIVATED_instance;
+  }
+  var CommandStateJson$State$DISABLED_instance;
+  function CommandStateJson$State$DISABLED_getInstance() {
+    CommandStateJson$State_initFields();
+    return CommandStateJson$State$DISABLED_instance;
   }
   CommandStateJson$State.$metadata$ = {
     kind: Kind_CLASS,
@@ -1012,29 +1100,33 @@ this['dep-graph-releaser-api-js'] = function (_, Kotlin, $module$kbox_js) {
     interfaces: [Enum]
   };
   function CommandStateJson$State$values() {
-    return [CommandStateJson$State$Waiting_getInstance(), CommandStateJson$State$Ready_getInstance(), CommandStateJson$State$ReadyToReTrigger_getInstance(), CommandStateJson$State$Queueing_getInstance(), CommandStateJson$State$InProgress_getInstance(), CommandStateJson$State$Succeeded_getInstance(), CommandStateJson$State$Failed_getInstance(), CommandStateJson$State$Deactivated_getInstance(), CommandStateJson$State$Disabled_getInstance()];
+    return [CommandStateJson$State$WAITING_getInstance(), CommandStateJson$State$READY_getInstance(), CommandStateJson$State$READY_TO_RE_TRIGGER_getInstance(), CommandStateJson$State$QUEUEING_getInstance(), CommandStateJson$State$STILL_QUEUEING_getInstance(), CommandStateJson$State$IN_PROGRESS_getInstance(), CommandStateJson$State$RE_POLLING_getInstance(), CommandStateJson$State$SUCCEEDED_getInstance(), CommandStateJson$State$FAILED_getInstance(), CommandStateJson$State$DEACTIVATED_getInstance(), CommandStateJson$State$DISABLED_getInstance()];
   }
   CommandStateJson$State.values = CommandStateJson$State$values;
   function CommandStateJson$State$valueOf(name) {
     switch (name) {
-      case 'Waiting':
-        return CommandStateJson$State$Waiting_getInstance();
-      case 'Ready':
-        return CommandStateJson$State$Ready_getInstance();
-      case 'ReadyToReTrigger':
-        return CommandStateJson$State$ReadyToReTrigger_getInstance();
-      case 'Queueing':
-        return CommandStateJson$State$Queueing_getInstance();
-      case 'InProgress':
-        return CommandStateJson$State$InProgress_getInstance();
-      case 'Succeeded':
-        return CommandStateJson$State$Succeeded_getInstance();
-      case 'Failed':
-        return CommandStateJson$State$Failed_getInstance();
-      case 'Deactivated':
-        return CommandStateJson$State$Deactivated_getInstance();
-      case 'Disabled':
-        return CommandStateJson$State$Disabled_getInstance();
+      case 'WAITING':
+        return CommandStateJson$State$WAITING_getInstance();
+      case 'READY':
+        return CommandStateJson$State$READY_getInstance();
+      case 'READY_TO_RE_TRIGGER':
+        return CommandStateJson$State$READY_TO_RE_TRIGGER_getInstance();
+      case 'QUEUEING':
+        return CommandStateJson$State$QUEUEING_getInstance();
+      case 'STILL_QUEUEING':
+        return CommandStateJson$State$STILL_QUEUEING_getInstance();
+      case 'IN_PROGRESS':
+        return CommandStateJson$State$IN_PROGRESS_getInstance();
+      case 'RE_POLLING':
+        return CommandStateJson$State$RE_POLLING_getInstance();
+      case 'SUCCEEDED':
+        return CommandStateJson$State$SUCCEEDED_getInstance();
+      case 'FAILED':
+        return CommandStateJson$State$FAILED_getInstance();
+      case 'DEACTIVATED':
+        return CommandStateJson$State$DEACTIVATED_getInstance();
+      case 'DISABLED':
+        return CommandStateJson$State$DISABLED_getInstance();
       default:throwISE('No enum constant ch.loewenfels.depgraph.data.serialization.CommandStateJson.State.' + name);
     }
   }
@@ -1084,32 +1176,121 @@ this['dep-graph-releaser-api-js'] = function (_, Kotlin, $module$kbox_js) {
   CommandStateJson.prototype.equals = function (other) {
     return this === other || (other !== null && (typeof other === 'object' && (Object.getPrototypeOf(this) === Object.getPrototypeOf(other) && (Kotlin.equals(this.state, other.state) && Kotlin.equals(this.dependencies, other.dependencies) && Kotlin.equals(this.previous, other.previous)))));
   };
+  function toJson(state) {
+    if (Kotlin.isType(state, CommandState$Waiting))
+      return CommandStateJson_init_0(CommandStateJson$State$WAITING_getInstance(), state.dependencies);
+    else if (Kotlin.isType(state, CommandState$Ready))
+      return CommandStateJson_init(CommandStateJson$State$READY_getInstance());
+    else if (Kotlin.isType(state, CommandState$ReadyToReTrigger))
+      return CommandStateJson_init(CommandStateJson$State$READY_TO_RE_TRIGGER_getInstance());
+    else if (Kotlin.isType(state, CommandState$Queueing))
+      return CommandStateJson_init(CommandStateJson$State$QUEUEING_getInstance());
+    else if (Kotlin.isType(state, CommandState$StillQueueing))
+      return CommandStateJson_init(CommandStateJson$State$STILL_QUEUEING_getInstance());
+    else if (Kotlin.isType(state, CommandState$InProgress))
+      return CommandStateJson_init(CommandStateJson$State$IN_PROGRESS_getInstance());
+    else if (Kotlin.isType(state, CommandState$RePolling))
+      return CommandStateJson_init(CommandStateJson$State$RE_POLLING_getInstance());
+    else if (Kotlin.isType(state, CommandState$Succeeded))
+      return CommandStateJson_init(CommandStateJson$State$SUCCEEDED_getInstance());
+    else if (Kotlin.isType(state, CommandState$Failed))
+      return CommandStateJson_init(CommandStateJson$State$FAILED_getInstance());
+    else if (Kotlin.isType(state, CommandState$Deactivated))
+      return CommandStateJson_init_1(CommandStateJson$State$DEACTIVATED_getInstance(), toJson(state.previous));
+    else if (Kotlin.isType(state, CommandState$Disabled))
+      return CommandStateJson_init(CommandStateJson$State$DISABLED_getInstance());
+    else
+      return Kotlin.noWhenBranchMatched();
+  }
   function fromJson(json) {
     var tmp$, tmp$_0;
     switch (json.state.name) {
-      case 'Waiting':
-        return new CommandState$Waiting((tmp$ = json.dependencies) != null ? tmp$ : throwIllegal('dependencies', 'Waiting'));
-      case 'Ready':
+      case 'WAITING':
+        return new CommandState$Waiting((tmp$ = json.dependencies) != null ? tmp$ : throwIllegal('dependencies', CommandStateJson$State$WAITING_getInstance().name));
+      case 'READY':
         return CommandState$Ready_getInstance();
-      case 'ReadyToReTrigger':
+      case 'READY_TO_RE_TRIGGER':
         return CommandState$ReadyToReTrigger_getInstance();
-      case 'Queueing':
+      case 'QUEUEING':
         return CommandState$Queueing_getInstance();
-      case 'InProgress':
+      case 'STILL_QUEUEING':
+        return CommandState$StillQueueing_getInstance();
+      case 'IN_PROGRESS':
         return CommandState$InProgress_getInstance();
-      case 'Succeeded':
+      case 'RE_POLLING':
+        return CommandState$RePolling_getInstance();
+      case 'SUCCEEDED':
         return CommandState$Succeeded_getInstance();
-      case 'Failed':
+      case 'FAILED':
         return CommandState$Failed_getInstance();
-      case 'Deactivated':
-        return new CommandState$Deactivated(fromJson((tmp$_0 = json.previous) != null ? tmp$_0 : throwIllegal('previous', 'Deactivated')));
-      case 'Disabled':
+      case 'DEACTIVATED':
+        return new CommandState$Deactivated(fromJson((tmp$_0 = json.previous) != null ? tmp$_0 : throwIllegal('previous', CommandStateJson$State$DEACTIVATED_getInstance().name)));
+      case 'DISABLED':
         return CommandState$Disabled_getInstance();
       default:return Kotlin.noWhenBranchMatched();
     }
   }
   function throwIllegal(fieldName, stateName) {
     throw IllegalArgumentException_init(fieldName + ' must be defined for state ' + stateName);
+  }
+  function TypeOfRun(name, ordinal) {
+    Enum.call(this);
+    this.name$ = name;
+    this.ordinal$ = ordinal;
+  }
+  function TypeOfRun_initFields() {
+    TypeOfRun_initFields = function () {
+    };
+    TypeOfRun$EXPLORE_instance = new TypeOfRun('EXPLORE', 0);
+    TypeOfRun$DRY_RUN_instance = new TypeOfRun('DRY_RUN', 1);
+    TypeOfRun$RELEASE_instance = new TypeOfRun('RELEASE', 2);
+  }
+  var TypeOfRun$EXPLORE_instance;
+  function TypeOfRun$EXPLORE_getInstance() {
+    TypeOfRun_initFields();
+    return TypeOfRun$EXPLORE_instance;
+  }
+  var TypeOfRun$DRY_RUN_instance;
+  function TypeOfRun$DRY_RUN_getInstance() {
+    TypeOfRun_initFields();
+    return TypeOfRun$DRY_RUN_instance;
+  }
+  var TypeOfRun$RELEASE_instance;
+  function TypeOfRun$RELEASE_getInstance() {
+    TypeOfRun_initFields();
+    return TypeOfRun$RELEASE_instance;
+  }
+  TypeOfRun.$metadata$ = {
+    kind: Kind_CLASS,
+    simpleName: 'TypeOfRun',
+    interfaces: [Enum]
+  };
+  function TypeOfRun$values() {
+    return [TypeOfRun$EXPLORE_getInstance(), TypeOfRun$DRY_RUN_getInstance(), TypeOfRun$RELEASE_getInstance()];
+  }
+  TypeOfRun.values = TypeOfRun$values;
+  function TypeOfRun$valueOf(name) {
+    switch (name) {
+      case 'EXPLORE':
+        return TypeOfRun$EXPLORE_getInstance();
+      case 'DRY_RUN':
+        return TypeOfRun$DRY_RUN_getInstance();
+      case 'RELEASE':
+        return TypeOfRun$RELEASE_getInstance();
+      default:throwISE('No enum constant ch.loewenfels.depgraph.data.TypeOfRun.' + name);
+    }
+  }
+  TypeOfRun.valueOf_61zpoe$ = TypeOfRun$valueOf;
+  function toProcessName($receiver) {
+    switch ($receiver.name) {
+      case 'EXPLORE':
+        return 'Explore Release Order';
+      case 'DRY_RUN':
+        return 'Dry Run';
+      case 'RELEASE':
+        return 'Release';
+      default:return Kotlin.noWhenBranchMatched();
+    }
   }
   function generateListOfDependentsWithoutSubmoduleAndExcluded$lambda(it) {
     return it.id.identifier;
@@ -1242,6 +1423,9 @@ this['dep-graph-releaser-api-js'] = function (_, Kotlin, $module$kbox_js) {
   Object.defineProperty(ConfigKey, 'JOB_MAPPING', {
     get: ConfigKey$JOB_MAPPING_getInstance
   });
+  Object.defineProperty(ConfigKey, 'INITIAL_RELEASE_JSON', {
+    get: ConfigKey$INITIAL_RELEASE_JSON_getInstance
+  });
   Object.defineProperty(ConfigKey, 'Companion', {
     get: ConfigKey$Companion_getInstance
   });
@@ -1265,8 +1449,14 @@ this['dep-graph-releaser-api-js'] = function (_, Kotlin, $module$kbox_js) {
   Object.defineProperty(CommandState, 'Queueing', {
     get: CommandState$Queueing_getInstance
   });
+  Object.defineProperty(CommandState, 'StillQueueing', {
+    get: CommandState$StillQueueing_getInstance
+  });
   Object.defineProperty(CommandState, 'InProgress', {
     get: CommandState$InProgress_getInstance
+  });
+  Object.defineProperty(CommandState, 'RePolling', {
+    get: CommandState$RePolling_getInstance
   });
   Object.defineProperty(CommandState, 'Succeeded', {
     get: CommandState$Succeeded_getInstance
@@ -1287,47 +1477,55 @@ this['dep-graph-releaser-api-js'] = function (_, Kotlin, $module$kbox_js) {
   package$data.Relation = Relation;
   package$data.ReleaseCommand = ReleaseCommand;
   package$data.ReleasePlan_init_nhmys$ = ReleasePlan_init;
-  package$data.ReleasePlan_init_up7prm$ = ReleasePlan_init_0;
   package$data.ReleasePlan = ReleasePlan;
-  Object.defineProperty(ReleaseState, 'Ready', {
-    get: ReleaseState$Ready_getInstance
+  Object.defineProperty(ReleaseState, 'READY', {
+    get: ReleaseState$READY_getInstance
   });
-  Object.defineProperty(ReleaseState, 'InProgress', {
-    get: ReleaseState$InProgress_getInstance
+  Object.defineProperty(ReleaseState, 'IN_PROGRESS', {
+    get: ReleaseState$IN_PROGRESS_getInstance
   });
-  Object.defineProperty(ReleaseState, 'Succeeded', {
-    get: ReleaseState$Succeeded_getInstance
+  Object.defineProperty(ReleaseState, 'SUCCEEDED', {
+    get: ReleaseState$SUCCEEDED_getInstance
   });
-  Object.defineProperty(ReleaseState, 'Failed', {
-    get: ReleaseState$Failed_getInstance
+  Object.defineProperty(ReleaseState, 'FAILED', {
+    get: ReleaseState$FAILED_getInstance
+  });
+  Object.defineProperty(ReleaseState, 'WATCHING', {
+    get: ReleaseState$WATCHING_getInstance
   });
   package$data.ReleaseState = ReleaseState;
-  Object.defineProperty(CommandStateJson$State, 'Waiting', {
-    get: CommandStateJson$State$Waiting_getInstance
+  Object.defineProperty(CommandStateJson$State, 'WAITING', {
+    get: CommandStateJson$State$WAITING_getInstance
   });
-  Object.defineProperty(CommandStateJson$State, 'Ready', {
-    get: CommandStateJson$State$Ready_getInstance
+  Object.defineProperty(CommandStateJson$State, 'READY', {
+    get: CommandStateJson$State$READY_getInstance
   });
-  Object.defineProperty(CommandStateJson$State, 'ReadyToReTrigger', {
-    get: CommandStateJson$State$ReadyToReTrigger_getInstance
+  Object.defineProperty(CommandStateJson$State, 'READY_TO_RE_TRIGGER', {
+    get: CommandStateJson$State$READY_TO_RE_TRIGGER_getInstance
   });
-  Object.defineProperty(CommandStateJson$State, 'Queueing', {
-    get: CommandStateJson$State$Queueing_getInstance
+  Object.defineProperty(CommandStateJson$State, 'QUEUEING', {
+    get: CommandStateJson$State$QUEUEING_getInstance
   });
-  Object.defineProperty(CommandStateJson$State, 'InProgress', {
-    get: CommandStateJson$State$InProgress_getInstance
+  Object.defineProperty(CommandStateJson$State, 'STILL_QUEUEING', {
+    get: CommandStateJson$State$STILL_QUEUEING_getInstance
   });
-  Object.defineProperty(CommandStateJson$State, 'Succeeded', {
-    get: CommandStateJson$State$Succeeded_getInstance
+  Object.defineProperty(CommandStateJson$State, 'IN_PROGRESS', {
+    get: CommandStateJson$State$IN_PROGRESS_getInstance
   });
-  Object.defineProperty(CommandStateJson$State, 'Failed', {
-    get: CommandStateJson$State$Failed_getInstance
+  Object.defineProperty(CommandStateJson$State, 'RE_POLLING', {
+    get: CommandStateJson$State$RE_POLLING_getInstance
   });
-  Object.defineProperty(CommandStateJson$State, 'Deactivated', {
-    get: CommandStateJson$State$Deactivated_getInstance
+  Object.defineProperty(CommandStateJson$State, 'SUCCEEDED', {
+    get: CommandStateJson$State$SUCCEEDED_getInstance
   });
-  Object.defineProperty(CommandStateJson$State, 'Disabled', {
-    get: CommandStateJson$State$Disabled_getInstance
+  Object.defineProperty(CommandStateJson$State, 'FAILED', {
+    get: CommandStateJson$State$FAILED_getInstance
+  });
+  Object.defineProperty(CommandStateJson$State, 'DEACTIVATED', {
+    get: CommandStateJson$State$DEACTIVATED_getInstance
+  });
+  Object.defineProperty(CommandStateJson$State, 'DISABLED', {
+    get: CommandStateJson$State$DISABLED_getInstance
   });
   CommandStateJson.State = CommandStateJson$State;
   var package$serialization = package$data.serialization || (package$data.serialization = {});
@@ -1335,7 +1533,19 @@ this['dep-graph-releaser-api-js'] = function (_, Kotlin, $module$kbox_js) {
   package$serialization.CommandStateJson_init_gvqfhq$ = CommandStateJson_init_0;
   package$serialization.CommandStateJson_init_cka4jb$ = CommandStateJson_init_1;
   package$serialization.CommandStateJson = CommandStateJson;
+  package$serialization.toJson_m86w84$ = toJson;
   package$serialization.fromJson_v4rmea$ = fromJson;
+  Object.defineProperty(TypeOfRun, 'EXPLORE', {
+    get: TypeOfRun$EXPLORE_getInstance
+  });
+  Object.defineProperty(TypeOfRun, 'DRY_RUN', {
+    get: TypeOfRun$DRY_RUN_getInstance
+  });
+  Object.defineProperty(TypeOfRun, 'RELEASE', {
+    get: TypeOfRun$RELEASE_getInstance
+  });
+  package$data.TypeOfRun = TypeOfRun;
+  package$data.toProcessName_ncdm8l$ = toProcessName;
   package$depgraph.generateListOfDependentsWithoutSubmoduleAndExcluded_4w9fpd$ = generateListOfDependentsWithoutSubmoduleAndExcluded;
   package$depgraph.generateGitCloneCommands_xx51qy$ = generateGitCloneCommands;
   package$depgraph.generateGitCloneCommands_z81nd8$ = generateGitCloneCommands_0;
@@ -1361,4 +1571,6 @@ this['dep-graph-releaser-api-js'] = function (_, Kotlin, $module$kbox_js) {
   someChars = '[\\S\\s]+?';
   Kotlin.defineModule('dep-graph-releaser-api-js', _);
   return _;
-}(typeof this['dep-graph-releaser-api-js'] === 'undefined' ? {} : this['dep-graph-releaser-api-js'], kotlin, this['kbox-js']);
+}));
+
+//# sourceMappingURL=dep-graph-releaser-api-js.js.map
