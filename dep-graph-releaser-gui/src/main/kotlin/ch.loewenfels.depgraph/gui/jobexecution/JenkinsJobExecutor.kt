@@ -57,7 +57,7 @@ class JenkinsJobExecutor(
                         )
                     }
                 }
-        }.unsafeCast<Promise<Pair<AuthData, Int>>>()
+        }.then { it }.then { it }.then { it }
     }
 
     private fun getQueuedItemUrlOrNull(nullableQueuedItemUrl: String?)

@@ -14,7 +14,7 @@ inline fun <reified T : HTMLElement> elementByIdOrNull(id: String): T? {
     require(element is T) {
         "element with $id found but was wrong type.<br/>Expected type ${T::class.js.name}<br/>Found $element"
     }
-    return element.unsafeCast<T>()
+    return element as T
 }
 
 fun display(id: String, what: String) {

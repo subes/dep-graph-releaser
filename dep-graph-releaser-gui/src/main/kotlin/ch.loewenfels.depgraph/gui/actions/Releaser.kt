@@ -192,7 +192,7 @@ class Releaser(
                     list.add(jobResult)
                     list
                 }
-            }.unsafeCast<Promise<MutableList<CommandState>>>()
+            }.then { it }
         }
     }
 
@@ -391,7 +391,7 @@ class Releaser(
                     result
                 }
             } else {
-                lock.then { withLockForProject(act) }.unsafeCast<Promise<T>>()
+                lock.then { withLockForProject(act) }.then { it }
             }
         }
     }

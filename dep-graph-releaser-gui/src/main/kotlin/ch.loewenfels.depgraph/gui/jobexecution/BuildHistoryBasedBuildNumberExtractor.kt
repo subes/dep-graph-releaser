@@ -16,7 +16,7 @@ class BuildHistoryBasedBuildNumberExtractor(
         return window.fetch("${jobExecutionData.jobBaseUrl}api/xml?xpath=//build/number&wrapper=builds", init)
             .then(::checkStatusOk)
             .then { searchBuildNumber(it.second, init) }
-            .unsafeCast<Promise<Int>>()
+            .then { it }
     }
 
     private fun searchBuildNumber(body: String, init: RequestInit): Promise<Int> {
@@ -32,12 +32,12 @@ class BuildHistoryBasedBuildNumberExtractor(
             .then(::checkStatusOk)
             .then { (_, body) ->
                 if (parametersRegex.containsMatchIn(body)) {
-                    buildNumber
+                    Promise.resolve(buildNumber)
                 } else {
                     val newMatchResult = matchResult.next()
                         ?: throw IllegalStateException("No job matches the given identifying parameters at ${jobExecutionData.jobBaseUrl}.\nRegex used: ${parametersRegex.pattern}")
-                    searchBuildNumber(newMatchResult, parametersRegex, init).unsafeCast<Int>()
+                    searchBuildNumber(newMatchResult, parametersRegex, init)
                 }
-            }
+            }.then { it }
     }
 }
