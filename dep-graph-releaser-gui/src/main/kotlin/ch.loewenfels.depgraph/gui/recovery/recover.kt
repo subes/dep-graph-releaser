@@ -12,8 +12,9 @@ import ch.loewenfels.depgraph.gui.serialization.ReleasePlanJson
 import ch.loewenfels.depgraph.gui.serialization.deserializeProjectId
 import ch.loewenfels.depgraph.gui.showDialog
 import ch.loewenfels.depgraph.gui.showInfo
+import ch.loewenfels.depgraph.gui.showThrowable
 import kotlin.browser.window
-import kotlin.js.Promise
+import kotlin.js.*
 
 
 fun recover(modifiableState: ModifiableState, defaultJenkinsBaseUrl: String?): Promise<ModifiableState> {
@@ -74,6 +75,7 @@ private fun recoverCommandStates(
 
                 is CommandState.Waiting,
                 is CommandState.ReadyToReTrigger,
+                is CommandState.StillQueueing,
                 is CommandState.RePolling,
                 is CommandState.Succeeded,
                 is CommandState.Failed,
@@ -106,10 +108,24 @@ private fun recoverStateQueueing(
         issueCrumb(jenkinsBaseUrl, usernameAndApiToken).then { authData ->
             val jobExecutionData = recoverJobExecutionData(modifiableState, project, command)
             val nullableQueuedItemUrl = command.buildUrl
-            extractBuildNumber(nullableQueuedItemUrl, authData, jobExecutionData).then { buildNumber ->
-                lazyProjectJson.commands[index].p.asDynamic().buildUrl = jobExecutionData.jobBaseUrl + buildNumber
-                recoverStateTo(lazyProjectJson, index, CommandStateJson.State.RE_POLLING)
-            }.catch {
+            extractBuildNumber(nullableQueuedItemUrl, authData, jobExecutionData).then { recoveredBuildNumber ->
+                when (recoveredBuildNumber) {
+                    is RecoveredBuildNumber.Determined -> {
+                        updateBuildUrlAndTransitionToRePolling(
+                            jobExecutionData, lazyProjectJson, index, recoveredBuildNumber
+                        )
+                    }
+                    is RecoveredBuildNumber.StillQueueing -> recoverStateTo(
+                        lazyProjectJson, index, CommandStateJson.State.STILL_QUEUEING
+                    )
+                    is RecoveredBuildNumber.Undetermined -> throw IllegalStateException(
+                        "we should either have a build number or know that the job is still queueing by now." +
+                            "\nJob name: ${jobExecutionData.jobName}" +
+                            "\nJobUrl: ${jobExecutionData.jobBaseUrl}"
+                    )
+                }
+            }.catch { t ->
+                showThrowable(IllegalStateException("job ${jobExecutionData.jobName} could not be recovered", t))
                 recoverStateTo(lazyProjectJson, index, CommandStateJson.State.FAILED)
             }
         }
@@ -119,6 +135,17 @@ private fun recoverStateQueueing(
                 "\nCommand: $command"
         )
     }
+}
+
+private fun updateBuildUrlAndTransitionToRePolling(
+    jobExecutionData: JobExecutionData,
+    lazyProjectJson: ProjectJson,
+    index: Int,
+    recoveredBuildNumber: RecoveredBuildNumber.Determined
+): Promise<*> {
+    val newBuildUrl = jobExecutionData.jobBaseUrl + recoveredBuildNumber.buildNumber
+    lazyProjectJson.commands[index].p.asDynamic().buildUrl = newBuildUrl
+    return recoverStateTo(lazyProjectJson, index, CommandStateJson.State.RE_POLLING)
 }
 
 private fun recoverJobExecutionData(
@@ -133,16 +160,20 @@ private fun recoverJobExecutionData(
     return jobExecutionDataFactory.create(project, command)
 }
 
-fun extractBuildNumber(
+private fun extractBuildNumber(
     nullableQueuedItemUrl: String?,
     authData: AuthData,
     jobExecutionData: JobExecutionData
-): Promise<Promise<Int>> {
-    return recoverBuildNumberFromQueue(nullableQueuedItemUrl, authData).then { nullableBuildNumber ->
-        if (nullableBuildNumber == null) {
-            BuildHistoryBasedBuildNumberExtractor(authData, jobExecutionData).extract()
-        } else {
-            Promise.resolve(nullableBuildNumber)
+): Promise<Promise<RecoveredBuildNumber>> {
+    return recoverBuildNumberFromQueue(nullableQueuedItemUrl, authData).then { recoveredBuildNumber ->
+        when (recoveredBuildNumber) {
+            is RecoveredBuildNumber.Determined,
+            is RecoveredBuildNumber.StillQueueing -> Promise.resolve(recoveredBuildNumber)
+            is RecoveredBuildNumber.Undetermined -> {
+                BuildHistoryBasedBuildNumberExtractor(authData, jobExecutionData)
+                    .extract()
+                    .then { RecoveredBuildNumber.Determined(it) }
+            }
         }
     }
 }
@@ -150,22 +181,31 @@ fun extractBuildNumber(
 private fun recoverBuildNumberFromQueue(
     nullableQueuedItemUrl: String?,
     authData: AuthData
-): Promise<Int?> {
-    return if (nullableQueuedItemUrl != null) {
-        val headers = createHeaderWithAuthAndCrumb(authData)
-        val init = createGetRequest(headers)
-        window.fetch(nullableQueuedItemUrl, init)
-            .then(::checkStatusOk)
-            .then { (_, body) ->
-                numberRegex.find(body)?.groupValues?.get(1)?.toInt()
-            }.then { it }
-            .catch {
-                // might well be that we get a 404 because the item is no longer in the queue
-                // (the job is already being executed) => we return null so that we recover it from the build history
-                null
+): Promise<RecoveredBuildNumber> {
+    if (nullableQueuedItemUrl == null) return Promise.resolve(RecoveredBuildNumber.Undetermined)
+
+    val headers = createHeaderWithAuthAndCrumb(authData)
+    val init = createGetRequest(headers)
+    return window.fetch(nullableQueuedItemUrl, init)
+        .then(::checkStatusOkOr404)
+        .then { (_, body) ->
+            // might well be that we get a 404 (body is null) because the item is no longer in the queue
+            // (the job is already being executed) => we return RecoverBuildNumber.Undetermined so that we recover
+            // the build number from the job's build history
+            if (body == null) return@then RecoveredBuildNumber.Undetermined
+
+            val match = numberRegex.find(body)
+            if (match != null) {
+                RecoveredBuildNumber.Determined(match.groupValues[1].toInt())
+            } else {
+                RecoveredBuildNumber.StillQueueing
             }
-    } else {
-        Promise.resolve(null as Int?)
-    }
+        }
+}
+
+private sealed class RecoveredBuildNumber {
+    data class Determined(val buildNumber: Int) : RecoveredBuildNumber()
+    object StillQueueing : RecoveredBuildNumber()
+    object Undetermined : RecoveredBuildNumber()
 }
 

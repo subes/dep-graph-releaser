@@ -19,10 +19,7 @@ class JenkinsJobExecutor(
         verbose: Boolean
     ): Promise<Pair<AuthData, Int>> {
         val jobName = jobExecutionData.jobName
-        val jenkinsBaseUrl = jobExecutionData.getJenkinsBaseUrl()
-        val usernameAndApiToken = usernameTokenRegistry.forHostOrThrow(jenkinsBaseUrl)
-
-        return issueCrumb(jenkinsBaseUrl, usernameAndApiToken).then { authData: AuthData ->
+        return issueCrumb(jobExecutionData).then { authData: AuthData ->
             triggerJob(authData, jobExecutionData)
                 .then(::checkStatusIgnoreOpaqueRedirect)
                 .catch<Pair<Response, String>> {
@@ -38,30 +35,56 @@ class JenkinsJobExecutor(
                     showInfoQueuedItemIfVerbose(verbose, nullableQueuedItemUrl, jobName)
                     val queuedItemUrl = getQueuedItemUrlOrNull(nullableQueuedItemUrl)
                     jobQueuedHook(queuedItemUrl).then {
-                        extractBuildNumber(nullableQueuedItemUrl, authData, jobExecutionData)
-                    }.then { it }
-                }.then { buildNumber: Int ->
-                    if (verbose) {
-                        showInfo(
-                            "$jobName started with build number $buildNumber, wait for completion...",
-                            2000
-                        )
-                    }
-                    jobStartedHook(buildNumber).then {
-                        pollJobForCompletion(
-                            authData,
+                        startOrResumeFromExtractBuildNumber(
                             jobExecutionData,
-                            buildNumber,
+                            nullableQueuedItemUrl,
+                            jobStartedHook,
                             pollEverySecond,
-                            maxWaitingTimeForCompletenessInSeconds
+                            maxWaitingTimeForCompletenessInSeconds,
+                            authData,
+                            verbose
                         )
                     }
                 }
         }.then { it }.then { it }.then { it }
     }
 
-    private fun getQueuedItemUrlOrNull(nullableQueuedItemUrl: String?)
-        = if (nullableQueuedItemUrl != null) "${nullableQueuedItemUrl}api/xml/" else null
+    private fun issueCrumb(jobExecutionData: JobExecutionData): Promise<AuthData> {
+        val jenkinsBaseUrl = jobExecutionData.getJenkinsBaseUrl()
+        val usernameAndApiToken = usernameTokenRegistry.forHostOrThrow(jenkinsBaseUrl)
+        return issueCrumb(jenkinsBaseUrl, usernameAndApiToken)
+    }
+
+    private fun startOrResumeFromExtractBuildNumber(
+        jobExecutionData: JobExecutionData,
+        nullableQueuedItemUrl: String?,
+        jobStartedHook: (buildNumber: Int) -> Promise<*>,
+        pollEverySecond: Int,
+        maxWaitingTimeForCompletenessInSeconds: Int,
+        authData: AuthData,
+        verbose: Boolean
+    ): Promise<Pair<AuthData, Int>> {
+        return extractBuildNumber(nullableQueuedItemUrl, authData, jobExecutionData).then { buildNumber: Int ->
+            if (verbose) {
+                showInfo(
+                    "${jobExecutionData.jobName} started with build number $buildNumber, wait for completion...",
+                    2000
+                )
+            }
+            jobStartedHook(buildNumber).then {
+                pollJobForCompletion(
+                    authData,
+                    jobExecutionData,
+                    buildNumber,
+                    pollEverySecond,
+                    maxWaitingTimeForCompletenessInSeconds
+                )
+            }
+        }.then { it }.then { it }
+    }
+
+    private fun getQueuedItemUrlOrNull(nullableQueuedItemUrl: String?) =
+        if (nullableQueuedItemUrl != null) "${nullableQueuedItemUrl}api/xml/" else null
 
     private fun triggerJob(authData: AuthData, jobExecutionData: JobExecutionData): Promise<Response> {
         val headers = createHeaderWithAuthAndCrumb(authData)
@@ -100,6 +123,26 @@ class JenkinsJobExecutor(
         } else {
             BuildHistoryBasedBuildNumberExtractor(authData, jobExecutionData).extract()
         }
+    }
+
+    override fun rePollQueueing(
+        jobExecutionData: JobExecutionData,
+        queuedItemUrl: String,
+        jobStartedHook: (buildNumber: Int) -> Promise<*>,
+        pollEverySecond: Int,
+        maxWaitingTimeForCompletenessInSeconds: Int
+    ): Promise<Pair<AuthData, Int>> {
+        return issueCrumb(jobExecutionData).then { authData ->
+            startOrResumeFromExtractBuildNumber(
+                jobExecutionData,
+                queuedItemUrl,
+                jobStartedHook,
+                pollEverySecond,
+                maxWaitingTimeForCompletenessInSeconds,
+                authData,
+                verbose = false
+            )
+        }.then { it }
     }
 
     override fun rePoll(

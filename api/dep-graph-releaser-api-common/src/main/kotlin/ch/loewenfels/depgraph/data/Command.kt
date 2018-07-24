@@ -39,12 +39,19 @@ sealed class CommandState {
     data class Waiting(val dependencies: Set<ProjectId>) : CommandState()
     object Ready : CommandState()
     object ReadyToReTrigger : CommandState()
+
     /**
      * Command is queued to be executed.
      */
     object Queueing : CommandState()
 
+    /**
+     * Command was queueing before we recovered an ongoing process and is still queueing now.
+     */
+    object StillQueueing: CommandState()
+
     object InProgress : CommandState()
+
     /**
      * Command has to be re-polled, meaning it has to be turned into InProgress again.
      */
@@ -53,6 +60,7 @@ sealed class CommandState {
     object Succeeded : CommandState()
     object Failed : CommandState()
     data class Deactivated(val previous: CommandState) : CommandState()
+
     /**
      * Such a command cannot be reactivated in contrast to [Deactivated].
      */
@@ -84,6 +92,7 @@ sealed class CommandState {
                 newState
             }
             is Queueing -> checkNewStateIsAfter(newState, Ready::class, ReadyToReTrigger::class)
+            is StillQueueing -> checkNewStateIsAfter(newState, Queueing::class)
             is InProgress -> checkNewStateIsAfter(newState, Queueing::class)
             is RePolling -> checkNewStateIsAfter(newState, InProgress::class)
             is Succeeded -> checkNewStateIsAfter(newState, InProgress::class, RePolling::class)

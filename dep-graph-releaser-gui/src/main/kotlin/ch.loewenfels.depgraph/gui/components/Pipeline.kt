@@ -369,7 +369,8 @@ class Pipeline(private val modifiableState: ModifiableState, private val menu: M
             is CommandState.Waiting -> "waiting"
             CommandState.Ready -> "ready"
             CommandState.ReadyToReTrigger -> "readyToReTrigger"
-            CommandState.Queueing -> "queueing"
+            CommandState.Queueing,
+            CommandState.StillQueueing -> "queueing"
             CommandState.RePolling -> "rePolling"
             CommandState.InProgress -> "inProgress"
             CommandState.Succeeded -> "succeeded"
@@ -382,7 +383,8 @@ class Pipeline(private val modifiableState: ModifiableState, private val menu: M
             is CommandState.Waiting -> STATE_WAITING
             CommandState.Ready -> STATE_READY
             CommandState.ReadyToReTrigger -> STATE_READY_TO_BE_TRIGGER
-            CommandState.Queueing -> STATE_QUEUEING
+            CommandState.Queueing,
+            CommandState.StillQueueing -> STATE_QUEUEING
             CommandState.RePolling -> STATE_RE_POLLING
             CommandState.InProgress -> STATE_IN_PROGRESS
             CommandState.Succeeded -> STATE_SUCCEEDED

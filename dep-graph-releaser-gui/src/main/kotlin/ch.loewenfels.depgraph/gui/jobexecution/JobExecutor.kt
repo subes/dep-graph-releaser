@@ -13,6 +13,14 @@ interface JobExecutor {
         verbose: Boolean = true
     ): Promise<Pair<AuthData, Int>>
 
+    fun rePollQueueing(
+        jobExecutionData: JobExecutionData,
+        queuedItemUrl: String,
+        jobStartedHook: (buildNumber: Int) -> Promise<*>,
+        pollEverySecond: Int,
+        maxWaitingTimeForCompletenessInSeconds: Int
+    ): Promise<Pair<AuthData, Int>>
+
     fun rePoll(
         jobExecutionData: JobExecutionData,
         buildNumber: Int,

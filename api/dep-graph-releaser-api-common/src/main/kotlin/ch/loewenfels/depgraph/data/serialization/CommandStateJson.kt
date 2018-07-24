@@ -18,8 +18,9 @@ data class CommandStateJson(
         READY,
         READY_TO_RE_TRIGGER,
         QUEUEING,
-        RE_POLLING,
+        STILL_QUEUEING,
         IN_PROGRESS,
+        RE_POLLING,
         SUCCEEDED,
         FAILED,
         DEACTIVATED,
@@ -32,8 +33,9 @@ fun toJson(state: CommandState) : CommandStateJson = when (state) {
     is CommandState.Ready -> CommandStateJson(READY)
     is CommandState.ReadyToReTrigger -> CommandStateJson(READY_TO_RE_TRIGGER)
     is CommandState.Queueing -> CommandStateJson(QUEUEING)
-    is CommandState.RePolling -> CommandStateJson(RE_POLLING)
+    is CommandState.StillQueueing -> CommandStateJson(STILL_QUEUEING)
     is CommandState.InProgress -> CommandStateJson(IN_PROGRESS)
+    is CommandState.RePolling -> CommandStateJson(RE_POLLING)
     is CommandState.Succeeded -> CommandStateJson(SUCCEEDED)
     is CommandState.Failed -> CommandStateJson(FAILED)
     is CommandState.Deactivated -> CommandStateJson(DEACTIVATED, toJson(state.previous))
@@ -45,8 +47,9 @@ fun fromJson(json: CommandStateJson): CommandState = when (json.state) {
     READY -> CommandState.Ready
     READY_TO_RE_TRIGGER -> CommandState.ReadyToReTrigger
     QUEUEING -> CommandState.Queueing
-    RE_POLLING -> CommandState.RePolling
+    STILL_QUEUEING -> CommandState.StillQueueing
     IN_PROGRESS -> CommandState.InProgress
+    RE_POLLING -> CommandState.RePolling
     SUCCEEDED -> CommandState.Succeeded
     FAILED -> CommandState.Failed
     DEACTIVATED -> CommandState.Deactivated(fromJson(json.previous ?: throwIllegal("previous", DEACTIVATED.name)))

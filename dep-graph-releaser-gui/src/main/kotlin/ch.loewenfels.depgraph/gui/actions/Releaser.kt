@@ -210,12 +210,18 @@ class Releaser(
 
     private fun createCommandPromise(paramObject: ParamObject, command: Command, index: Int): Promise<CommandState> {
         val state = Pipeline.getCommandState(paramObject.project.id, index)
-        return if (state === CommandState.Ready || state === CommandState.ReadyToReTrigger) {
-            triggerCommand(paramObject, command, index)
-        } else if (state === CommandState.RePolling) {
-            rePollCommand(paramObject, command, index)
-        } else {
-            Promise.resolve(state)
+        return when (state) {
+            is CommandState.Ready, is CommandState.ReadyToReTrigger -> triggerCommand(paramObject, command, index)
+            is CommandState.StillQueueing -> rePollQueueing(paramObject, command, index)
+            is CommandState.RePolling -> rePollCommand(paramObject, command, index)
+
+            is CommandState.Waiting,
+            is CommandState.Queueing,
+            is CommandState.InProgress,
+            is CommandState.Succeeded,
+            is CommandState.Failed,
+            is CommandState.Deactivated,
+            is CommandState.Disabled -> Promise.resolve(state)
         }
     }
 
@@ -224,11 +230,25 @@ class Releaser(
         return triggerJob(paramObject, index, jobExecutionData)
     }
 
-    private fun rePollCommand(
-        paramObject: ParamObject,
-        command: Command,
-        index: Int
-    ): Promise<CommandState> {
+
+    private fun rePollQueueing(paramObject: ParamObject, command: Command, index: Int): Promise<CommandState> {
+        if (command !is JenkinsCommand) {
+            throw IllegalStateException("We do not know how to re-poll a non Jenkins command.\nGiven Command: $command")
+        }
+        val queuedItemUrl = command.buildUrl
+            ?: throw IllegalStateException("We do not know how to re-poll a queued Jenkins job if it does not have a specified build url.\nGiven Command: $command")
+
+        val jobExecutionData = paramObject.jobExecutionDataFactory.create(paramObject.project, command)
+        return paramObject.jobExecutor.rePollQueueing(
+            jobExecutionData,
+            queuedItemUrl,
+            jobStartedHookHandler(paramObject, jobExecutionData, index),
+            POLL_EVERY_SECOND,
+            MAX_WAIT_FOR_COMPLETION
+        ).finalizeJob(paramObject, jobExecutionData, index)
+    }
+
+    private fun rePollCommand(paramObject: ParamObject, command: Command, index: Int): Promise<CommandState> {
         if (command !is JenkinsCommand) {
             throw IllegalStateException("We do not know how to re-poll a non Jenkins command.\nGiven Command: $command")
         }
@@ -270,31 +290,46 @@ class Releaser(
         index: Int,
         jobExecutionData: JobExecutionData
     ): Promise<CommandState> {
-        return paramObject.jobExecutor.trigger(jobExecutionData,
-            { queuedItemUrl ->
-                Pipeline.changeStateOfCommandAndAddBuildUrlIfSet(
-                    paramObject.project,
-                    index,
-                    CommandState.Queueing,
-                    Pipeline.STATE_QUEUEING,
-                    queuedItemUrl
-                )
-                quietSave(paramObject)
-            }, { buildNumber ->
-                Pipeline.changeStateOfCommandAndAddBuildUrl(
-                    paramObject.project,
-                    index,
-                    CommandState.InProgress,
-                    Pipeline.STATE_IN_PROGRESS,
-                    "${jobExecutionData.jobBaseUrl}$buildNumber/"
-                )
-                Promise.resolve(1)
-            },
+        return paramObject.jobExecutor.trigger(
+            jobExecutionData,
+            jobQueuedHookHandler(paramObject, index),
+            jobStartedHookHandler(paramObject, jobExecutionData, index),
             POLL_EVERY_SECOND,
             MAX_WAIT_FOR_COMPLETION,
             verbose = false
         ).finalizeJob(paramObject, jobExecutionData, index)
     }
+
+    private fun jobQueuedHookHandler(paramObject: ParamObject, index: Int): (String?) -> Promise<Unit> {
+        return { queuedItemUrl ->
+            Pipeline.changeStateOfCommandAndAddBuildUrlIfSet(
+                paramObject.project,
+                index,
+                CommandState.Queueing,
+                Pipeline.STATE_QUEUEING,
+                queuedItemUrl
+            )
+            quietSave(paramObject)
+        }
+    }
+
+    private fun jobStartedHookHandler(
+        paramObject: ParamObject,
+        jobExecutionData: JobExecutionData,
+        index: Int
+    ): (Int) -> Promise<Int> {
+        return { buildNumber ->
+            Pipeline.changeStateOfCommandAndAddBuildUrl(
+                paramObject.project,
+                index,
+                CommandState.InProgress,
+                Pipeline.STATE_IN_PROGRESS,
+                "${jobExecutionData.jobBaseUrl}$buildNumber/"
+            )
+            Promise.resolve(1)
+        }
+    }
+
 
     private fun Promise<*>.finalizeJob(
         paramObject: ParamObject,

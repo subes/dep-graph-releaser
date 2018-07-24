@@ -8,6 +8,7 @@ import waitBetweenSteps
 import kotlin.js.Promise
 
 class SimulatingJobExecutor : JobExecutor {
+
     private var count = 0
 
     override fun pollAndExtract(
@@ -35,8 +36,7 @@ class SimulatingJobExecutor : JobExecutor {
             informIfStepWiseAndNotPublish("job $jobName queued", jobName)
         }.then {
             sleep(waitBetweenSteps) {
-                jobStartedHook(100)
-                informIfStepWiseAndNotPublish("job $jobName started", jobName)
+                simulateBuildNumberExtracted(jobName, jobStartedHook)
             }
         }.then {
             sleep(waitBetweenSteps) {
@@ -47,12 +47,34 @@ class SimulatingJobExecutor : JobExecutor {
         }
     }
 
+    private fun simulateBuildNumberExtracted(
+        jobName: String,
+        jobStartedHook: (buildNumber: Int) -> Promise<*>
+    ): Promise<Unit> {
+        jobStartedHook(100)
+        return informIfStepWiseAndNotPublish("job $jobName started", jobName)
+    }
+
     private fun informIfStepWiseAndNotPublish(msg: String, jobName: String): Promise<Unit> {
         return if (!jobName.startsWith("publish")) {
             informIfStepWise(msg)
         } else {
             Promise.resolve(Unit)
         }
+    }
+
+    override fun rePollQueueing(
+        jobExecutionData: JobExecutionData,
+        queuedItemUrl: String,
+        jobStartedHook: (buildNumber: Int) -> Promise<*>,
+        pollEverySecond: Int,
+        maxWaitingTimeForCompletenessInSeconds: Int
+    ): Promise<Pair<AuthData, Int>> {
+        return sleep(waitBetweenSteps) {
+            simulateBuildNumberExtracted(jobExecutionData.jobName, jobStartedHook)
+        }.then {
+            rePoll(jobExecutionData, 100, pollEverySecond, maxWaitingTimeForCompletenessInSeconds)
+        }.then { it }
     }
 
     override fun rePoll(
