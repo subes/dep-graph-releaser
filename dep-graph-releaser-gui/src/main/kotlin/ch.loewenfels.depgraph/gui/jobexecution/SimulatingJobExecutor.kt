@@ -2,6 +2,7 @@ package ch.loewenfels.depgraph.gui.jobexecution
 
 import ch.loewenfels.depgraph.gui.showAlert
 import ch.loewenfels.depgraph.gui.sleep
+import ch.loewenfels.depgraph.gui.unwrapPromise
 import failAfterSteps
 import stepWise
 import waitBetweenSteps
@@ -74,7 +75,7 @@ class SimulatingJobExecutor : JobExecutor {
             simulateBuildNumberExtracted(jobExecutionData.jobName, jobStartedHook)
         }.then {
             rePoll(jobExecutionData, 100, pollEverySecond, maxWaitingTimeForCompletenessInSeconds)
-        }.then { it }
+        }.unwrapPromise()
     }
 
     override fun rePoll(

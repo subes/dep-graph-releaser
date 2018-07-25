@@ -9,6 +9,20 @@ fun <T> sleep(ms: Int, action: () -> T): Promise<T> {
     return p.then { action() }
 }
 
+// It's workaround for KT-19672 since we can fix it properly until KT-11265 isn't fixed.
+inline fun <T> Promise<Promise<T>>.unwrapPromise(): Promise<T> {
+    return this.unsafeCast<Promise<T>>()
+}
+inline fun <T> Promise<Promise<Promise<T>>>.unwrap2Promise(): Promise<T> {
+    return this.unsafeCast<Promise<T>>()
+}
+inline fun <T> Promise<Promise<Promise<Promise<T>>>>.unwrap3Promise(): Promise<T> {
+    return this.unsafeCast<Promise<T>>()
+}
+inline fun <T> Promise<Promise<Promise<Promise<Promise<T>>>>>.unwrap4Promise(): Promise<T> {
+    return this.unsafeCast<Promise<T>>()
+}
+
 fun changeCursorToProgress() {
     document.body!!.style.cursor = "progress"
 }

@@ -1,7 +1,6 @@
 package ch.loewenfels.depgraph.gui.jobexecution
 
-import ch.loewenfels.depgraph.gui.showInfo
-import ch.loewenfels.depgraph.gui.sleep
+import ch.loewenfels.depgraph.gui.*
 import org.w3c.fetch.Response
 import kotlin.browser.window
 import kotlin.js.Promise
@@ -46,7 +45,7 @@ class JenkinsJobExecutor(
                         )
                     }
                 }
-        }.then { it }.then { it }.then { it }
+        }.unwrap3Promise()
     }
 
     private fun issueCrumb(jobExecutionData: JobExecutionData): Promise<AuthData> {
@@ -80,7 +79,7 @@ class JenkinsJobExecutor(
                     maxWaitingTimeForCompletenessInSeconds
                 )
             }
-        }.then { it }.then { it }
+        }.unwrap2Promise()
     }
 
     private fun getQueuedItemUrlOrNull(nullableQueuedItemUrl: String?) =
@@ -142,7 +141,7 @@ class JenkinsJobExecutor(
                 authData,
                 verbose = false
             )
-        }.then { it }
+        }.unwrapPromise()
     }
 
     override fun rePoll(
@@ -161,7 +160,7 @@ class JenkinsJobExecutor(
                 pollEverySecond,
                 maxWaitingTimeForCompletenessInSeconds
             )
-        }.then { it }
+        }.unwrapPromise()
     }
 
 
@@ -189,7 +188,7 @@ class JenkinsJobExecutor(
                     }
                     authData to buildNumber
                 }
-        }.then { it }
+        }.unwrapPromise()
     }
 
     override fun pollAndExtract(

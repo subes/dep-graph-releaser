@@ -192,7 +192,7 @@ class Releaser(
                     list.add(jobResult)
                     list
                 }
-            }.then { it }
+            }.unwrapPromise()
         }
     }
 
@@ -426,7 +426,7 @@ class Releaser(
                     result
                 }
             } else {
-                lock.then { withLockForProject(act) }.then { it }
+                lock.then { withLockForProject(act) }.unwrapPromise()
             }
         }
     }

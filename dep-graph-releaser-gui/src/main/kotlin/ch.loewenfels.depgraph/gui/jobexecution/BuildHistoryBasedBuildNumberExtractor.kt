@@ -1,6 +1,7 @@
 package ch.loewenfels.depgraph.gui.jobexecution
 
 import ch.loewenfels.depgraph.gui.jobexecution.BuilderNumberExtractor.Companion.numberRegex
+import ch.loewenfels.depgraph.gui.unwrapPromise
 import org.w3c.fetch.RequestInit
 import kotlin.browser.window
 import kotlin.js.Promise
@@ -16,7 +17,7 @@ class BuildHistoryBasedBuildNumberExtractor(
         return window.fetch("${jobExecutionData.jobBaseUrl}api/xml?xpath=//build/number&wrapper=builds", init)
             .then(::checkStatusOk)
             .then { searchBuildNumber(it.second, init) }
-            .then { it }
+            .unwrapPromise()
     }
 
     private fun searchBuildNumber(body: String, init: RequestInit): Promise<Int> {
@@ -38,6 +39,6 @@ class BuildHistoryBasedBuildNumberExtractor(
                         ?: throw IllegalStateException("No job matches the given identifying parameters at ${jobExecutionData.jobBaseUrl}.\nRegex used: ${parametersRegex.pattern}")
                     searchBuildNumber(newMatchResult, parametersRegex, init)
                 }
-            }.then { it }
+            }.unwrapPromise()
     }
 }
