@@ -807,4 +807,5 @@ input:disabled {
 }
 #modals .text .output span {
     vertical-align: middle;
+    display: table-cell;
 }
