@@ -209,5 +209,6 @@ Prepare next dev cycle
    b) search for `tree/vX.Y.Z` and replace it with `tree/master`
 2. search for X.Y.Z and change to X.Y+1.Z-SNAPSHOT
 3. commit & push changes (message `prepare vX.Y+1.Z-SNAPSHOT`)
+4. gr cleanDist   // this way you don't have two jars on your dev-classpath
 
 */
