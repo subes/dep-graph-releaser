@@ -123,8 +123,10 @@ private fun DIV.convertTabToTwoSpacesAndUrlToLinks(message: String) {
         do {
             val match = matchResult!!
             convertTabToTwoSpaces(message.substring(index, match.range.start))
-            a(href = match.value) {
-                +match.value
+            val tmpUrl = match.value
+            val url = if(tmpUrl.endsWith(".")) tmpUrl.substring(0, tmpUrl.length-1) else tmpUrl
+            a(href = url) {
+                +url
             }
             index = match.range.endInclusive + 1
             matchResult = match.next()
@@ -148,7 +150,7 @@ private fun DIV.convertTabToTwoSpaces(content: String) {
     +content.substring(currentIndex)
 }
 
-private val urlRegex = Regex("http(?:s)?://[^ ]+(?<!\\.)")
+private val urlRegex = Regex("http(?:s)?://[^ ]+")
 
 
 fun showDialog(msg: String): Promise<Boolean> {
