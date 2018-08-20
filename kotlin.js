@@ -1683,8 +1683,6 @@
     findNext$ObjectLiteral$groups$ObjectLiteral.prototype.constructor = findNext$ObjectLiteral$groups$ObjectLiteral;
     Experimental$Level.prototype = Object.create(Enum.prototype);
     Experimental$Level.prototype.constructor = Experimental$Level;
-    Experimental$Impact.prototype = Object.create(Enum.prototype);
-    Experimental$Impact.prototype.constructor = Experimental$Impact;
     State.prototype = Object.create(Enum.prototype);
     State.prototype.constructor = State;
     AbstractList$SubList.prototype = Object.create(AbstractList.prototype);
@@ -21059,6 +21057,12 @@
     }
     var PI;
     var E;
+    function ExperimentalMultiplatform() {
+    }
+    ExperimentalMultiplatform.$metadata$ = {kind: Kind_CLASS, simpleName: 'ExperimentalMultiplatform', interfaces: [Annotation]};
+    function OptionalExpectation() {
+    }
+    OptionalExpectation.$metadata$ = {kind: Kind_CLASS, simpleName: 'OptionalExpectation', interfaces: [Annotation]};
     function Annotation() {
     }
     Annotation.$metadata$ = {kind: Kind_INTERFACE, simpleName: 'Annotation', interfaces: []};
@@ -21712,26 +21716,20 @@
       return mod_0(mod_0(a, c).subtract(mod_0(b, c)), c);
     }
     function getProgressionLastElement(start, end, step) {
-      if (step > 0) {
-        return end - differenceModulo(end, start, step) | 0;
-      }
-       else if (step < 0) {
-        return end + differenceModulo(start, end, -step | 0) | 0;
-      }
-       else {
+      if (step > 0)
+        return start >= end ? end : end - differenceModulo(end, start, step) | 0;
+      else if (step < 0)
+        return start <= end ? end : end + differenceModulo(start, end, -step | 0) | 0;
+      else
         throw IllegalArgumentException_init_0('Step is zero.');
-      }
     }
     function getProgressionLastElement_0(start, end, step) {
-      if (step.toNumber() > 0) {
-        return end.subtract(differenceModulo_0(end, start, step));
-      }
-       else if (step.toNumber() < 0) {
-        return end.add(differenceModulo_0(start, end, step.unaryMinus()));
-      }
-       else {
+      if (step.toNumber() > 0)
+        return start.compareTo_11rb$(end) >= 0 ? end : end.subtract(differenceModulo_0(end, start, step));
+      else if (step.toNumber() < 0)
+        return start.compareTo_11rb$(end) <= 0 ? end : end.add(differenceModulo_0(start, end, step.unaryMinus()));
+      else
         throw IllegalArgumentException_init_0('Step is zero.');
-      }
     }
     function KAnnotatedElement() {
     }
@@ -28799,50 +28797,6 @@
       }
     }
     Experimental$Level.valueOf_61zpoe$ = Experimental$Level$valueOf;
-    function Experimental$Impact(name, ordinal) {
-      Enum.call(this);
-      this.name$ = name;
-      this.ordinal$ = ordinal;
-    }
-    function Experimental$Impact_initFields() {
-      Experimental$Impact_initFields = function () {
-      };
-      Experimental$Impact$COMPILATION_instance = new Experimental$Impact('COMPILATION', 0);
-      Experimental$Impact$LINKAGE_instance = new Experimental$Impact('LINKAGE', 1);
-      Experimental$Impact$RUNTIME_instance = new Experimental$Impact('RUNTIME', 2);
-    }
-    var Experimental$Impact$COMPILATION_instance;
-    function Experimental$Impact$COMPILATION_getInstance() {
-      Experimental$Impact_initFields();
-      return Experimental$Impact$COMPILATION_instance;
-    }
-    var Experimental$Impact$LINKAGE_instance;
-    function Experimental$Impact$LINKAGE_getInstance() {
-      Experimental$Impact_initFields();
-      return Experimental$Impact$LINKAGE_instance;
-    }
-    var Experimental$Impact$RUNTIME_instance;
-    function Experimental$Impact$RUNTIME_getInstance() {
-      Experimental$Impact_initFields();
-      return Experimental$Impact$RUNTIME_instance;
-    }
-    Experimental$Impact.$metadata$ = {kind: Kind_CLASS, simpleName: 'Impact', interfaces: [Enum]};
-    function Experimental$Impact$values() {
-      return [Experimental$Impact$COMPILATION_getInstance(), Experimental$Impact$LINKAGE_getInstance(), Experimental$Impact$RUNTIME_getInstance()];
-    }
-    Experimental$Impact.values = Experimental$Impact$values;
-    function Experimental$Impact$valueOf(name) {
-      switch (name) {
-        case 'COMPILATION':
-          return Experimental$Impact$COMPILATION_getInstance();
-        case 'LINKAGE':
-          return Experimental$Impact$LINKAGE_getInstance();
-        case 'RUNTIME':
-          return Experimental$Impact$RUNTIME_getInstance();
-        default:throwISE('No enum constant kotlin.Experimental.Impact.' + name);
-      }
-    }
-    Experimental$Impact.valueOf_61zpoe$ = Experimental$Impact$valueOf;
     Experimental.$metadata$ = {kind: Kind_CLASS, simpleName: 'Experimental', interfaces: [Annotation]};
     function UseExperimental(markerClass) {
       this.markerClass = markerClass;
@@ -33230,7 +33184,7 @@
       var tmp$, tmp$_0;
       var index = 0;
       tmp$ = lines_0.iterator();
-      while (tmp$.hasNext()) {
+      loop_label: while (tmp$.hasNext()) {
         var item = tmp$.next();
         var tmp$_1;
         var index_0 = (tmp$_0 = index, index = tmp$_0 + 1 | 0, tmp$_0);
@@ -34409,7 +34363,7 @@
       }
       tmp$ = coerceAtLeast_2(startIndex, 0);
       tmp$_0 = get_lastIndex_9($receiver);
-      for (var index = tmp$; index <= tmp$_0; index++) {
+      loop_label: for (var index = tmp$; index <= tmp$_0; index++) {
         var charAtIndex = $receiver.charCodeAt(index);
         var any$result;
         any$break: do {
@@ -34438,7 +34392,7 @@
         var char = single_7(chars);
         return $receiver.lastIndexOf(String.fromCharCode(char), startIndex);
       }
-      for (var index = coerceAtMost_2(startIndex, get_lastIndex_9($receiver)); index >= 0; index--) {
+      loop_label: for (var index = coerceAtMost_2(startIndex, get_lastIndex_9($receiver)); index >= 0; index--) {
         var charAtIndex = $receiver.charCodeAt(index);
         var any$result;
         any$break: do {
@@ -34491,7 +34445,7 @@
       var indices = !last ? new IntRange(coerceAtLeast_2(startIndex, 0), $receiver.length) : downTo_4(coerceAtMost_2(startIndex, get_lastIndex_9($receiver)), 0);
       if (typeof $receiver === 'string') {
         tmp$ = indices.iterator();
-        while (tmp$.hasNext()) {
+        loop_label: while (tmp$.hasNext()) {
           var index_0 = tmp$.next();
           var firstOrNull$result;
           firstOrNull$break: do {
@@ -34514,7 +34468,7 @@
       }
        else {
         tmp$_0 = indices.iterator();
-        while (tmp$_0.hasNext()) {
+        loop_label: while (tmp$_0.hasNext()) {
           var index_1 = tmp$_0.next();
           var firstOrNull$result_0;
           firstOrNull$break: do {
@@ -34965,7 +34919,7 @@
     function KotlinVersion$Companion() {
       KotlinVersion$Companion_instance = this;
       this.MAX_COMPONENT_VALUE = 255;
-      this.CURRENT = new KotlinVersion(1, 2, 51);
+      this.CURRENT = new KotlinVersion(1, 2, 60);
     }
     KotlinVersion$Companion.$metadata$ = {kind: Kind_OBJECT, simpleName: 'Companion', interfaces: []};
     var KotlinVersion$Companion_instance = null;
@@ -36948,6 +36902,8 @@
     Object.defineProperty(package$math, 'E', {get: function () {
       return E;
     }});
+    package$kotlin.ExperimentalMultiplatform = ExperimentalMultiplatform;
+    package$kotlin.OptionalExpectation = OptionalExpectation;
     package$kotlin.Annotation = Annotation;
     package$kotlin.CharSequence = CharSequence;
     package$collections.Iterable = Iterable;
@@ -37590,10 +37546,6 @@
     Object.defineProperty(Experimental$Level, 'WARNING', {get: Experimental$Level$WARNING_getInstance});
     Object.defineProperty(Experimental$Level, 'ERROR', {get: Experimental$Level$ERROR_getInstance});
     Experimental.Level = Experimental$Level;
-    Object.defineProperty(Experimental$Impact, 'COMPILATION', {get: Experimental$Impact$COMPILATION_getInstance});
-    Object.defineProperty(Experimental$Impact, 'LINKAGE', {get: Experimental$Impact$LINKAGE_getInstance});
-    Object.defineProperty(Experimental$Impact, 'RUNTIME', {get: Experimental$Impact$RUNTIME_getInstance});
-    Experimental.Impact = Experimental$Impact;
     package$kotlin.Experimental = Experimental;
     package$kotlin.UseExperimental = UseExperimental;
     package$kotlin.WasExperimental = WasExperimental;

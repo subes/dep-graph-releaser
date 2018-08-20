@@ -75,6 +75,7 @@
   var getKClass = Kotlin.getKClass;
   var span = $module$kotlinx_html_js.kotlinx.html.span_6djfml$;
   var set_title = $module$kotlinx_html_js.kotlinx.html.set_title_ueiko3$;
+  var hasClass = Kotlin.kotlin.dom.hasClass_46n0ku$;
   var asList = Kotlin.org.w3c.dom.asList_kt9thq$;
   var Triple = Kotlin.kotlin.Triple;
   var addClass = Kotlin.kotlin.dom.addClass_hhb33f$;
@@ -92,7 +93,6 @@
   var div_0 = $module$kotlinx_html_js.kotlinx.html.js.div_wkomt5$;
   var append = $module$kotlinx_html_js.kotlinx.html.dom.append_k9bwru$;
   var toShort = Kotlin.toShort;
-  var hasClass = Kotlin.kotlin.dom.hasClass_46n0ku$;
   var listOf = Kotlin.kotlin.collections.listOf_i5x0yv$;
   var TypeOfRun = $module$dep_graph_releaser_api_js.ch.loewenfels.depgraph.data.TypeOfRun;
   var generateEclipsePsf = $module$dep_graph_releaser_api_js.ch.loewenfels.depgraph.generateEclipsePsf_xx51qy$;
@@ -587,16 +587,13 @@
       return closure$action(closure$element).then(Releaser$doSequentially$lambda$lambda$lambda(list));
     };
   }
-  function Releaser$doSequentially$lambda$lambda_0(it) {
-    return it;
-  }
   Releaser.prototype.doSequentially_0 = function ($receiver, initial, action) {
     var tmp$;
     var accumulator = Promise.resolve(initial);
     tmp$ = $receiver.iterator();
     while (tmp$.hasNext()) {
       var element = tmp$.next();
-      accumulator = accumulator.then(Releaser$doSequentially$lambda$lambda(action, element)).then(Releaser$doSequentially$lambda$lambda_0);
+      accumulator = accumulator.then(Releaser$doSequentially$lambda$lambda(action, element));
     }
     return accumulator;
   };
@@ -822,9 +819,6 @@
       return this$ParamObject.withLockForProject_509nd4$(closure$act);
     };
   }
-  function Releaser$ParamObject$withLockForProject$lambda_1(it) {
-    return it;
-  }
   Releaser$ParamObject.prototype.withLockForProject_509nd4$ = function (act) {
     var tmp$;
     var projectId = this.project.id;
@@ -835,7 +829,7 @@
       tmp$ = promise.then(Releaser$ParamObject$withLockForProject$lambda(this, projectId));
     }
      else {
-      tmp$ = lock.then(Releaser$ParamObject$withLockForProject$lambda_0(act, this)).then(Releaser$ParamObject$withLockForProject$lambda_1);
+      tmp$ = lock.then(Releaser$ParamObject$withLockForProject$lambda_0(act, this));
     }
     return tmp$;
   };
@@ -1222,13 +1216,22 @@
       return Unit;
     };
   }
+  function ContextMenu$contextMenuEntry$lambda$lambda_0(closure$div, closure$action) {
+    return function (e) {
+      if (!hasClass(closure$div, ContextMenu$Companion_getInstance().CSS_DISABLED)) {
+        closure$action(e);
+      }
+      return Unit;
+    };
+  }
   function ContextMenu$contextMenuEntry$lambda(closure$idPrefix, closure$cssClass, closure$title, closure$iconCreator, closure$text, closure$action) {
     return function ($receiver) {
       set_id($receiver, closure$idPrefix + closure$cssClass);
       set_title($receiver, closure$title);
       closure$iconCreator($receiver);
       span($receiver, void 0, ContextMenu$contextMenuEntry$lambda$lambda(closure$text));
-      addClickEventListener(getUnderlyingHtmlElement($receiver), void 0, closure$action);
+      var div = getUnderlyingHtmlElement($receiver);
+      addClickEventListener(div, void 0, ContextMenu$contextMenuEntry$lambda$lambda_0(div, closure$action));
       return Unit;
     };
   }
@@ -1438,14 +1441,14 @@
     var entry = elementById(id);
     if (disable) {
       setTitleSaveOld(entry, 'Cannot apply this action.');
-      addClass(entry, ['disabled']);
+      addClass(entry, [ContextMenu$Companion_getInstance().CSS_DISABLED]);
     }
      else {
       var title = getOldTitleOrNull(entry);
       if (title != null) {
         entry.title = title;
       }
-      removeClass(entry, ['disabled']);
+      removeClass(entry, [ContextMenu$Companion_getInstance().CSS_DISABLED]);
     }
   };
   ContextMenu.prototype.hideAllContextMenus_0 = function () {
@@ -1485,6 +1488,7 @@
     this.CONTEXT_MENU_SUFFIX = ':contextMenu';
     this.CONTEXT_MENU_COMMAND_DEACTIVATED = 'deactivated';
     this.CONTEXT_MENU_COMMAND_SUCCEEDED = 'succeeded';
+    this.CSS_DISABLED = 'disabled';
   }
   ContextMenu$Companion.$metadata$ = {
     kind: Kind_OBJECT,
@@ -3290,7 +3294,7 @@
         var destination = ArrayList_init_0();
         var tmp$_0;
         tmp$_0 = $receiver.iterator();
-        while (tmp$_0.hasNext()) {
+        loop_label: while (tmp$_0.hasNext()) {
           var element_0 = tmp$_0.next();
           var predicate$result;
           predicate$break: do {
@@ -3726,15 +3730,12 @@
       return this$BuildHistoryBasedBuildNumberExtractor.searchBuildNumber_0(it.second, closure$init);
     };
   }
-  function BuildHistoryBasedBuildNumberExtractor$extract$lambda_0(it) {
-    return it;
-  }
   BuildHistoryBasedBuildNumberExtractor.prototype.extract = function () {
     var headers = createHeaderWithAuthAndCrumb(this.authData_0);
     var init = createGetRequest(headers);
     return window.fetch(this.jobExecutionData_0.jobBaseUrl + 'api/xml?xpath=//build/number&wrapper=builds', init).then(getCallableRef('checkStatusOk', function (response) {
       return checkStatusOk(response);
-    })).then(BuildHistoryBasedBuildNumberExtractor$extract$lambda(init, this)).then(BuildHistoryBasedBuildNumberExtractor$extract$lambda_0);
+    })).then(BuildHistoryBasedBuildNumberExtractor$extract$lambda(init, this));
   };
   BuildHistoryBasedBuildNumberExtractor.prototype.searchBuildNumber_0 = function (body, init) {
     var tmp$;
@@ -3763,14 +3764,11 @@
       }
     };
   }
-  function BuildHistoryBasedBuildNumberExtractor$searchBuildNumber$lambda_0(it) {
-    return it;
-  }
   BuildHistoryBasedBuildNumberExtractor.prototype.searchBuildNumber_1 = function (matchResult, parametersRegex, init) {
     var buildNumber = toInt(matchResult.groupValues.get_za3lpa$(1));
     return window.fetch(this.jobExecutionData_0.jobBaseUrl + buildNumber + '/api/xml', init).then(getCallableRef('checkStatusOk', function (response) {
       return checkStatusOk(response);
-    })).then(BuildHistoryBasedBuildNumberExtractor$searchBuildNumber$lambda(parametersRegex, buildNumber, matchResult, this, init)).then(BuildHistoryBasedBuildNumberExtractor$searchBuildNumber$lambda_0);
+    })).then(BuildHistoryBasedBuildNumberExtractor$searchBuildNumber$lambda(parametersRegex, buildNumber, matchResult, this, init));
   };
   BuildHistoryBasedBuildNumberExtractor.$metadata$ = {
     kind: Kind_CLASS,
@@ -4185,18 +4183,9 @@
       return $receiver.then(onFulfilled);
     };
   }
-  function JenkinsJobExecutor$trigger$lambda_0(it) {
-    return it;
-  }
-  function JenkinsJobExecutor$trigger$lambda_1(it) {
-    return it;
-  }
-  function JenkinsJobExecutor$trigger$lambda_2(it) {
-    return it;
-  }
   JenkinsJobExecutor.prototype.trigger_gyv2e7$$default = function (jobExecutionData, jobQueuedHook, jobStartedHook, pollEverySecond, maxWaitingTimeForCompletenessInSeconds, verbose) {
     var jobName = jobExecutionData.jobName;
-    return this.issueCrumb_0(jobExecutionData).then(JenkinsJobExecutor$trigger$lambda(jobExecutionData, this, jobName, verbose, jobQueuedHook, jobStartedHook, pollEverySecond, maxWaitingTimeForCompletenessInSeconds)).then(JenkinsJobExecutor$trigger$lambda_0).then(JenkinsJobExecutor$trigger$lambda_1).then(JenkinsJobExecutor$trigger$lambda_2);
+    return this.issueCrumb_0(jobExecutionData).then(JenkinsJobExecutor$trigger$lambda(jobExecutionData, this, jobName, verbose, jobQueuedHook, jobStartedHook, pollEverySecond, maxWaitingTimeForCompletenessInSeconds));
   };
   JenkinsJobExecutor.prototype.issueCrumb_0 = function (jobExecutionData) {
     var jenkinsBaseUrl = jobExecutionData.getJenkinsBaseUrl();
@@ -4216,14 +4205,8 @@
       return closure$jobStartedHook(buildNumber).then(JenkinsJobExecutor$startOrResumeFromExtractBuildNumber$lambda$lambda(closure$authData, closure$jobExecutionData, buildNumber, closure$pollEverySecond, closure$maxWaitingTimeForCompletenessInSeconds, this$JenkinsJobExecutor));
     };
   }
-  function JenkinsJobExecutor$startOrResumeFromExtractBuildNumber$lambda_0(it) {
-    return it;
-  }
-  function JenkinsJobExecutor$startOrResumeFromExtractBuildNumber$lambda_1(it) {
-    return it;
-  }
   JenkinsJobExecutor.prototype.startOrResumeFromExtractBuildNumber_0 = function (jobExecutionData, nullableQueuedItemUrl, jobStartedHook, pollEverySecond, maxWaitingTimeForCompletenessInSeconds, authData, verbose) {
-    return this.extractBuildNumber_0(nullableQueuedItemUrl, authData, jobExecutionData).then(JenkinsJobExecutor$startOrResumeFromExtractBuildNumber$lambda(verbose, jobExecutionData, jobStartedHook, authData, pollEverySecond, maxWaitingTimeForCompletenessInSeconds, this)).then(JenkinsJobExecutor$startOrResumeFromExtractBuildNumber$lambda_0).then(JenkinsJobExecutor$startOrResumeFromExtractBuildNumber$lambda_1);
+    return this.extractBuildNumber_0(nullableQueuedItemUrl, authData, jobExecutionData).then(JenkinsJobExecutor$startOrResumeFromExtractBuildNumber$lambda(verbose, jobExecutionData, jobStartedHook, authData, pollEverySecond, maxWaitingTimeForCompletenessInSeconds, this));
   };
   JenkinsJobExecutor.prototype.getQueuedItemUrlOrNull_0 = function (nullableQueuedItemUrl) {
     return nullableQueuedItemUrl != null ? toString(nullableQueuedItemUrl) + 'api/xml/' : null;
@@ -4259,24 +4242,18 @@
       return this$JenkinsJobExecutor.startOrResumeFromExtractBuildNumber_0(closure$jobExecutionData, closure$queuedItemUrl, closure$jobStartedHook, closure$pollEverySecond, closure$maxWaitingTimeForCompletenessInSeconds, authData, false);
     };
   }
-  function JenkinsJobExecutor$rePollQueueing$lambda_0(it) {
-    return it;
-  }
   JenkinsJobExecutor.prototype.rePollQueueing_aav45s$ = function (jobExecutionData, queuedItemUrl, jobStartedHook, pollEverySecond, maxWaitingTimeForCompletenessInSeconds) {
-    return this.issueCrumb_0(jobExecutionData).then(JenkinsJobExecutor$rePollQueueing$lambda(jobExecutionData, queuedItemUrl, jobStartedHook, pollEverySecond, maxWaitingTimeForCompletenessInSeconds, this)).then(JenkinsJobExecutor$rePollQueueing$lambda_0);
+    return this.issueCrumb_0(jobExecutionData).then(JenkinsJobExecutor$rePollQueueing$lambda(jobExecutionData, queuedItemUrl, jobStartedHook, pollEverySecond, maxWaitingTimeForCompletenessInSeconds, this));
   };
   function JenkinsJobExecutor$rePoll$lambda(closure$jobExecutionData, closure$buildNumber, closure$pollEverySecond, closure$maxWaitingTimeForCompletenessInSeconds, this$JenkinsJobExecutor) {
     return function (authData) {
       return this$JenkinsJobExecutor.pollJobForCompletion_0(authData, closure$jobExecutionData, closure$buildNumber, closure$pollEverySecond, closure$maxWaitingTimeForCompletenessInSeconds);
     };
   }
-  function JenkinsJobExecutor$rePoll$lambda_0(it) {
-    return it;
-  }
   JenkinsJobExecutor.prototype.rePoll_m7tqv$ = function (jobExecutionData, buildNumber, pollEverySecond, maxWaitingTimeForCompletenessInSeconds) {
     var jenkinsBaseUrl = jobExecutionData.getJenkinsBaseUrl();
     var usernameAndApiToken = this.usernameTokenRegistry_0.forHostOrThrow_61zpoe$(jenkinsBaseUrl);
-    return issueCrumb(jenkinsBaseUrl, usernameAndApiToken).then(JenkinsJobExecutor$rePoll$lambda(jobExecutionData, buildNumber, pollEverySecond, maxWaitingTimeForCompletenessInSeconds, this)).then(JenkinsJobExecutor$rePoll$lambda_0);
+    return issueCrumb(jenkinsBaseUrl, usernameAndApiToken).then(JenkinsJobExecutor$rePoll$lambda(jobExecutionData, buildNumber, pollEverySecond, maxWaitingTimeForCompletenessInSeconds, this));
   };
   function JenkinsJobExecutor$pollJobForCompletion$lambda$lambda(e) {
     throw e;
@@ -4304,11 +4281,8 @@
       return this$JenkinsJobExecutor.pollAndExtract_s7mrf0$(closure$authData, closure$jobExecutionData.jobBaseUrl + closure$buildNumber + '/api/xml', JenkinsJobExecutor$Companion_getInstance().resultRegex_0, closure$pollEverySecond, closure$maxWaitingTimeForCompletenessInSeconds, JenkinsJobExecutor$pollJobForCompletion$lambda$lambda).then(JenkinsJobExecutor$pollJobForCompletion$lambda$lambda_0(closure$buildNumber)).then(JenkinsJobExecutor$pollJobForCompletion$lambda$lambda_1(closure$jobExecutionData, closure$authData));
     };
   }
-  function JenkinsJobExecutor$pollJobForCompletion$lambda_0(it) {
-    return it;
-  }
   JenkinsJobExecutor.prototype.pollJobForCompletion_0 = function (authData, jobExecutionData, buildNumber, pollEverySecond, maxWaitingTimeForCompletenessInSeconds) {
-    return sleep(pollEverySecond * 500 | 0, JenkinsJobExecutor$pollJobForCompletion$lambda(authData, jobExecutionData, buildNumber, pollEverySecond, maxWaitingTimeForCompletenessInSeconds, this)).then(JenkinsJobExecutor$pollJobForCompletion$lambda_0);
+    return sleep(pollEverySecond * 500 | 0, JenkinsJobExecutor$pollJobForCompletion$lambda(authData, jobExecutionData, buildNumber, pollEverySecond, maxWaitingTimeForCompletenessInSeconds, this));
   };
   JenkinsJobExecutor.prototype.pollAndExtract_s7mrf0$ = function (authData, url, regex, pollEverySecond, maxWaitingTimeInSeconds, errorHandler) {
     return Poller_getInstance().pollAndExtract_s7mrf0$(authData, url, regex, pollEverySecond, maxWaitingTimeInSeconds, errorHandler);
@@ -4891,11 +4865,8 @@
       return this$SimulatingJobExecutor.rePoll_m7tqv$(closure$jobExecutionData, 100, closure$pollEverySecond, closure$maxWaitingTimeForCompletenessInSeconds);
     };
   }
-  function SimulatingJobExecutor$rePollQueueing$lambda_1(it) {
-    return it;
-  }
   SimulatingJobExecutor.prototype.rePollQueueing_aav45s$ = function (jobExecutionData, queuedItemUrl, jobStartedHook, pollEverySecond, maxWaitingTimeForCompletenessInSeconds) {
-    return sleep(waitBetweenSteps, SimulatingJobExecutor$rePollQueueing$lambda(jobExecutionData, jobStartedHook, this)).then(SimulatingJobExecutor$rePollQueueing$lambda_0(jobExecutionData, pollEverySecond, maxWaitingTimeForCompletenessInSeconds, this)).then(SimulatingJobExecutor$rePollQueueing$lambda_1);
+    return sleep(waitBetweenSteps, SimulatingJobExecutor$rePollQueueing$lambda(jobExecutionData, jobStartedHook, this)).then(SimulatingJobExecutor$rePollQueueing$lambda_0(jobExecutionData, pollEverySecond, maxWaitingTimeForCompletenessInSeconds, this));
   };
   function SimulatingJobExecutor$rePoll$lambda(closure$jobExecutionData, this$SimulatingJobExecutor) {
     return function () {
@@ -5248,9 +5219,9 @@
       convertTabToTwoSpacesAndUrlToLinks($receiver, messages.get_za3lpa$(i));
     }
   }
-  function convertTabToTwoSpacesAndUrlToLinks$lambda(closure$match) {
+  function convertTabToTwoSpacesAndUrlToLinks$lambda(closure$url) {
     return function ($receiver) {
-      $receiver.unaryPlus_pdl1vz$(closure$match.value);
+      $receiver.unaryPlus_pdl1vz$(closure$url);
       return Unit;
     };
   }
@@ -5263,7 +5234,16 @@
         var startIndex = index;
         var endIndex = match.range.start;
         convertTabToTwoSpaces($receiver, message.substring(startIndex, endIndex));
-        a($receiver, match.value, void 0, void 0, convertTabToTwoSpacesAndUrlToLinks$lambda(match));
+        var tmpUrl = match.value;
+        var tmp$;
+        if (endsWith(tmpUrl, '.')) {
+          var endIndex_0 = tmpUrl.length - 1 | 0;
+          tmp$ = tmpUrl.substring(0, endIndex_0);
+        }
+         else
+          tmp$ = tmpUrl;
+        var url = tmp$;
+        a($receiver, url, void 0, void 0, convertTabToTwoSpacesAndUrlToLinks$lambda(url));
         index = match.range.endInclusive + 1 | 0;
         matchResult = match.next();
       }
@@ -5760,7 +5740,7 @@
     var changed = {v: false};
     var $receiver = releasePlanJson.config;
     var tmp$;
-    for (tmp$ = 0; tmp$ !== $receiver.length; ++tmp$) {
+    loop_label: for (tmp$ = 0; tmp$ !== $receiver.length; ++tmp$) {
       var element = $receiver[tmp$];
       action$break: do {
         var tmp$_0, tmp$_1, tmp$_2;
@@ -5802,7 +5782,7 @@
   ChangeApplier.prototype.updateReleaseVersionOfSubmodules_0 = function (releasePlan, releasePlanJson, mavenProjectId, releaseVersion) {
     var tmp$;
     tmp$ = releasePlan.getSubmodules_lljhqa$(mavenProjectId).iterator();
-    while (tmp$.hasNext()) {
+    loop_label: while (tmp$.hasNext()) {
       var element = tmp$.next();
       var $receiver = map(asSequence_1(releasePlanJson.projects), ChangeApplier$updateReleaseVersionOfSubmodules$lambda$lambda);
       var first$result;
@@ -6191,6 +6171,18 @@
     var p = new Promise(sleep$lambda(ms));
     return p.then(sleep$lambda_0(action));
   }
+  var unwrapPromise = defineInlineFunction('dep-graph-releaser-gui.ch.loewenfels.depgraph.gui.unwrapPromise_his4r1$', function ($receiver) {
+    return $receiver;
+  });
+  var unwrap2Promise = defineInlineFunction('dep-graph-releaser-gui.ch.loewenfels.depgraph.gui.unwrap2Promise_rc74cx$', function ($receiver) {
+    return $receiver;
+  });
+  var unwrap3Promise = defineInlineFunction('dep-graph-releaser-gui.ch.loewenfels.depgraph.gui.unwrap3Promise_vvsos3$', function ($receiver) {
+    return $receiver;
+  });
+  var unwrap4Promise = defineInlineFunction('dep-graph-releaser-gui.ch.loewenfels.depgraph.gui.unwrap4Promise_umlhv3$', function ($receiver) {
+    return $receiver;
+  });
   function changeCursorToProgress() {
     ensureNotNull(document.body).style.cursor = 'progress';
   }
@@ -6434,6 +6426,10 @@
   package$serialization.ModifiableState_init_74kwio$ = ModifiableState_init;
   package$serialization.ModifiableState = ModifiableState;
   package$gui.sleep_xsjjga$ = sleep;
+  package$gui.unwrapPromise_his4r1$ = unwrapPromise;
+  package$gui.unwrap2Promise_rc74cx$ = unwrap2Promise;
+  package$gui.unwrap3Promise_vvsos3$ = unwrap3Promise;
+  package$gui.unwrap4Promise_umlhv3$ = unwrap4Promise;
   package$gui.changeCursorToProgress = changeCursorToProgress;
   package$gui.changeCursorBackToNormal = changeCursorBackToNormal;
   package$gui.finally_wus875$ = finally_0;
@@ -6476,7 +6472,7 @@
   GITHUB_NEW_ISSUE = 'https://github.com/loewenfels/dep-graph-releaser/issues/new';
   LOEWENFELS_URL = 'https://www.loewenfels.ch';
   msgCounter = 0;
-  urlRegex = Regex_init('http(?:s)?://[^ ]+(?<!\\.)');
+  urlRegex = Regex_init('http(?:s)?://[^ ]+');
   MAVEN_PROJECT_ID = 'ch.loewenfels.depgraph.data.maven.MavenProjectId';
   JENKINS_MAVEN_RELEASE_PLUGIN = 'ch.loewenfels.depgraph.data.maven.jenkins.JenkinsMavenReleasePlugin';
   JENKINS_MULTI_MAVEN_RELEASE_PLUGIN = 'ch.loewenfels.depgraph.data.maven.jenkins.JenkinsMultiMavenReleasePlugin';
