@@ -20,6 +20,7 @@ import org.w3c.dom.events.MouseEvent
 import kotlin.browser.document
 import kotlin.browser.window
 import kotlin.dom.addClass
+import kotlin.dom.hasClass
 import kotlin.dom.removeClass
 import kotlin.reflect.KClass
 
@@ -83,14 +84,18 @@ class ContextMenu(private val modifiableState: ModifiableState, private val menu
             this.title = title
             iconCreator()
             span { +text }
-            getUnderlyingHtmlElement().addClickEventListener(action = action)
+            val div = getUnderlyingHtmlElement()
+            div.addClickEventListener { e ->
+                if (!div.hasClass(CSS_DISABLED)) {
+                    action(e)
+                }
+            }
         }
     }
 
     private fun transitionToDeactivatedIfOk(project: Project, index: Int) {
         val commandState = Pipeline.getCommandState(project.id, index)
         if (isNotInStateToDeactivate(commandState)) return
-
 
         Pipeline.getToggle(project, index).click()
     }
@@ -210,13 +215,14 @@ class ContextMenu(private val modifiableState: ModifiableState, private val menu
         val entry = elementById(id)
         if (disable) {
             entry.setTitleSaveOld("Cannot apply this action.")
-            entry.addClass("disabled")
+            entry.addClass(CSS_DISABLED)
+
         } else {
             val title = entry.getOldTitleOrNull()
             if (title != null) {
                 entry.title = title
             }
-            entry.removeClass("disabled")
+            entry.removeClass(CSS_DISABLED)
         }
     }
 
@@ -250,5 +256,6 @@ class ContextMenu(private val modifiableState: ModifiableState, private val menu
         const val CONTEXT_MENU_SUFFIX = ":contextMenu"
         const val CONTEXT_MENU_COMMAND_DEACTIVATED = "deactivated"
         const val CONTEXT_MENU_COMMAND_SUCCEEDED = "succeeded"
+        const val CSS_DISABLED = "disabled"
     }
 }
