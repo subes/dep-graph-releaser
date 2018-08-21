@@ -116,6 +116,9 @@ private fun DIV.convertNewLinesToBrTabToTwoSpacesAndParseUrls(message: String) {
     }
 }
 
+
+private val urlRegex = Regex("http(?:s)?://[^ ]+")
+
 private fun DIV.convertTabToTwoSpacesAndUrlToLinks(message: String) {
     var matchResult = urlRegex.find(message)
     if (matchResult != null) {
@@ -123,12 +126,11 @@ private fun DIV.convertTabToTwoSpacesAndUrlToLinks(message: String) {
         do {
             val match = matchResult!!
             convertTabToTwoSpaces(message.substring(index, match.range.start))
-            val tmpUrl = match.value
-            val url = if(tmpUrl.endsWith(".")) tmpUrl.substring(0, tmpUrl.length-1) else tmpUrl
+            val (url, nextIndex) = determineUrlAndNextIndex(match)
             a(href = url) {
                 +url
             }
-            index = match.range.endInclusive + 1
+            index = nextIndex
             matchResult = match.next()
         } while (matchResult != null)
         convertTabToTwoSpaces(message.substring(index))
@@ -150,8 +152,15 @@ private fun DIV.convertTabToTwoSpaces(content: String) {
     +content.substring(currentIndex)
 }
 
-private val urlRegex = Regex("http(?:s)?://[^ ]+")
 
+private fun determineUrlAndNextIndex(match: MatchResult): Pair<String, Int> {
+    val tmpUrl = match.value
+    return if (tmpUrl.endsWith(".")) {
+        tmpUrl.substring(0, tmpUrl.length - 1) to match.range.endInclusive
+    } else {
+        tmpUrl to match.range.endInclusive + 1
+    }
+}
 
 fun showDialog(msg: String): Promise<Boolean> {
     return Promise { resolve, _ ->
