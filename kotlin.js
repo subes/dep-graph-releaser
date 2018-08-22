@@ -34919,7 +34919,7 @@
     function KotlinVersion$Companion() {
       KotlinVersion$Companion_instance = this;
       this.MAX_COMPONENT_VALUE = 255;
-      this.CURRENT = new KotlinVersion(1, 2, 60);
+      this.CURRENT = new KotlinVersion(1, 2, 61);
     }
     KotlinVersion$Companion.$metadata$ = {kind: Kind_OBJECT, simpleName: 'Companion', interfaces: []};
     var KotlinVersion$Companion_instance = null;

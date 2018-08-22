@@ -5219,6 +5219,7 @@
       convertTabToTwoSpacesAndUrlToLinks($receiver, messages.get_za3lpa$(i));
     }
   }
+  var urlRegex;
   function convertTabToTwoSpacesAndUrlToLinks$lambda(closure$url) {
     return function ($receiver) {
       $receiver.unaryPlus_pdl1vz$(closure$url);
@@ -5234,17 +5235,11 @@
         var startIndex = index;
         var endIndex = match.range.start;
         convertTabToTwoSpaces($receiver, message.substring(startIndex, endIndex));
-        var tmpUrl = match.value;
-        var tmp$;
-        if (endsWith(tmpUrl, '.')) {
-          var endIndex_0 = tmpUrl.length - 1 | 0;
-          tmp$ = tmpUrl.substring(0, endIndex_0);
-        }
-         else
-          tmp$ = tmpUrl;
-        var url = tmp$;
+        var tmp$ = determineUrlAndNextIndex(match);
+        var url = tmp$.component1()
+        , nextIndex = tmp$.component2();
         a($receiver, url, void 0, void 0, convertTabToTwoSpacesAndUrlToLinks$lambda(url));
-        index = match.range.endInclusive + 1 | 0;
+        index = nextIndex;
         matchResult = match.next();
       }
        while (matchResult != null);
@@ -5274,7 +5269,18 @@
     var startIndex_0 = currentIndex;
     $receiver.unaryPlus_pdl1vz$(content.substring(startIndex_0));
   }
-  var urlRegex;
+  function determineUrlAndNextIndex(match) {
+    var tmp$;
+    var tmpUrl = match.value;
+    if (endsWith(tmpUrl, '.')) {
+      var endIndex = tmpUrl.length - 1 | 0;
+      tmp$ = to(tmpUrl.substring(0, endIndex), match.range.endInclusive);
+    }
+     else {
+      tmp$ = to(tmpUrl, match.range.endInclusive + 1 | 0);
+    }
+    return tmp$;
+  }
   function showDialog$lambda$lambda(closure$resolve) {
     return function ($receiver, box) {
       modalButton($receiver, 'Yes', box, closure$resolve, true);
