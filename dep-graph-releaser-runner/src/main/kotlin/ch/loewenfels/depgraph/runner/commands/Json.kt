@@ -99,6 +99,7 @@ object Json : ConsoleCommand {
             ConfigKey.RELATIVE_PATH_TO_GIT_REPO_REGEX to gitRepoRegex,
             ConfigKey.RELATIVE_PATH_TO_GIT_REPO_REPLACEMENT to gitRepoReplacement,
             ConfigKey.REGEX_PARAMS to (regexParameters ?: ""),
+            ConfigKey.INITIAL_RELEASE_JSON to "",
             ConfigKey.JOB_MAPPING to (jobMapping ?: "")
         )
 
