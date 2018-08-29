@@ -72,6 +72,7 @@
                                 <argument>-disableRegex=${disableRegex}</argument>
                                 <argument>-jobMapping=${jobMapping}</argument>
                                 <argument>-commitPrefix=${commitPrefix}</argument>
+                                <argument>-buildWithParamJobs=${buildWithParamJobs}</argument>
                             </arguments>
                         </configuration>
                     </execution>

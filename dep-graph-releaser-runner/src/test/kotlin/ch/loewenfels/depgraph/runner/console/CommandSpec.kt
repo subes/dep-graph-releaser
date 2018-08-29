@@ -48,14 +48,14 @@ abstract class CommandSpec(
         describe("fun ${testee::numOfArgsNotOk.name}") {
             group("returns false for a correct number of args") {
                 allowedNumberOfArgs.forEach { number ->
-                    it("$number") {
+                    test("$number") {
                         assert(testee.numOfArgsNotOk(number)).toBe(false)
                     }
                 }
             }
             group("returns true for an incorrect number of args") {
                 listOf(allowedNumberOfArgs.start - 1, allowedNumberOfArgs.endInclusive + 1).forEach { number ->
-                    it("$number") {
+                    test("$number") {
                         assert(testee.numOfArgsNotOk(number)).toBe(true)
                     }
                 }

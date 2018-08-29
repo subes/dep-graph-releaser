@@ -15,6 +15,7 @@ object Json : ConsoleCommand {
     val REGEX_PARAMS_ARG = "-${ConfigKey.REGEX_PARAMS.asString()}="
     val JOB_MAPPING_ARG = "-${ConfigKey.JOB_MAPPING.asString()}="
     val COMMIT_PREFIX_ARG = "-${ConfigKey.COMMIT_PREFIX.asString()}="
+    val BUILD_WITH_PARAM_JOBS_ARG = "-${ConfigKey.BUILD_WITH_PARAM_JOBS.asString()}="
     const val DISABLE_RELEASE_FOR = "-disableRegex="
 
     override val name = "json"
@@ -49,20 +50,22 @@ object Json : ConsoleCommand {
         |${ConfigKey.RELATIVE_PATH_TO_GIT_REPO_REPLACEMENT.asString()}    // replacement string used to turn a relative project path into
         |                                    // a git repository url
         |
-        |(${REGEX_PARAMS_ARG}spec)       // optionally: parameters of the form regex#a=b;c=d${'$'}.*#e=f where the regex
-        |                          // defines for which job the parameters shall apply. Multiple regex can be
-        |                          // specified. In the above, .* matches all, so every job gets e=f as argument.
-        |(${DISABLE_RELEASE_FOR}Regex)     // optionally: regex specifying for which projects
-        |                          // the release commands have to be disabled
-        |(${JOB_MAPPING_ARG}spec)        // optionally: in case a jenkins job differ from its artifact name,
-        |                          // you can use this mapping which is of the form:
-        |                          // groupId:artifactId1=jobName1|groupId:artifactId2=anotherName
-        |(${COMMIT_PREFIX_ARG}spec)      // optionally: it is possible to define a commit prefix
-        |                          // if not specified, the default "[DGR]" is used
+        |(${REGEX_PARAMS_ARG}spec)         // optionally: parameters of the form regex#a=b;c=d${'$'}.*#e=f where the regex
+        |                            // defines for which project the parameters shall apply. Multiple regex can be
+        |                            // specified. In the above, .* matches all, so every job gets e=f as argument.
+        |(${DISABLE_RELEASE_FOR}Regex)       // optionally: regex specifying for which projects
+        |                            // the release commands have to be disabled
+        |(${JOB_MAPPING_ARG}spec)          // optionally: in case a jenkins job differ from its artifact name,
+        |                            // you can use this mapping which is of the form:
+        |                            // groupId:artifactId1=jobName1|groupId:artifactId2=anotherName
+        |(${COMMIT_PREFIX_ARG}spec)        // optionally: it is possible to define a commit prefix
+        |                            // if not specified, the default "[DGR]" is used
+        |(${BUILD_WITH_PARAM_JOBS_ARG}Regex) // optionally: project identifier (groupId:artifactId) matching will use the
+        |                            // buildWithParameters endpoint instead of m2release.
         """.trimMargin()
     }
 
-    override fun numOfArgsNotOk(number: Int) = number < 11 || number > 15
+    override fun numOfArgsNotOk(number: Int) = number < 11 || number > 16
 
     override fun execute(args: Array<out String>, errorHandler: ErrorHandler) {
         val (_, groupId, artifactId, unsafeDirectoryToAnalyse, jsonFile) = args
@@ -71,9 +74,14 @@ object Json : ConsoleCommand {
         val afterFirstEight = afterFirst5.drop(3)
         val (excludeRegex, gitRepoRegex, gitRepoReplacement) = afterFirstEight
         val optionalArgs = afterFirstEight.drop(3).toOptionalArgs(
-            errorHandler, REGEX_PARAMS_ARG, DISABLE_RELEASE_FOR, JOB_MAPPING_ARG, COMMIT_PREFIX_ARG
+            errorHandler,
+            REGEX_PARAMS_ARG,
+            DISABLE_RELEASE_FOR,
+            JOB_MAPPING_ARG,
+            COMMIT_PREFIX_ARG,
+            BUILD_WITH_PARAM_JOBS_ARG
         )
-        val (regexParameters, disableReleaseFor, jobMapping, commitPrefix) = optionalArgs
+        val (regexParameters, disableReleaseFor, jobMapping, commitPrefix, buildWithParamJobs) = optionalArgs
 
         val disableReleaseForRegex = if (disableReleaseFor != null) {
             Regex(disableReleaseFor.substringAfter(DISABLE_RELEASE_FOR))
@@ -86,9 +94,10 @@ object Json : ConsoleCommand {
         )
         val json = toVerifiedFileIfParentExists(jsonFile, "json file", errorHandler)
 
-        //will both throw if there is a validation error
+        //will all throw if there is a validation error
         parseRemoteRegex(remoteRegex)
         if (regexParameters != null) parseRegexParameters(regexParameters)
+        if (buildWithParamJobs != null) Regex(buildWithParamJobs)
 
         val config = mapOf(
             ConfigKey.COMMIT_PREFIX to (commitPrefix ?: "[DGR]"),
@@ -99,8 +108,9 @@ object Json : ConsoleCommand {
             ConfigKey.RELATIVE_PATH_TO_GIT_REPO_REGEX to gitRepoRegex,
             ConfigKey.RELATIVE_PATH_TO_GIT_REPO_REPLACEMENT to gitRepoReplacement,
             ConfigKey.REGEX_PARAMS to (regexParameters ?: ""),
-            ConfigKey.INITIAL_RELEASE_JSON to "",
-            ConfigKey.JOB_MAPPING to (jobMapping ?: "")
+            ConfigKey.JOB_MAPPING to (jobMapping ?: ""),
+            ConfigKey.BUILD_WITH_PARAM_JOBS to (buildWithParamJobs ?: "^$"), //default matches nothing
+            ConfigKey.INITIAL_RELEASE_JSON to ""
         )
 
         val mavenProjectId = MavenProjectId(groupId, artifactId)

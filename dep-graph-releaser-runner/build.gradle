@@ -95,6 +95,7 @@ task json {
     def disableRegexArg = 'disableRegex'
     def jobMappingArg = 'jobMapping'
     def commitPrefixArg = 'commitPrefix'
+    def buildWithParamJobsArg = 'buildWithParamJobs'
     inputs.property(groupIdArg, findProperty(groupIdArg) ?: '')
     inputs.property(artifactIdArg, findProperty(artifactIdArg) ?: '')
     inputs.property(dirArg, findProperty(dirArg) ?: defaultDirArg)
@@ -108,6 +109,7 @@ task json {
     inputs.property(disableRegexArg, findProperty(disableRegexArg) ?: '^$')
     inputs.property(jobMappingArg, findProperty(jobMappingArg) ?: '')
     inputs.property(commitPrefixArg, findProperty(commitPrefixArg) ?: '')
+    inputs.property(buildWithParamJobsArg, findProperty(buildWithParamJobsArg) ?: '')
     inputs.files dist
     outputs.file jsonFile
     doLast {
@@ -132,10 +134,11 @@ task json {
                  "ch.loewenfels.depgraph:dgr-5=apnoea-test-5"
             ]
         def commitPrefix = findProperty(commitPrefixArg) != null ? ["-$commitPrefixArg=${findProperty(commitPrefixArg)}"] : []
+        def buildWithParamJobs = findProperty(buildWithParamJobsArg) != null ? ["-$buildWithParamJobsArg=${findProperty(buildWithParamJobsArg)}"] : []
 
         execMain(
             ['json', groupId, artifactId, dir, jsonFile.absolutePath, updateDependencyJob, dryRunJob, remoteRegex, relativePathExcludeProjects, relativePathGitRepoRegex, relativePathGitRepoReplacement] +
-                params + disableRegex + jobMapping + commitPrefix
+                params + disableRegex + jobMapping + commitPrefix + buildWithParamJobs
         )
     }
 }
