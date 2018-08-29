@@ -16,8 +16,8 @@ class ReleaseJobExecutionDataFactory(
     releasePlan: ReleasePlan
 ) : BaseJobExecutionDataFactory(defaultJenkinsBaseUrl, releasePlan) {
 
-    private val remoteRegex : List<Pair<Regex, String>>
-    private val regexParametersList: List<Pair<Regex, String>>
+    private val remoteRegex: List<Pair<Regex, String>>
+    private val regexParametersList: List<Pair<Regex, List<String>>>
     private val jobMapping: Map<String, String>
 
     init {
@@ -72,7 +72,7 @@ class ReleaseJobExecutionDataFactory(
         return JobExecutionData.buildWithParameters(jobName, jobUrl, toQueryParameters(params), params)
     }
 
-    private fun createUpdateDependencyParams(project: Project, command: JenkinsUpdateDependency): Map<String,String> {
+    private fun createUpdateDependencyParams(project: Project, command: JenkinsUpdateDependency): Map<String, String> {
         val dependency = releasePlan.getProject(command.projectId)
         val dependencyMavenProjectId = dependency.id as MavenProjectId
         return mapOf(
@@ -90,7 +90,7 @@ class ReleaseJobExecutionDataFactory(
         val jobName = getJobName(project)
         val jenkinsBaseUrl = getMatchingEntries(remoteRegex, mavenProjectId).firstOrNull() ?: defaultJenkinsBaseUrl
         val jobUrl = getJobUrl(jenkinsBaseUrl, jobName)
-        val relevantParams = getMatchingEntries(regexParametersList, mavenProjectId)
+        val relevantParams = getMatchingEntries(regexParametersList, mavenProjectId).flatMap { it.asSequence() }
         val parameters = StringBuilder()
         relevantParams.appendToStringBuilder(parameters, ",") {
             val (name, value) = it.split('=')
@@ -108,8 +108,8 @@ class ReleaseJobExecutionDataFactory(
         )
     }
 
-    private fun getMatchingEntries(
-        regex: List<Pair<Regex, String>>,
+    private fun <T> getMatchingEntries(
+        regex: List<Pair<Regex, T>>,
         mavenProjectId: MavenProjectId
     ) = regex.asSequence().filter { (regex, _) -> regex.matches(mavenProjectId.identifier) }.map { it.second }
 }

@@ -5,29 +5,34 @@ import ch.loewenfels.depgraph.data.ReleasePlan
 
 fun parseRemoteRegex(releasePlan: ReleasePlan) =
     parseRemoteRegex(releasePlan.getConfig(ConfigKey.REMOTE_REGEX))
+
 fun parseRemoteRegex(regex: String): List<Pair<Regex, String>> {
-    return parseRegex(regex, ';', "remoteRegex", ::checkUrlDefined)
+    return parseRegex(regex, ';', "remoteRegex", ::checkUrlDefined) { it }
 }
 
 fun parseRegexParameters(releasePlan: ReleasePlan) =
     parseRegexParameters(releasePlan.getConfig(ConfigKey.REGEX_PARAMS))
-fun parseRegexParameters(regex: String): List<Pair<Regex, String>> {
-    return parseRegex(regex, '$', "regexParameters", ::checkAtLeastOneParameter)
+
+fun parseRegexParameters(regex: String): List<Pair<Regex, List<String>>> {
+    return parseRegex(regex, '$', "regexParameters", ::checkAtLeastOneParameter) { params ->
+        params.split(';')
+    }
 }
 
-private fun parseRegex(
+private fun <T> parseRegex(
     configValue: String,
     splitChar: Char,
     name: String,
-    checkRightSide: (String, String) -> Unit
-): List<Pair<Regex, String>> {
+    checkRightSide: (String, String) -> Unit,
+    rightSideConverter: (String) -> T
+): List<Pair<Regex, T>> {
     return if (configValue.isNotEmpty()) {
         configValue.splitToSequence(splitChar)
             .map { pair ->
                 val index = checkRegexNotEmpty(pair, name, configValue)
                 val rightSide = pair.substring(index + 1)
                 checkRightSide(rightSide, configValue)
-                Regex(pair.substring(0, index)) to rightSide
+                Regex(pair.substring(0, index).replace("\n", "")) to rightSideConverter(rightSide)
             }
             .toList()
     } else {
@@ -44,7 +49,7 @@ private fun checkRegexNotEmpty(pair: String, name: String, input: String): Int {
 }
 
 private fun checkUrlDefined(jenkinsBaseUrl: String, remoteRegex: String) {
-    check(jenkinsBaseUrl.isNotBlank()){
+    check(jenkinsBaseUrl.isNotBlank()) {
         "A remoteRegex requires a related jenkins base url.\remoteRegex: $remoteRegex"
     }
 }
