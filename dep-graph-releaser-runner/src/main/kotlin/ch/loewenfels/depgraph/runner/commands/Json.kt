@@ -22,12 +22,12 @@ object Json : ConsoleCommand {
     override val name = "json"
     override val description = "analyse projects, create a release plan and serialize it to json"
     override val example = "./dgr $name com.example example-project ./repo ./release.json " +
-        "dgr-updater dgr-dry-run \"ch\\..*#https://example.com/jenkins;com\\..*#https://jenkins.example.com\" " +
+        "dgr-updater dgr-dry-run \"ch\\..*#https://example.com/jenkins\\ncom\\..*#https://jenkins.example.com\" " +
         "\"[^/]+/[^/]+/.+\" \"^(.*)/\$\" https://github.com/\$1" +
         "$REGEX_PARAMS_ARG\".*#branch.name=master\" $DISABLE_RELEASE_FOR\"ch\\.loewenfels:dist.*\" " +
-        "${JOB_MAPPING_ARG}com.example:a=exampleA|ch.loewenfels:dgr-1=apnoea-test-1" +
+        "${JOB_MAPPING_ARG}com.example:a=exampleA\\nch.loewenfels:dgr-1=apnoea-test-1" +
         "$COMMIT_PREFIX_ARG[RELEASE]" +
-        "${BUILD_WITH_PARAM_JOBS_ARG}ch.loewenfels.depgraph:.*#maven#releaseVersion;nextDevVersion;additional${'$'}.*#query#RELEASE_VERSION;DEVELOPMENT_VERSION"
+        "${BUILD_WITH_PARAM_JOBS_ARG}ch.loewenfels.depgraph:.*#maven#releaseVersion;nextDevVersion;additional\\n.*#query#RELEASE_VERSION;DEVELOPMENT_VERSION"
 
     override val arguments by lazy {
         """
@@ -52,9 +52,9 @@ object Json : ConsoleCommand {
         |${ConfigKey.RELATIVE_PATH_TO_GIT_REPO_REPLACEMENT.asString()}    // replacement string used to turn a relative project path into
         |                                    // a git repository url
         |
-        |(${REGEX_PARAMS_ARG}spec)         // optionally: parameters of the form regex#a=b;c=d${'$'}.*#e=f where the regex
+        |(${REGEX_PARAMS_ARG}spec)         // optionally: parameters of the form regex#a=b;c=d\n.*#e=f where the regex
         |                            // defines for which project the parameters shall apply. Multiple regex can be
-        |                            // specified. In the above, .* matches all, so every job gets e=f as argument.
+        |                            // specified (separated by \n). In the above, .* matches all, so every job gets e=f as argument.
         |(${DISABLE_RELEASE_FOR}Regex)       // optionally: regex specifying for which projects
         |                            // the release commands have to be disabled
         |(${JOB_MAPPING_ARG}spec)          // optionally: in case a jenkins job differ from its artifact name,
@@ -63,11 +63,11 @@ object Json : ConsoleCommand {
         |(${COMMIT_PREFIX_ARG}spec)        // optionally: it is possible to define a commit prefix
         |                            // if not specified, the default "[DGR]" is used
         |(${BUILD_WITH_PARAM_JOBS_ARG}spec)  // optionally: allows to specify a different endpoint than m2release. Spec is in the format
-        |                            // regex#format#releseVersion;nextDevVersion${'$'}regex2#maven#releaseVersion;nextDevVersion;additionalParam
+        |                            // regex#format#releseVersion;nextDevVersion\nregex2#maven#releaseVersion;nextDevVersion;additionalParam
         |                            // where project identifier (groupId:artifactId) matching regex will use the
         |                            // buildWithParameters endpoint instead of m2release whereas the two parameters releaseVersion and
         |                            // nextDevVersion will be transferred in the given format and with the given names specified
-        |                            // in the 3 part of the spec. You can specify multiple regex (separated by ${'$'})
+        |                            // in the 3 part of the spec. You can specify multiple regex (separated by \n)
         |                            // whereas the first match is considered and the rest ignored.
         |                            // You can use the following formats:
         |                            // - query => params are passed independently with the given names.

@@ -64,10 +64,9 @@ class ContentContainer(modifiableState: ModifiableState, private val menu: Menu)
                 arrayOf(
                     ConfigKey.REGEX_PARAMS,
                     ConfigKey.REMOTE_REGEX,
-                    ConfigKey.BUILD_WITH_PARAM_JOBS
-                ).forEach(textAreaForConfig(config))
-
-                jobMappingTextArea(config)
+                    ConfigKey.BUILD_WITH_PARAM_JOBS,
+                    ConfigKey.JOB_MAPPING
+                ).forEach(configTextArea(config))
             }
         }
         val initialSite = getTextField("config-${ConfigKey.INITIAL_RELEASE_JSON.asString()}")
@@ -80,19 +79,17 @@ class ContentContainer(modifiableState: ModifiableState, private val menu: Menu)
         textFieldWithLabel("config-${key.asString()}", key.asString(), config[key] ?: "", menu)
     }
 
-    private fun DIV.textAreaForConfig(config: Map<ConfigKey, String>): (ConfigKey) -> Unit {
+    private fun DIV.configTextArea(config: Map<ConfigKey, String>): (ConfigKey) -> Unit {
         return { key ->
+            val value = config[key]
+                ?.replace("\\n", "\n")
+                ?.replace("\t", "  ")
+                ?.trim()
+                ?: ""
             textAreaWithLabel(
-                "config-${key.asString()}", key.asString(), config[key] ?: "", menu
+                "config-${key.asString()}", key.asString(), value, menu
             )
         }
-    }
-
-    private fun DIV.jobMappingTextArea(config: Map<ConfigKey, String>) {
-        val key = ConfigKey.JOB_MAPPING
-        textAreaWithLabel(
-            "config-${key.asString()}", key.asString(), config[key]?.replace("|", "\n") ?: "", menu
-        )
     }
 
     companion object {

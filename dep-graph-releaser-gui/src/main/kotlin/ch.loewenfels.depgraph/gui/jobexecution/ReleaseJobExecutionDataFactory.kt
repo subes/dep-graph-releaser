@@ -39,7 +39,7 @@ class ReleaseJobExecutionDataFactory(
 
     private fun parseJobMapping(): Map<String, String> {
         val mapping = getConfig(ConfigKey.JOB_MAPPING)
-        return mapping.split("|").associate { pair ->
+        return mapping.split("\\n").associate { pair ->
             val index = pair.indexOf('=')
             check(index > 0) {
                 "At least one mapping has no groupId and artifactId defined.\njobMapping: $mapping"

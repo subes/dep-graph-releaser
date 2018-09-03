@@ -34,14 +34,14 @@ object MainSpec : Spek({
                 val jsonFile = File(tempFolder.tmpDir, "test.json")
                 val dryRunJob = "dgr-dry-run"
                 val updateJob = "dgr-updater"
-                val remoteRegex = "^$#none"
+                val remoteRegex = "^$#none\\n(a\\n\tcomplicated|regex)(?!\\n\ta|\\n\tb).*#https://somewhere.else.com/\\nb#https://test"
                 val relativePathExcludeProjectRegex = "[^/]+/[^/]+/.+"
                 val relativePathToGitRepoRegex = "^(.*)/\$"
                 val relativePathToGitRepoReplacement = "https://github.com/$1"
-                val regexParams = ".*#branch.name=master${'$'}a.*#param1=2;param2=3"
+                val regexParams = ".*#branch.name=master\\na.*#param1=2;param2=3"
                 val jobMapping = "com.example.project=ownJobName"
                 val commitPrefix = "[DGR] DEV-12345"
-                val buildWithParamsJob = "^#maven#r;n;a$.*#query#releaseVersion;nextDevVersion"
+                val buildWithParamsJob = "^$#maven#r;n;a\\n.*#query#releaseVersion;nextDevVersion"
                 Main.main(
                     "json", "com.example", "a",
                     getTestDirectory("managingVersions/inDependency").absolutePath,
@@ -77,6 +77,7 @@ object MainSpec : Spek({
                         returnValueOf(ReleasePlan::getConfig, ConfigKey.REGEX_PARAMS).toBe(regexParams)
                         returnValueOf(ReleasePlan::getConfig, ConfigKey.JOB_MAPPING).toBe(jobMapping)
                         returnValueOf(ReleasePlan::getConfig, ConfigKey.COMMIT_PREFIX).toBe(commitPrefix)
+                        returnValueOf(ReleasePlan::getConfig, ConfigKey.BUILD_WITH_PARAM_JOBS).toBe(buildWithParamsJob)
                     }
                 }
             }
