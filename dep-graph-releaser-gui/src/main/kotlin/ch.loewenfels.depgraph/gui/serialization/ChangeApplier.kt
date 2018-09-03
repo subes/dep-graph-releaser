@@ -101,6 +101,7 @@ object ChangeApplier {
             ConfigKey.JOB_MAPPING.asString() ->
                 (input as HTMLTextAreaElement).value.replace("\r", "").replace("\n", "|")
 
+            ConfigKey.REGEX_PARAMS.asString(),
             ConfigKey.REMOTE_REGEX.asString(),
             ConfigKey.BUILD_WITH_PARAM_JOBS.asString() ->
                 (input as HTMLTextAreaElement).value

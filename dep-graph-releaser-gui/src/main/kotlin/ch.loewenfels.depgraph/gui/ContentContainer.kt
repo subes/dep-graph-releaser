@@ -51,21 +51,22 @@ class ContentContainer(modifiableState: ModifiableState, private val menu: Menu)
                 textFieldWithLabel(RELEASE_ID_HTML_ID, "ReleaseId", releasePlan.releaseId, menu)
 
                 val config = releasePlan.config
-                listOf(
+                arrayOf(
                     ConfigKey.COMMIT_PREFIX,
                     ConfigKey.UPDATE_DEPENDENCY_JOB,
-                    ConfigKey.DRY_RUN_JOB
-                ).forEach(configTextField(config))
-                listOf(
+                    ConfigKey.DRY_RUN_JOB,
                     ConfigKey.RELATIVE_PATH_EXCLUDE_PROJECT_REGEX,
                     ConfigKey.RELATIVE_PATH_TO_GIT_REPO_REGEX,
                     ConfigKey.RELATIVE_PATH_TO_GIT_REPO_REPLACEMENT,
-                    ConfigKey.REGEX_PARAMS,
                     ConfigKey.INITIAL_RELEASE_JSON
                 ).forEach(configTextField(config))
 
-                textAreaForConfig(config, ConfigKey.REMOTE_REGEX)
-                textAreaForConfig(config, ConfigKey.BUILD_WITH_PARAM_JOBS)
+                arrayOf(
+                    ConfigKey.REGEX_PARAMS,
+                    ConfigKey.REMOTE_REGEX,
+                    ConfigKey.BUILD_WITH_PARAM_JOBS
+                ).forEach(textAreaForConfig(config))
+
                 jobMappingTextArea(config)
             }
         }
@@ -75,10 +76,16 @@ class ContentContainer(modifiableState: ModifiableState, private val menu: Menu)
         }
     }
 
-    private fun DIV.textAreaForConfig(config: Map<ConfigKey, String>, key: ConfigKey) {
-        textAreaWithLabel(
-            "config-${key.asString()}", key.asString(), config[key] ?: "", menu
-        )
+    private fun DIV.configTextField(config: Map<ConfigKey, String>): (ConfigKey) -> Unit = { key ->
+        textFieldWithLabel("config-${key.asString()}", key.asString(), config[key] ?: "", menu)
+    }
+
+    private fun DIV.textAreaForConfig(config: Map<ConfigKey, String>): (ConfigKey) -> Unit {
+        return { key ->
+            textAreaWithLabel(
+                "config-${key.asString()}", key.asString(), config[key] ?: "", menu
+            )
+        }
     }
 
     private fun DIV.jobMappingTextArea(config: Map<ConfigKey, String>) {
@@ -86,10 +93,6 @@ class ContentContainer(modifiableState: ModifiableState, private val menu: Menu)
         textAreaWithLabel(
             "config-${key.asString()}", key.asString(), config[key]?.replace("|", "\n") ?: "", menu
         )
-    }
-
-    private fun DIV.configTextField(config: Map<ConfigKey, String>): (ConfigKey) -> Unit = { key ->
-        textFieldWithLabel("config-${key.asString()}", key.asString(), config[key] ?: "", menu)
     }
 
     companion object {

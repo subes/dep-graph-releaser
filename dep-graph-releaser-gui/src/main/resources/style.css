@@ -120,7 +120,7 @@ a:hover {
     transition: top .5s ease;
     overflow-y: auto;
 }
-@media (max-height:642px) {
+@media (max-height:850px) {
     #config {
         bottom: 30px;
     }
