@@ -38,9 +38,10 @@ object MainSpec : Spek({
                 val relativePathExcludeProjectRegex = "[^/]+/[^/]+/.+"
                 val relativePathToGitRepoRegex = "^(.*)/\$"
                 val relativePathToGitRepoReplacement = "https://github.com/$1"
-                val regexParams = ".*#branch.name=master"
+                val regexParams = ".*#branch.name=master${'$'}a.*#param1=2;param2=3"
                 val jobMapping = "com.example.project=ownJobName"
                 val commitPrefix = "[DGR] DEV-12345"
+                val buildWithParamsJob = "^#maven#r;n;a$.*#query#releaseVersion;nextDevVersion"
                 Main.main(
                     "json", "com.example", "a",
                     getTestDirectory("managingVersions/inDependency").absolutePath,
@@ -53,7 +54,8 @@ object MainSpec : Spek({
                     relativePathToGitRepoReplacement,
                     "${Json.REGEX_PARAMS_ARG}$regexParams",
                     "${Json.JOB_MAPPING_ARG}$jobMapping",
-                    "${Json.COMMIT_PREFIX_ARG}$commitPrefix"
+                    "${Json.COMMIT_PREFIX_ARG}$commitPrefix",
+                    "${Json.BUILD_WITH_PARAM_JOBS_ARG}$buildWithParamsJob"
                 )
                 it("creates a corresponding json file") {
                     assert(jsonFile).returnValueOf(jsonFile::exists).toBe(true)

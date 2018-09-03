@@ -3,6 +3,7 @@ package ch.loewenfels.depgraph.runner.commands
 import ch.loewenfels.depgraph.ConfigKey
 import ch.loewenfels.depgraph.data.maven.MavenProjectId
 import ch.loewenfels.depgraph.maven.JenkinsReleasePlanCreator
+import ch.loewenfels.depgraph.parseBuildWithParamJobs
 import ch.loewenfels.depgraph.parseRegexParameters
 import ch.loewenfels.depgraph.parseRemoteRegex
 import ch.loewenfels.depgraph.runner.Orchestrator
@@ -24,8 +25,9 @@ object Json : ConsoleCommand {
         "dgr-updater dgr-dry-run \"ch\\..*#https://example.com/jenkins;com\\..*#https://jenkins.example.com\" " +
         "\"[^/]+/[^/]+/.+\" \"^(.*)/\$\" https://github.com/\$1" +
         "$REGEX_PARAMS_ARG\".*#branch.name=master\" $DISABLE_RELEASE_FOR\"ch\\.loewenfels:dist.*\" " +
-        "$JOB_MAPPING_ARG=com.example:a=exampleA|ch.loewenfels:dgr-1=apnoea-test-1" +
-        "$COMMIT_PREFIX_ARG=[RELEASE]"
+        "${JOB_MAPPING_ARG}com.example:a=exampleA|ch.loewenfels:dgr-1=apnoea-test-1" +
+        "$COMMIT_PREFIX_ARG[RELEASE]" +
+        "${BUILD_WITH_PARAM_JOBS_ARG}ch.loewenfels.depgraph:.*#maven#releaseVersion;nextDevVersion;additional${'$'}.*#query#RELEASE_VERSION;DEVELOPMENT_VERSION"
 
     override val arguments by lazy {
         """
@@ -60,8 +62,24 @@ object Json : ConsoleCommand {
         |                            // groupId:artifactId1=jobName1|groupId:artifactId2=anotherName
         |(${COMMIT_PREFIX_ARG}spec)        // optionally: it is possible to define a commit prefix
         |                            // if not specified, the default "[DGR]" is used
-        |(${BUILD_WITH_PARAM_JOBS_ARG}Regex) // optionally: project identifier (groupId:artifactId) matching will use the
-        |                            // buildWithParameters endpoint instead of m2release.
+        |(${BUILD_WITH_PARAM_JOBS_ARG}spec)  // optionally: allows to specify a different endpoint than m2release. Spec is in the format
+        |                            // regex#format#releseVersion;nextDevVersion${'$'}regex2#maven#releaseVersion;nextDevVersion;additionalParam
+        |                            // where project identifier (groupId:artifactId) matching regex will use the
+        |                            // buildWithParameters endpoint instead of m2release whereas the two parameters releaseVersion and
+        |                            // nextDevVersion will be transferred in the given format and with the given names specified
+        |                            // in the 3 part of the spec. You can specify multiple regex (separated by ${'$'})
+        |                            // whereas the first match is considered and the rest ignored.
+        |                            // You can use the following formats:
+        |                            // - query => params are passed independently with the given names.
+        |                            //            For instance .*#query#release;nextDev will result in the following arguments
+        |                            //            release=1.20&nextDev=1.21-SNAPSHOT
+        |                            // - maven => params are squashed into one parameter (name is the third in the 3 part of the spec)
+        |                            //            where argument has the form '-Darg1=value2 -Darg2 value2".
+        |                            //            For instance .*#maven#release;nextDev;ADDITIONAL_PARAMS will result in the following arguments
+        |                            //            ADDITIONAL_PARAMS="-Drelease=1.20 -DnextDev=1.21-SNAPSHOT"
+        |                            //
+        |                            // Notice that ${ConfigKey.REGEX_PARAMS.asString()} are not affected by the format option, they are always
+        |                            // sent as independent parameters
         """.trimMargin()
     }
 
@@ -97,7 +115,7 @@ object Json : ConsoleCommand {
         //will all throw if there is a validation error
         parseRemoteRegex(remoteRegex)
         if (regexParameters != null) parseRegexParameters(regexParameters)
-        if (buildWithParamJobs != null) Regex(buildWithParamJobs)
+        if (buildWithParamJobs != null) parseBuildWithParamJobs(buildWithParamJobs)
 
         val config = mapOf(
             ConfigKey.COMMIT_PREFIX to (commitPrefix ?: "[DGR]"),
@@ -109,7 +127,7 @@ object Json : ConsoleCommand {
             ConfigKey.RELATIVE_PATH_TO_GIT_REPO_REPLACEMENT to gitRepoReplacement,
             ConfigKey.REGEX_PARAMS to (regexParameters ?: ""),
             ConfigKey.JOB_MAPPING to (jobMapping ?: ""),
-            ConfigKey.BUILD_WITH_PARAM_JOBS to (buildWithParamJobs ?: "^$"), //default matches nothing
+            ConfigKey.BUILD_WITH_PARAM_JOBS to (buildWithParamJobs ?: ""),
             ConfigKey.INITIAL_RELEASE_JSON to ""
         )
 
