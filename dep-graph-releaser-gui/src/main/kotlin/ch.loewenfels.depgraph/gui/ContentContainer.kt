@@ -8,6 +8,7 @@ import ch.loewenfels.depgraph.gui.components.Pipeline
 import ch.loewenfels.depgraph.gui.components.textAreaWithLabel
 import ch.loewenfels.depgraph.gui.components.textFieldWithLabel
 import ch.loewenfels.depgraph.gui.serialization.ModifiableState
+import kotlinx.html.DIV
 import kotlinx.html.div
 import kotlinx.html.dom.append
 import org.w3c.dom.asList
@@ -53,26 +54,41 @@ class ContentContainer(modifiableState: ModifiableState, private val menu: Menu)
                 listOf(
                     ConfigKey.COMMIT_PREFIX,
                     ConfigKey.UPDATE_DEPENDENCY_JOB,
-                    ConfigKey.DRY_RUN_JOB,
-                    ConfigKey.REMOTE_REGEX,
+                    ConfigKey.DRY_RUN_JOB
+                ).forEach(configTextField(config))
+                listOf(
                     ConfigKey.RELATIVE_PATH_EXCLUDE_PROJECT_REGEX,
                     ConfigKey.RELATIVE_PATH_TO_GIT_REPO_REGEX,
                     ConfigKey.RELATIVE_PATH_TO_GIT_REPO_REPLACEMENT,
                     ConfigKey.REGEX_PARAMS,
                     ConfigKey.INITIAL_RELEASE_JSON
-                ).forEach { key ->
-                    textFieldWithLabel("config-${key.asString()}", key.asString(), config[key] ?: "", menu)
-                }
-                val key = ConfigKey.JOB_MAPPING
-                textAreaWithLabel(
-                    "config-${key.asString()}", key.asString(), config[key]?.replace("|", "\n") ?: "", menu
-                )
+                ).forEach(configTextField(config))
+                remoteRegexTextArea(config)
+                jobMappingTextArea(config)
             }
         }
         val initialSite = getTextField("config-${ConfigKey.INITIAL_RELEASE_JSON.asString()}")
         if (initialSite.value.isBlank()) {
             initialSite.value = App.determineJsonUrl() ?: ""
         }
+    }
+
+    private fun DIV.remoteRegexTextArea(config: Map<ConfigKey, String>) {
+        val key = ConfigKey.REMOTE_REGEX
+        textAreaWithLabel(
+            "config-${key.asString()}", key.asString(), config[key] ?: "", menu
+        )
+    }
+
+    private fun DIV.jobMappingTextArea(config: Map<ConfigKey, String>) {
+        val key = ConfigKey.JOB_MAPPING
+        textAreaWithLabel(
+            "config-${key.asString()}", key.asString(), config[key]?.replace("|", "\n") ?: "", menu
+        )
+    }
+
+    private fun DIV.configTextField(config: Map<ConfigKey, String>): (ConfigKey) -> Unit = { key ->
+        textFieldWithLabel("config-${key.asString()}", key.asString(), config[key] ?: "", menu)
     }
 
     companion object {

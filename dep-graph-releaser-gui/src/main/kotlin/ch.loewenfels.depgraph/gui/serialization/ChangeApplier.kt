@@ -86,10 +86,11 @@ object ChangeApplier {
             if (arr.size != 2) return@forEach
 
             val input = elementById("config-${arr[0]}")
-            val value = if (arr[0] == ConfigKey.JOB_MAPPING.asString()) {
-                (input as HTMLTextAreaElement).value.replace("\r", "").replace("\n", "|")
-            } else {
-                (input as HTMLInputElement).value
+            val value = when (arr[0]) {
+                ConfigKey.JOB_MAPPING.asString() -> (input as HTMLTextAreaElement).value
+                    .replace("\r", "").replace("\n", "|")
+                ConfigKey.REMOTE_REGEX.asString() -> (input as HTMLTextAreaElement).value
+                else -> (input as HTMLInputElement).value
             }
             if (arr[1] != value) {
                 arr[1] = value
