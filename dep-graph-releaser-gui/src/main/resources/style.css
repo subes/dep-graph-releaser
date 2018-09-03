@@ -120,6 +120,11 @@ a:hover {
     transition: top .5s ease;
     overflow-y: auto;
 }
+@media (max-height:642px) {
+    #config {
+        bottom: 30px;
+    }
+}
 
 .menuLayer.active {
     visibility: visible;
