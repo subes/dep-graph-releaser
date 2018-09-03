@@ -26,7 +26,16 @@ object VersionDeterminerSpec : Spek({
             "2.5" to "2.6",
             "2.x" to "3",
             "2" to "3",
-            "lovelyVersion" to "lovelyVersion.2"
+            "lovelyVersion" to "lovelyVersion.2",
+            "2.0.3.9" to "2.0.3.10",
+            "2.1.5.0" to "2.1.6.0",
+            "2.1.0" to "2.2.0",
+            "2.0.0" to "2.1.0",
+            "2.0" to "3.0",
+            "2.0.3.9-a1" to "2.0.3.9-a2",
+            "2.0.3-RC-1" to "2.0.3-RC-2",
+            "2.0.rc1" to "2.0.rc2",
+            "2_RC1" to "2_RC2"
         ).forEach { version, expected ->
             test("$version turns into $expected") {
                 val result = testee.releaseVersion(version)
@@ -41,7 +50,7 @@ object VersionDeterminerSpec : Spek({
 
     describe("fun ${testee::nextDevVersion.name}") {
         mapOf(
-            "2.0.1-10-SNAPSHOT" to "2.0.2-SNAPSHOT",
+            "2.0.1-10-SNAPSHOT" to "2.0.1-11-SNAPSHOT",
             "2.0.1-SNAPSHOT" to "2.0.2-SNAPSHOT",
             "2.x.1-SNAPSHOT" to "2.x.2-SNAPSHOT",
             "2.0-SNAPSHOT" to "2.1-SNAPSHOT",
@@ -61,7 +70,23 @@ object VersionDeterminerSpec : Spek({
             "8" to "10-SNAPSHOT",
             "9" to "11-SNAPSHOT",
             "10" to "12-SNAPSHOT",
-            "lovelyVersion" to "lovelyVersion.3-SNAPSHOT"
+            "lovelyVersion" to "lovelyVersion.3-SNAPSHOT",
+            "2.1.5.0-SNAPSHOT" to "2.1.6.0-SNAPSHOT",
+            "2.1.0-SNAPSHOT" to "2.2.0-SNAPSHOT",
+            "2.0-SNAPSHOT" to "3.0-SNAPSHOT",
+            "2.0.3.9" to "2.0.3.11-SNAPSHOT",
+            "2.1.5.0" to "2.1.7.0-SNAPSHOT",
+            "2.1.0" to "2.3.0-SNAPSHOT",
+            "2.0.0" to "2.2.0-SNAPSHOT",
+            "2.0" to "4.0-SNAPSHOT",
+            "2.0.3.9-a1-SNAPSHOT" to "2.0.3.9-a2-SNAPSHOT",
+            "2.0.3-RC-1-SNAPSHOT" to "2.0.3-RC-2-SNAPSHOT",
+            "2.0.rc1-SNAPSHOT" to "2.0.rc2-SNAPSHOT",
+            "2_RC1-SNAPSHOT" to "2_RC2-SNAPSHOT",
+            "2.0.3.9-a1" to "2.0.3.9-a3-SNAPSHOT",
+            "2.0.3-RC-1" to "2.0.3-RC-3-SNAPSHOT",
+            "2.0.rc1" to "2.0.rc3-SNAPSHOT",
+            "2_RC1" to "2_RC3-SNAPSHOT"
         ).forEach { version, expected ->
             test("$version turns into $expected") {
                 val result = testee.nextDevVersion(version)
