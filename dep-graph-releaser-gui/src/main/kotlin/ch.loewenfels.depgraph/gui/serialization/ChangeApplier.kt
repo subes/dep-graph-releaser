@@ -11,6 +11,7 @@ import ch.loewenfels.depgraph.gui.components.Pipeline
 import ch.loewenfels.depgraph.gui.elementById
 import ch.loewenfels.depgraph.gui.getTextField
 import ch.loewenfels.depgraph.gui.getTextFieldOrNull
+import org.w3c.dom.HTMLElement
 import org.w3c.dom.HTMLInputElement
 import org.w3c.dom.HTMLTextAreaElement
 
@@ -86,12 +87,7 @@ object ChangeApplier {
             if (arr.size != 2) return@forEach
 
             val input = elementById("config-${arr[0]}")
-            val value = when (arr[0]) {
-                ConfigKey.JOB_MAPPING.asString() -> (input as HTMLTextAreaElement).value
-                    .replace("\r", "").replace("\n", "|")
-                ConfigKey.REMOTE_REGEX.asString() -> (input as HTMLTextAreaElement).value
-                else -> (input as HTMLInputElement).value
-            }
+            val value = getConfigValue(arr, input)
             if (arr[1] != value) {
                 arr[1] = value
                 changed = true
@@ -100,6 +96,18 @@ object ChangeApplier {
         return changed
     }
 
+    private fun getConfigValue(arr: Array<String>, input: HTMLElement): String {
+        return when (arr[0]) {
+            ConfigKey.JOB_MAPPING.asString() ->
+                (input as HTMLTextAreaElement).value.replace("\r", "").replace("\n", "|")
+
+            ConfigKey.REMOTE_REGEX.asString(),
+            ConfigKey.BUILD_WITH_PARAM_JOBS.asString() ->
+                (input as HTMLTextAreaElement).value
+
+            else -> (input as HTMLInputElement).value
+        }
+    }
 
     private fun replaceReleaseVersionIfChanged(
         releasePlan: ReleasePlan,

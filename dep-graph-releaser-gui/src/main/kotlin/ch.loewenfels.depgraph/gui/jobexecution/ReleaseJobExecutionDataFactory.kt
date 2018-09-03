@@ -2,11 +2,13 @@ package ch.loewenfels.depgraph.gui.jobexecution
 
 import ch.loewenfels.depgraph.ConfigKey
 import ch.loewenfels.depgraph.data.Command
+import ch.loewenfels.depgraph.jobexecution.BuildWithParamFormat
 import ch.loewenfels.depgraph.data.Project
 import ch.loewenfels.depgraph.data.ReleasePlan
 import ch.loewenfels.depgraph.data.maven.MavenProjectId
 import ch.loewenfels.depgraph.data.maven.jenkins.JenkinsUpdateDependency
 import ch.loewenfels.depgraph.data.maven.jenkins.M2ReleaseCommand
+import ch.loewenfels.depgraph.parseBuildWithParamJobs
 import ch.loewenfels.depgraph.parseRegexParameters
 import ch.loewenfels.depgraph.parseRemoteRegex
 import ch.tutteli.kbox.appendToStringBuilder
@@ -19,12 +21,14 @@ class ReleaseJobExecutionDataFactory(
     private val remoteRegex: List<Pair<Regex, String>>
     private val regexParametersList: List<Pair<Regex, List<String>>>
     private val jobMapping: Map<String, String>
+    private val buildWithParamJobsList: List<Pair<Regex, BuildWithParamFormat>>
 
     init {
         checkConfig(releasePlan.config)
         remoteRegex = parseRemoteRegex(releasePlan)
         regexParametersList = parseRegexParameters(releasePlan)
         jobMapping = parseJobMapping()
+        buildWithParamJobsList = parseBuildWithParamJobs(releasePlan)
     }
 
     private fun checkConfig(config: Map<ConfigKey, String>) {
@@ -91,6 +95,37 @@ class ReleaseJobExecutionDataFactory(
         val jenkinsBaseUrl = getMatchingEntries(remoteRegex, mavenProjectId).firstOrNull() ?: defaultJenkinsBaseUrl
         val jobUrl = getJobUrl(jenkinsBaseUrl, jobName)
         val relevantParams = getMatchingEntries(regexParametersList, mavenProjectId).flatMap { it.asSequence() }
+        val buildWithParamFormat = getMatchingEntries(buildWithParamJobsList, mavenProjectId).firstOrNull()
+
+        return if (buildWithParamFormat != null) {
+            triggerBuildWithParamRelease(buildWithParamFormat, relevantParams, project, command, jobUrl)
+        } else {
+            triggerM2Release(relevantParams, project, command, jobUrl)
+        }
+    }
+
+    private fun triggerBuildWithParamRelease(
+        buildWithParamFormat: BuildWithParamFormat,
+        relevantParams: Sequence<String>,
+        project: Project,
+        command: M2ReleaseCommand,
+        jobUrl: String
+    ): JobExecutionData {
+        val identifyingParams = buildWithParamFormat.format(project.releaseVersion, command.nextDevVersion)
+        return JobExecutionData.buildWithParameters(
+            "release ${project.id.identifier}",
+            jobUrl,
+            toQueryParameters(identifyingParams) + "&" + relevantParams.joinToString("&") ,
+            identifyingParams
+        )
+    }
+
+    private fun triggerM2Release(
+        relevantParams: Sequence<String>,
+        project: Project,
+        command: M2ReleaseCommand,
+        jobUrl: String
+    ): JobExecutionData {
         val parameters = StringBuilder()
         relevantParams.appendToStringBuilder(parameters, ",") {
             val (name, value) = it.split('=')

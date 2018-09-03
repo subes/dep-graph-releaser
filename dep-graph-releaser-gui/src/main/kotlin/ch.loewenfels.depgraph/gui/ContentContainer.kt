@@ -63,7 +63,9 @@ class ContentContainer(modifiableState: ModifiableState, private val menu: Menu)
                     ConfigKey.REGEX_PARAMS,
                     ConfigKey.INITIAL_RELEASE_JSON
                 ).forEach(configTextField(config))
-                remoteRegexTextArea(config)
+
+                textAreaForConfig(config, ConfigKey.REMOTE_REGEX)
+                textAreaForConfig(config, ConfigKey.BUILD_WITH_PARAM_JOBS)
                 jobMappingTextArea(config)
             }
         }
@@ -73,8 +75,7 @@ class ContentContainer(modifiableState: ModifiableState, private val menu: Menu)
         }
     }
 
-    private fun DIV.remoteRegexTextArea(config: Map<ConfigKey, String>) {
-        val key = ConfigKey.REMOTE_REGEX
+    private fun DIV.textAreaForConfig(config: Map<ConfigKey, String>, key: ConfigKey) {
         textAreaWithLabel(
             "config-${key.asString()}", key.asString(), config[key] ?: "", menu
         )

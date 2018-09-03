@@ -1,6 +1,7 @@
 package ch.loewenfels.depgraph
 
 import ch.loewenfels.depgraph.data.ReleasePlan
+import ch.loewenfels.depgraph.jobexecution.BuildWithParamFormat
 
 
 fun parseRemoteRegex(releasePlan: ReleasePlan) =
@@ -19,11 +20,11 @@ fun parseRegexParameters(regex: String): List<Pair<Regex, List<String>>> {
     }
 }
 
-fun parseBuildWithParamJobs(regex: String): List<Pair<Regex, Pair<String, List<String>>>> {
-    return parseRegex(regex, '$', "buildWithParamJobs", ::requireFormatAndNames) { formatAndNames ->
-        val (format, namesAsString) = formatAndNames.split('#')
-        format to namesAsString.split(';')
-    }
+fun parseBuildWithParamJobs(releasePlan: ReleasePlan) =
+    parseBuildWithParamJobs(releasePlan.getConfig(ConfigKey.BUILD_WITH_PARAM_JOBS))
+
+fun parseBuildWithParamJobs(regex: String): List<Pair<Regex, BuildWithParamFormat>> {
+    return parseRegex(regex, '$', "buildWithParamJobs", ::requireFormatAndNames, ::createBuildWithParamFormat)
 }
 
 private fun <T> parseRegex(
@@ -78,5 +79,20 @@ private fun requireFormatAndNames(formatAndNames: String, buildWithParamJobs: St
     val names = namesAsString.split(';')
     require(names.size == numOfNames) {
         "Format `$format` requires $numOfNames names, ${names.size} given.\nbuildWithParamJobs: $buildWithParamJobs"
+    }
+}
+
+fun createBuildWithParamFormat(formatAndNames: String): BuildWithParamFormat {
+    val (format, namesAsString) = formatAndNames.split('#')
+    return when (format) {
+        "query" -> {
+            val (releaseVersion, nextDevVersion) = namesAsString.split(';')
+            BuildWithParamFormat.Query(releaseVersion, nextDevVersion)
+        }
+        "maven" -> {
+            val (releaseVersion, nextDevVersion, parameterName) = namesAsString.split(';')
+            BuildWithParamFormat.Maven(releaseVersion, nextDevVersion, parameterName)
+        }
+        else -> throw IllegalArgumentException("Illegal format $format")
     }
 }
