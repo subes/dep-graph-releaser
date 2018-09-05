@@ -120,6 +120,11 @@ a:hover {
     transition: top .5s ease;
     overflow-y: auto;
 }
+@media (max-height:850px) {
+    #config {
+        bottom: 30px;
+    }
+}
 
 .menuLayer.active {
     visibility: visible;
@@ -135,8 +140,8 @@ a:hover {
 
 #config input,
 #config textarea {
-    width: 400px;
-    margin-right: 10px;
+    width: 600px;
+    margin-right: 15px;
 }
 #config textarea {
     height: 100px;

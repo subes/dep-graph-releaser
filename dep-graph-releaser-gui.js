@@ -118,8 +118,8 @@
   var Project = $module$dep_graph_releaser_api_js.ch.loewenfels.depgraph.data.Project;
   var plus = Kotlin.kotlin.sequences.plus_v0iwhp$;
   var mapIndexed = Kotlin.kotlin.sequences.mapIndexed_b7yuyq$;
-  var replace = Kotlin.kotlin.text.replace_680rmw$;
   var isBlank = Kotlin.kotlin.text.isBlank_gw00vp$;
+  var replace = Kotlin.kotlin.text.replace_680rmw$;
   var get_js = Kotlin.kotlin.js.get_js_1yb8b7$;
   var defineInlineFunction = Kotlin.defineInlineFunction;
   var wrapFunction = Kotlin.wrapFunction;
@@ -135,8 +135,11 @@
   var indexOf = Kotlin.kotlin.text.indexOf_8eortd$;
   var contains_0 = Kotlin.kotlin.text.contains_sgbm27$;
   var firstOrNull = Kotlin.kotlin.sequences.firstOrNull_veqyi0$;
+  var flatMap = Kotlin.kotlin.sequences.flatMap_49vfel$;
+  var joinToString_0 = Kotlin.kotlin.sequences.joinToString_853xkz$;
   var StringBuilder_init = Kotlin.kotlin.text.StringBuilder_init;
   var parseRegexParameters = $module$dep_graph_releaser_api_js.ch.loewenfels.depgraph.parseRegexParameters_429wai$;
+  var parseBuildWithParamJobs = $module$dep_graph_releaser_api_js.ch.loewenfels.depgraph.parseBuildWithParamJobs_429wai$;
   var substringBeforeLast = Kotlin.kotlin.text.substringBeforeLast_j4ogox$;
   var get_create = $module$kotlinx_html_js.kotlinx.html.dom.get_create_4wc2mh$;
   var indexOf_0 = Kotlin.kotlin.text.indexOf_l5u8uk$;
@@ -145,6 +148,7 @@
   var lazy = Kotlin.kotlin.lazy_klfg04$;
   var toList = Kotlin.kotlin.sequences.toList_veqyi0$;
   var CommandStateJson$State = $module$dep_graph_releaser_api_js.ch.loewenfels.depgraph.data.serialization.CommandStateJson.State;
+  var lineSequence = Kotlin.kotlin.text.lineSequence_gw00vp$;
   var asSequence_1 = Kotlin.kotlin.collections.asSequence_us0mfu$;
   var toJson = $module$dep_graph_releaser_api_js.ch.loewenfels.depgraph.data.serialization.toJson_m86w84$;
   var toList_0 = Kotlin.kotlin.collections.toList_us0mfu$;
@@ -3427,20 +3431,22 @@
   };
   function ContentContainer$setUpConfig$lambda$lambda(closure$releasePlan, this$ContentContainer) {
     return function ($receiver) {
-      var tmp$, tmp$_0;
       textFieldWithLabel($receiver, ContentContainer$Companion_getInstance().RELEASE_ID_HTML_ID, 'ReleaseId', closure$releasePlan.releaseId, this$ContentContainer.menu_0);
       var config = closure$releasePlan.config;
-      var $receiver_0 = listOf([ConfigKey.COMMIT_PREFIX, ConfigKey.UPDATE_DEPENDENCY_JOB, ConfigKey.DRY_RUN_JOB, ConfigKey.REMOTE_REGEX, ConfigKey.RELATIVE_PATH_EXCLUDE_PROJECT_REGEX, ConfigKey.RELATIVE_PATH_TO_GIT_REPO_REGEX, ConfigKey.RELATIVE_PATH_TO_GIT_REPO_REPLACEMENT, ConfigKey.REGEX_PARAMS, ConfigKey.INITIAL_RELEASE_JSON]);
-      var tmp$_1;
-      tmp$_1 = $receiver_0.iterator();
-      while (tmp$_1.hasNext()) {
-        var element = tmp$_1.next();
-        var this$ContentContainer_0 = this$ContentContainer;
-        var tmp$_2;
-        textFieldWithLabel($receiver, 'config-' + element.asString(), element.asString(), (tmp$_2 = config.get_11rb$(element)) != null ? tmp$_2 : '', this$ContentContainer_0.menu_0);
+      var $receiver_0 = [ConfigKey.COMMIT_PREFIX, ConfigKey.UPDATE_DEPENDENCY_JOB, ConfigKey.DRY_RUN_JOB, ConfigKey.RELATIVE_PATH_EXCLUDE_PROJECT_REGEX, ConfigKey.RELATIVE_PATH_TO_GIT_REPO_REGEX, ConfigKey.RELATIVE_PATH_TO_GIT_REPO_REPLACEMENT, ConfigKey.INITIAL_RELEASE_JSON];
+      var action = this$ContentContainer.configTextField_0($receiver, config);
+      var tmp$;
+      for (tmp$ = 0; tmp$ !== $receiver_0.length; ++tmp$) {
+        var element = $receiver_0[tmp$];
+        action(element);
       }
-      var key = ConfigKey.JOB_MAPPING;
-      textAreaWithLabel($receiver, 'config-' + key.asString(), key.asString(), (tmp$_0 = (tmp$ = config.get_11rb$(key)) != null ? replace(tmp$, '|', '\n') : null) != null ? tmp$_0 : '', this$ContentContainer.menu_0);
+      var $receiver_1 = [ConfigKey.REGEX_PARAMS, ConfigKey.REMOTE_REGEX, ConfigKey.BUILD_WITH_PARAM_JOBS, ConfigKey.JOB_MAPPING];
+      var action_0 = this$ContentContainer.configTextArea_0($receiver, config);
+      var tmp$_0;
+      for (tmp$_0 = 0; tmp$_0 !== $receiver_1.length; ++tmp$_0) {
+        var element_0 = $receiver_1[tmp$_0];
+        action_0(element_0);
+      }
       return Unit;
     };
   }
@@ -3457,6 +3463,39 @@
     if (isBlank(initialSite.value)) {
       initialSite.value = (tmp$ = App$Companion_getInstance().determineJsonUrl()) != null ? tmp$ : '';
     }
+  };
+  function ContentContainer$configTextField$lambda(closure$config, this$ContentContainer, this$configTextField) {
+    return function (key) {
+      var tmp$, tmp$_0, tmp$_1, tmp$_2, tmp$_3;
+      tmp$ = 'config-' + key.asString();
+      tmp$_0 = key.asString();
+      tmp$_2 = (tmp$_1 = closure$config.get_11rb$(key)) != null ? tmp$_1 : '';
+      tmp$_3 = this$ContentContainer.menu_0;
+      textFieldWithLabel(this$configTextField, tmp$, tmp$_0, tmp$_2, tmp$_3);
+      return Unit;
+    };
+  }
+  ContentContainer.prototype.configTextField_0 = function ($receiver, config) {
+    return ContentContainer$configTextField$lambda(config, this, $receiver);
+  };
+  var trim = Kotlin.kotlin.text.trim_gw00vp$;
+  function ContentContainer$configTextArea$lambda(closure$config, this$ContentContainer, this$configTextArea) {
+    return function (key) {
+      var tmp$, tmp$_0, tmp$_1, tmp$_2;
+      var tmp$_3;
+      if ((tmp$_1 = (tmp$_0 = (tmp$ = closure$config.get_11rb$(key)) != null ? replace(tmp$, '\\n', '\n') : null) != null ? replace(tmp$_0, '\t', '  ') : null) != null) {
+        var tmp$_4;
+        tmp$_3 = trim(Kotlin.isCharSequence(tmp$_4 = tmp$_1) ? tmp$_4 : throwCCE()).toString();
+      }
+       else
+        tmp$_3 = null;
+      var value = (tmp$_2 = tmp$_3) != null ? tmp$_2 : '';
+      textAreaWithLabel(this$configTextArea, 'config-' + key.asString(), key.asString(), value, this$ContentContainer.menu_0);
+      return Unit;
+    };
+  }
+  ContentContainer.prototype.configTextArea_0 = function ($receiver, config) {
+    return ContentContainer$configTextArea$lambda(config, this, $receiver);
   };
   function ContentContainer$Companion() {
     ContentContainer$Companion_instance = this;
@@ -4656,10 +4695,12 @@
     this.remoteRegex_0 = null;
     this.regexParametersList_0 = null;
     this.jobMapping_0 = null;
+    this.buildWithParamJobsList_0 = null;
     this.checkConfig_0(releasePlan.config);
     this.remoteRegex_0 = parseRemoteRegex(releasePlan);
     this.regexParametersList_0 = parseRegexParameters(releasePlan);
     this.jobMapping_0 = this.parseJobMapping_0();
+    this.buildWithParamJobsList_0 = parseBuildWithParamJobs(releasePlan);
   }
   ReleaseJobExecutionDataFactory.prototype.checkConfig_0 = function (config) {
     this.requireConfigEntry_nhrt5l$(config, ConfigKey.UPDATE_DEPENDENCY_JOB);
@@ -4671,7 +4712,7 @@
   var LinkedHashMap_init = Kotlin.kotlin.collections.LinkedHashMap_init_bwtc7$;
   ReleaseJobExecutionDataFactory.prototype.parseJobMapping_0 = function () {
     var mapping = this.getConfig_udzor3$(ConfigKey.JOB_MAPPING);
-    var $receiver = split_0(mapping, ['|']);
+    var $receiver = split_0(mapping, ['\\n']);
     var capacity = coerceAtLeast(mapCapacity(collectionSizeOrDefault($receiver, 10)), 16);
     var destination = LinkedHashMap_init(capacity);
     var tmp$;
@@ -4726,26 +4767,43 @@
     var dependencyMavenProjectId = Kotlin.isType(tmp$ = dependency.id, MavenProjectId) ? tmp$ : throwCCE();
     return mapOf([to('pathToProject', project.relativePath), to('&groupId', dependencyMavenProjectId.groupId), to('&artifactId', dependencyMavenProjectId.artifactId), to('&newVersion', dependency.releaseVersion), to('&commitPrefix', this.getConfig_udzor3$(ConfigKey.COMMIT_PREFIX)), to('&releaseId', this.releasePlan.releaseId)]);
   };
+  function ReleaseJobExecutionDataFactory$triggerRelease$lambda(it) {
+    return asSequence(it);
+  }
   ReleaseJobExecutionDataFactory.prototype.triggerRelease_0 = function (project, command) {
-    var tmp$, tmp$_0;
+    var tmp$, tmp$_0, tmp$_1;
     var mavenProjectId = Kotlin.isType(tmp$ = project.id, MavenProjectId) ? tmp$ : throwCCE();
     var jobName = this.getJobName_0(project);
     var jenkinsBaseUrl = (tmp$_0 = firstOrNull(this.getMatchingEntries_0(this.remoteRegex_0, mavenProjectId))) != null ? tmp$_0 : this.defaultJenkinsBaseUrl;
     var jobUrl = this.getJobUrl_puj7f4$(jenkinsBaseUrl, jobName);
-    var relevantParams = this.getMatchingEntries_0(this.regexParametersList_0, mavenProjectId);
+    var relevantParams = flatMap(this.getMatchingEntries_0(this.regexParametersList_0, mavenProjectId), ReleaseJobExecutionDataFactory$triggerRelease$lambda);
+    var buildWithParamFormat = firstOrNull(this.getMatchingEntries_0(this.buildWithParamJobsList_0, mavenProjectId));
+    if (buildWithParamFormat != null) {
+      tmp$_1 = this.triggerBuildWithParamRelease_0(buildWithParamFormat, relevantParams, project, command, jobUrl);
+    }
+     else {
+      tmp$_1 = this.triggerM2Release_0(relevantParams, project, command, jobUrl);
+    }
+    return tmp$_1;
+  };
+  ReleaseJobExecutionDataFactory.prototype.triggerBuildWithParamRelease_0 = function (buildWithParamFormat, relevantParams, project, command, jobUrl) {
+    var identifyingParams = buildWithParamFormat.format_puj7f4$(project.releaseVersion, command.nextDevVersion);
+    return JobExecutionData$Companion_getInstance().buildWithParameters_k99ke9$('release ' + project.id.identifier, jobUrl, toQueryParameters(identifyingParams) + '&' + joinToString_0(relevantParams, '&'), identifyingParams);
+  };
+  ReleaseJobExecutionDataFactory.prototype.triggerM2Release_0 = function (relevantParams, project, command, jobUrl) {
     var parameters = StringBuilder_init();
     var itr = relevantParams.iterator();
     if (itr.hasNext()) {
-      var tmp$_1 = split(itr.next(), Kotlin.charArrayOf(61));
-      var name = tmp$_1.get_za3lpa$(0);
-      var value = tmp$_1.get_za3lpa$(1);
+      var tmp$ = split(itr.next(), Kotlin.charArrayOf(61));
+      var name = tmp$.get_za3lpa$(0);
+      var value = tmp$.get_za3lpa$(1);
       parameters.append_gw00v9$('{' + '"' + 'name' + '"' + ':' + '"' + name + '"' + ',' + '"' + 'value' + '"' + ':' + '"' + value + '"' + '}');
     }
     while (itr.hasNext()) {
       parameters.append_gw00v9$(',');
-      var tmp$_2 = split(itr.next(), Kotlin.charArrayOf(61));
-      var name_0 = tmp$_2.get_za3lpa$(0);
-      var value_0 = tmp$_2.get_za3lpa$(1);
+      var tmp$_0 = split(itr.next(), Kotlin.charArrayOf(61));
+      var name_0 = tmp$_0.get_za3lpa$(0);
+      var value_0 = tmp$_0.get_za3lpa$(1);
       parameters.append_gw00v9$('{' + '"' + 'name' + '"' + ':' + '"' + name_0 + '"' + ',' + '"' + 'value' + '"' + ':' + '"' + value_0 + '"' + '}');
     }
     var params = 'releaseVersion=' + project.releaseVersion + ('&developmentVersion=' + command.nextDevVersion) + ('&json={parameter=[' + parameters + ']}');
@@ -5749,17 +5807,10 @@
     loop_label: for (tmp$ = 0; tmp$ !== $receiver.length; ++tmp$) {
       var element = $receiver[tmp$];
       action$break: do {
-        var tmp$_0, tmp$_1, tmp$_2;
         if (element.length !== 2)
           break action$break;
         var input = elementById('config-' + element[0]);
-        if (equals(element[0], ConfigKey.JOB_MAPPING.asString())) {
-          tmp$_2 = replace(replace((Kotlin.isType(tmp$_0 = input, HTMLTextAreaElement) ? tmp$_0 : throwCCE()).value, '\r', ''), '\n', '|');
-        }
-         else {
-          tmp$_2 = (Kotlin.isType(tmp$_1 = input, HTMLInputElement) ? tmp$_1 : throwCCE()).value;
-        }
-        var value = tmp$_2;
+        var value = this.getConfigValue_0(element, input);
         if (!equals(element[1], value)) {
           element[1] = value;
           changed.v = true;
@@ -5768,6 +5819,36 @@
        while (false);
     }
     return changed.v;
+  };
+  ChangeApplier.prototype.getConfigValue_0 = function (arr, input) {
+    var tmp$, tmp$_0, tmp$_1, tmp$_2;
+    tmp$ = arr[0];
+    if (equals(tmp$, ConfigKey.REGEX_PARAMS.asString()) || equals(tmp$, ConfigKey.REMOTE_REGEX.asString()) || equals(tmp$, ConfigKey.BUILD_WITH_PARAM_JOBS.asString()) || equals(tmp$, ConfigKey.JOB_MAPPING.asString())) {
+      tmp$_2 = this.getTextAreaValueEscaped_0(Kotlin.isType(tmp$_0 = input, HTMLTextAreaElement) ? tmp$_0 : throwCCE());
+    }
+     else
+      tmp$_2 = (Kotlin.isType(tmp$_1 = input, HTMLInputElement) ? tmp$_1 : throwCCE()).value;
+    return tmp$_2;
+  };
+  var trimEnd = Kotlin.kotlin.text.trimEnd_gw00vp$;
+  function ChangeApplier$getTextAreaValueEscaped$lambda(closure$regex) {
+    return function (it) {
+      var matchResult = closure$regex.find_905azu$(it);
+      if (matchResult != null) {
+        var tmp$ = repeat('\t', matchResult.groupValues.get_za3lpa$(1).length / 2 | 0);
+        var $receiver = matchResult.groupValues.get_za3lpa$(2);
+        var tmp$_0;
+        return tmp$ + trimEnd(Kotlin.isCharSequence(tmp$_0 = $receiver) ? tmp$_0 : throwCCE()).toString();
+      }
+       else {
+        var tmp$_1;
+        return trim(Kotlin.isCharSequence(tmp$_1 = it) ? tmp$_1 : throwCCE()).toString();
+      }
+    };
+  }
+  ChangeApplier.prototype.getTextAreaValueEscaped_0 = function (textArea) {
+    var regex = Regex_init('^( +)(.+)');
+    return joinToString_0(lineSequence(textArea.value), '\\n', void 0, void 0, void 0, void 0, ChangeApplier$getTextAreaValueEscaped$lambda(regex));
   };
   ChangeApplier.prototype.replaceReleaseVersionIfChanged_0 = function (releasePlan, releasePlanJson, project, mavenProjectId) {
     var input = getTextFieldOrNull(mavenProjectId.identifier + ':releaseVersion');

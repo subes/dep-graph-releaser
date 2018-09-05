@@ -22,22 +22,24 @@
   var throwISE = Kotlin.throwISE;
   var Unit = Kotlin.kotlin.Unit;
   var getCallableRef = Kotlin.getCallableRef;
-  var splitToSequence = Kotlin.kotlin.text.splitToSequence_o64adg$;
-  var Regex_init = Kotlin.kotlin.text.Regex_init_61zpoe$;
-  var to = Kotlin.kotlin.to_ujzrz7$;
-  var map = Kotlin.kotlin.sequences.map_z5avom$;
-  var toList = Kotlin.kotlin.sequences.toList_veqyi0$;
-  var emptyList = Kotlin.kotlin.collections.emptyList_287e2$;
+  var split = Kotlin.kotlin.text.split_o64adg$;
+  var replace = Kotlin.kotlin.text.replace_680rmw$;
   var indexOf = Kotlin.kotlin.text.indexOf_8eortd$;
+  var to = Kotlin.kotlin.to_ujzrz7$;
+  var emptyList = Kotlin.kotlin.collections.emptyList_287e2$;
+  var Regex_init = Kotlin.kotlin.text.Regex_init_61zpoe$;
+  var indexOf_0 = Kotlin.kotlin.text.indexOf_l5u8uk$;
+  var Pair = Kotlin.kotlin.Pair;
+  var IllegalArgumentException_init = Kotlin.kotlin.IllegalArgumentException_init_pdl1vj$;
   var Kind_INTERFACE = Kotlin.Kind.INTERFACE;
   var getKClass = Kotlin.getKClass;
   var toString = Kotlin.toString;
   var ensureNotNull = Kotlin.ensureNotNull;
   var joinToString = Kotlin.kotlin.collections.joinToString_cgipc5$;
-  var IllegalArgumentException_init = Kotlin.kotlin.IllegalArgumentException_init_pdl1vj$;
   var mutableListOf = Kotlin.kotlin.collections.mutableListOf_i5x0yv$;
   var asSequence = Kotlin.kotlin.collections.asSequence_7wnvza$;
   var filter = Kotlin.kotlin.sequences.filter_euau3h$;
+  var map = Kotlin.kotlin.sequences.map_z5avom$;
   var Iterator = Kotlin.kotlin.collections.Iterator;
   var asSequence_0 = Kotlin.kotlin.sequences.asSequence_35ci02$;
   var drop = Kotlin.kotlin.sequences.drop_wuwhe2$;
@@ -45,6 +47,8 @@
   var joinToString_0 = Kotlin.kotlin.sequences.joinToString_853xkz$;
   var trimMargin = Kotlin.kotlin.text.trimMargin_rjktp$;
   var StringBuilder = Kotlin.kotlin.text.StringBuilder;
+  var mapOf = Kotlin.kotlin.collections.mapOf_qfcya0$;
+  var mapOf_0 = Kotlin.kotlin.collections.mapOf_x2b85n$;
   var NoSuchElementException = Kotlin.kotlin.NoSuchElementException;
   var last = Kotlin.kotlin.collections.last_2p1efm$;
   var linkedMapOf = Kotlin.kotlin.collections.linkedMapOf_qfcya0$;
@@ -78,6 +82,10 @@
   CommandStateJson$State.prototype.constructor = CommandStateJson$State;
   TypeOfRun.prototype = Object.create(Enum.prototype);
   TypeOfRun.prototype.constructor = TypeOfRun;
+  BuildWithParamFormat$Query.prototype = Object.create(BuildWithParamFormat.prototype);
+  BuildWithParamFormat$Query.prototype.constructor = BuildWithParamFormat$Query;
+  BuildWithParamFormat$Maven.prototype = Object.create(BuildWithParamFormat.prototype);
+  BuildWithParamFormat$Maven.prototype.constructor = BuildWithParamFormat$Maven;
   function ConfigKey(name, ordinal, key) {
     Enum.call(this);
     this.key_c1gzzu$_0 = key;
@@ -96,7 +104,8 @@
     ConfigKey$RELATIVE_PATH_TO_GIT_REPO_REPLACEMENT_instance = new ConfigKey('RELATIVE_PATH_TO_GIT_REPO_REPLACEMENT', 6, 'relativePathToGitRepoReplacement');
     ConfigKey$REGEX_PARAMS_instance = new ConfigKey('REGEX_PARAMS', 7, 'regexParams');
     ConfigKey$JOB_MAPPING_instance = new ConfigKey('JOB_MAPPING', 8, 'jobMapping');
-    ConfigKey$INITIAL_RELEASE_JSON_instance = new ConfigKey('INITIAL_RELEASE_JSON', 9, 'initialJson');
+    ConfigKey$BUILD_WITH_PARAM_JOBS_instance = new ConfigKey('BUILD_WITH_PARAM_JOBS', 9, 'buildWithParamJobs');
+    ConfigKey$INITIAL_RELEASE_JSON_instance = new ConfigKey('INITIAL_RELEASE_JSON', 10, 'initialJson');
     ConfigKey$Companion_getInstance();
   }
   var ConfigKey$COMMIT_PREFIX_instance;
@@ -143,6 +152,11 @@
   function ConfigKey$JOB_MAPPING_getInstance() {
     ConfigKey_initFields();
     return ConfigKey$JOB_MAPPING_instance;
+  }
+  var ConfigKey$BUILD_WITH_PARAM_JOBS_instance;
+  function ConfigKey$BUILD_WITH_PARAM_JOBS_getInstance() {
+    ConfigKey_initFields();
+    return ConfigKey$BUILD_WITH_PARAM_JOBS_instance;
   }
   var ConfigKey$INITIAL_RELEASE_JSON_instance;
   function ConfigKey$INITIAL_RELEASE_JSON_getInstance() {
@@ -191,7 +205,7 @@
     interfaces: [Enum]
   };
   function ConfigKey$values() {
-    return [ConfigKey$COMMIT_PREFIX_getInstance(), ConfigKey$UPDATE_DEPENDENCY_JOB_getInstance(), ConfigKey$DRY_RUN_JOB_getInstance(), ConfigKey$REMOTE_REGEX_getInstance(), ConfigKey$RELATIVE_PATH_EXCLUDE_PROJECT_REGEX_getInstance(), ConfigKey$RELATIVE_PATH_TO_GIT_REPO_REGEX_getInstance(), ConfigKey$RELATIVE_PATH_TO_GIT_REPO_REPLACEMENT_getInstance(), ConfigKey$REGEX_PARAMS_getInstance(), ConfigKey$JOB_MAPPING_getInstance(), ConfigKey$INITIAL_RELEASE_JSON_getInstance()];
+    return [ConfigKey$COMMIT_PREFIX_getInstance(), ConfigKey$UPDATE_DEPENDENCY_JOB_getInstance(), ConfigKey$DRY_RUN_JOB_getInstance(), ConfigKey$REMOTE_REGEX_getInstance(), ConfigKey$RELATIVE_PATH_EXCLUDE_PROJECT_REGEX_getInstance(), ConfigKey$RELATIVE_PATH_TO_GIT_REPO_REGEX_getInstance(), ConfigKey$RELATIVE_PATH_TO_GIT_REPO_REPLACEMENT_getInstance(), ConfigKey$REGEX_PARAMS_getInstance(), ConfigKey$JOB_MAPPING_getInstance(), ConfigKey$BUILD_WITH_PARAM_JOBS_getInstance(), ConfigKey$INITIAL_RELEASE_JSON_getInstance()];
   }
   ConfigKey.values = ConfigKey$values;
   function ConfigKey$valueOf(name) {
@@ -214,6 +228,8 @@
         return ConfigKey$REGEX_PARAMS_getInstance();
       case 'JOB_MAPPING':
         return ConfigKey$JOB_MAPPING_getInstance();
+      case 'BUILD_WITH_PARAM_JOBS':
+        return ConfigKey$BUILD_WITH_PARAM_JOBS_getInstance();
       case 'INITIAL_RELEASE_JSON':
         return ConfigKey$INITIAL_RELEASE_JSON_getInstance();
       default:throwISE('No enum constant ch.loewenfels.depgraph.ConfigKey.' + name);
@@ -223,63 +239,139 @@
   function parseRemoteRegex(releasePlan) {
     return parseRemoteRegex_0(releasePlan.getConfig_udzor3$(ConfigKey$REMOTE_REGEX_getInstance()));
   }
+  function parseRemoteRegex$lambda(it) {
+    return it;
+  }
   function parseRemoteRegex_0(regex) {
-    return parseRegex(regex, 59, 'remoteRegex', getCallableRef('checkUrlDefined', function (jenkinsBaseUrl, remoteRegex) {
-      return checkUrlDefined(jenkinsBaseUrl, remoteRegex), Unit;
-    }));
+    return parseRegex(regex, 'remoteRegex', getCallableRef('requireUrlDefined', function (jenkinsBaseUrl, remoteRegex) {
+      return requireUrlDefined(jenkinsBaseUrl, remoteRegex), Unit;
+    }), parseRemoteRegex$lambda);
   }
   function parseRegexParameters(releasePlan) {
     return parseRegexParameters_0(releasePlan.getConfig_udzor3$(ConfigKey$REGEX_PARAMS_getInstance()));
   }
+  function parseRegexParameters$lambda(params) {
+    return split(params, Kotlin.charArrayOf(59));
+  }
   function parseRegexParameters_0(regex) {
-    return parseRegex(regex, 36, 'regexParameters', getCallableRef('checkAtLeastOneParameter', function (pair, regexParameters) {
-      return checkAtLeastOneParameter(pair, regexParameters), Unit;
+    return parseRegex(regex, 'regexParameters', getCallableRef('requireAtLeastOneParameter', function (pair, regexParameters) {
+      return requireAtLeastOneParameter(pair, regexParameters), Unit;
+    }), parseRegexParameters$lambda);
+  }
+  function parseBuildWithParamJobs(releasePlan) {
+    return parseBuildWithParamJobs_0(releasePlan.getConfig_udzor3$(ConfigKey$BUILD_WITH_PARAM_JOBS_getInstance()));
+  }
+  function parseBuildWithParamJobs_0(regex) {
+    return parseRegex(regex, 'buildWithParamJobs', getCallableRef('requireFormatAndNames', function (formatAndNames, buildWithParamJobs) {
+      return requireFormatAndNames(formatAndNames, buildWithParamJobs), Unit;
+    }), getCallableRef('createBuildWithParamFormat', function (formatAndNames) {
+      return createBuildWithParamFormat(formatAndNames);
     }));
   }
-  function parseRegex$lambda(closure$name, closure$configValue, closure$checkRightSide) {
-    return function (pair) {
-      var index = checkRegexNotEmpty(pair, closure$name, closure$configValue);
-      var startIndex = index + 1 | 0;
-      var rightSide = pair.substring(startIndex);
-      closure$checkRightSide(rightSide, closure$configValue);
-      return to(Regex_init(pair.substring(0, index)), rightSide);
-    };
-  }
-  function parseRegex(configValue, splitChar, name, checkRightSide) {
+  var ArrayList_init = Kotlin.kotlin.collections.ArrayList_init_287e2$;
+  function parseRegex(configValue, name, requireRightSideToBe, rightSideConverter) {
     var tmp$;
     if (configValue.length > 0) {
-      tmp$ = toList(map(splitToSequence(configValue, Kotlin.charArrayOf(splitChar)), parseRegex$lambda(name, configValue, checkRightSide)));
+      var value = replace(configValue, '\t', '');
+      var mutableList = ArrayList_init();
+      var startIndex = 0;
+      var endRegex = indexOf(value, 35, startIndex);
+      while (endRegex >= 0) {
+        checkRegexNotEmpty(endRegex, name, configValue);
+        var regex = getUnescapedRegex(value, startIndex, endRegex);
+        var tmp$_0 = getRightSide(value, endRegex);
+        var endRightSide = tmp$_0.component1()
+        , rightSide = tmp$_0.component2();
+        requireRightSideToBe(rightSide, configValue);
+        mutableList.add_11rb$(to(regex, rightSideConverter(rightSide)));
+        startIndex = endRightSide + 2 | 0;
+        endRegex = indexOf(value, 35, startIndex);
+      }
+      tmp$ = mutableList;
     }
      else {
       tmp$ = emptyList();
     }
     return tmp$;
   }
-  var IllegalStateException_init = Kotlin.kotlin.IllegalStateException_init_pdl1vj$;
-  function checkRegexNotEmpty(pair, name, input) {
-    var index = indexOf(pair, 35);
+  function getUnescapedRegex(value, startIndex, endRegex) {
+    var regexEscaped = value.substring(startIndex, endRegex);
+    return Regex_init(replace(regexEscaped, '\\n', ''));
+  }
+  function getRightSide(value, endRegex) {
+    var indexOf = indexOf_0(value, '\\n', endRegex);
+    var endRightSide = indexOf < 0 ? value.length : indexOf;
+    var startIndex = endRegex + 1 | 0;
+    var rightSide = value.substring(startIndex, endRightSide);
+    return new Pair(endRightSide, rightSide);
+  }
+  function checkRegexNotEmpty(index, name, input) {
     if (!(index > 0)) {
       var message = 'regex requires at least one character.' + '\n' + name + ': ' + input;
-      throw IllegalStateException_init(message.toString());
+      throw IllegalArgumentException_init(message.toString());
     }
-    return index;
   }
   var isBlank = Kotlin.kotlin.text.isBlank_gw00vp$;
-  function checkUrlDefined(jenkinsBaseUrl, remoteRegex) {
+  function requireUrlDefined(jenkinsBaseUrl, remoteRegex) {
     if (!!isBlank(jenkinsBaseUrl)) {
       var message = 'A remoteRegex requires a related jenkins base url.' + '\r' + 'emoteRegex: ' + remoteRegex;
-      throw IllegalStateException_init(message.toString());
+      throw IllegalArgumentException_init(message.toString());
     }
   }
-  function checkAtLeastOneParameter(pair, regexParameters) {
+  function requireAtLeastOneParameter(pair, regexParameters) {
     var index = indexOf(pair, 61);
     if (!(index > 0)) {
       var message = 'A regexParam requires at least one parameter.' + '\n' + 'regexParameters: ' + regexParameters;
-      throw IllegalStateException_init(message.toString());
+      throw IllegalArgumentException_init(message.toString());
     }
+  }
+  function requireFormatAndNames(formatAndNames, buildWithParamJobs) {
+    var tmp$;
+    var tmp$_0 = split(formatAndNames, Kotlin.charArrayOf(35));
+    var format = tmp$_0.get_za3lpa$(0);
+    var namesAsString = tmp$_0.get_za3lpa$(1);
+    switch (format) {
+      case 'query':
+        tmp$ = 2;
+        break;
+      case 'maven':
+        tmp$ = 3;
+        break;
+      default:throw IllegalArgumentException_init('Illegal format `' + format + '` provided, only `query` and `maven` supported.' + '\n' + 'buildWithParamJobs: ' + buildWithParamJobs);
+    }
+    var numOfNames = tmp$;
+    var names = split(namesAsString, Kotlin.charArrayOf(59));
+    if (!(names.size === numOfNames)) {
+      var message = 'Format `' + format + '` requires ' + numOfNames + ' names, ' + names.size + ' given.' + '\n' + 'buildWithParamJobs: ' + buildWithParamJobs;
+      throw IllegalArgumentException_init(message.toString());
+    }
+  }
+  function createBuildWithParamFormat(formatAndNames) {
+    var tmp$;
+    var tmp$_0 = split(formatAndNames, Kotlin.charArrayOf(35));
+    var format = tmp$_0.get_za3lpa$(0);
+    var namesAsString = tmp$_0.get_za3lpa$(1);
+    switch (format) {
+      case 'query':
+        var tmp$_1 = split(namesAsString, Kotlin.charArrayOf(59));
+        var releaseVersion = tmp$_1.get_za3lpa$(0);
+        var nextDevVersion = tmp$_1.get_za3lpa$(1);
+        tmp$ = new BuildWithParamFormat$Query(releaseVersion, nextDevVersion);
+        break;
+      case 'maven':
+        var tmp$_2 = split(namesAsString, Kotlin.charArrayOf(59));
+        var releaseVersion_0 = tmp$_2.get_za3lpa$(0);
+        var nextDevVersion_0 = tmp$_2.get_za3lpa$(1);
+        var parameterName = tmp$_2.get_za3lpa$(2);
+        tmp$ = new BuildWithParamFormat$Maven(releaseVersion_0, nextDevVersion_0, parameterName);
+        break;
+      default:throw IllegalArgumentException_init('Illegal format ' + format);
+    }
+    return tmp$;
   }
   function Command() {
   }
+  var IllegalStateException_init = Kotlin.kotlin.IllegalStateException_init_pdl1vj$;
   Command.prototype.asDeactivated = function () {
     if (!!Kotlin.isType(this.state, CommandState$Deactivated)) {
       var message = 'Cannot deactivate an already deactivated command: ' + this;
@@ -760,14 +852,14 @@
   };
   var HashSet_init = Kotlin.kotlin.collections.HashSet_init_287e2$;
   var collectionSizeOrDefault = Kotlin.kotlin.collections.collectionSizeOrDefault_ba2ldo$;
-  var ArrayList_init = Kotlin.kotlin.collections.ArrayList_init_ww73n8$;
+  var ArrayList_init_0 = Kotlin.kotlin.collections.ArrayList_init_ww73n8$;
   ReleasePlan.prototype.collectDependentsInclDependentsOfAllSubmodules_lljhqa$ = function (multiModuleId) {
     var projectIds = HashSet_init();
     var projectsToVisit = mutableListOf([multiModuleId]);
     do {
       var projectId = projectsToVisit.removeAt_za3lpa$(0);
       var $receiver = this.getDependents_lljhqa$(projectId);
-      var destination = ArrayList_init(collectionSizeOrDefault($receiver, 10));
+      var destination = ArrayList_init_0(collectionSizeOrDefault($receiver, 10));
       var tmp$;
       tmp$ = $receiver.iterator();
       while (tmp$.hasNext()) {
@@ -1344,6 +1436,44 @@
   function turnIntoGitRepoUrl($receiver, relativePathTransformerRegex, relativePathTransformerReplacement) {
     return relativePathTransformerRegex.replace_x2uqeu$($receiver.relativePath, relativePathTransformerReplacement);
   }
+  function BuildWithParamFormat(releaseVersionName, nextDevVersionName) {
+    this.releaseVersionName = releaseVersionName;
+    this.nextDevVersionName = nextDevVersionName;
+  }
+  function BuildWithParamFormat$Query(releaseVersionName, nextDevVersionName) {
+    BuildWithParamFormat.call(this, releaseVersionName, nextDevVersionName);
+  }
+  BuildWithParamFormat$Query.prototype.format_puj7f4$ = function (releaseVersion, nextDevVersion) {
+    return mapOf([to(this.releaseVersionName, releaseVersion), to(this.nextDevVersionName, nextDevVersion)]);
+  };
+  BuildWithParamFormat$Query.prototype.toString = function () {
+    return 'BuildWithParamFormat.Query[rel: ' + this.releaseVersionName + ', dev: ' + this.nextDevVersionName + ']';
+  };
+  BuildWithParamFormat$Query.$metadata$ = {
+    kind: Kind_CLASS,
+    simpleName: 'Query',
+    interfaces: [BuildWithParamFormat]
+  };
+  function BuildWithParamFormat$Maven(releaseVersionName, nextDevVersionName, parameterName) {
+    BuildWithParamFormat.call(this, releaseVersionName, nextDevVersionName);
+    this.parameterName_0 = parameterName;
+  }
+  BuildWithParamFormat$Maven.prototype.format_puj7f4$ = function (releaseVersion, nextDevVersion) {
+    return mapOf_0(to(this.parameterName_0, '-D' + this.releaseVersionName + '=' + releaseVersion + ' -D' + this.nextDevVersionName + '=' + nextDevVersion));
+  };
+  BuildWithParamFormat$Maven.prototype.toString = function () {
+    return 'BuildWithParamFormat.Maven[rel: ' + this.releaseVersionName + ', dev: ' + this.nextDevVersionName + ', paramName: ' + this.parameterName_0 + ']';
+  };
+  BuildWithParamFormat$Maven.$metadata$ = {
+    kind: Kind_CLASS,
+    simpleName: 'Maven',
+    interfaces: [BuildWithParamFormat]
+  };
+  BuildWithParamFormat.$metadata$ = {
+    kind: Kind_CLASS,
+    simpleName: 'BuildWithParamFormat',
+    interfaces: []
+  };
   function LevelIterator(startingPoint) {
     this.startingPoint_0 = startingPoint;
     this.itemsToVisit_0 = mutableListOf([linkedMapOf([this.startingPoint_0])]);
@@ -1423,6 +1553,9 @@
   Object.defineProperty(ConfigKey, 'JOB_MAPPING', {
     get: ConfigKey$JOB_MAPPING_getInstance
   });
+  Object.defineProperty(ConfigKey, 'BUILD_WITH_PARAM_JOBS', {
+    get: ConfigKey$BUILD_WITH_PARAM_JOBS_getInstance
+  });
   Object.defineProperty(ConfigKey, 'INITIAL_RELEASE_JSON', {
     get: ConfigKey$INITIAL_RELEASE_JSON_getInstance
   });
@@ -1437,6 +1570,9 @@
   package$depgraph.parseRemoteRegex_61zpoe$ = parseRemoteRegex_0;
   package$depgraph.parseRegexParameters_429wai$ = parseRegexParameters;
   package$depgraph.parseRegexParameters_61zpoe$ = parseRegexParameters_0;
+  package$depgraph.parseBuildWithParamJobs_429wai$ = parseBuildWithParamJobs;
+  package$depgraph.parseBuildWithParamJobs_61zpoe$ = parseBuildWithParamJobs_0;
+  package$depgraph.createBuildWithParamFormat_61zpoe$ = createBuildWithParamFormat;
   var package$data = package$depgraph.data || (package$depgraph.data = {});
   package$data.Command = Command;
   CommandState.Waiting = CommandState$Waiting;
@@ -1552,6 +1688,10 @@
   $$importsForInline$$['kbox-js'] = $module$kbox_js;
   package$depgraph.generateEclipsePsf_xx51qy$ = generateEclipsePsf;
   package$depgraph.turnIntoGitRepoUrl_gfn6d5$ = turnIntoGitRepoUrl;
+  BuildWithParamFormat.Query = BuildWithParamFormat$Query;
+  BuildWithParamFormat.Maven = BuildWithParamFormat$Maven;
+  var package$jobexecution = package$depgraph.jobexecution || (package$depgraph.jobexecution = {});
+  package$jobexecution.BuildWithParamFormat = BuildWithParamFormat;
   package$depgraph.LevelIterator = LevelIterator;
   package$depgraph.hasNextOnTheSameLevel_r88oei$ = hasNextOnTheSameLevel;
   var package$regex = package$depgraph.regex || (package$depgraph.regex = {});
