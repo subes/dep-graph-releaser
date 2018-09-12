@@ -34,18 +34,17 @@ private fun <T> parseRegex(
     rightSideConverter: (String) -> T
 ): List<Pair<Regex, T>> {
     return if (configValue.isNotEmpty()) {
-        val value = configValue.replace("\t", "")
         val mutableList = mutableListOf<Pair<Regex, T>>()
         var startIndex = 0
-        var endRegex = value.indexOf('#', startIndex)
+        var endRegex = configValue.indexOf('#', startIndex)
         while (endRegex >= 0) {
             checkRegexNotEmpty(endRegex, name, configValue)
-            val regex = getUnescapedRegex(value, startIndex, endRegex)
-            val (endRightSide, rightSide) = getRightSide(value, endRegex)
+            val regex = getUnescapedRegex(configValue, startIndex, endRegex)
+            val (endRightSide, rightSide) = getRightSide(configValue, endRegex)
             requireRightSideToBe(rightSide, configValue)
             mutableList.add(regex to rightSideConverter(rightSide))
             startIndex = endRightSide + 2
-            endRegex = value.indexOf('#', startIndex)
+            endRegex = configValue.indexOf('#', startIndex)
         }
         mutableList
     } else {
@@ -55,7 +54,7 @@ private fun <T> parseRegex(
 
 private fun getUnescapedRegex(value: String, startIndex: Int, endRegex: Int): Regex {
     val regexEscaped = value.substring(startIndex, endRegex)
-    return Regex(regexEscaped.replace("\\n", ""))
+    return Regex(regexEscaped.replace(Regex("( |\t|\\\\n)"), ""))
 }
 
 private fun getRightSide(value: String, endRegex: Int): Pair<Int, String> {
@@ -73,7 +72,7 @@ private fun checkRegexNotEmpty(index: Int, name: String, input: String) {
 
 private fun requireUrlDefined(jenkinsBaseUrl: String, remoteRegex: String) {
     require(jenkinsBaseUrl.isNotBlank()) {
-        "A remoteRegex requires a related jenkins base url.\remoteRegex: $remoteRegex"
+        "A remoteRegex requires a related jenkins base url.\nremoteRegex: $remoteRegex"
     }
 }
 
