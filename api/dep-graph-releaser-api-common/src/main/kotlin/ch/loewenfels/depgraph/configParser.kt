@@ -37,6 +37,7 @@ private fun <T> parseRegex(
         val mutableList = mutableListOf<Pair<Regex, T>>()
         var startIndex = 0
         var endRegex = configValue.indexOf('#', startIndex)
+        checkEntryHasHash(endRegex, name, configValue)
         while (endRegex >= 0) {
             checkRegexNotEmpty(endRegex, name, configValue)
             val regex = getUnescapedRegex(configValue, startIndex, endRegex)
@@ -45,11 +46,18 @@ private fun <T> parseRegex(
             mutableList.add(regex to rightSideConverter(rightSide))
             startIndex = endRightSide + 2
             endRegex = configValue.indexOf('#', startIndex)
+            if (startIndex < configValue.length) {
+                checkEntryHasHash(endRegex, name, configValue)
+            }
         }
         mutableList
     } else {
         emptyList()
     }
+}
+
+private fun checkEntryHasHash(endRegex: Int, name: String, configValue: String) {
+    require(endRegex >= 0) { "You forgot to separate regex from the rest with #\n$name: $configValue" }
 }
 
 private fun getUnescapedRegex(value: String, startIndex: Int, endRegex: Int): Regex {
@@ -96,7 +104,7 @@ private fun requireFormatAndNames(formatAndNames: String, buildWithParamJobs: St
     }
 }
 
-fun createBuildWithParamFormat(formatAndNames: String): BuildWithParamFormat {
+private fun createBuildWithParamFormat(formatAndNames: String): BuildWithParamFormat {
     val (format, namesAsString) = formatAndNames.split('#')
     return when (format) {
         "query" -> {

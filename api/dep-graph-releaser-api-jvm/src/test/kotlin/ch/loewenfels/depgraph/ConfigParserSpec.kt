@@ -42,6 +42,14 @@ class ConfigParserSpec : Spek({
                 }
             }
 
+            given("# missing") {
+                it("throws an IllegalArgumentException mentioning # is missing") {
+                    expect {
+                        fn(".*test")
+                    }.toThrow<IllegalArgumentException> { messageContains("You forgot to separate regex from the rest with #") }
+                }
+            }
+
             given("open bracket") {
                 it("throws a PatternSyntaxException") {
                     expect {
@@ -54,6 +62,7 @@ class ConfigParserSpec : Spek({
 
     describe("fun parseRemoteRegex") {
         describe("validation errors") {
+
             given("no url defined") {
                 it("throws an IllegalArgumentException mentioning url required") {
                     expect {
@@ -66,6 +75,14 @@ class ConfigParserSpec : Spek({
                     expect {
                         parseRemoteRegex(".*#   ")
                     }.toThrow<IllegalArgumentException> { messageContains("remoteRegex requires") }
+                }
+            }
+
+            given("second config value does not have a #"){
+                it("throws an IllegalArgumentException mentioning # is missing") {
+                    expect {
+                        parseRemoteRegex(".*#test\\n.*test2")
+                    }.toThrow<IllegalArgumentException> { messageContains("You forgot to separate regex from the rest with #") }
                 }
             }
         }
