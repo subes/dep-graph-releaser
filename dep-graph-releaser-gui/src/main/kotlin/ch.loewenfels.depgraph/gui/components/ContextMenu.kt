@@ -54,6 +54,14 @@ class ContextMenu(private val modifiableState: ModifiableState, private val menu
             commandContextMenuEntry(idPrefix, CONTEXT_MENU_COMMAND_SUCCEEDED, CommandState.Succeeded::class) {
                 transitionToSucceededIfOk(project, index)
             }
+            contextMenuEntry(idPrefix, CONTEXT_MENU_COMMAND_RE_TRIGGER,
+                text = "Re-Trigger Command immediately",
+                title = "Re-Triggers the Command without waiting until the whole process ends.",
+                iconCreator = { i("material-icons") { span()  /* done via css */ } },
+                action = {
+                    //TODO re-trigger command
+                }
+            )
         }
     }
 
@@ -200,21 +208,30 @@ class ContextMenu(private val modifiableState: ModifiableState, private val menu
         disableOrEnableContextMenuEntry(
             "$idPrefix$CONTEXT_MENU_COMMAND_DEACTIVATED",
             state == ReleaseState.IN_PROGRESS ||
-                state == ReleaseState.WATCHING ||
                 isNotInStateToDeactivate(commandState)
         )
         disableOrEnableContextMenuEntry(
             "$idPrefix$CONTEXT_MENU_COMMAND_SUCCEEDED",
             state == ReleaseState.IN_PROGRESS ||
-                state == ReleaseState.WATCHING ||
                 commandState === CommandState.Succeeded
+        )
+        disableOrEnableContextMenuEntry(
+            "$idPrefix$CONTEXT_MENU_COMMAND_RE_TRIGGER",
+            state != ReleaseState.IN_PROGRESS ||
+                commandState !== CommandState.Failed,
+            "Can only re-trigger when previously failed and process state is in progress."
         )
     }
 
-    private fun disableOrEnableContextMenuEntry(id: String, disable: Boolean) {
+    /**
+     * Disables the given context entry with the given [id] if either
+     * [Pipeline.getReleaseState] == [ReleaseState.WATCHING] or if [disable] is true.
+     * You can optionally pass a [disabledReason] which is used to explain why the context entry is disabled.
+     */
+    private fun disableOrEnableContextMenuEntry(id: String, disable: Boolean, disabledReason: String = "Cannot apply this action.") {
         val entry = elementById(id)
-        if (disable) {
-            entry.setTitleSaveOld("Cannot apply this action.")
+        if (Pipeline.getReleaseState() == ReleaseState.WATCHING || disable) {
+            entry.setTitleSaveOld(disabledReason)
             entry.addClass(CSS_DISABLED)
 
         } else {
@@ -256,6 +273,7 @@ class ContextMenu(private val modifiableState: ModifiableState, private val menu
         const val CONTEXT_MENU_SUFFIX = ":contextMenu"
         const val CONTEXT_MENU_COMMAND_DEACTIVATED = "deactivated"
         const val CONTEXT_MENU_COMMAND_SUCCEEDED = "succeeded"
+        const val CONTEXT_MENU_COMMAND_RE_TRIGGER = "reTrigger"
         const val CSS_DISABLED = "disabled"
     }
 }

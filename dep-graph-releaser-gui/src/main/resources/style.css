@@ -395,7 +395,8 @@ input:disabled {
     display: inline-block;
 }
 
-.command.readyToReTrigger > .fields > .state .material-icons span::after {
+.command.readyToReTrigger > .fields > .state .material-icons span::after,
+.contextMenu .reTrigger > .material-icons span::after {
     content: 'playlist_play';
 }
 
@@ -556,6 +557,12 @@ input:disabled {
 }
 .contextMenu .gitClone > .material-icons {
     color: #f34f29;
+}
+.contextMenu .reTrigger .material-icons {
+    color: #e6930d;
+    width: 24px;
+    height: 24px;
+    font-size: 24px;
 }
 
 #poweredBy,
