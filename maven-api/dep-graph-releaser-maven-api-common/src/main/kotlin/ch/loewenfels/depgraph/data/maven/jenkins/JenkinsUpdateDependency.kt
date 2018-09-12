@@ -12,5 +12,11 @@ data class JenkinsUpdateDependency(
     val projectId: MavenProjectId,
     override val buildUrl: String? = null
 ) : JenkinsCommand {
+
+    override val typeId = TYPE_ID
     override fun asNewState(newState: CommandState) = JenkinsUpdateDependency(newState, projectId, buildUrl)
+
+    companion object {
+        const val TYPE_ID = "JenkinsUpdateDependency"
+    }
 }

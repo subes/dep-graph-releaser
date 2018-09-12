@@ -13,5 +13,11 @@ data class JenkinsSingleMavenReleaseCommand(
     override val nextDevVersion: String,
     override val buildUrl: String? = null
 ) : JenkinsNextDevReleaseCommand {
+
+    override val typeId = TYPE_ID
     override fun asNewState(newState: CommandState) = JenkinsSingleMavenReleaseCommand(newState, nextDevVersion, buildUrl)
+
+    companion object {
+        const val TYPE_ID = "JenkinsSingleMavenRelease"
+    }
 }

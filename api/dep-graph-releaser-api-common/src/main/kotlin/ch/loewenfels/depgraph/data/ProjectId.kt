@@ -1,5 +1,7 @@
 package ch.loewenfels.depgraph.data
 
+import ch.loewenfels.depgraph.data.serialization.PolymorphSerializable
+
 /**
  * Represents an identification of a project represented by [identifier].
  *
@@ -9,7 +11,7 @@ package ch.loewenfels.depgraph.data
  * Notice that the version of a project or the current git-hash or similar information does not belong to a project id
  * because they identify a certain point in time of the project but not the project as such.
  */
-interface ProjectId {
+interface ProjectId: PolymorphSerializable {
     /**
      * The identifier which uniquely identifies a project.
      */

@@ -10,13 +10,6 @@ import ch.loewenfels.depgraph.data.serialization.CommandStateJson
 import ch.loewenfels.depgraph.data.serialization.fromJson
 import ch.loewenfels.depgraph.gui.showWarning
 
-internal const val MAVEN_PROJECT_ID = "ch.loewenfels.depgraph.data.maven.MavenProjectId"
-internal const val JENKINS_MAVEN_RELEASE_PLUGIN =
-    "ch.loewenfels.depgraph.data.maven.jenkins.JenkinsSingleMavenReleaseCommand"
-internal const val JENKINS_MULTI_MAVEN_RELEASE_PLUGIN =
-    "ch.loewenfels.depgraph.data.maven.jenkins.JenkinsMultiMavenReleasePlugin"
-internal const val JENKINS_UPDATE_DEPENDENCY = "ch.loewenfels.depgraph.data.maven.jenkins.JenkinsUpdateDependency"
-
 fun deserialize(body: String): ReleasePlan {
     val releasePlanJson = JSON.parse<ReleasePlanJson>(body)
     val state = deserializeReleaseState(releasePlanJson)
@@ -53,10 +46,8 @@ fun deserializeTypeOfRun(releasePlanJson: ReleasePlanJson): TypeOfRun {
 
 fun deserializeProjectId(id: GenericType<ProjectId>): ProjectId {
     return when (id.t) {
-        MAVEN_PROJECT_ID -> createMavenProjectId(
-            id
-        )
-        else -> throw UnsupportedOperationException("${id.t} is not supported.")
+        MavenProjectId.TYPE_ID -> createMavenProjectId(id)
+        else -> throw UnsupportedOperationException("${id.t} is not a supported ProjectId type.")
     }
 }
 
@@ -79,11 +70,12 @@ fun deserializeProjects(releasePlanJson: ReleasePlanJson): Map<ProjectId, Projec
 }
 
 fun deserializeCommand(it: GenericType<Command>): Command {
+    //TODO if we want to support custom commands then we have to come up with a ServiceLoader for JS as well
     return when (it.t) {
-        JENKINS_MAVEN_RELEASE_PLUGIN -> createJenkinsMavenReleasePlugin(it.p)
-        JENKINS_MULTI_MAVEN_RELEASE_PLUGIN -> createJenkinsMultiMavenReleasePlugin(it.p)
-        JENKINS_UPDATE_DEPENDENCY -> createJenkinsUpdateDependency(it.p)
-        else -> throw UnsupportedOperationException("${it.t} is not supported.")
+        JenkinsSingleMavenReleaseCommand.TYPE_ID -> createJenkinsMavenReleasePlugin(it.p)
+        JenkinsMultiMavenReleasePlugin.TYPE_ID -> createJenkinsMultiMavenReleasePlugin(it.p)
+        JenkinsUpdateDependency.TYPE_ID -> createJenkinsUpdateDependency(it.p)
+        else -> throw UnsupportedOperationException("${it.t} is not a supported Command type.")
     }
 }
 

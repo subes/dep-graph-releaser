@@ -20,9 +20,16 @@ data class MavenProjectId(
     val artifactId: String
 ) : ProjectId {
 
+    override val typeId = TYPE_ID
+
     /**
      * Returns [groupId]:[artifactId]
      * @return The identifier of the maven artifact.
      */
     override val identifier = "$groupId:$artifactId"
+
+
+    companion object {
+        const val TYPE_ID = "MavenProjectId"
+    }
 }

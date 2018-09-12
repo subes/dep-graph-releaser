@@ -46,7 +46,7 @@ class MapAdapterFactory<K : Any>(private val keyType: Class<K>) : JsonAdapter.Fa
         }
 
         private fun <T> JsonReader.checkNextNameAndGetValue(name: String, adapter: JsonAdapter<T>)
-            = checkNextNameAndGetValue("map with object as key", name, adapter)
+            = checkNextFieldNameAndGetValue("map with object as key", name, adapter)
     }
 
     companion object {

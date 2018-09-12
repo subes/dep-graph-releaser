@@ -1,8 +1,8 @@
 package ch.loewenfels.depgraph.serialization
 
-import ch.loewenfels.depgraph.data.CommandState
 import ch.loewenfels.depgraph.data.ProjectId
-import ch.loewenfels.depgraph.data.serialization.CommandStateJson
+import ch.loewenfels.depgraph.data.serialization.PolymorphSerializable
+import ch.loewenfels.depgraph.data.serialization.ProjectIdTypeIdMapper
 import ch.loewenfels.depgraph.serialization.PolymorphicAdapterFactory.Companion.PAYLOAD
 import ch.loewenfels.depgraph.serialization.PolymorphicAdapterFactory.Companion.TYPE
 import ch.tutteli.atrium.api.cc.en_GB.*
@@ -13,38 +13,35 @@ import com.squareup.moshi.JsonReader
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import org.jetbrains.spek.api.Spek
-import org.jetbrains.spek.api.dsl.*
+import org.jetbrains.spek.api.dsl.describe
+import org.jetbrains.spek.api.dsl.given
+import org.jetbrains.spek.api.dsl.it
+import org.jetbrains.spek.api.dsl.on
 import java.io.EOFException
+import kotlin.reflect.KClass
 
 object PolymorphicAdapterFactorySpec : Spek({
 
-    val testee = PolymorphicAdapterFactory(ProjectId::class.java)
+    val testee = PolymorphicAdapterFactory(ProjectId::class.java, listOf(DummyProjectIdTypeIdMapper()))
     val moshi = Moshi.Builder()
         .add(KotlinJsonAdapterFactory())
         .build()
     @Suppress("UNCHECKED_CAST")
     val adapter = testee.create(ProjectId::class.java, mutableSetOf(), moshi) as NonNullJsonAdapter<ProjectId>
     val notType = "notType"
-    val typeDummy = """"$TYPE":"${DummyProjectId::class.java.name}""""
+    val typeDummy = """"$TYPE":"${DummyProjectId.TYPE_ID}""""
 
     describe("Adapter creation") {
 
         describe("validation errors") {
             given("not an interface nor an abstract class passed into the constructor") {
-                listOf(
-                    PolymorphicAdapterFactorySpec::class.java,
-                    CommandState.Ready::class.java,
-                    CommandStateJson::class.java,
-                    CommandStateJson.State::class.java
-                ).forEach { clazz ->
-                    context(clazz.name) {
-                        it("throws an IllegalArgumentException containing the wrong type") {
-                            expect {
-                                PolymorphicAdapterFactory(clazz)
-                            }.toThrow<IllegalArgumentException> {
-                                message { contains(clazz.name) }
-                            }
-                        }
+                class Dummy(override val typeId: String) : PolymorphSerializable
+
+                it("throws an IllegalArgumentException containing the wrong type") {
+                    expect {
+                        PolymorphicAdapterFactory(Dummy::class.java, listOf())
+                    }.toThrow<IllegalArgumentException> {
+                        messageContains(Dummy::class.java.name)
                     }
                 }
             }
@@ -71,6 +68,7 @@ object PolymorphicAdapterFactorySpec : Spek({
             given("anonymous class") {
                 it("throws an IllegalArgumentException") {
                     val value = object : ProjectId {
+                        override val typeId = "anon"
                         override val identifier = "test"
                     }
                     expect {
@@ -84,7 +82,7 @@ object PolymorphicAdapterFactorySpec : Spek({
 
         on("serialize ${DummyProjectId::class.java.simpleName}") {
             val result = adapter.toJson(DummyProjectId("test"))
-            it("contains the full name of the type") {
+            it("contains $typeDummy") {
                 assert(result).contains(typeDummy)
             }
             it("contains ${DummyProjectId::identifier.name}") {
@@ -138,26 +136,12 @@ object PolymorphicAdapterFactorySpec : Spek({
                 }
             }
 
-            given("json with unknown class as $TYPE") {
-                it("throws an ClassNotFoundException") {
+            given("json with unknown typeId as $TYPE") {
+                it("throws an IllegalStateException") {
+                    val typeId = """AnUnknownTypeId"""
                     expect {
-                        adapter.fromJson("""{"$TYPE": "com.example.AnUnknownType"}""")
-                    }.toThrow<ClassNotFoundException> {}
-                }
-            }
-
-            given("json with another type than the one we want to deserialize") {
-                it("throws an IllegalArgumentException, containing both, given type and expected abstract type") {
-                    expect {
-                        adapter.fromJson("""{"$TYPE": "${PolymorphicAdapterFactorySpec::class.java.name}"}""")
-                    }.toThrow<IllegalArgumentException> {
-                        message {
-                            contains(
-                                "Expected: ${ProjectId::class.java.name}",
-                                "Given: ${PolymorphicAdapterFactorySpec::class.java.name}"
-                            )
-                        }
-                    }
+                        adapter.fromJson("""{"$TYPE": "$typeId"}""")
+                    }.toThrow<IllegalStateException> { messageContains("No TypeIdMapper found for entity with type id $typeId") }
                 }
             }
 
@@ -216,4 +200,3 @@ object PolymorphicAdapterFactorySpec : Spek({
         }
     }
 })
-

@@ -122,8 +122,3 @@ object SerializerSpec : Spek({
         }
     }
 })
-
-
-data class DummyCommand(override val state: CommandState) : Command {
-    override fun asNewState(newState: CommandState) = DummyCommand(newState)
-}

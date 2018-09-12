@@ -3,8 +3,7 @@ package ch.loewenfels.depgraph.gui.serialization
 import ch.loewenfels.depgraph.ConfigKey
 import ch.loewenfels.depgraph.data.*
 import ch.loewenfels.depgraph.data.maven.MavenProjectId
-import ch.loewenfels.depgraph.data.maven.jenkins.JenkinsCommand
-import ch.loewenfels.depgraph.data.maven.jenkins.JenkinsNextDevReleaseCommand
+import ch.loewenfels.depgraph.data.maven.jenkins.*
 import ch.loewenfels.depgraph.data.serialization.toJson
 import ch.loewenfels.depgraph.gui.ContentContainer
 import ch.loewenfels.depgraph.gui.components.Pipeline
@@ -188,7 +187,7 @@ object ChangeApplier {
                 "state": "WAITING",
                 "dependencies": [
                     {
-                        "t": "ch.loewenfels.depgraph.data.maven.MavenProjectId",
+                        "t": "MavenProjectId",
                         "p": {
                             "groupId": "com.example",
                             "artifactId": "artifact"
@@ -201,7 +200,7 @@ object ChangeApplier {
             when (it) {
                 is MavenProjectId -> {
                     val entry = js("({})")
-                    entry.t = MAVEN_PROJECT_ID
+                    entry.t = MavenProjectId.TYPE_ID
                     val p = js("({})")
                     p.groupId = it.groupId
                     p.artifactId = it.artifactId
@@ -216,11 +215,11 @@ object ChangeApplier {
 
     private fun replaceFieldsIfChanged(command: GenericType<Command>, mavenProjectId: ProjectId, index: Int): Boolean {
         return when (command.t) {
-            JENKINS_MAVEN_RELEASE_PLUGIN, JENKINS_MULTI_MAVEN_RELEASE_PLUGIN -> {
+            JenkinsSingleMavenReleaseCommand.TYPE_ID, JenkinsMultiMavenReleasePlugin.TYPE_ID -> {
                 replaceNextDevVersionIfChanged(command.p, mavenProjectId, index) or
                     replaceBuildUrlIfChanged(command.p, mavenProjectId, index)
             }
-            JENKINS_UPDATE_DEPENDENCY -> replaceBuildUrlIfChanged(command.p, mavenProjectId, index)
+            JenkinsUpdateDependency.TYPE_ID -> replaceBuildUrlIfChanged(command.p, mavenProjectId, index)
             else -> throw UnsupportedOperationException("${command.t} is not supported.")
         }
     }
