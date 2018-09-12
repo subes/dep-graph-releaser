@@ -3,7 +3,7 @@ package ch.tutteli.atrium
 import ch.loewenfels.depgraph.data.Project
 import ch.loewenfels.depgraph.data.ReleasePlan
 import ch.loewenfels.depgraph.data.maven.MavenProjectId
-import ch.loewenfels.depgraph.data.maven.jenkins.JenkinsMavenReleasePlugin
+import ch.loewenfels.depgraph.data.maven.jenkins.JenkinsSingleMavenReleaseCommand
 import ch.loewenfels.depgraph.data.maven.jenkins.JenkinsMultiMavenReleasePlugin
 import ch.tutteli.atrium.api.cc.en_GB.*
 import org.jetbrains.spek.api.dsl.TestContainer
@@ -142,7 +142,7 @@ fun TestContainer.assertRootProjectMultiReleaseCommand(
             })
         }
     }
-    test("the command is in state Ready with ${JenkinsMavenReleasePlugin::nextDevVersion.name} = ${rootProjectIdAndVersions.nextDevVersion}\"") {
+    test("the command is in state Ready with ${JenkinsSingleMavenReleaseCommand::nextDevVersion.name} = ${rootProjectIdAndVersions.nextDevVersion}\"") {
         assert(rootProject.commands[0]).isA<JenkinsMultiMavenReleasePlugin> {
             isStateReady()
             property(subject::nextDevVersion).toBe(rootProjectIdAndVersions.nextDevVersion)
@@ -155,10 +155,10 @@ fun TestContainer.assertRootProjectOnlyReleaseCommand(
     rootProjectIdAndVersions: IdAndVersions
 ) {
     val rootProject = assertRootProject(releasePlan, rootProjectIdAndVersions)
-    test("root project contains just the ${JenkinsMavenReleasePlugin::class.simpleName} command, which is Ready with ${JenkinsMavenReleasePlugin::nextDevVersion.name} = ${rootProjectIdAndVersions.nextDevVersion}") {
+    test("root project contains just the ${JenkinsSingleMavenReleaseCommand::class.simpleName} command, which is Ready with ${JenkinsSingleMavenReleaseCommand::nextDevVersion.name} = ${rootProjectIdAndVersions.nextDevVersion}") {
         assert(rootProject) {
             property(subject::commands).containsStrictly({
-                isA<JenkinsMavenReleasePlugin> {
+                isA<JenkinsSingleMavenReleaseCommand> {
                     isStateReady()
                     property(subject::nextDevVersion).toBe(rootProjectIdAndVersions.nextDevVersion)
                 }
@@ -319,7 +319,7 @@ fun TestContainer.assertOneUpdateAndOneDisabledReleaseCommand(
     project: IdAndVersions,
     dependency: IdAndVersions
 ) {
-    test("$name has one waiting Update and one disabled Release command with ${JenkinsMavenReleasePlugin::nextDevVersion.name} = ${project.nextDevVersion}") {
+    test("$name has one waiting Update and one disabled Release command with ${JenkinsSingleMavenReleaseCommand::nextDevVersion.name} = ${project.nextDevVersion}") {
         assert(releasePlan.getProject(project.id)) {
             property(subject::commands).containsStrictly(
                 { isJenkinsUpdateDependencyWaiting(dependency) },
@@ -335,7 +335,7 @@ fun TestContainer.assertOneDeactivatedUpdateAndOneDeactivatedReleaseCommand(
     project: IdAndVersions,
     dependency: IdAndVersions
 ) {
-    test("$name has one deactivated Update and one deactivated Release command with ${JenkinsMavenReleasePlugin::nextDevVersion.name} = ${project.nextDevVersion}") {
+    test("$name has one deactivated Update and one deactivated Release command with ${JenkinsSingleMavenReleaseCommand::nextDevVersion.name} = ${project.nextDevVersion}") {
         assert(releasePlan.getProject(project.id)) {
             property(subject::commands).containsStrictly(
                 { isJenkinsUpdateDependencyDeactivatedWaiting(dependency) },
@@ -351,7 +351,7 @@ fun TestContainer.assertOneDeactivatedUpdateAndOneDisabledReleaseCommand(
     project: IdAndVersions,
     dependency: IdAndVersions
 ) {
-    test("$name has one deactivated Update and one disabled Release command with ${JenkinsMavenReleasePlugin::nextDevVersion.name} = ${project.nextDevVersion}") {
+    test("$name has one deactivated Update and one disabled Release command with ${JenkinsSingleMavenReleaseCommand::nextDevVersion.name} = ${project.nextDevVersion}") {
         assert(releasePlan.getProject(project.id)) {
             property(subject::commands).containsStrictly(
                 { isJenkinsUpdateDependencyDeactivatedWaiting(dependency) },

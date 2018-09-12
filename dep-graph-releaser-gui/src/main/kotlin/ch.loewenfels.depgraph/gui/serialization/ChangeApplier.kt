@@ -4,7 +4,7 @@ import ch.loewenfels.depgraph.ConfigKey
 import ch.loewenfels.depgraph.data.*
 import ch.loewenfels.depgraph.data.maven.MavenProjectId
 import ch.loewenfels.depgraph.data.maven.jenkins.JenkinsCommand
-import ch.loewenfels.depgraph.data.maven.jenkins.M2ReleaseCommand
+import ch.loewenfels.depgraph.data.maven.jenkins.JenkinsNextDevReleaseCommand
 import ch.loewenfels.depgraph.data.serialization.toJson
 import ch.loewenfels.depgraph.gui.ContentContainer
 import ch.loewenfels.depgraph.gui.components.Pipeline
@@ -226,7 +226,7 @@ object ChangeApplier {
     }
 
     private fun replaceNextDevVersionIfChanged(command: Command, mavenProjectId: ProjectId, index: Int): Boolean {
-        val m2Command = command.unsafeCast<M2ReleaseCommand>()
+        val m2Command = command.unsafeCast<JenkinsNextDevReleaseCommand>()
         val input = getTextField(Pipeline.getCommandId(mavenProjectId, index) + Pipeline.NEXT_DEV_VERSION_SUFFIX)
         if (m2Command.nextDevVersion != input.value) {
             check(input.value.isNotBlank()) {

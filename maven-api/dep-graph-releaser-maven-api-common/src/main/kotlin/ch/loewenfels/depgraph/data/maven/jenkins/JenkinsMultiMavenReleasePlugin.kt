@@ -6,6 +6,6 @@ data class JenkinsMultiMavenReleasePlugin(
     override val state: CommandState,
     override val nextDevVersion: String,
     override val buildUrl: String? = null
-) : M2ReleaseCommand {
+) : JenkinsNextDevReleaseCommand {
     override fun asNewState(newState: CommandState) = JenkinsMultiMavenReleasePlugin(newState, nextDevVersion, buildUrl)
 }

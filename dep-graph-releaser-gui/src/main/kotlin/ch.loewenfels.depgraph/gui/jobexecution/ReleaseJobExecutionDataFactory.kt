@@ -7,7 +7,7 @@ import ch.loewenfels.depgraph.data.Project
 import ch.loewenfels.depgraph.data.ReleasePlan
 import ch.loewenfels.depgraph.data.maven.MavenProjectId
 import ch.loewenfels.depgraph.data.maven.jenkins.JenkinsUpdateDependency
-import ch.loewenfels.depgraph.data.maven.jenkins.M2ReleaseCommand
+import ch.loewenfels.depgraph.data.maven.jenkins.JenkinsNextDevReleaseCommand
 import ch.loewenfels.depgraph.parseBuildWithParamJobs
 import ch.loewenfels.depgraph.parseRegexParameters
 import ch.loewenfels.depgraph.parseRemoteRegex
@@ -64,7 +64,7 @@ class ReleaseJobExecutionDataFactory(
     override fun create(project: Project, command: Command): JobExecutionData {
         return when (command) {
             is JenkinsUpdateDependency -> triggerUpdateDependency(project, command)
-            is M2ReleaseCommand -> triggerRelease(project, command)
+            is JenkinsNextDevReleaseCommand -> triggerRelease(project, command)
             else -> throw UnsupportedOperationException("We do not (yet) support the command: $command")
         }
     }
@@ -89,7 +89,7 @@ class ReleaseJobExecutionDataFactory(
         )
     }
 
-    private fun triggerRelease(project: Project, command: M2ReleaseCommand): JobExecutionData {
+    private fun triggerRelease(project: Project, command: JenkinsNextDevReleaseCommand): JobExecutionData {
         val mavenProjectId = project.id as MavenProjectId
         val jobName = getJobName(project)
         val jenkinsBaseUrl = getMatchingEntries(remoteRegex, mavenProjectId).firstOrNull() ?: defaultJenkinsBaseUrl
@@ -108,7 +108,7 @@ class ReleaseJobExecutionDataFactory(
         buildWithParamFormat: BuildWithParamFormat,
         relevantParams: Sequence<String>,
         project: Project,
-        command: M2ReleaseCommand,
+        command: JenkinsNextDevReleaseCommand,
         jobUrl: String
     ): JobExecutionData {
         val identifyingParams = buildWithParamFormat.format(project.releaseVersion, command.nextDevVersion)
@@ -123,7 +123,7 @@ class ReleaseJobExecutionDataFactory(
     private fun triggerM2Release(
         relevantParams: Sequence<String>,
         project: Project,
-        command: M2ReleaseCommand,
+        command: JenkinsNextDevReleaseCommand,
         jobUrl: String
     ): JobExecutionData {
         val parameters = StringBuilder()

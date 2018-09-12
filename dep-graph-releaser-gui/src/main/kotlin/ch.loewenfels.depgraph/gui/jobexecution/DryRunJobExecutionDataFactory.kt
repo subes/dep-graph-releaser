@@ -4,7 +4,7 @@ import ch.loewenfels.depgraph.ConfigKey
 import ch.loewenfels.depgraph.data.*
 import ch.loewenfels.depgraph.data.maven.MavenProjectId
 import ch.loewenfels.depgraph.data.maven.jenkins.JenkinsUpdateDependency
-import ch.loewenfels.depgraph.data.maven.jenkins.M2ReleaseCommand
+import ch.loewenfels.depgraph.data.maven.jenkins.JenkinsNextDevReleaseCommand
 import ch.loewenfels.depgraph.gui.components.Pipeline
 
 private typealias GroupIdArtifactIdAndNewVersion = Triple<String, String, String>
@@ -26,7 +26,7 @@ class DryRunJobExecutionDataFactory(
     override fun create(project: Project, command: Command): JobExecutionData {
         return when (command) {
             is JenkinsUpdateDependency -> triggerUpdateDependency(project, command)
-            is M2ReleaseCommand -> triggerRelease(project)
+            is JenkinsNextDevReleaseCommand -> triggerRelease(project)
             else -> throw UnsupportedOperationException("We do not (yet) support the command: $command")
         }
     }

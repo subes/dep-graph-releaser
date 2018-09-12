@@ -3,7 +3,7 @@ package ch.loewenfels.depgraph.gui.serialization
 import ch.loewenfels.depgraph.ConfigKey
 import ch.loewenfels.depgraph.data.*
 import ch.loewenfels.depgraph.data.maven.MavenProjectId
-import ch.loewenfels.depgraph.data.maven.jenkins.JenkinsMavenReleasePlugin
+import ch.loewenfels.depgraph.data.maven.jenkins.JenkinsSingleMavenReleaseCommand
 import ch.loewenfels.depgraph.data.maven.jenkins.JenkinsMultiMavenReleasePlugin
 import ch.loewenfels.depgraph.data.maven.jenkins.JenkinsUpdateDependency
 import ch.loewenfels.depgraph.data.serialization.CommandStateJson
@@ -11,7 +11,8 @@ import ch.loewenfels.depgraph.data.serialization.fromJson
 import ch.loewenfels.depgraph.gui.showWarning
 
 internal const val MAVEN_PROJECT_ID = "ch.loewenfels.depgraph.data.maven.MavenProjectId"
-internal const val JENKINS_MAVEN_RELEASE_PLUGIN = "ch.loewenfels.depgraph.data.maven.jenkins.JenkinsMavenReleasePlugin"
+internal const val JENKINS_MAVEN_RELEASE_PLUGIN =
+    "ch.loewenfels.depgraph.data.maven.jenkins.JenkinsSingleMavenReleaseCommand"
 internal const val JENKINS_MULTI_MAVEN_RELEASE_PLUGIN =
     "ch.loewenfels.depgraph.data.maven.jenkins.JenkinsMultiMavenReleasePlugin"
 internal const val JENKINS_UPDATE_DEPENDENCY = "ch.loewenfels.depgraph.data.maven.jenkins.JenkinsUpdateDependency"
@@ -86,9 +87,9 @@ fun deserializeCommand(it: GenericType<Command>): Command {
     }
 }
 
-fun createJenkinsMavenReleasePlugin(command: Command): JenkinsMavenReleasePlugin {
-    val it = command.unsafeCast<JenkinsMavenReleasePlugin>()
-    return JenkinsMavenReleasePlugin(deserializeCommandState(it), it.nextDevVersion, it.buildUrl)
+fun createJenkinsMavenReleasePlugin(command: Command): JenkinsSingleMavenReleaseCommand {
+    val it = command.unsafeCast<JenkinsSingleMavenReleaseCommand>()
+    return JenkinsSingleMavenReleaseCommand(deserializeCommandState(it), it.nextDevVersion, it.buildUrl)
 }
 
 fun createJenkinsMultiMavenReleasePlugin(command: Command): Command {

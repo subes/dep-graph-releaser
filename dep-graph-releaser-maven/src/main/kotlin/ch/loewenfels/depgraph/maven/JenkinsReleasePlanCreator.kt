@@ -4,7 +4,7 @@ import ch.loewenfels.depgraph.ConfigKey
 import ch.loewenfels.depgraph.LevelIterator
 import ch.loewenfels.depgraph.data.*
 import ch.loewenfels.depgraph.data.maven.MavenProjectId
-import ch.loewenfels.depgraph.data.maven.jenkins.JenkinsMavenReleasePlugin
+import ch.loewenfels.depgraph.data.maven.jenkins.JenkinsSingleMavenReleaseCommand
 import ch.loewenfels.depgraph.data.maven.jenkins.JenkinsMultiMavenReleasePlugin
 import ch.loewenfels.depgraph.data.maven.jenkins.JenkinsUpdateDependency
 import ch.loewenfels.depgraph.manipulation.ReleasePlanManipulator
@@ -100,7 +100,7 @@ class JenkinsReleasePlanCreator(
         return if (analyser.hasSubmodules(projectId)) {
             JenkinsMultiMavenReleasePlugin(state, nextDevVersion)
         } else {
-            JenkinsMavenReleasePlugin(state, nextDevVersion)
+            JenkinsSingleMavenReleaseCommand(state, nextDevVersion)
         }
     }
 

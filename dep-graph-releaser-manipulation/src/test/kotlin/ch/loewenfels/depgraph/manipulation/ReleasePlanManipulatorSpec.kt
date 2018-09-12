@@ -5,7 +5,7 @@ import ch.loewenfels.depgraph.data.Project
 import ch.loewenfels.depgraph.data.ProjectId
 import ch.loewenfels.depgraph.data.ReleasePlan
 import ch.loewenfels.depgraph.data.maven.MavenProjectId
-import ch.loewenfels.depgraph.data.maven.jenkins.JenkinsMavenReleasePlugin
+import ch.loewenfels.depgraph.data.maven.jenkins.JenkinsSingleMavenReleaseCommand
 import ch.loewenfels.depgraph.data.maven.jenkins.JenkinsUpdateDependency
 import ch.tutteli.atrium.*
 import ch.tutteli.atrium.api.cc.en_GB.*
@@ -20,7 +20,7 @@ object ReleasePlanManipulatorSpec : Spek({
     val multiModuleUpdateRootProject =
         JenkinsUpdateDependency(CommandState.Waiting(setOf(rootProjectId)), rootProjectId)
     val multiModuleJenkinsRelease =
-        JenkinsMavenReleasePlugin(CommandState.Waiting(setOf(rootProjectId)), "3.1-SNAPSHOT")
+        JenkinsSingleMavenReleaseCommand(CommandState.Waiting(setOf(rootProjectId)), "3.1-SNAPSHOT")
     val multiModuleCommands = listOf(
         multiModuleUpdateRootProject,
         multiModuleJenkinsRelease
@@ -33,7 +33,7 @@ object ReleasePlanManipulatorSpec : Spek({
     val submoduleUpdateMultiModule =
         JenkinsUpdateDependency(CommandState.Waiting(setOf(multiModuleId)), multiModuleId)
     val submoduleJenkinsRelease =
-        JenkinsMavenReleasePlugin(CommandState.Waiting(setOf(multiModuleId, rootProjectId)), "3.1-SNAPSHOT")
+        JenkinsSingleMavenReleaseCommand(CommandState.Waiting(setOf(multiModuleId, rootProjectId)), "3.1-SNAPSHOT")
     val submoduleCommands = listOf(
         submoduleUpdateRootProject,
         submoduleUpdateMultiModule,
@@ -51,7 +51,7 @@ object ReleasePlanManipulatorSpec : Spek({
         )
     val projectWithoutDependentUpdateSubmodule =
         JenkinsUpdateDependency(CommandState.Waiting(setOf(submoduleId)), submoduleId)
-    val projectWithoutDependentJenkinsRelease = JenkinsMavenReleasePlugin(
+    val projectWithoutDependentJenkinsRelease = JenkinsSingleMavenReleaseCommand(
         CommandState.Waiting(setOf(submoduleId, multiModuleId, rootProjectId)),
         "4.2-SNAPSHOT"
     )

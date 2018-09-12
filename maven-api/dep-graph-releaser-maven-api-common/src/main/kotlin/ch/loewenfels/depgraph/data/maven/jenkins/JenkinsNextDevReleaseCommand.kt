@@ -3,8 +3,8 @@ package ch.loewenfels.depgraph.data.maven.jenkins
 import ch.loewenfels.depgraph.data.ReleaseCommand
 
 /**
- * Marker interface for [ReleaseCommand] which involve the M2 Release Plugin.
+ * A [ReleaseCommand] which also specifies the [nextDevVersion].
  */
-interface M2ReleaseCommand: ReleaseCommand, JenkinsCommand {
+interface JenkinsNextDevReleaseCommand: ReleaseCommand, JenkinsCommand {
     val nextDevVersion: String
 }

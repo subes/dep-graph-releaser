@@ -3,7 +3,7 @@ package ch.loewenfels.depgraph.gui.components
 import ch.loewenfels.depgraph.data.*
 import ch.loewenfels.depgraph.data.maven.MavenProjectId
 import ch.loewenfels.depgraph.data.maven.jenkins.JenkinsCommand
-import ch.loewenfels.depgraph.data.maven.jenkins.JenkinsMavenReleasePlugin
+import ch.loewenfels.depgraph.data.maven.jenkins.JenkinsSingleMavenReleaseCommand
 import ch.loewenfels.depgraph.data.maven.jenkins.JenkinsMultiMavenReleasePlugin
 import ch.loewenfels.depgraph.data.maven.jenkins.JenkinsUpdateDependency
 import ch.loewenfels.depgraph.gui.elementById
@@ -186,7 +186,7 @@ class Pipeline(private val modifiableState: ModifiableState, private val menu: M
         this@Pipeline.contextMenu.createCommandContextMenu(this, idPrefix, project, index)
 
         when (command) {
-            is JenkinsMavenReleasePlugin ->
+            is JenkinsSingleMavenReleaseCommand ->
                 appendJenkinsMavenReleasePluginField(idPrefix, command)
             is JenkinsMultiMavenReleasePlugin ->
                 appendJenkinsMultiMavenReleasePluginFields(idPrefix, project.id, command)
@@ -197,7 +197,7 @@ class Pipeline(private val modifiableState: ModifiableState, private val menu: M
         }
     }
 
-    private fun DIV.appendJenkinsMavenReleasePluginField(idPrefix: String, command: JenkinsMavenReleasePlugin) {
+    private fun DIV.appendJenkinsMavenReleasePluginField(idPrefix: String, command: JenkinsSingleMavenReleaseCommand) {
         fieldNextDevVersion(idPrefix, command, command.nextDevVersion)
     }
 

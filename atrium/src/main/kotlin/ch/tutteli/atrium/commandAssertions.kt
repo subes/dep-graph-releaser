@@ -3,7 +3,7 @@ package ch.tutteli.atrium
 import ch.loewenfels.depgraph.data.Command
 import ch.loewenfels.depgraph.data.CommandState
 import ch.loewenfels.depgraph.data.ProjectId
-import ch.loewenfels.depgraph.data.maven.jenkins.JenkinsMavenReleasePlugin
+import ch.loewenfels.depgraph.data.maven.jenkins.JenkinsSingleMavenReleaseCommand
 import ch.loewenfels.depgraph.data.maven.jenkins.JenkinsMultiMavenReleasePlugin
 import ch.loewenfels.depgraph.data.maven.jenkins.JenkinsUpdateDependency
 import ch.tutteli.atrium.api.cc.en_GB.*
@@ -56,7 +56,7 @@ fun Assert<Command>.isJenkinsMavenReleaseWaiting(
     dependency: IdAndVersions,
     vararg otherDependencies: IdAndVersions
 ) {
-    isA<JenkinsMavenReleasePlugin> {
+    isA<JenkinsSingleMavenReleaseCommand> {
         withStateWaitingWithDependencies(dependency.id, *otherDependencies.mapToProjectIds())
         property(subject::nextDevVersion).toBe(nextDevVersion)
     }
@@ -67,7 +67,7 @@ fun Assert<Command>.isJenkinsMavenReleaseDeactivatedWaiting(
     dependency: IdAndVersions,
     vararg otherDependencies: IdAndVersions
 ) {
-    isA<JenkinsMavenReleasePlugin> {
+    isA<JenkinsSingleMavenReleaseCommand> {
         property(subject::state).isA<CommandState.Deactivated> {
             previousIsStateWaiting(dependency.id, *otherDependencies.mapToProjectIds())
         }
@@ -76,7 +76,7 @@ fun Assert<Command>.isJenkinsMavenReleaseDeactivatedWaiting(
 }
 
 fun Assert<Command>.isJenkinsMavenReleaseDisabled(nextDevVersion: String) {
-    isA<JenkinsMavenReleasePlugin> {
+    isA<JenkinsSingleMavenReleaseCommand> {
         property(subject::state).toBe(CommandState.Disabled)
         property(subject::nextDevVersion).toBe(nextDevVersion)
     }
@@ -108,8 +108,8 @@ fun Assert<Command>.isJenkinsUpdateDependencyDisabled(oldCommand: JenkinsUpdateD
     }
 }
 
-fun Assert<Command>.isJenkinsMavenReleaseDeactivated(oldCommand: JenkinsMavenReleasePlugin) {
-    isA<JenkinsMavenReleasePlugin> {
+fun Assert<Command>.isJenkinsMavenReleaseDeactivated(oldCommand: JenkinsSingleMavenReleaseCommand) {
+    isA<JenkinsSingleMavenReleaseCommand> {
         property(subject::state).toBe(CommandState.Deactivated(oldCommand.state))
         property(subject::nextDevVersion).toBe(oldCommand.nextDevVersion)
     }
