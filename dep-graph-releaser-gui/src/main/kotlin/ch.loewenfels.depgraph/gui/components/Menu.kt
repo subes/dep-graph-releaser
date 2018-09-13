@@ -447,8 +447,7 @@ class Menu(
             )
         )
         return nonNullProcessStarter.publishChanges(verbose = true).then { hadChanges ->
-            if (hadChanges) showInfo("Seems like all changes have been reverted manually. Will not save anything.")
-
+            if (!hadChanges) showInfo("Seems like all changes have been reverted manually. Will not save anything.")
         }
     }
 
