@@ -3,7 +3,6 @@ package ch.loewenfels.depgraph.gui.actions
 import ch.loewenfels.depgraph.data.*
 import ch.loewenfels.depgraph.data.maven.jenkins.JenkinsCommand
 import ch.loewenfels.depgraph.gui.*
-import ch.loewenfels.depgraph.gui.components.Menu
 import ch.loewenfels.depgraph.gui.components.Pipeline
 import ch.loewenfels.depgraph.gui.jobexecution.*
 import ch.loewenfels.depgraph.gui.serialization.ModifiableState
@@ -16,7 +15,7 @@ import kotlin.js.Promise
 class Releaser(
     defaultJenkinsBaseUrl: String,
     private val modifiableState: ModifiableState,
-    private val menu: Menu
+    private val processStarter: ProcessStarter
 ) {
 
     private val isOnSameHost: Boolean
@@ -373,7 +372,7 @@ class Releaser(
     }
 
     private fun quietSave(paramObject: ParamObject, verbose: Boolean = false): Promise<Unit> {
-        return menu.save(paramObject.jobExecutor, verbose)
+        return processStarter.publishChanges(paramObject.jobExecutor, verbose)
             .then { hadChanges ->
                 if (!hadChanges) {
                     showWarning(
