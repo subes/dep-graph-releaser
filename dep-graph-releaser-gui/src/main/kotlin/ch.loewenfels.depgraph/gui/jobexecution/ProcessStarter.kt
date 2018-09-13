@@ -1,10 +1,13 @@
 package ch.loewenfels.depgraph.gui.jobexecution
 
+import ch.loewenfels.depgraph.data.*
 import ch.loewenfels.depgraph.gui.ContentContainer
 import ch.loewenfels.depgraph.gui.actions.Publisher
 import ch.loewenfels.depgraph.gui.actions.Releaser
+import ch.loewenfels.depgraph.gui.components.Pipeline
 import ch.loewenfels.depgraph.gui.getTextField
 import ch.loewenfels.depgraph.gui.serialization.ModifiableState
+import ch.tutteli.kbox.mapWithIndex
 import kotlin.js.Promise
 
 class ProcessStarter(
@@ -39,12 +42,91 @@ class ProcessStarter(
         }
     }
 
-    fun dryRun(modifiableState: ModifiableState): Promise<Boolean>
-        = releaser.release(jenkinsJobExecutor, modifiableState.dryRunExecutionDataFactory)
+    fun dryRun(modifiableState: ModifiableState): Promise<Boolean> =
+        triggerProcess(modifiableState, TypeOfRun.DRY_RUN) {
+            releaser.release(jenkinsJobExecutor, modifiableState.dryRunExecutionDataFactory)
+        }
 
-    fun release(modifiableState: ModifiableState): Promise<Boolean>
-        = releaser.release(jenkinsJobExecutor, modifiableState.releaseJobExecutionDataFactory)
+    fun release(modifiableState: ModifiableState): Promise<Boolean> =
+        triggerProcess(modifiableState, TypeOfRun.RELEASE) {
+            releaser.release(jenkinsJobExecutor, modifiableState.releaseJobExecutionDataFactory)
+        }
 
-    fun explore(modifiableState: ModifiableState): Promise<Boolean>
-        = releaser.release(simulatingJobExecutor, modifiableState.releaseJobExecutionDataFactory)
+    fun explore(modifiableState: ModifiableState): Promise<Boolean> =
+        triggerProcess(modifiableState, TypeOfRun.EXPLORE) {
+            releaser.release(simulatingJobExecutor, modifiableState.releaseJobExecutionDataFactory)
+        }
+
+    private fun triggerProcess(
+        modifiableState: ModifiableState,
+        typeOfRun: TypeOfRun,
+        action: () -> Promise<Boolean>
+    ): Promise<Boolean> {
+        if (Pipeline.getReleaseState() === ReleaseState.FAILED) {
+            if (typeOfRun == TypeOfRun.DRY_RUN) {
+                turnFailedProjectsIntoReTriggerAndReady(modifiableState.releasePlan)
+            } else {
+                turnFailedCommandsIntoStateReTrigger(modifiableState.releasePlan)
+            }
+        }
+        if (Pipeline.getReleaseState() === ReleaseState.SUCCEEDED) {
+            Pipeline.changeReleaseState(ReleaseState.READY)
+        }
+        Pipeline.changeTypeOfRun(typeOfRun)
+        return action()
+    }
+
+
+    private fun turnFailedProjectsIntoReTriggerAndReady(releasePlan: ReleasePlan) {
+        releasePlan.iterator().forEach { project ->
+            if (!project.isSubmodule && project.hasFailedCommandsOrSubmoduleHasFailedCommands(releasePlan)) {
+                turnCommandsIntoStateReadyToReTriggerAndReady(releasePlan, project)
+            }
+        }
+    }
+
+    private fun turnCommandsIntoStateReadyToReTriggerAndReady(releasePlan: ReleasePlan, project: Project) {
+        project.commands.forEachIndexed { index, _ ->
+            val commandState = Pipeline.getCommandState(project.id, index)
+            if (commandState === CommandState.Failed) {
+                changeToStateReadyToReTrigger(project, index)
+            } else if (commandState === CommandState.Succeeded) {
+                changeStateToReadyWithoutCheck(project, index)
+            }
+        }
+        releasePlan.getSubmodules(project.id).forEach {
+            val submodule = releasePlan.getProject(it)
+            turnCommandsIntoStateReadyToReTriggerAndReady(releasePlan, submodule)
+        }
+    }
+
+    private fun Project.hasFailedCommandsOrSubmoduleHasFailedCommands(releasePlan: ReleasePlan): Boolean {
+        return commands.mapWithIndex()
+            .any { (index, _) -> Pipeline.getCommandState(id, index) === CommandState.Failed }
+            || releasePlan.getSubmodules(id).any {
+            releasePlan.getProject(it).hasFailedCommandsOrSubmoduleHasFailedCommands(releasePlan)
+        }
+    }
+
+    private fun turnFailedCommandsIntoStateReTrigger(releasePlan: ReleasePlan) {
+        releasePlan.iterator().forEach { project ->
+            project.commands.forEachIndexed { index, _ ->
+                val commandState = Pipeline.getCommandState(project.id, index)
+                if (commandState === CommandState.Failed) {
+                    changeToStateReadyToReTrigger(project, index)
+                }
+            }
+        }
+    }
+
+    private fun changeStateToReadyWithoutCheck(project: Project, index: Int) {
+        Pipeline.changeStateOfCommand(project, index, CommandState.Ready, Pipeline.STATE_READY) { _, _ ->
+            // we do not check transition here, Succeeded to Ready is normally not allowed
+            CommandState.Ready
+        }
+    }
+
+    private fun changeToStateReadyToReTrigger(project: Project, index: Int) {
+        Pipeline.changeStateOfCommand(project, index, CommandState.ReadyToReTrigger, Pipeline.STATE_READY_TO_BE_TRIGGER)
+    }
 }

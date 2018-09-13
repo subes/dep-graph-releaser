@@ -12,7 +12,6 @@ import ch.loewenfels.depgraph.gui.components.Pipeline.Companion.stateToTitle
 import ch.loewenfels.depgraph.gui.jobexecution.*
 import ch.loewenfels.depgraph.gui.serialization.ModifiableState
 import ch.loewenfels.depgraph.gui.serialization.deserialize
-import ch.tutteli.kbox.mapWithIndex
 import org.w3c.dom.CustomEvent
 import org.w3c.dom.CustomEventInit
 import org.w3c.dom.HTMLElement
@@ -140,14 +139,15 @@ class Menu(
     }
 
     private fun restartProcess(modifiableState: ModifiableState, processStarter: ProcessStarter?) {
-        if (processStarter != null) {
-            when (modifiableState.releasePlan.typeOfRun) {
+        @Suppress("UNUSED_VARIABLE" /* used to check that we have covered all TypeOfRun */)
+        val checkWhenExhaustiveness: Any? = when {
+            processStarter != null -> when (modifiableState.releasePlan.typeOfRun) {
                 TypeOfRun.EXPLORE -> startExploration(modifiableState, processStarter)
                 TypeOfRun.DRY_RUN -> startDryRun(modifiableState, processStarter)
                 TypeOfRun.RELEASE -> startRelease(modifiableState, processStarter)
             }
-        } else if (modifiableState.releasePlan.typeOfRun == TypeOfRun.EXPLORE) {
-            startExploration(modifiableState, null)
+            modifiableState.releasePlan.typeOfRun == TypeOfRun.EXPLORE -> startExploration(modifiableState, null)
+            else -> null //only necessary to be when exhaustive
         }
     }
 
@@ -237,14 +237,10 @@ class Menu(
     }
 
     private fun startDryRun(modifiableState: ModifiableState, processStarter: ProcessStarter): Promise<*> =
-        triggerProcess(modifiableState.releasePlan, TypeOfRun.DRY_RUN) {
-            processStarter.dryRun(modifiableState)
-        }
+        triggerProcess { processStarter.dryRun(modifiableState) }
 
     private fun startRelease(modifiableState: ModifiableState, processStarter: ProcessStarter): Promise<*> =
-        triggerProcess(modifiableState.releasePlan, TypeOfRun.RELEASE) {
-            processStarter.release(modifiableState)
-        }
+        triggerProcess { processStarter.release(modifiableState) }
 
     private fun startExploration(modifiableState: ModifiableState, processStarter: ProcessStarter?): Promise<*> {
         val fakeJenkinsBaseUrl = "https://github.com/loewenfels/"
@@ -253,9 +249,24 @@ class Menu(
             "${fakeJenkinsBaseUrl}dgr-publisher/",
             modifiableState
         )!!
-        return triggerProcess(modifiableState.releasePlan, TypeOfRun.EXPLORE) {
-            nonNullProcessStarter.explore(modifiableState)
+        return triggerProcess{ nonNullProcessStarter.explore(modifiableState) }
+    }
+
+    private fun triggerProcess(action: () -> Promise<Boolean>): Promise<*> {
+        dispatchProcessStart()
+        if (Pipeline.getReleaseState() === ReleaseState.SUCCEEDED) {
+            dispatchProcessContinue()
         }
+        return action().then(
+            { result ->
+                dispatchProcessEnd(success = result)
+            },
+            { t ->
+                dispatchProcessEnd(success = false)
+                // the user should see this, otherwise we only display it in the dev-console.
+                showThrowableAndThrow(t)
+            }
+        )
     }
 
     private fun initStartOverButton(processStarter: ProcessStarter?) {
@@ -354,89 +365,6 @@ class Menu(
             val title = "The following projects are (indirect) dependents of ${releasePlan.rootProjectId.identifier}"
             showOutput(title, list)
         }
-    }
-
-    private fun triggerProcess(
-        releasePlan: ReleasePlan,
-        typeOfRun: TypeOfRun,
-        action: () -> Promise<Boolean>
-    ): Promise<*> {
-        if (Pipeline.getReleaseState() === ReleaseState.FAILED) {
-            if (typeOfRun == TypeOfRun.DRY_RUN) {
-                turnFailedProjectsIntoReTriggerAndReady(releasePlan)
-            } else {
-                turnFailedCommandsIntoStateReTrigger(releasePlan)
-            }
-        }
-        if (Pipeline.getReleaseState() === ReleaseState.SUCCEEDED) {
-            dispatchProcessContinue()
-            Pipeline.changeReleaseState(ReleaseState.READY)
-        }
-        Pipeline.changeTypeOfRun(typeOfRun)
-        dispatchProcessStart()
-        return action().then(
-            { result ->
-                dispatchProcessEnd(success = result)
-            },
-            { t ->
-                dispatchProcessEnd(success = false)
-                // the user should see this, otherwise we only display it in the dev-console.
-                showThrowableAndThrow(t)
-            }
-        )
-    }
-
-    private fun turnFailedProjectsIntoReTriggerAndReady(releasePlan: ReleasePlan) {
-        releasePlan.iterator().forEach { project ->
-            if (!project.isSubmodule && project.hasFailedCommandsOrSubmoduleHasFailedCommands(releasePlan)) {
-                turnCommandsIntoStateReadyToReTriggerAndReady(releasePlan, project)
-            }
-        }
-    }
-
-    private fun turnCommandsIntoStateReadyToReTriggerAndReady(releasePlan: ReleasePlan, project: Project) {
-        project.commands.forEachIndexed { index, _ ->
-            val commandState = Pipeline.getCommandState(project.id, index)
-            if (commandState === CommandState.Failed) {
-                changeToStateReadyToReTrigger(project, index)
-            } else if (commandState === CommandState.Succeeded) {
-                changeStateToReadyWithoutCheck(project, index)
-            }
-        }
-        releasePlan.getSubmodules(project.id).forEach {
-            val submodule = releasePlan.getProject(it)
-            turnCommandsIntoStateReadyToReTriggerAndReady(releasePlan, submodule)
-        }
-    }
-
-    private fun Project.hasFailedCommandsOrSubmoduleHasFailedCommands(releasePlan: ReleasePlan): Boolean {
-        return commands.mapWithIndex()
-            .any { (index, _) -> Pipeline.getCommandState(id, index) === CommandState.Failed }
-            || releasePlan.getSubmodules(id).any {
-            releasePlan.getProject(it).hasFailedCommandsOrSubmoduleHasFailedCommands(releasePlan)
-        }
-    }
-
-    private fun turnFailedCommandsIntoStateReTrigger(releasePlan: ReleasePlan) {
-        releasePlan.iterator().forEach { project ->
-            project.commands.forEachIndexed { index, _ ->
-                val commandState = Pipeline.getCommandState(project.id, index)
-                if (commandState === CommandState.Failed) {
-                    changeToStateReadyToReTrigger(project, index)
-                }
-            }
-        }
-    }
-
-    private fun changeStateToReadyWithoutCheck(project: Project, index: Int) {
-        Pipeline.changeStateOfCommand(project, index, CommandState.Ready, Pipeline.STATE_READY) { _, _ ->
-            // we do not check transition here, Succeeded to Ready is normally not allowed
-            CommandState.Ready
-        }
-    }
-
-    private fun changeToStateReadyToReTrigger(project: Project, index: Int) {
-        Pipeline.changeStateOfCommand(project, index, CommandState.ReadyToReTrigger, Pipeline.STATE_READY_TO_BE_TRIGGER)
     }
 
     private fun HTMLElement.addClickEventListenerIfNotDeactivatedNorDisabled(action: () -> Any) {
