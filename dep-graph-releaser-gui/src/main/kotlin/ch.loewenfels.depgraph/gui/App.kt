@@ -1,6 +1,7 @@
 package ch.loewenfels.depgraph.gui
 
-import ch.loewenfels.depgraph.data.*
+import ch.loewenfels.depgraph.data.ReleasePlan
+import ch.loewenfels.depgraph.data.ReleaseState
 import ch.loewenfels.depgraph.gui.actions.Downloader
 import ch.loewenfels.depgraph.gui.actions.Publisher
 import ch.loewenfels.depgraph.gui.actions.Releaser
@@ -12,7 +13,7 @@ import ch.loewenfels.depgraph.gui.serialization.ModifiableState
 import ch.loewenfels.depgraph.parseRemoteRegex
 import org.w3c.fetch.Response
 import kotlin.browser.window
-import kotlin.js.*
+import kotlin.js.Promise
 
 class App {
     private val publishJobUrl: String?
@@ -77,11 +78,12 @@ class App {
                     promise
                 }.then { modifiableState ->
                     Loader.updateToLoadPipeline()
-                    ContentContainer(modifiableState, menu)
-                    val dependencies = createDependencies(
-                        defaultJenkinsBaseUrl, publishJobUrl, modifiableState, menu
+                    val processStarter = createProcessStarter(
+                        defaultJenkinsBaseUrl, publishJobUrl, modifiableState
                     )
-                    menu.initDependencies(Downloader(modifiableState), dependencies, modifiableState)
+                    ContentContainer(modifiableState, menu, processStarter)
+
+                    menu.initDependencies(Downloader(modifiableState), modifiableState, processStarter)
                     switchLoaderWithPipeline()
                 }
                 .catch {
@@ -187,27 +189,38 @@ class App {
             return window.fetch(jsonUrl, init)
         }
 
-        internal fun createDependencies(
+        internal fun createProcessStarter(
             defaultJenkinsBaseUrl: String?,
             publishJobUrl: String?,
-            modifiableState: ModifiableState,
-            menu: Menu
-        ): Menu.Dependencies? {
+            modifiableState: ModifiableState
+        ): ProcessStarter? {
             return if (publishJobUrl != null && defaultJenkinsBaseUrl != null) {
-                val publisher = Publisher(publishJobUrl, modifiableState)
-                val releaser = Releaser(defaultJenkinsBaseUrl, modifiableState, menu)
 
+                val publisher = Publisher(publishJobUrl, modifiableState)
                 val jenkinsJobExecutor = JenkinsJobExecutor(UsernameTokenRegistry)
                 val simulatingJobExecutor = SimulatingJobExecutor()
-                Menu.Dependencies(
+                ProcessStarter(
                     publisher,
-                    releaser,
                     jenkinsJobExecutor,
                     simulatingJobExecutor
-                )
+                ) { processStarter ->
+                    Releaser(defaultJenkinsBaseUrl, modifiableState, processStarter)
+                }
             } else {
                 null
             }
+        }
+
+        fun givenOrFakeProcessStarter(
+            processStarter: ProcessStarter?,
+            modifiableState: ModifiableState
+        ): ProcessStarter {
+            val fakeJenkinsBaseUrl = "https://github.com/loewenfels/"
+            return processStarter ?: App.createProcessStarter(
+                fakeJenkinsBaseUrl,
+                "${fakeJenkinsBaseUrl}dgr-publisher/",
+                modifiableState
+            )!!
         }
     }
 }

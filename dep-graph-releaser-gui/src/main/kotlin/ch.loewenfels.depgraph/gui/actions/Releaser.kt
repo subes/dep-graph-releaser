@@ -3,7 +3,6 @@ package ch.loewenfels.depgraph.gui.actions
 import ch.loewenfels.depgraph.data.*
 import ch.loewenfels.depgraph.data.maven.jenkins.JenkinsCommand
 import ch.loewenfels.depgraph.gui.*
-import ch.loewenfels.depgraph.gui.components.Menu
 import ch.loewenfels.depgraph.gui.components.Pipeline
 import ch.loewenfels.depgraph.gui.jobexecution.*
 import ch.loewenfels.depgraph.gui.serialization.ModifiableState
@@ -16,10 +15,11 @@ import kotlin.js.Promise
 class Releaser(
     defaultJenkinsBaseUrl: String,
     private val modifiableState: ModifiableState,
-    private val menu: Menu
+    private val processStarter: ProcessStarter
 ) {
 
     private val isOnSameHost: Boolean
+    private val additionalTriggers = mutableListOf<Promise<ParamObject>>()
 
     init {
         val prefix = window.location.protocol + "//" + window.location.hostname
@@ -40,6 +40,16 @@ class Releaser(
             }
     }
 
+    fun reTrigger(project: Project, jobExecutor: JobExecutor, jobExecutionDataFactory: JobExecutionDataFactory) {
+        val paramObject = ParamObject(
+            modifiableState.releasePlan, jobExecutor, jobExecutionDataFactory, project, hashMapOf(), hashMapOf()
+        )
+        val additionalTrigger = releaseProject(paramObject)
+            .then { paramObject }
+        additionalTriggers.add(additionalTrigger)
+    }
+
+
     private fun warnIfNotOnSameHost() {
         if (!isOnSameHost) {
             showWarning(
@@ -50,15 +60,16 @@ class Releaser(
         }
     }
 
-    private fun release(paramObject: ParamObject): Promise<Boolean> {
+    private fun release(rootParamObject: ParamObject): Promise<Boolean> {
         if (modifiableState.releasePlan.state != ReleaseState.IN_PROGRESS) {
             Pipeline.changeReleaseState(ReleaseState.IN_PROGRESS)
         }
-        return releaseProject(paramObject)
-            .then {
-                val (result, newState) = checkProjectStates(paramObject)
+        return releaseProject(rootParamObject)
+            .then { waitForAdditionalTriggers(rootParamObject) }
+            .then { mergedParamObject ->
+                val (result, newState) = checkProjectStates(mergedParamObject.projectResults)
                 Pipeline.changeReleaseState(newState)
-                quietSave(paramObject, verbose = false)
+                quietSave(mergedParamObject, verbose = false)
                     .catch { t ->
                         showThrowable(
                             Error(
@@ -73,22 +84,32 @@ class Releaser(
             }
     }
 
-    private fun checkProjectStates(paramObject: ParamObject): Pair<Boolean, ReleaseState> {
-        val result = paramObject.projectResults.values.all {
+    private fun waitForAdditionalTriggers(rootParamObject: ParamObject): Promise<ParamObject> =
+        if (additionalTriggers.isNotEmpty()) {
+            additionalTriggers.removeAt(0).then { paramObject ->
+                rootParamObject.addAndOverwriteProjectResults(paramObject)
+                waitForAdditionalTriggers(rootParamObject)
+            }.unwrapPromise()
+        } else {
+            Promise.resolve(rootParamObject)
+        }
+
+    private fun checkProjectStates(projectResults: Map<ProjectId, CommandState>): Pair<Boolean, ReleaseState> {
+        val result = projectResults.values.all {
             it === CommandState.Succeeded || it is CommandState.Deactivated || it === CommandState.Disabled
         }
         val newState = if (result) {
             ReleaseState.SUCCEEDED
         } else {
-            checkForNoneFailedBug(paramObject)
+            checkForNoneFailedBug(projectResults)
             ReleaseState.FAILED
         }
         return result to newState
     }
 
-    private fun checkForNoneFailedBug(paramObject: ParamObject) {
-        if (paramObject.projectResults.values.none { it === CommandState.Failed }) {
-            val erroneousProjects = paramObject.projectResults.entries
+    private fun checkForNoneFailedBug(projectResults: Map<ProjectId, CommandState>) {
+        if (projectResults.values.none { it === CommandState.Failed }) {
+            val erroneousProjects = projectResults.entries
                 .filter {
                     it.value !== CommandState.Failed && it.value !== CommandState.Succeeded &&
                         it.value !is CommandState.Deactivated && it.value !== CommandState.Disabled
@@ -373,7 +394,7 @@ class Releaser(
     }
 
     private fun quietSave(paramObject: ParamObject, verbose: Boolean = false): Promise<Unit> {
-        return menu.save(paramObject.jobExecutor, verbose)
+        return processStarter.publishChanges(paramObject.jobExecutor, verbose)
             .then { hadChanges ->
                 if (!hadChanges) {
                     showWarning(
@@ -428,6 +449,13 @@ class Releaser(
             } else {
                 lock.then { withLockForProject(act) }.unwrapPromise()
             }
+        }
+
+        /**
+         * Adds the project results from [paramObject] to this projects results overriding results for existing projects.
+         */
+        fun addAndOverwriteProjectResults(paramObject: ParamObject) {
+            projectResults.putAll(paramObject.projectResults)
         }
     }
 

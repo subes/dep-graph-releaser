@@ -8,13 +8,10 @@ import ch.loewenfels.depgraph.generateListOfDependentsWithoutSubmoduleAndExclude
 import ch.loewenfels.depgraph.gui.*
 import ch.loewenfels.depgraph.gui.ContentContainer.Companion.RELEASE_ID_HTML_ID
 import ch.loewenfels.depgraph.gui.actions.Downloader
-import ch.loewenfels.depgraph.gui.actions.Publisher
-import ch.loewenfels.depgraph.gui.actions.Releaser
 import ch.loewenfels.depgraph.gui.components.Pipeline.Companion.stateToTitle
 import ch.loewenfels.depgraph.gui.jobexecution.*
 import ch.loewenfels.depgraph.gui.serialization.ModifiableState
 import ch.loewenfels.depgraph.gui.serialization.deserialize
-import ch.tutteli.kbox.mapWithIndex
 import org.w3c.dom.CustomEvent
 import org.w3c.dom.CustomEventInit
 import org.w3c.dom.HTMLElement
@@ -32,8 +29,6 @@ class Menu(
     private val usernameTokenRegistry: UsernameTokenRegistry,
     private val defaultJenkinsBaseUrl: String?
 ) {
-    private var publisher: Publisher? = null
-
     init {
         setUpMenuLayers(
             Triple(toolsButton, "toolbox", TOOLS_INACTIVE_TITLE to "Close the toolbox."),
@@ -109,13 +104,10 @@ class Menu(
 
     internal fun initDependencies(
         downloader: Downloader,
-        dependencies: Dependencies?,
-        modifiableState: ModifiableState
+        modifiableState: ModifiableState,
+        processStarter: ProcessStarter?
     ) {
         Companion.modifiableState = modifiableState
-        if (dependencies != null) {
-            publisher = dependencies.publisher
-        }
 
         window.onbeforeunload = {
             if (!saveButton.hasClass(DEACTIVATED)) {
@@ -127,17 +119,17 @@ class Menu(
             }
         }
 
-        initSaveAndDownloadButton(downloader, dependencies)
-        initRunButtons(dependencies, modifiableState)
+        initSaveAndDownloadButton(downloader, processStarter)
+        initRunButtons(modifiableState, processStarter)
         activateToolsButton()
         activateSettingsButton()
-        initStartOverButton(dependencies)
+        initStartOverButton(processStarter)
         initExportButtons(modifiableState)
 
         val releasePlan = modifiableState.releasePlan
         return when (releasePlan.state) {
             ReleaseState.READY -> Unit /* nothing to do */
-            ReleaseState.IN_PROGRESS -> restartProcess(modifiableState, dependencies)
+            ReleaseState.IN_PROGRESS -> restartProcess(modifiableState, processStarter)
             ReleaseState.FAILED, ReleaseState.SUCCEEDED -> {
                 dispatchProcessStart()
                 dispatchProcessEnd(success = releasePlan.state == ReleaseState.SUCCEEDED)
@@ -146,25 +138,25 @@ class Menu(
         }
     }
 
-    private fun restartProcess(modifiableState: ModifiableState, dependencies: Dependencies?) {
-        if (dependencies != null) {
-            when (modifiableState.releasePlan.typeOfRun) {
-                TypeOfRun.EXPLORE -> startExploration(modifiableState, dependencies)
-                TypeOfRun.DRY_RUN -> startDryRun(modifiableState, dependencies)
-                TypeOfRun.RELEASE -> startRelease(modifiableState, dependencies)
+    private fun restartProcess(modifiableState: ModifiableState, processStarter: ProcessStarter?) {
+        //TODO change to nicer code in case https://youtrack.jetbrains.com/issue/KT-12380 is implemented
+        @Suppress("UNUSED_VARIABLE" /* used to check that we have covered all TypeOfRun */)
+        val checkWhenExhaustiveness: Any? = when {
+            processStarter != null -> when (modifiableState.releasePlan.typeOfRun) {
+                TypeOfRun.EXPLORE -> startExploration(modifiableState, processStarter)
+                TypeOfRun.DRY_RUN -> startDryRun(modifiableState, processStarter)
+                TypeOfRun.RELEASE -> startRelease(modifiableState, processStarter)
             }
-        } else if (modifiableState.releasePlan.typeOfRun == TypeOfRun.EXPLORE) {
-            startExploration(modifiableState, null)
+            modifiableState.releasePlan.typeOfRun == TypeOfRun.EXPLORE -> startExploration(modifiableState, null)
+            else -> null //only necessary to be when exhaustive
         }
     }
 
-    private fun initSaveAndDownloadButton(downloader: Downloader, dependencies: Dependencies?) {
+    private fun initSaveAndDownloadButton(downloader: Downloader, processStarter: ProcessStarter?) {
         deactivateSaveButton()
-        if (dependencies != null) {
+        if (processStarter != null) {
             saveButton.addClickEventListenerIfNotDeactivatedNorDisabled {
-                save(dependencies.jenkinsJobExecutor, verbose = true).then {
-                    deactivateSaveButton()
-                }
+                save(processStarter)
             }
         }
         downloadButton.title = "Download the release.json"
@@ -174,22 +166,22 @@ class Menu(
         }
     }
 
-    private fun initRunButtons(dependencies: Dependencies?, modifiableState: ModifiableState) {
-        if (dependencies != null) {
 
+    private fun initRunButtons(modifiableState: ModifiableState, processStarter: ProcessStarter?) {
+        if (processStarter != null) {
             activateDryRunButton()
             dryRunButton.addClickEventListenerIfNotDeactivatedNorDisabled {
-                startDryRun(modifiableState, dependencies)
+                startDryRun(modifiableState, processStarter)
             }
             activateReleaseButton()
             releaseButton.addClickEventListenerIfNotDeactivatedNorDisabled {
-                startRelease(modifiableState, dependencies)
+                startRelease(modifiableState, processStarter)
             }
         }
 
         activateExploreButton()
         exploreButton.addClickEventListenerIfNotDeactivatedNorDisabled {
-            startExploration(modifiableState, dependencies)
+            startExploration(modifiableState, processStarter)
         }
 
         registerForProcessStartEvent {
@@ -212,7 +204,7 @@ class Menu(
                             "or make changes and continue with the release process."
                     }
                 }
-                val hintIfNotRelease = if (dependencies != null && button != releaseButton) {
+                val hintIfNotRelease = if (processStarter != null && button != releaseButton) {
                     startOverButton.style.display = "inline-block"
                     "Click on the 'Start Over' button if you want to start over with a new process.\n"
                 } else {
@@ -245,64 +237,42 @@ class Menu(
         }
     }
 
-    private fun startDryRun(
-        modifiableState: ModifiableState,
-        dependencies: Dependencies
-    ): Promise<*> {
-        return triggerProcess(
-            modifiableState.releasePlan,
-            dependencies,
-            dependencies.jenkinsJobExecutor,
-            modifiableState.dryRunExecutionDataFactory,
-            TypeOfRun.DRY_RUN
-        )
+    private fun startDryRun(modifiableState: ModifiableState, processStarter: ProcessStarter): Promise<*> =
+        triggerProcess { processStarter.dryRun(modifiableState) }
+
+    private fun startRelease(modifiableState: ModifiableState, processStarter: ProcessStarter): Promise<*> =
+        triggerProcess { processStarter.release(modifiableState) }
+
+    private fun startExploration(modifiableState: ModifiableState, processStarter: ProcessStarter?): Promise<*> {
+        val nonNullProcessStarter = App.givenOrFakeProcessStarter(processStarter, modifiableState)
+        return triggerProcess { nonNullProcessStarter.explore(modifiableState) }
     }
 
-    private fun startRelease(
-        modifiableState: ModifiableState,
-        dependencies: Dependencies
-    ): Promise<*> {
-        return triggerProcess(
-            modifiableState.releasePlan,
-            dependencies,
-            dependencies.jenkinsJobExecutor,
-            modifiableState.releaseJobExecutionDataFactory,
-            TypeOfRun.RELEASE
-        )
-    }
-
-    private fun startExploration(
-        modifiableState: ModifiableState,
-        dependencies: Dependencies?
-    ): Promise<Unit> {
-        val fakeJenkinsBaseUrl = "https://github.com/loewenfels/"
-        val nonNullDependencies = dependencies ?: App.createDependencies(
-            fakeJenkinsBaseUrl,
-            "${fakeJenkinsBaseUrl}dgr-publisher/",
-            modifiableState,
-            this
-        )!!
-        publisher = nonNullDependencies.publisher
-        return triggerProcess(
-            modifiableState.releasePlan,
-            nonNullDependencies,
-            nonNullDependencies.simulatingJobExecutor,
-            modifiableState.releaseJobExecutionDataFactory,
-            TypeOfRun.EXPLORE
-        ).finally {
-            //reset to null in case it was not defined previously
-            publisher = dependencies?.publisher
+    private fun triggerProcess(action: () -> Promise<Boolean>): Promise<*> {
+        dispatchProcessStart()
+        if (Pipeline.getReleaseState() === ReleaseState.SUCCEEDED) {
+            dispatchProcessContinue()
         }
+        return action().then(
+            { result ->
+                dispatchProcessEnd(success = result)
+            },
+            { t ->
+                dispatchProcessEnd(success = false)
+                // the user should see this, otherwise we only display it in the dev-console.
+                showThrowableAndThrow(t)
+            }
+        )
     }
 
-    private fun initStartOverButton(dependencies: Dependencies?) {
-        if (dependencies != null) {
+    private fun initStartOverButton(processStarter: ProcessStarter?) {
+        if (processStarter != null) {
             activateStartOverButton()
-            startOverButton.addClickEventListener { resetForNewProcess(dependencies) }
+            startOverButton.addClickEventListener { resetForNewProcess(processStarter) }
         }
     }
 
-    private fun resetForNewProcess(dependencies: Dependencies) {
+    private fun resetForNewProcess(processStarter: ProcessStarter) {
         val currentReleasePlan = modifiableState.releasePlan
         val initialJson = currentReleasePlan.config[ConfigKey.INITIAL_RELEASE_JSON]
             ?: App.determineJsonUrlOrThrow()
@@ -328,9 +298,7 @@ class Menu(
             elementById<HTMLInputElement>(ContentContainer.RELEASE_ID_HTML_ID).value = randomPublishId()
             resetButtons()
             startOverButton.style.display = "none"
-            save(dependencies.jenkinsJobExecutor, verbose = true).then {
-                deactivateSaveButton()
-            }
+            save(processStarter)
         }
     }
 
@@ -393,91 +361,6 @@ class Menu(
             val title = "The following projects are (indirect) dependents of ${releasePlan.rootProjectId.identifier}"
             showOutput(title, list)
         }
-    }
-
-    private fun triggerProcess(
-        releasePlan: ReleasePlan,
-        dependencies: Dependencies,
-        jobExecutor: JobExecutor,
-        jobExecutionDataFactory: JobExecutionDataFactory,
-        typeOfRun: TypeOfRun
-    ): Promise<*> {
-        if (Pipeline.getReleaseState() === ReleaseState.FAILED) {
-            if (typeOfRun == TypeOfRun.DRY_RUN) {
-                turnFailedProjectsIntoReTriggerAndReady(releasePlan)
-            } else {
-                turnFailedCommandsIntoStateReTrigger(releasePlan)
-            }
-        }
-        if (Pipeline.getReleaseState() === ReleaseState.SUCCEEDED) {
-            dispatchProcessContinue()
-            Pipeline.changeReleaseState(ReleaseState.READY)
-        }
-        Pipeline.changeTypeOfRun(typeOfRun)
-        dispatchProcessStart()
-        return dependencies.releaser.release(jobExecutor, jobExecutionDataFactory).then(
-            { result ->
-                dispatchProcessEnd(success = result)
-            },
-            { t ->
-                dispatchProcessEnd(success = false)
-                // the user should see this, otherwise we only display it in the dev-console.
-                showThrowableAndThrow(t)
-            }
-        )
-    }
-
-    private fun turnFailedProjectsIntoReTriggerAndReady(releasePlan: ReleasePlan) {
-        releasePlan.iterator().forEach { project ->
-            if (!project.isSubmodule && project.hasFailedCommandsOrSubmoduleHasFailedCommands(releasePlan)) {
-                turnCommandsIntoStateReadyToReTriggerAndReady(releasePlan, project)
-            }
-        }
-    }
-
-    private fun turnCommandsIntoStateReadyToReTriggerAndReady(releasePlan: ReleasePlan, project: Project) {
-        project.commands.forEachIndexed { index, _ ->
-            val commandState = Pipeline.getCommandState(project.id, index)
-            if (commandState === CommandState.Failed) {
-                changeToStateReadyToReTrigger(project, index)
-            } else if (commandState === CommandState.Succeeded) {
-                changeStateToReadyWithoutCheck(project, index)
-            }
-        }
-        releasePlan.getSubmodules(project.id).forEach {
-            val submodule = releasePlan.getProject(it)
-            turnCommandsIntoStateReadyToReTriggerAndReady(releasePlan, submodule)
-        }
-    }
-
-    private fun Project.hasFailedCommandsOrSubmoduleHasFailedCommands(releasePlan: ReleasePlan): Boolean {
-        return commands.mapWithIndex()
-            .any { (index, _) -> Pipeline.getCommandState(id, index) === CommandState.Failed }
-            || releasePlan.getSubmodules(id).any {
-            releasePlan.getProject(it).hasFailedCommandsOrSubmoduleHasFailedCommands(releasePlan)
-        }
-    }
-
-    private fun turnFailedCommandsIntoStateReTrigger(releasePlan: ReleasePlan) {
-        releasePlan.iterator().forEach { project ->
-            project.commands.forEachIndexed { index, _ ->
-                val commandState = Pipeline.getCommandState(project.id, index)
-                if (commandState === CommandState.Failed) {
-                    changeToStateReadyToReTrigger(project, index)
-                }
-            }
-        }
-    }
-
-    private fun changeStateToReadyWithoutCheck(project: Project, index: Int) {
-        Pipeline.changeStateOfCommand(project, index, CommandState.Ready, Pipeline.STATE_READY) { _, _ ->
-            // we do not check transition here, Succeeded to Ready is normally not allowed
-            CommandState.Ready
-        }
-    }
-
-    private fun changeToStateReadyToReTrigger(project: Project, index: Int) {
-        Pipeline.changeStateOfCommand(project, index, CommandState.ReadyToReTrigger, Pipeline.STATE_READY_TO_BE_TRIGGER)
     }
 
     private fun HTMLElement.addClickEventListenerIfNotDeactivatedNorDisabled(action: () -> Any) {
@@ -555,32 +438,16 @@ class Menu(
         button.title = newTitle
     }
 
-    /**
-     * Applies changes and publishes the new release.json with the help of the [Publisher].
-     * @return `true` if publishing was carried out, `false` in case there were not any changes.
-     */
-    fun save(jobExecutor: JobExecutor, verbose: Boolean): Promise<Boolean> {
-        val publisher = publisher
-        if (publisher == null) {
-            deactivateSaveButton()
-            showThrowableAndThrow(
-                IllegalStateException(
-                    "Save button should not be activate if no publish job url was specified." +
-                        "\nPlease report a bug: $GITHUB_REPO"
-                )
+    private fun save(processStarter: ProcessStarter?): Promise<Unit> {
+        deactivateSaveButton()
+        val nonNullProcessStarter = processStarter ?: showThrowableAndThrow(
+            IllegalStateException(
+                "Save button should not be activated if no publish job url was specified." +
+                    "\nPlease report a bug: $GITHUB_REPO"
             )
-        }
-
-        val changed = publisher.applyChanges()
-        return if (changed) {
-            val publishId = getTextField(ContentContainer.RELEASE_ID_HTML_ID).value
-            val newFileName = "release-$publishId"
-            publisher.publish(newFileName, verbose, jobExecutor)
-                .then { true }
-        } else {
-            if (verbose) showInfo("Seems like all changes have been reverted manually. Will not save anything.")
-            deactivateSaveButton()
-            Promise.resolve(false)
+        )
+        return nonNullProcessStarter.publishChanges(verbose = true).then { hadChanges ->
+            if (!hadChanges) showInfo("Seems like all changes have been reverted manually. Will not save anything.")
         }
     }
 
@@ -705,11 +572,4 @@ class Menu(
             }
         }
     }
-
-    internal class Dependencies(
-        val publisher: Publisher,
-        val releaser: Releaser,
-        val jenkinsJobExecutor: JobExecutor,
-        val simulatingJobExecutor: JobExecutor
-    )
 }
