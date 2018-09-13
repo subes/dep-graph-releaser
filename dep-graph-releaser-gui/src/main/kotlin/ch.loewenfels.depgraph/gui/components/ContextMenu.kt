@@ -59,7 +59,9 @@ class ContextMenu(private val modifiableState: ModifiableState, private val menu
                 title = "Re-Triggers the Command without waiting until the whole process ends.",
                 iconCreator = { i("material-icons") { span()  /* done via css */ } },
                 action = {
-                    //TODO re-trigger command
+                    transitionToReadyToReTriggerIfOk(project, index)
+                    //TODO trigger re-trigger for this we require JobExecutor and co. currently logic is in Menu
+                    //we should move that out of menu
                 }
             )
         }
@@ -146,12 +148,7 @@ class ContextMenu(private val modifiableState: ModifiableState, private val menu
     }
 
     private fun transitionToSucceeded(project: Project, index: Int) {
-        Pipeline.changeStateOfCommand(
-            project,
-            index,
-            CommandState.Succeeded,
-            Pipeline.stateToTitle(CommandState.Succeeded)
-        ) { _, _ ->
+        Pipeline.changeStateOfCommand(project, index, CommandState.Succeeded, Pipeline.STATE_SUCCEEDED) { _, _ ->
             // we do not check transition here, the user has to know what she does (at least for now)
             CommandState.Succeeded
         }
@@ -165,6 +162,11 @@ class ContextMenu(private val modifiableState: ModifiableState, private val menu
             }
             || modifiableState.releasePlan.getSubmodules(project.id)
             .any { notAllOtherCommandsSucceeded(modifiableState.releasePlan.getProject(it), null) }
+    }
+
+    private fun transitionToReadyToReTriggerIfOk(project: Project, index: Int){
+        //verifies that the transition is OK
+        Pipeline.changeStateOfCommand(project, index, CommandState.ReadyToReTrigger, Pipeline.STATE_READY_TO_BE_TRIGGER)
     }
 
     fun setUpOnContextMenuForProjectsAndCommands() {
