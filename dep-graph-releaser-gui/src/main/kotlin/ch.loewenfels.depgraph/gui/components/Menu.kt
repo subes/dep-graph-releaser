@@ -139,6 +139,7 @@ class Menu(
     }
 
     private fun restartProcess(modifiableState: ModifiableState, processStarter: ProcessStarter?) {
+        //TODO change to nicer code in case https://youtrack.jetbrains.com/issue/KT-12380 is implemented
         @Suppress("UNUSED_VARIABLE" /* used to check that we have covered all TypeOfRun */)
         val checkWhenExhaustiveness: Any? = when {
             processStarter != null -> when (modifiableState.releasePlan.typeOfRun) {
@@ -243,13 +244,8 @@ class Menu(
         triggerProcess { processStarter.release(modifiableState) }
 
     private fun startExploration(modifiableState: ModifiableState, processStarter: ProcessStarter?): Promise<*> {
-        val fakeJenkinsBaseUrl = "https://github.com/loewenfels/"
-        val nonNullProcessStarter = processStarter ?: App.createProcessStarter(
-            fakeJenkinsBaseUrl,
-            "${fakeJenkinsBaseUrl}dgr-publisher/",
-            modifiableState
-        )!!
-        return triggerProcess{ nonNullProcessStarter.explore(modifiableState) }
+        val nonNullProcessStarter = App.givenOrFakeProcessStarter(processStarter, modifiableState)
+        return triggerProcess { nonNullProcessStarter.explore(modifiableState) }
     }
 
     private fun triggerProcess(action: () -> Promise<Boolean>): Promise<*> {

@@ -7,6 +7,7 @@ import ch.loewenfels.depgraph.gui.components.Menu
 import ch.loewenfels.depgraph.gui.components.Pipeline
 import ch.loewenfels.depgraph.gui.components.textAreaWithLabel
 import ch.loewenfels.depgraph.gui.components.textFieldWithLabel
+import ch.loewenfels.depgraph.gui.jobexecution.ProcessStarter
 import ch.loewenfels.depgraph.gui.serialization.ModifiableState
 import kotlinx.html.DIV
 import kotlinx.html.div
@@ -14,7 +15,7 @@ import kotlinx.html.dom.append
 import org.w3c.dom.asList
 import kotlin.browser.document
 
-class ContentContainer(modifiableState: ModifiableState, private val menu: Menu) {
+class ContentContainer(modifiableState: ModifiableState, private val menu: Menu, processStarter: ProcessStarter?) {
 
     init {
         val releasePlan = modifiableState.releasePlan
@@ -24,7 +25,7 @@ class ContentContainer(modifiableState: ModifiableState, private val menu: Menu)
         releasePlan.warnings.forEach { showWarning(it) }
         setInfoBubble(releasePlan.infos)
         setUpConfig(releasePlan)
-        Pipeline(modifiableState, menu)
+        Pipeline(modifiableState, menu, processStarter)
     }
 
     private fun setInfoBubble(messages: List<String>) {

@@ -78,10 +78,11 @@ class App {
                     promise
                 }.then { modifiableState ->
                     Loader.updateToLoadPipeline()
-                    ContentContainer(modifiableState, menu)
                     val processStarter = createProcessStarter(
                         defaultJenkinsBaseUrl, publishJobUrl, modifiableState
                     )
+                    ContentContainer(modifiableState, menu, processStarter)
+
                     menu.initDependencies(Downloader(modifiableState), modifiableState, processStarter)
                     switchLoaderWithPipeline()
                 }
@@ -208,6 +209,18 @@ class App {
             } else {
                 null
             }
+        }
+
+        fun givenOrFakeProcessStarter(
+            processStarter: ProcessStarter?,
+            modifiableState: ModifiableState
+        ): ProcessStarter {
+            val fakeJenkinsBaseUrl = "https://github.com/loewenfels/"
+            return processStarter ?: App.createProcessStarter(
+                fakeJenkinsBaseUrl,
+                "${fakeJenkinsBaseUrl}dgr-publisher/",
+                modifiableState
+            )!!
         }
     }
 }

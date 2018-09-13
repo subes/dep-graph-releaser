@@ -129,4 +129,13 @@ class ProcessStarter(
     private fun changeToStateReadyToReTrigger(project: Project, index: Int) {
         Pipeline.changeStateOfCommand(project, index, CommandState.ReadyToReTrigger, Pipeline.STATE_READY_TO_BE_TRIGGER)
     }
+
+    fun reTrigger(project: Project, modifiableState: ModifiableState) {
+        val (jobExecutor, dataFactory) = when (Pipeline.getTypeOfRun()) {
+            TypeOfRun.EXPLORE -> simulatingJobExecutor to modifiableState.releaseJobExecutionDataFactory
+            TypeOfRun.DRY_RUN -> jenkinsJobExecutor to modifiableState.dryRunExecutionDataFactory
+            TypeOfRun.RELEASE -> jenkinsJobExecutor to modifiableState.releaseJobExecutionDataFactory
+        }
+        releaser.reTrigger(project, jobExecutor, dataFactory)
+    }
 }

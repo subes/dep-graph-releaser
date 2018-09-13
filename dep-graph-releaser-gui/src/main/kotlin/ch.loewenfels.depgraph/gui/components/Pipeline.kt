@@ -10,6 +10,7 @@ import ch.loewenfels.depgraph.gui.elementById
 import ch.loewenfels.depgraph.gui.getCheckbox
 import ch.loewenfels.depgraph.gui.getUnderlyingHtmlElement
 import ch.loewenfels.depgraph.gui.jobexecution.GITHUB_NEW_ISSUE
+import ch.loewenfels.depgraph.gui.jobexecution.ProcessStarter
 import ch.loewenfels.depgraph.gui.serialization.ModifiableState
 import ch.loewenfels.depgraph.gui.showError
 import ch.loewenfels.depgraph.hasNextOnTheSameLevel
@@ -22,8 +23,8 @@ import kotlin.dom.addClass
 import kotlin.dom.hasClass
 import kotlin.dom.removeClass
 
-class Pipeline(private val modifiableState: ModifiableState, private val menu: Menu) {
-    private val contextMenu = ContextMenu(modifiableState, menu)
+class Pipeline(private val modifiableState: ModifiableState, private val menu: Menu, processStarter: ProcessStarter?) {
+    private val contextMenu = ContextMenu(modifiableState, menu, processStarter)
 
     init {
         setUpProjects()

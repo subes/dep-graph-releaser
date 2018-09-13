@@ -1,12 +1,10 @@
 package ch.loewenfels.depgraph.gui.components
 
 import ch.loewenfels.depgraph.ConfigKey
-import ch.loewenfels.depgraph.data.CommandState
-import ch.loewenfels.depgraph.data.Project
-import ch.loewenfels.depgraph.data.ReleaseCommand
-import ch.loewenfels.depgraph.data.ReleaseState
+import ch.loewenfels.depgraph.data.*
 import ch.loewenfels.depgraph.generateGitCloneCommands
 import ch.loewenfels.depgraph.gui.*
+import ch.loewenfels.depgraph.gui.jobexecution.ProcessStarter
 import ch.loewenfels.depgraph.gui.serialization.ModifiableState
 import ch.tutteli.kbox.forEachIn
 import ch.tutteli.kbox.mapWithIndex
@@ -24,7 +22,11 @@ import kotlin.dom.hasClass
 import kotlin.dom.removeClass
 import kotlin.reflect.KClass
 
-class ContextMenu(private val modifiableState: ModifiableState, private val menu: Menu) {
+class ContextMenu(
+    private val modifiableState: ModifiableState,
+    private val menu: Menu,
+    private val processStarter: ProcessStarter?
+) {
 
     fun createProjectContextMenu(div: DIV, project: Project) {
         div.div("contextMenu") {
@@ -58,15 +60,10 @@ class ContextMenu(private val modifiableState: ModifiableState, private val menu
                 text = "Re-Trigger Command immediately",
                 title = "Re-Triggers the Command without waiting until the whole process ends.",
                 iconCreator = { i("material-icons") { span()  /* done via css */ } },
-                action = {
-                    transitionToReadyToReTriggerIfOk(project, index)
-                    //TODO trigger re-trigger for this we require JobExecutor and co. currently logic is in Menu
-                    //we should move that out of menu
-                }
+                action = { reTriggerProject(project, index) }
             )
         }
     }
-
 
     private fun DIV.commandContextMenuEntry(
         idPrefix: String,
@@ -164,7 +161,19 @@ class ContextMenu(private val modifiableState: ModifiableState, private val menu
             .any { notAllOtherCommandsSucceeded(modifiableState.releasePlan.getProject(it), null) }
     }
 
-    private fun transitionToReadyToReTriggerIfOk(project: Project, index: Int){
+    private fun reTriggerProject(project: Project, index: Int) {
+        val processStarter = if (Pipeline.getTypeOfRun() == TypeOfRun.EXPLORE) {
+            App.givenOrFakeProcessStarter(this@ContextMenu.processStarter, modifiableState)
+        } else {
+            this@ContextMenu.processStarter
+        }
+        if (processStarter != null) {
+            transitionToReadyToReTriggerIfOk(project, index)
+            processStarter.reTrigger(project, modifiableState)
+        }
+    }
+
+    private fun transitionToReadyToReTriggerIfOk(project: Project, index: Int) {
         //verifies that the transition is OK
         Pipeline.changeStateOfCommand(project, index, CommandState.ReadyToReTrigger, Pipeline.STATE_READY_TO_BE_TRIGGER)
     }
@@ -230,7 +239,11 @@ class ContextMenu(private val modifiableState: ModifiableState, private val menu
      * [Pipeline.getReleaseState] == [ReleaseState.WATCHING] or if [disable] is true.
      * You can optionally pass a [disabledReason] which is used to explain why the context entry is disabled.
      */
-    private fun disableOrEnableContextMenuEntry(id: String, disable: Boolean, disabledReason: String = "Cannot apply this action.") {
+    private fun disableOrEnableContextMenuEntry(
+        id: String,
+        disable: Boolean,
+        disabledReason: String = "Cannot apply this action."
+    ) {
         val entry = elementById(id)
         if (Pipeline.getReleaseState() == ReleaseState.WATCHING || disable) {
             entry.setTitleSaveOld(disabledReason)
