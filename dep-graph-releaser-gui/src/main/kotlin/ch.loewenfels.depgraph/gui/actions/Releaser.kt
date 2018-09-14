@@ -157,9 +157,7 @@ class Releaser(
                 if (state is CommandState.Waiting && state.dependencies.contains(multiOrSubmoduleId)) {
                     (state.dependencies as MutableSet).remove(multiOrSubmoduleId)
                     if (state.dependencies.isEmpty()) {
-                        Pipeline.changeStateOfCommand(
-                            dependentProject, index, CommandState.Ready, Pipeline.STATE_READY
-                        )
+                        Pipeline.changeStateOfCommand(dependentProject, index, CommandState.Ready)
                     }
                 }
             }
@@ -336,7 +334,6 @@ class Releaser(
                 paramObject.project,
                 index,
                 CommandState.Queueing,
-                Pipeline.STATE_QUEUEING,
                 queuedItemUrl
             )
             quietSave(paramObject)
@@ -353,7 +350,6 @@ class Releaser(
                 paramObject.project,
                 index,
                 CommandState.InProgress,
-                Pipeline.STATE_IN_PROGRESS,
                 "${jobExecutionData.jobBaseUrl}$buildNumber/"
             )
             Promise.resolve(1)
@@ -373,7 +369,7 @@ class Releaser(
     }
 
     private fun onJobEndedSuccessFully(project: Project, index: Int): CommandState {
-        Pipeline.changeStateOfCommand(project, index, CommandState.Succeeded, Pipeline.STATE_SUCCEEDED)
+        Pipeline.changeStateOfCommand(project, index, CommandState.Succeeded)
         return CommandState.Succeeded
     }
 
@@ -388,18 +384,18 @@ class Releaser(
             "${Pipeline.getCommandId(project, index)}${Pipeline.STATE_SUFFIX}"
         )
 
-        val (errorState, title) = if (t is PollTimeoutException) {
+        val errorState = if (t is PollTimeoutException) {
             val previous = Pipeline.getCommandState(project.id, index)
-            CommandState.Timeout(previous) to Pipeline.STATE_TIMEOUT
+            CommandState.Timeout(previous)
         } else {
-            CommandState.Failed to Pipeline.STATE_FAILED
+            CommandState.Failed
         }
         val href = if (!state.href.endsWith(endOfConsoleUrlSuffix)) {
             state.href + "/" + endOfConsoleUrlSuffix
         } else {
             state.href
         }
-        Pipeline.changeStateOfCommandAndAddBuildUrl(project, index, errorState, title, href)
+        Pipeline.changeStateOfCommandAndAddBuildUrl(project, index, errorState, href)
         return errorState
     }
 

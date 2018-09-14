@@ -174,9 +174,7 @@ class ContextMenu(
         project: Project,
         index: Int,
         checkStateTransition: (previousState: CommandState, commandId: String) -> CommandState
-    ) = Pipeline.changeStateOfCommand(
-        project, index, CommandState.Succeeded, Pipeline.STATE_SUCCEEDED, checkStateTransition
-    )
+    ) = Pipeline.changeStateOfCommand(project, index, CommandState.Succeeded, checkStateTransition)
 
     private fun notAllOtherCommandsSucceeded(project: Project, index: Int?): Boolean {
         return project.commands.asSequence()
@@ -192,7 +190,7 @@ class ContextMenu(
     private fun reTriggerProject(project: Project, index: Int) {
         reProcessProject(project, index) { p, i ->
             //verifies that the transition is OK
-            Pipeline.changeStateOfCommand(p, i, CommandState.ReadyToReTrigger, Pipeline.STATE_READY_TO_BE_TRIGGER)
+            Pipeline.changeStateOfCommand(p, i, CommandState.ReadyToReTrigger)
         }
     }
 

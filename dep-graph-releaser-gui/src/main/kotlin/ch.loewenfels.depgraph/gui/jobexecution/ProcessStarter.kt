@@ -120,14 +120,14 @@ class ProcessStarter(
     }
 
     private fun changeStateToReadyWithoutCheck(project: Project, index: Int) {
-        Pipeline.changeStateOfCommand(project, index, CommandState.Ready, Pipeline.STATE_READY) { _, _ ->
+        Pipeline.changeStateOfCommand(project, index, CommandState.Ready) { _, _ ->
             // we do not check transition here, Succeeded to Ready is normally not allowed
             CommandState.Ready
         }
     }
 
     private fun changeToStateReadyToReTrigger(project: Project, index: Int) {
-        Pipeline.changeStateOfCommand(project, index, CommandState.ReadyToReTrigger, Pipeline.STATE_READY_TO_BE_TRIGGER)
+        Pipeline.changeStateOfCommand(project, index, CommandState.ReadyToReTrigger)
     }
 
     fun reProcess(project: Project, modifiableState: ModifiableState) {

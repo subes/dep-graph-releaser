@@ -263,16 +263,16 @@ class Pipeline(private val modifiableState: ModifiableState, private val menu: M
         private const val PIPELINE_HTML_ID = "pipeline"
 
         private const val STATE_WAITING = "Wait for dependent projects to complete."
-        const val STATE_READY = "Ready to be queued for execution."
-        const val STATE_READY_TO_BE_TRIGGER = "Ready to be re-scheduled"
-        const val STATE_QUEUEING = "Currently queueing the job."
+        private const val STATE_READY = "Ready to be queued for execution."
+        private const val STATE_READY_TO_BE_TRIGGER = "Ready to be re-scheduled"
+        private const val STATE_QUEUEING = "Currently queueing the job."
         private const val STATE_RE_POLLING = "Job is being re-polled."
-        const val STATE_IN_PROGRESS = "Job is running."
-        const val STATE_SUCCEEDED = "Job completed successfully."
-        const val STATE_FAILED = "Job failed - click to navigate to console or queue item."
-        const val STATE_TIMEOUT = "Job run into a timeout - click to navigate to console or queue item."
+        private const val STATE_IN_PROGRESS = "Job is running."
+        private const val STATE_SUCCEEDED = "Job completed successfully."
+        private const val STATE_FAILED = "Job failed - click to navigate to console or queue item."
+        private const val STATE_TIMEOUT = "Job run into a timeout - click to navigate to console or queue item."
         private const val STATE_DEACTIVATED = "Currently deactivated, click to activate"
-        const val STATE_DISABLED = "Command disabled, cannot be reactivated."
+        private const val STATE_DISABLED = "Command disabled, cannot be reactivated."
 
         const val DEACTIVATE_SUFFIX = ":deactivate"
         const val SLIDER_SUFFIX = ":slider"
@@ -296,18 +296,16 @@ class Pipeline(private val modifiableState: ModifiableState, private val menu: M
             project: Project,
             index: Int,
             newState: CommandState,
-            title: String,
             buildUrl: String
-        ) = changeStateOfCommandAndAddBuildUrlIfSet(project, index, newState, title, buildUrl)
+        ) = changeStateOfCommandAndAddBuildUrlIfSet(project, index, newState, buildUrl)
 
         fun changeStateOfCommandAndAddBuildUrlIfSet(
             project: Project,
             index: Int,
             newState: CommandState,
-            title: String,
             buildUrl: String?
         ) {
-            changeStateOfCommand(project, index, newState, title)
+            changeStateOfCommand(project, index, newState)
             if (buildUrl != null) {
                 changeBuildUrlOfCommand(project, index, buildUrl)
             }
@@ -319,8 +317,8 @@ class Pipeline(private val modifiableState: ModifiableState, private val menu: M
             elementById(commandId).asDynamic().buildUrl = buildUrl
         }
 
-        fun changeStateOfCommand(project: Project, index: Int, newState: CommandState, title: String) {
-            changeStateOfCommand(project, index, newState, title) { previousState, commandId ->
+        fun changeStateOfCommand(project: Project, index: Int, newState: CommandState) {
+            changeStateOfCommand(project, index, newState) { previousState, commandId ->
                 try {
                     previousState.checkTransitionAllowed(newState)
                 } catch (e: IllegalStateException) {
@@ -351,7 +349,6 @@ class Pipeline(private val modifiableState: ModifiableState, private val menu: M
             project: Project,
             index: Int,
             newState: CommandState,
-            title: String,
             checkStateTransition: (previousState: CommandState, commandId: String) -> CommandState
         ) {
             val commandId = getCommandId(project, index)
@@ -361,7 +358,7 @@ class Pipeline(private val modifiableState: ModifiableState, private val menu: M
             dynCommand.state = checkStateTransition(previousState, commandId)
             command.removeClass(stateToCssClass(previousState))
             command.addClass(stateToCssClass(newState))
-            elementById("$commandId$STATE_SUFFIX").title = title
+            elementById("$commandId$STATE_SUFFIX").title = stateToTitle(newState)
         }
 
         fun getReleaseState() = getPipelineAsDynamic().state as ReleaseState

@@ -53,15 +53,14 @@ class Toggler(private val modifiableState: ModifiableState, private val menu: Me
         val toggle = Pipeline.getToggle(project, index)
         val command = Pipeline.getCommand(project, index).asDynamic()
         val slider = getSlider(toggle)
-        val currentTitle = elementById("${Pipeline.getCommandId(project, index)}${Pipeline.STATE_SUFFIX}").title
         if (!toggle.checked) {
             dispatchToggleEvent(project, toggle, uncheckedEvent)
             val previous = command.state as CommandState
-            Pipeline.changeStateOfCommand(project, index, CommandState.Deactivated(previous), currentTitle)
+            Pipeline.changeStateOfCommand(project, index, CommandState.Deactivated(previous))
             slider.title = "Click to activate command."
         } else {
             val oldState = command.state as CommandState.Deactivated
-            Pipeline.changeStateOfCommand(project, index, oldState.previous, currentTitle)
+            Pipeline.changeStateOfCommand(project, index, oldState.previous)
             slider.title = "Click to deactivate command."
         }
         menu.activateSaveButton()
