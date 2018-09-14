@@ -143,8 +143,7 @@ class Releaser(
                 updateStateWaiting(releasePlan, allDependents)
                 releaseDependentProjects(allDependents, releasePlan, paramObject)
             }.catch { t ->
-                val errorState = if (t is PollTimeoutException) CommandState.Timeout else CommandState.Failed
-                paramObject.projectResults[paramObject.project.id] = errorState
+                paramObject.projectResults[paramObject.project.id] = CommandState.Failed
                 if (t !== ReleaseFailure) throw t
             }
         }
@@ -390,7 +389,8 @@ class Releaser(
         )
 
         val (errorState, title) = if (t is PollTimeoutException) {
-            CommandState.Timeout to Pipeline.STATE_TIMEOUT
+            val previous = Pipeline.getCommandState(project.id, index)
+            CommandState.Timeout(previous) to Pipeline.STATE_TIMEOUT
         } else {
             CommandState.Failed to Pipeline.STATE_FAILED
         }
@@ -467,7 +467,7 @@ class Releaser(
          */
         fun mergeProjectResults(paramObject: ParamObject) {
             paramObject.projectResults.forEach { (projectId, state) ->
-                if(state !is CommandState.Waiting && projectResults[projectId] !== CommandState.Succeeded) {
+                if (state !is CommandState.Waiting && projectResults[projectId] !== CommandState.Succeeded) {
                     projectResults[projectId] = state
                 }
             }

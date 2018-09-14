@@ -294,7 +294,7 @@ class ContextMenu(
         disableOrEnableContextMenuEntry(
             "$idPrefix$CONTEXT_MENU_COMMAND_RE_POLL",
             state != ReleaseState.IN_PROGRESS ||
-                commandState !== CommandState.Timeout,
+                commandState !is CommandState.Timeout,
             "Can only re-poll if previously timed out and process state is in progress."
         )
     }

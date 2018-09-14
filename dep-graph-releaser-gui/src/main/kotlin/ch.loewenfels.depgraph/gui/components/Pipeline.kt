@@ -387,7 +387,7 @@ class Pipeline(private val modifiableState: ModifiableState, private val menu: M
             CommandState.InProgress -> "inProgress"
             CommandState.Succeeded -> "succeeded"
             CommandState.Failed -> "failed"
-            CommandState.Timeout -> "timeout"
+            is CommandState.Timeout -> "timeout"
             is CommandState.Deactivated -> "deactivated"
             CommandState.Disabled -> "disabled"
         }
@@ -402,7 +402,7 @@ class Pipeline(private val modifiableState: ModifiableState, private val menu: M
             CommandState.InProgress -> STATE_IN_PROGRESS
             CommandState.Succeeded -> STATE_SUCCEEDED
             CommandState.Failed -> STATE_FAILED
-            CommandState.Timeout -> STATE_TIMEOUT
+            is CommandState.Timeout -> STATE_TIMEOUT
             is CommandState.Deactivated -> STATE_DEACTIVATED
             CommandState.Disabled -> STATE_DISABLED
         }

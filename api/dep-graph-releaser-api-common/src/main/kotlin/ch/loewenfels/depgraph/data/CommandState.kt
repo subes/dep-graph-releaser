@@ -27,10 +27,11 @@ sealed class CommandState {
 
     object Succeeded : CommandState()
     object Failed : CommandState()
+
     /**
-     * Command run into a timeout.
+     * Command run into a timeout, was in state [previous] before.
      */
-    object Timeout : CommandState()
+    data class Timeout(val previous: CommandState) : CommandState()
 
     data class Deactivated(val previous: CommandState) : CommandState()
 
@@ -65,9 +66,9 @@ sealed class CommandState {
                 newState
             }
             is Queueing -> checkNewStateIsAfter(newState, Ready::class, ReadyToReTrigger::class)
-            is StillQueueing -> checkNewStateIsAfter(newState, Queueing::class)
+            is StillQueueing -> checkNewStateIsAfter(newState, Queueing::class, Timeout::class)
             is InProgress -> checkNewStateIsAfter(newState, Queueing::class)
-            is RePolling -> checkNewStateIsAfter(newState, InProgress::class)
+            is RePolling -> checkNewStateIsAfter(newState, InProgress::class, Timeout::class)
             is Succeeded -> checkNewStateIsAfter(newState, InProgress::class, RePolling::class)
             is Timeout -> checkNewStateIsAfter(newState, Queueing::class, InProgress::class, RePolling::class)
             is Waiting,
@@ -103,9 +104,8 @@ sealed class CommandState {
     }
 
     companion object {
-        fun isFailureState(state: CommandState) = state === Failed || state === Timeout
+        fun isFailureState(state: CommandState) = state === Failed || state is Timeout
 
         fun isEndState(state: CommandState): Boolean = state === CommandState.Succeeded || isFailureState(state)
-
     }
 }
