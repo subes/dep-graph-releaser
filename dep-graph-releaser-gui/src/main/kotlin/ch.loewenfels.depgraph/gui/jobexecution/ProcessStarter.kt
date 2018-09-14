@@ -16,7 +16,7 @@ class ProcessStarter(
     private val simulatingJobExecutor: SimulatingJobExecutor,
     releaserSupplier: (ProcessStarter) -> Releaser
 ) {
-    private val releaser by lazy { releaserSupplier(this) }
+    private val releaser : Releaser by lazy { releaserSupplier(this) }
 
     /**
      * Applies changes and publishes the new release.json with the help of the [publisher] which in turn uses the
@@ -136,6 +136,6 @@ class ProcessStarter(
             TypeOfRun.DRY_RUN -> jenkinsJobExecutor to modifiableState.dryRunExecutionDataFactory
             TypeOfRun.RELEASE -> jenkinsJobExecutor to modifiableState.releaseJobExecutionDataFactory
         }
-        releaser.reTrigger(project, jobExecutor, dataFactory)
+        releaser.reTrigger(project.id, jobExecutor, dataFactory)
     }
 }

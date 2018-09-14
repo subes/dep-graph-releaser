@@ -32,17 +32,12 @@ class Releaser(
         val paramObject = ParamObject(
             modifiableState.releasePlan, jobExecutor, jobExecutionDataFactory, rootProject, hashMapOf(), hashMapOf()
         )
-        changeCursorToProgress()
         return release(paramObject)
-            .finally {
-                changeCursorBackToNormal()
-                it ?: false
-            }
     }
 
-    fun reTrigger(project: Project, jobExecutor: JobExecutor, jobExecutionDataFactory: JobExecutionDataFactory) {
+    fun reTrigger(projectId: ProjectId, jobExecutor: JobExecutor, jobExecutionDataFactory: JobExecutionDataFactory) {
         val paramObject = ParamObject(
-            modifiableState.releasePlan, jobExecutor, jobExecutionDataFactory, project, hashMapOf(), hashMapOf()
+            modifiableState.releasePlan, jobExecutor, jobExecutionDataFactory, modifiableState.releasePlan.getProject(projectId), hashMapOf(), hashMapOf()
         )
         val additionalTrigger = releaseProject(paramObject)
             .then { paramObject }
