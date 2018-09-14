@@ -512,7 +512,7 @@ input:disabled {
     min-width: 135px;
 }
 .fields .contextMenu {
-    min-width: 211px;
+    min-width: 280px;
 }
 .contextMenu div {
     cursor: pointer;
