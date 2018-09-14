@@ -92,7 +92,9 @@ class SimulatingJobExecutor : JobExecutor {
     }
 
     private fun simulateJobFinished(jobExecutionData: JobExecutionData): Promise<Boolean> {
-        ++count
+        if (!jobExecutionData.jobName.startsWith("publish")) {
+            ++count
+        }
         if (count > failAfterSteps) check(false) {
             count = -3; "simulating a failure for ${jobExecutionData.jobName}"
         }
