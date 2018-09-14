@@ -89,7 +89,7 @@ class Releaser(
     private fun waitForAdditionalTriggers(rootParamObject: ParamObject): Promise<ParamObject> =
         if (additionalTriggers.isNotEmpty()) {
             additionalTriggers.removeAt(0).then { paramObject ->
-                rootParamObject.addAndOverwriteProjectResults(paramObject)
+                rootParamObject.mergeProjectResults(paramObject)
                 waitForAdditionalTriggers(rootParamObject)
             }.unwrapPromise()
         } else {
@@ -462,10 +462,15 @@ class Releaser(
         )
 
         /**
-         * Adds the project results from [paramObject] to this projects results overriding results for existing projects.
+         * Merges the project results from [paramObject] into this [projectResults] where existing results are
+         * overwritten in case it is not [CommandState.Succeeded] and the other is not [CommandState.Waiting].
          */
-        fun addAndOverwriteProjectResults(paramObject: ParamObject) {
-            projectResults.putAll(paramObject.projectResults)
+        fun mergeProjectResults(paramObject: ParamObject) {
+            paramObject.projectResults.forEach { (projectId, state) ->
+                if(state !is CommandState.Waiting && projectResults[projectId] !== CommandState.Succeeded) {
+                    projectResults[projectId] = state
+                }
+            }
         }
     }
 
