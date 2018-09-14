@@ -39,7 +39,7 @@ fun toJson(state: CommandState) : CommandStateJson = when (state) {
     is CommandState.RePolling -> CommandStateJson(RE_POLLING)
     is CommandState.Succeeded -> CommandStateJson(SUCCEEDED)
     is CommandState.Failed -> CommandStateJson(FAILED)
-    is CommandState.Timeout -> CommandStateJson(TIMEOUT)
+    is CommandState.Timeout -> CommandStateJson(TIMEOUT, toJson(state.previous))
     is CommandState.Deactivated -> CommandStateJson(DEACTIVATED, toJson(state.previous))
     is CommandState.Disabled -> CommandStateJson(DISABLED)
 }
@@ -54,7 +54,7 @@ fun fromJson(json: CommandStateJson): CommandState = when (json.state) {
     RE_POLLING -> CommandState.RePolling
     SUCCEEDED -> CommandState.Succeeded
     FAILED -> CommandState.Failed
-    TIMEOUT -> CommandState.Timeout
+    TIMEOUT -> CommandState.Timeout(fromJson(json.previous ?: throwIllegal("previous", TIMEOUT.name)))
     DEACTIVATED -> CommandState.Deactivated(fromJson(json.previous ?: throwIllegal("previous", DEACTIVATED.name)))
     DISABLED -> CommandState.Disabled
 }

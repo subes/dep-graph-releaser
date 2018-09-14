@@ -11,10 +11,16 @@ val onlyUsedToCallMain = main()
 
 @JsName("failAfterSteps")
 var failAfterSteps = 10000
+
 @JsName("failWithTimeout")
 var failWithTimeout = false
+
+@JsName("failDuringQueueing")
+var failDuringQueueing = false
+
 @JsName("waitBetweenSteps")
 var waitBetweenSteps = 500
+
 @JsName("stepWise")
 var stepWise = false
 
@@ -24,6 +30,7 @@ fun options() {
         mapOf(
             "failAfterSteps" to failAfterSteps,
             "failWithTimeout" to failWithTimeout,
+            "failDuringQueueing" to failDuringQueueing,
             "waitBetweenSteps" to waitBetweenSteps,
             "stepWise" to stepWise
         ).entries.joinToString("\n") { (k, v) -> "$k: $v" }

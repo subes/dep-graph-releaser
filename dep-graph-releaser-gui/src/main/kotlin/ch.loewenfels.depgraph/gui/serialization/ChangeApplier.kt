@@ -166,7 +166,7 @@ object ChangeApplier {
         if (previousState::class != newState::class) {
             val stateObject = js("({})")
             stateObject.state = toJson(newState).state.name
-            if (newState is CommandState.Deactivated) {
+            if (newState is CommandState.Deactivated || newState is CommandState.Timeout) {
                 stateObject.previous = command.state
             }
             command.asDynamic().state = stateObject

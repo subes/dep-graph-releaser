@@ -442,12 +442,14 @@ input:disabled {
 .command.inProgress > .fields > .state .material-icons span::after {
     content: 'play_arrow';
 }
-.command.rePolling .state {
+.command.rePolling .state,
+.contextMenu .rePoll > .material-icons{
     -moz-transform: scale(-1, 1);
     -webkit-transform: scale(-1, 1);
     transform: scale(-1, 1);
 }
-.command.rePolling > .fields > .state .material-icons span::after {
+.command.rePolling > .fields > .state .material-icons span::after,
+.contextMenu .rePoll > .material-icons span::after {
     content: 'reply';
 }
 
@@ -561,14 +563,15 @@ input:disabled {
 .contextMenu .gitClone > .material-icons {
     color: #f34f29;
 }
-.contextMenu .reTrigger > .material-icons {
+.contextMenu .reTrigger > .material-icons,
+.contextMenu .succeededContinue > .material-icons,
+.contextMenu .rePoll > .material-icons {
     color: #e6930d;
+}
+.contextMenu .reTrigger > .material-icons{
     width: 24px;
     height: 24px;
     font-size: 24px;
-}
-.contextMenu .succeededContinue > .material-icons {
-    color: #e6930d;
 }
 .contextMenu .succeededContinue > .material-icons span::before {
     content: 'play_arrow';

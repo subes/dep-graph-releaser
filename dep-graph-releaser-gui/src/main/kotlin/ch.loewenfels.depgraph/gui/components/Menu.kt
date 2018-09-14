@@ -287,7 +287,7 @@ class Menu(
                 project.commands.forEachIndexed { index, command ->
                     val newState = determineNewState(project, index, command)
                     Pipeline.changeBuildUrlOfCommand(project, index, "")
-                    Pipeline.changeStateOfCommand(project, index, newState, stateToTitle(newState)) { _, _ ->
+                    Pipeline.changeStateOfCommand(project, index, newState) { _, _ ->
                         // we do not check if the transition is allowed since we reset the command
                         newState
                     }

@@ -4,6 +4,7 @@ import ch.loewenfels.depgraph.gui.showAlert
 import ch.loewenfels.depgraph.gui.sleep
 import ch.loewenfels.depgraph.gui.unwrapPromise
 import failAfterSteps
+import failDuringQueueing
 import failWithTimeout
 import stepWise
 import waitBetweenSteps
@@ -36,6 +37,12 @@ class SimulatingJobExecutor : JobExecutor {
         return sleep(100) {
             jobQueuedHook("${jobExecutionData.jobBaseUrl}queuingUrl")
             informIfStepWiseAndNotPublish("job $jobName queued", jobName)
+            if (!jobExecutionData.jobName.startsWith("publish")) {
+                ++count
+            }
+            if (failDuringQueueing) {
+                checkIfNeedsToFail(jobExecutionData)
+            }
         }.then {
             sleep(waitBetweenSteps) {
                 simulateBuildNumberExtracted(jobName, jobStartedHook)
@@ -93,9 +100,12 @@ class SimulatingJobExecutor : JobExecutor {
     }
 
     private fun simulateJobFinished(jobExecutionData: JobExecutionData): Promise<Boolean> {
-        if (!jobExecutionData.jobName.startsWith("publish")) {
-            ++count
-        }
+        checkIfNeedsToFail(jobExecutionData)
+        return informIfStepWise("job ${jobExecutionData.jobName} ended")
+            .then { true }
+    }
+
+    private fun checkIfNeedsToFail(jobExecutionData: JobExecutionData) {
         if (count >= failAfterSteps) {
             count = 0
             if (failWithTimeout) {
@@ -104,8 +114,6 @@ class SimulatingJobExecutor : JobExecutor {
                 throw IllegalArgumentException("simulating a failure for ${jobExecutionData.jobName}")
             }
         }
-        return informIfStepWise("job ${jobExecutionData.jobName} ended")
-            .then { true }
     }
 
     private fun informIfStepWise(msg: String): Promise<Unit> {
