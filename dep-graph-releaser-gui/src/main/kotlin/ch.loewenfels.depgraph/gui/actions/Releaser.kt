@@ -379,18 +379,18 @@ class Releaser(
         val state = elementById<HTMLAnchorElement>(
             "${Pipeline.getCommandId(project, index)}${Pipeline.STATE_SUFFIX}"
         )
+
+        val (errState, title) = if (t is PollTimeoutException) {
+            CommandState.Timeout to Pipeline.STATE_TIMEOUT
+        } else {
+            CommandState.Failed to Pipeline.STATE_FAILED
+        }
         val href = if (!state.href.endsWith(endOfConsoleUrlSuffix)) {
             state.href + "/" + endOfConsoleUrlSuffix
         } else {
             state.href
         }
-        Pipeline.changeStateOfCommandAndAddBuildUrl(
-            project,
-            index,
-            CommandState.Failed,
-            Pipeline.STATE_FAILED,
-            href
-        )
+        Pipeline.changeStateOfCommandAndAddBuildUrl(project, index, errState, title, href)
         return CommandState.Failed
     }
 

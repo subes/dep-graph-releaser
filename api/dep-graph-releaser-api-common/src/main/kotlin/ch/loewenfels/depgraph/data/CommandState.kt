@@ -69,7 +69,7 @@ sealed class CommandState {
             is InProgress -> checkNewStateIsAfter(newState, Queueing::class)
             is RePolling -> checkNewStateIsAfter(newState, InProgress::class)
             is Succeeded -> checkNewStateIsAfter(newState, InProgress::class, RePolling::class)
-            is Timeout -> checkNewStateIsAfter(newState, InProgress::class, RePolling::class)
+            is Timeout -> checkNewStateIsAfter(newState, Queueing::class, InProgress::class, RePolling::class)
             is Waiting,
             is Failed,
             is Deactivated,
