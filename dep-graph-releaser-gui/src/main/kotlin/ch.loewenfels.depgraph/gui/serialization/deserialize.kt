@@ -3,8 +3,8 @@ package ch.loewenfels.depgraph.gui.serialization
 import ch.loewenfels.depgraph.ConfigKey
 import ch.loewenfels.depgraph.data.*
 import ch.loewenfels.depgraph.data.maven.MavenProjectId
-import ch.loewenfels.depgraph.data.maven.jenkins.JenkinsSingleMavenReleaseCommand
 import ch.loewenfels.depgraph.data.maven.jenkins.JenkinsMultiMavenReleasePlugin
+import ch.loewenfels.depgraph.data.maven.jenkins.JenkinsSingleMavenReleaseCommand
 import ch.loewenfels.depgraph.data.maven.jenkins.JenkinsUpdateDependency
 import ch.loewenfels.depgraph.data.serialization.CommandStateJson
 import ch.loewenfels.depgraph.data.serialization.fromJson
@@ -117,10 +117,10 @@ private fun fakeEnumsName(json: CommandStateJson): CommandStateJson {
     while (tmp != null) {
         //necessary to fake an enum's name attribute (state is actually a json object and not really a CommandStateJson)
         js("tmp.state = {name: tmp.state}")
-        tmp = if (tmp.state.name == CommandStateJson.State.DEACTIVATED.name) {
-            tmp.previous
-        } else {
-            null
+        tmp =  when(tmp.state.name) {
+            CommandStateJson.State.DEACTIVATED.name,
+            CommandStateJson.State.TIMEOUT.name -> tmp.previous
+            else -> null
         }
     }
     return state
