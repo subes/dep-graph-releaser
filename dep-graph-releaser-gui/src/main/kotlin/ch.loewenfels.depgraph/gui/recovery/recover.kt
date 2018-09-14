@@ -122,7 +122,7 @@ private fun recoverStateQueueing(
     return issueCrumb(jenkinsBaseUrl, usernameAndApiToken).then { authData ->
         val jobExecutionData = recoverJobExecutionData(modifiableState, project, command)
         val nullableQueuedItemUrl = command.buildUrl
-        recoverToQueueingOrRePolling(nullableQueuedItemUrl, authData, jobExecutionData, lazyProjectJson, index)
+        recoverToStillQueueingOrRePolling(nullableQueuedItemUrl, authData, jobExecutionData, lazyProjectJson, index)
             .catch { t ->
                 showThrowable(IllegalStateException("job ${jobExecutionData.jobName} could not be recovered", t))
                 recoverStateTo(lazyProjectJson, index, CommandStateJson.State.FAILED)
@@ -152,7 +152,7 @@ private fun recoverJobExecutionData(
     return jobExecutionDataFactory.create(project, command)
 }
 
-private fun recoverToQueueingOrRePolling(
+private fun recoverToStillQueueingOrRePolling(
     nullableQueuedItemUrl: String?,
     authData: AuthData,
     jobExecutionData: JobExecutionData,
