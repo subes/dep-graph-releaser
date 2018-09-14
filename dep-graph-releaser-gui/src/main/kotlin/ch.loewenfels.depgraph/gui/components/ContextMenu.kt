@@ -207,11 +207,31 @@ class ContextMenu(
     }
 
     private fun rePollProject(project: Project, index: Int) {
-        //TODO either RePolling or StillQueueing depending on when the timeout happened
-//        reProcessProject(project, index) { p, i ->
-//            verifies that the transition is OK
-//            Pipeline.changeStateOfCommand(p, i, CommandState.RePolling, Pipeline.STATE_RE_POLLING)
-//        }
+        reProcessProject(project, index) { p, i ->
+            val currentState = Pipeline.getCommandState(p.id, i)
+            //TODO change with update to kotlin 1.3 where `check` supports smart casts as well
+            if (currentState !is CommandState.Timeout) {
+                val commandId = Pipeline.getCommandId(p, i)
+                throw IllegalStateException(
+                    "Cannot re-poll project, current state was not ${CommandState.Timeout::class.simpleName}." +
+                        Pipeline.failureDiagnosticsStateTransition(p, i, currentState, commandId)
+                )
+            }
+
+            val newState = when (currentState.previous) {
+                CommandState.Queueing -> CommandState.StillQueueing
+                CommandState.InProgress -> CommandState.RePolling
+                else -> {
+                    val commandId = Pipeline.getCommandId(p, i)
+                    throw IllegalStateException(
+                        "state ${CommandState.Timeout::class.simpleName} with an illegal previous state." +
+                            Pipeline.failureDiagnosticsStateTransition(p, i, currentState, commandId)
+                    )
+                }
+            }
+            //verifies that the transition to the new state is OK
+            Pipeline.changeStateOfCommand(p, i, newState)
+        }
     }
 
     private fun reProcessProject(project: Project, index: Int, stateTransition: (Project, index: Int) -> Unit) {
