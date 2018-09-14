@@ -101,23 +101,23 @@ class Releaser(
         val newState = if (result) {
             ReleaseState.SUCCEEDED
         } else {
-            checkForNoneFailedBug(projectResults)
+            checkForNotAllCompleteButNoneFailedBug(projectResults)
             ReleaseState.FAILED
         }
         return result to newState
     }
 
-    private fun checkForNoneFailedBug(projectResults: Map<ProjectId, CommandState>) {
-        if (projectResults.values.none { it === CommandState.Failed }) {
+    private fun checkForNotAllCompleteButNoneFailedBug(projectResults: Map<ProjectId, CommandState>) {
+        if (projectResults.values.none { CommandState.isFailureState(it) }) {
             val erroneousProjects = projectResults.entries
                 .filter {
-                    it.value !== CommandState.Failed && it.value !== CommandState.Succeeded &&
+                    !CommandState.isEndState(it.value) &&
                         it.value !is CommandState.Deactivated && it.value !== CommandState.Disabled
                 }
             if (erroneousProjects.isNotEmpty()) {
                 showError(
                     """
-                        |Seems like there is a bug since no command failed but not all commands are in status Succeeded.
+                        |Seems like there is a bug since no command failed but not all commands are in status ${CommandState.Succeeded::class.simpleName}.
                         |Please report a bug at $GITHUB_NEW_ISSUE - the following projects where affected:
                         |${erroneousProjects.joinToString("\n") { it.key.identifier }}
                     """.trimMargin()
@@ -141,7 +141,8 @@ class Releaser(
                 updateStateWaiting(releasePlan, allDependents)
                 releaseDependentProjects(allDependents, releasePlan, paramObject)
             }.catch { t ->
-                paramObject.projectResults[paramObject.project.id] = CommandState.Failed
+                val errorState = if (t is PollTimeoutException) CommandState.Timeout else CommandState.Failed
+                paramObject.projectResults[paramObject.project.id] = errorState
                 if (t !== ReleaseFailure) throw t
             }
         }
@@ -209,7 +210,7 @@ class Releaser(
             acc.then { list ->
                 action(element).then { jobResult ->
                     //do not continue with next command if a previous was not successful
-                    if (jobResult === CommandState.Failed) throw ReleaseFailure
+                    if (CommandState.isFailureState(jobResult)) throw ReleaseFailure
                     list.add(jobResult)
                     list
                 }
@@ -380,7 +381,7 @@ class Releaser(
             "${Pipeline.getCommandId(project, index)}${Pipeline.STATE_SUFFIX}"
         )
 
-        val (errState, title) = if (t is PollTimeoutException) {
+        val (errorState, title) = if (t is PollTimeoutException) {
             CommandState.Timeout to Pipeline.STATE_TIMEOUT
         } else {
             CommandState.Failed to Pipeline.STATE_FAILED
@@ -390,8 +391,8 @@ class Releaser(
         } else {
             state.href
         }
-        Pipeline.changeStateOfCommandAndAddBuildUrl(project, index, errState, title, href)
-        return CommandState.Failed
+        Pipeline.changeStateOfCommandAndAddBuildUrl(project, index, errorState, title, href)
+        return errorState
     }
 
     private fun quietSave(paramObject: ParamObject, verbose: Boolean = false): Promise<Unit> {

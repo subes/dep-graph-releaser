@@ -107,7 +107,7 @@ class DryRunJobExecutionDataFactory(
     private fun commandRanOnProjectOrSubmodules(project: Project): Boolean {
         var commandAlreadyRan = project.commands.withIndex().any { (index, command) ->
             val state = getState(project, index, command)
-            state === CommandState.Succeeded || state === CommandState.Failed
+            CommandState.isEndState(state)
         }
         val submodules = releasePlan.getSubmodules(project.id)
         commandAlreadyRan = commandAlreadyRan || (submodules.isNotEmpty() && submodules.any {

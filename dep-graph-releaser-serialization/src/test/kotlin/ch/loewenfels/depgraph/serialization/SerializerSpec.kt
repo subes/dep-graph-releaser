@@ -82,6 +82,7 @@ object SerializerSpec : Spek({
             CommandState.InProgress,
             CommandState.Succeeded,
             CommandState.Failed,
+            CommandState.Timeout,
             CommandState.Deactivated(CommandState.Waiting(setOf(DummyProjectId("x"), DummyProjectId("z"))))
         ).associateBy(
             { "a Project with a single command in state ${it::class.java.simpleName}" },

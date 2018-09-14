@@ -88,7 +88,7 @@ class ProcessStarter(
     private fun turnCommandsIntoStateReadyToReTriggerAndReady(releasePlan: ReleasePlan, project: Project) {
         project.commands.forEachIndexed { index, _ ->
             val commandState = Pipeline.getCommandState(project.id, index)
-            if (commandState === CommandState.Failed) {
+            if (CommandState.isFailureState(commandState)) {
                 changeToStateReadyToReTrigger(project, index)
             } else if (commandState === CommandState.Succeeded) {
                 changeStateToReadyWithoutCheck(project, index)
@@ -102,7 +102,7 @@ class ProcessStarter(
 
     private fun Project.hasFailedCommandsOrSubmoduleHasFailedCommands(releasePlan: ReleasePlan): Boolean {
         return commands.mapWithIndex()
-            .any { (index, _) -> Pipeline.getCommandState(id, index) === CommandState.Failed }
+            .any { (index, _) -> CommandState.isFailureState(Pipeline.getCommandState(id, index)) }
             || releasePlan.getSubmodules(id).any {
             releasePlan.getProject(it).hasFailedCommandsOrSubmoduleHasFailedCommands(releasePlan)
         }
@@ -112,7 +112,7 @@ class ProcessStarter(
         releasePlan.iterator().forEach { project ->
             project.commands.forEachIndexed { index, _ ->
                 val commandState = Pipeline.getCommandState(project.id, index)
-                if (commandState === CommandState.Failed) {
+                if (CommandState.isFailureState(commandState)) {
                     changeToStateReadyToReTrigger(project, index)
                 }
             }

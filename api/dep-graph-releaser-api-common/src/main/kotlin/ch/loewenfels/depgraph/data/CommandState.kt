@@ -51,7 +51,7 @@ sealed class CommandState {
 
         return when (newState) {
 
-            is ReadyToReTrigger -> checkNewStateIsAfter(newState, Failed::class)
+            is ReadyToReTrigger -> checkNewStateIsAfter(newState, Failed::class, Timeout::class)
             is Ready -> {
                 checkNewStateIsAfter(newState, Waiting::class)
                 if (this is Waiting) { //could also be Deactivated with previous Ready
@@ -100,5 +100,12 @@ sealed class CommandState {
             }
         }
         return newState
+    }
+
+    companion object {
+        fun isFailureState(state: CommandState) = state === Failed || state === Timeout
+
+        fun isEndState(state: CommandState): Boolean = state === CommandState.Succeeded || isFailureState(state)
+
     }
 }
