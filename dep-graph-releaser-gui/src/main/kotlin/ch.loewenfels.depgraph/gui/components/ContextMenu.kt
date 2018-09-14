@@ -56,11 +56,15 @@ class ContextMenu(
             commandContextMenuEntry(idPrefix, CONTEXT_MENU_COMMAND_SUCCEEDED, CommandState.Succeeded::class) {
                 transitionToSucceededIfOk(project, index)
             }
-            contextMenuEntry(idPrefix, CONTEXT_MENU_COMMAND_RE_TRIGGER,
+            contextMenuEntryWithCssIcon(idPrefix, CONTEXT_MENU_COMMAND_RE_TRIGGER,
                 text = "Re-Trigger Command immediately",
                 title = "Re-Triggers the Command without waiting until the whole process ends.",
-                iconCreator = { i("material-icons") { span()  /* done via css */ } },
                 action = { reTriggerProject(project, index) }
+            )
+            contextMenuEntryWithCssIcon(idPrefix, CONTEXT_MENU_COMMAND_SUCCEEDED_CONTINUE,
+                text = "Set Command to ${CommandState.Succeeded::class.simpleName} and Continue",
+                title = "Forcibly sets the state of this command to ${CommandState.Succeeded::class.simpleName} and continues with the process. To be used with care.",
+                action = { transitionToSucceededIfOkAndContinue(project, index) }
             )
         }
     }
@@ -70,10 +74,21 @@ class ContextMenu(
         cssClass: String,
         commandClass: KClass<out CommandState>,
         action: (Event) -> Unit
-    ) = contextMenuEntry(
+    ) = contextMenuEntryWithCssIcon(
         idPrefix, cssClass,
         text = "Set Command to ${commandClass.simpleName}",
         title = "Forcibly sets the state of this command to ${commandClass.simpleName}, to be used with care.",
+        action = action
+    )
+
+    private fun DIV.contextMenuEntryWithCssIcon(
+        idPrefix: String,
+        cssClass: String,
+        text: String,
+        title: String,
+        action: (Event) -> Unit
+    ) = contextMenuEntry(
+        idPrefix, cssClass, text, title,
         iconCreator = { i("material-icons") { span() /* done via css */ } },
         action = action
     )
@@ -130,13 +145,13 @@ class ContextMenu(
                 return
             }
         }
-        transitionToSucceeded(project, index)
+        transitionToSucceededWithoutCheck(project, index)
         menu.activateSaveButton()
     }
 
     private fun transitionAllCommandsToSucceeded(project: Project) {
         project.commands.forEachIndexed { index, _ ->
-            transitionToSucceeded(project, index)
+            transitionToSucceededWithoutCheck(project, index)
         }
         val releasePlan = modifiableState.releasePlan
         releasePlan.getSubmodules(project.id).forEach {
@@ -144,12 +159,19 @@ class ContextMenu(
         }
     }
 
-    private fun transitionToSucceeded(project: Project, index: Int) {
-        Pipeline.changeStateOfCommand(project, index, CommandState.Succeeded, Pipeline.STATE_SUCCEEDED) { _, _ ->
+    private fun transitionToSucceededWithoutCheck(project: Project, index: Int) =
+        transitionToSucceededWithCheck(project, index) { _, _ ->
             // we do not check transition here, the user has to know what she does (at least for now)
             CommandState.Succeeded
         }
-    }
+
+    private fun transitionToSucceededWithCheck(
+        project: Project,
+        index: Int,
+        checkStateTransition: (previousState: CommandState, commandId: String) -> CommandState
+    ) = Pipeline.changeStateOfCommand(
+        project, index, CommandState.Succeeded, Pipeline.STATE_SUCCEEDED, checkStateTransition
+    )
 
     private fun notAllOtherCommandsSucceeded(project: Project, index: Int?): Boolean {
         return project.commands.asSequence()
@@ -161,14 +183,17 @@ class ContextMenu(
             .any { notAllOtherCommandsSucceeded(modifiableState.releasePlan.getProject(it), null) }
     }
 
-    private fun reTriggerProject(project: Project, index: Int) {
+    private fun reTriggerProject(project: Project, index: Int) =
+        reTriggerProject(project, index, ::transitionToReadyToReTriggerIfOk)
+
+    private fun reTriggerProject(project: Project, index: Int, stateTransition: (Project, index: Int) -> Unit) {
         val processStarter = if (Pipeline.getTypeOfRun() == TypeOfRun.EXPLORE) {
             App.givenOrFakeProcessStarter(this@ContextMenu.processStarter, modifiableState)
         } else {
             this@ContextMenu.processStarter
         }
         if (processStarter != null) {
-            transitionToReadyToReTriggerIfOk(project, index)
+            stateTransition(project, index)
             processStarter.reTrigger(project, modifiableState)
         }
     }
@@ -177,6 +202,18 @@ class ContextMenu(
         //verifies that the transition is OK
         Pipeline.changeStateOfCommand(project, index, CommandState.ReadyToReTrigger, Pipeline.STATE_READY_TO_BE_TRIGGER)
     }
+
+
+    private fun transitionToSucceededIfOkAndContinue(project: Project, index: Int) =
+        reTriggerProject(project, index) { p, i ->
+            transitionToSucceededWithCheck(p, i) { previousState, commandId ->
+                check(previousState == CommandState.Failed) {
+                    "Cannot set state to ${CommandState.Succeeded::class.simpleName} and continue, previous state needs to be ${CommandState.Failed::class.simpleName}" +
+                        Pipeline.failureDiagnosticsStateTransition(p, i, previousState, commandId)
+                }
+                CommandState.Succeeded
+            }
+        }
 
     fun setUpOnContextMenuForProjectsAndCommands() {
         val projects = document.querySelectorAll(".project")
@@ -230,7 +267,13 @@ class ContextMenu(
             "$idPrefix$CONTEXT_MENU_COMMAND_RE_TRIGGER",
             state != ReleaseState.IN_PROGRESS ||
                 commandState !== CommandState.Failed,
-            "Can only re-trigger when previously failed and process state is in progress."
+            "Can only re-trigger if previously failed and process state is in progress."
+        )
+        disableOrEnableContextMenuEntry(
+            "$idPrefix$CONTEXT_MENU_COMMAND_SUCCEEDED_CONTINUE",
+            state != ReleaseState.IN_PROGRESS ||
+                commandState !== CommandState.Failed,
+            "Can only set to Succeeded and continue if previously failed and process state is in progress."
         )
     }
 
@@ -285,10 +328,11 @@ class ContextMenu(
     }
 
     companion object {
-        const val CONTEXT_MENU_SUFFIX = ":contextMenu"
-        const val CONTEXT_MENU_COMMAND_DEACTIVATED = "deactivated"
-        const val CONTEXT_MENU_COMMAND_SUCCEEDED = "succeeded"
-        const val CONTEXT_MENU_COMMAND_RE_TRIGGER = "reTrigger"
-        const val CSS_DISABLED = "disabled"
+        private const val CONTEXT_MENU_SUFFIX = ":contextMenu"
+        private const val CONTEXT_MENU_COMMAND_DEACTIVATED = "deactivated"
+        private const val CONTEXT_MENU_COMMAND_SUCCEEDED = "succeeded"
+        private const val CONTEXT_MENU_COMMAND_RE_TRIGGER = "reTrigger"
+        private const val CONTEXT_MENU_COMMAND_SUCCEEDED_CONTINUE = "succeededContinue"
+        private const val CSS_DISABLED = "disabled"
     }
 }

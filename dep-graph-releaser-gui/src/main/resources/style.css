@@ -447,7 +447,8 @@ input:disabled {
 }
 
 .command.succeeded > .fields > .state .material-icons span::after,
-.contextMenu .succeeded > .material-icons span::after {
+.contextMenu .succeeded > .material-icons span::after,
+.contextMenu .succeededContinue > .material-icons span::after {
     content: 'check';
 }
 .command.succeeded > .fields > .state {
@@ -558,11 +559,22 @@ input:disabled {
 .contextMenu .gitClone > .material-icons {
     color: #f34f29;
 }
-.contextMenu .reTrigger .material-icons {
+.contextMenu .reTrigger > .material-icons {
     color: #e6930d;
     width: 24px;
     height: 24px;
     font-size: 24px;
+}
+.contextMenu .succeededContinue > .material-icons {
+    color: #e6930d;
+}
+.contextMenu .succeededContinue > .material-icons span::before {
+    content: 'play_arrow';
+    font-size: 10px;
+    margin-left: 11px;
+}
+.contextMenu .succeededContinue > .material-icons span::after {
+    margin-left: -21px;
 }
 
 #poweredBy,

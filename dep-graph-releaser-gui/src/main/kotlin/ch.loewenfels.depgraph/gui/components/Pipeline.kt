@@ -3,8 +3,8 @@ package ch.loewenfels.depgraph.gui.components
 import ch.loewenfels.depgraph.data.*
 import ch.loewenfels.depgraph.data.maven.MavenProjectId
 import ch.loewenfels.depgraph.data.maven.jenkins.JenkinsCommand
-import ch.loewenfels.depgraph.data.maven.jenkins.JenkinsSingleMavenReleaseCommand
 import ch.loewenfels.depgraph.data.maven.jenkins.JenkinsMultiMavenReleasePlugin
+import ch.loewenfels.depgraph.data.maven.jenkins.JenkinsSingleMavenReleaseCommand
 import ch.loewenfels.depgraph.data.maven.jenkins.JenkinsUpdateDependency
 import ch.loewenfels.depgraph.gui.elementById
 import ch.loewenfels.depgraph.gui.getCheckbox
@@ -307,7 +307,7 @@ class Pipeline(private val modifiableState: ModifiableState, private val menu: M
             buildUrl: String?
         ) {
             changeStateOfCommand(project, index, newState, title)
-            if(buildUrl != null){
+            if (buildUrl != null) {
                 changeBuildUrlOfCommand(project, index, buildUrl)
             }
         }
@@ -323,17 +323,27 @@ class Pipeline(private val modifiableState: ModifiableState, private val menu: M
                 try {
                     previousState.checkTransitionAllowed(newState)
                 } catch (e: IllegalStateException) {
-                    val commandTitle = elementById(commandId + TITLE_SUFFIX)
                     //TODO use $this instead of $getToStringRepresentation(...) once https://youtrack.jetbrains.com/issue/KT-23970 is fixed
                     throw IllegalStateException(
                         "Cannot change the state of the command to ${newState.getToStringRepresentation()}." +
-                            "\nProject: ${project.id.identifier}" +
-                            "\nCommand: ${commandTitle.innerText} (${index + 1}. command)" +
-                            "\nCurrent state: ${previousState.getToStringRepresentation()}",
+                            failureDiagnosticsStateTransition(project, index, previousState, commandId),
                         e
                     )
                 }
             }
+        }
+
+        fun failureDiagnosticsStateTransition(
+            project: Project,
+            index: Int,
+            previousState: CommandState,
+            commandId: String
+        ): String {
+            //TODO use $this instead of $getToStringRepresentation(...) once https://youtrack.jetbrains.com/issue/KT-23970 is fixed
+            val commandTitle = elementById(commandId + TITLE_SUFFIX)
+            return "\nProject: ${project.id.identifier}" +
+                "\nCommand: ${commandTitle.innerText} (${index + 1}. command)" +
+                "\nCurrent state: ${previousState.getToStringRepresentation()}"
         }
 
         internal fun changeStateOfCommand(
