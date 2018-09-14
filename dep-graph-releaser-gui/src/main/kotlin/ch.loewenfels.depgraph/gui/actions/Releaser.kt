@@ -20,6 +20,8 @@ class Releaser(
 
     private val isOnSameHost: Boolean
     private val additionalTriggers = mutableListOf<Promise<ParamObject>>()
+    //We would need another solution if the Releaser is used multiple times for different release processes
+    private val locks = hashMapOf<ProjectId, Promise<*>>()
 
     init {
         val prefix = window.location.protocol + "//" + window.location.hostname
@@ -29,21 +31,26 @@ class Releaser(
     fun release(jobExecutor: JobExecutor, jobExecutionDataFactory: JobExecutionDataFactory): Promise<Boolean> {
         warnIfNotOnSameHost()
         val rootProject = modifiableState.releasePlan.getRootProject()
-        val paramObject = ParamObject(
-            modifiableState.releasePlan, jobExecutor, jobExecutionDataFactory, rootProject, hashMapOf(), hashMapOf()
-        )
+        val paramObject = createParamObject(jobExecutor, jobExecutionDataFactory, rootProject)
         return release(paramObject)
     }
 
-    fun reTrigger(projectId: ProjectId, jobExecutor: JobExecutor, jobExecutionDataFactory: JobExecutionDataFactory) {
-        val paramObject = ParamObject(
-            modifiableState.releasePlan, jobExecutor, jobExecutionDataFactory, modifiableState.releasePlan.getProject(projectId), hashMapOf(), hashMapOf()
-        )
-        val additionalTrigger = releaseProject(paramObject)
-            .then { paramObject }
+    fun reProcess(projectId: ProjectId, jobExecutor: JobExecutor, jobExecutionDataFactory: JobExecutionDataFactory) {
+        val project = modifiableState.releasePlan.getProject(projectId)
+        val paramObject = createParamObject(jobExecutor, jobExecutionDataFactory, project)
+        val additionalTrigger = releaseProject(paramObject).then { paramObject }
         additionalTriggers.add(additionalTrigger)
     }
 
+    private fun createParamObject(
+        jobExecutor: JobExecutor,
+        jobExecutionDataFactory: JobExecutionDataFactory,
+        project: Project
+    ): ParamObject {
+        return ParamObject(
+            modifiableState.releasePlan, jobExecutor, jobExecutionDataFactory, project, hashMapOf()
+        )
+    }
 
     private fun warnIfNotOnSameHost() {
         if (!isOnSameHost) {
@@ -122,7 +129,7 @@ class Releaser(
     }
 
     private fun releaseProject(paramObject: ParamObject): Promise<*> {
-        return paramObject.withLockForProject {
+        return withLockForProject(paramObject.project.id) {
             triggerNonReleaseCommandsInclSubmoduleCommands(paramObject).then { jobResult ->
                 if (jobResult !== CommandState.Succeeded) return@then jobResult
 
@@ -232,9 +239,15 @@ class Releaser(
             is CommandState.StillQueueing -> rePollQueueing(paramObject, command, index)
             is CommandState.RePolling -> rePollCommand(paramObject, command, index)
 
-            is CommandState.Waiting,
             is CommandState.Queueing,
-            is CommandState.InProgress,
+            is CommandState.InProgress -> throw IllegalStateException(
+                "Seems like locking did not work properly, invalid state. Please report a bug $GITHUB_NEW_ISSUE" +
+                    Pipeline.failureDiagnosticsStateTransition(
+                        paramObject.project, index, state, Pipeline.getCommandId(paramObject.project, index)
+                    )
+            )
+
+            is CommandState.Waiting,
             is CommandState.Succeeded,
             is CommandState.Failed,
             is CommandState.Timeout,
@@ -406,6 +419,23 @@ class Releaser(
             }
     }
 
+    private fun <T> withLockForProject(projectId: ProjectId, act: () -> Promise<T>): Promise<T> {
+        val lock = locks[projectId]
+        return if (lock == null) {
+            val promise = act()
+            locks[projectId] = promise
+            promise.then { result ->
+                locks.remove(projectId)
+                result
+            }
+        } else {
+            console.log("wait for lock of project $projectId")
+            lock.then {
+                withLockForProject(projectId, act)
+            }.unwrapPromise()
+        }
+    }
+
     companion object {
         const val POLL_EVERY_SECOND = 5
         const val MAX_WAIT_FOR_COMPLETION = 60 * 15
@@ -416,7 +446,6 @@ class Releaser(
         val jobExecutor: JobExecutor,
         val jobExecutionDataFactory: JobExecutionDataFactory,
         val project: Project,
-        private val locks: HashMap<ProjectId, Promise<*>>,
         val projectResults: HashMap<ProjectId, CommandState>
     ) {
 
@@ -429,24 +458,8 @@ class Releaser(
             paramObject.jobExecutor,
             paramObject.jobExecutionDataFactory,
             newProject,
-            paramObject.locks,
             paramObject.projectResults
         )
-
-        fun <T> withLockForProject(act: () -> Promise<T>): Promise<T> {
-            val projectId = project.id
-            val lock = locks[projectId]
-            return if (lock == null) {
-                val promise = act()
-                locks[projectId] = promise
-                promise.then { result ->
-                    locks.remove(projectId)
-                    result
-                }
-            } else {
-                lock.then { withLockForProject(act) }.unwrapPromise()
-            }
-        }
 
         /**
          * Adds the project results from [paramObject] to this projects results overriding results for existing projects.

@@ -136,6 +136,6 @@ class ProcessStarter(
             TypeOfRun.DRY_RUN -> jenkinsJobExecutor to modifiableState.dryRunExecutionDataFactory
             TypeOfRun.RELEASE -> jenkinsJobExecutor to modifiableState.releaseJobExecutionDataFactory
         }
-        releaser.reTrigger(project.id, jobExecutor, dataFactory)
+        releaser.reProcess(project.id, jobExecutor, dataFactory)
     }
 }
