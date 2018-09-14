@@ -269,7 +269,8 @@ class Pipeline(private val modifiableState: ModifiableState, private val menu: M
         private const val STATE_RE_POLLING = "Job is being re-polled."
         const val STATE_IN_PROGRESS = "Job is running."
         const val STATE_SUCCEEDED = "Job completed successfully."
-        const val STATE_FAILED = "Job failed - click to navigate to console."
+        const val STATE_FAILED = "Job failed - click to navigate to console or queue item."
+        const val STATE_TIMEOUT = "Job run into a timeout - click to navigate to console or queue item."
         private const val STATE_DEACTIVATED = "Currently deactivated, click to activate"
         const val STATE_DISABLED = "Command disabled, cannot be reactivated."
 
@@ -385,7 +386,8 @@ class Pipeline(private val modifiableState: ModifiableState, private val menu: M
             CommandState.RePolling -> "rePolling"
             CommandState.InProgress -> "inProgress"
             CommandState.Succeeded -> "succeeded"
-            is CommandState.Failed -> "failed"
+            CommandState.Failed -> "failed"
+            CommandState.Timeout -> "timeout"
             is CommandState.Deactivated -> "deactivated"
             CommandState.Disabled -> "disabled"
         }
@@ -400,6 +402,7 @@ class Pipeline(private val modifiableState: ModifiableState, private val menu: M
             CommandState.InProgress -> STATE_IN_PROGRESS
             CommandState.Succeeded -> STATE_SUCCEEDED
             CommandState.Failed -> STATE_FAILED
+            CommandState.Timeout -> STATE_TIMEOUT
             is CommandState.Deactivated -> STATE_DEACTIVATED
             CommandState.Disabled -> STATE_DISABLED
         }

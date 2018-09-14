@@ -74,13 +74,11 @@ private fun mapCommandStates(
 ): List<Promise<Any?>> {
     return project.commands.mapIndexed { index, command ->
         when (command.state) {
-        //TODO we need also to check if a job is queueing or already finished if the state is Ready.
-        // It could be that we trigger a job and then the browser crashed (or the user closed the page)
-        // before we had a chance to publish the new state => We could introduce a state Triggered but
-        // this would mean we need one more publish per job which is bad. This brings me to another idea,
-        // we could get rid of the save after state queueing if we implement recovery from state ready.
-        // Nah... then we wouldn't save anything anymore which is bad as well (we have to save from time
-        // to time :D). But I think there is potential here to reduce the number of publishes per pipeline.
+            // we could also check if a job is queueing or already finished if the state is Ready.
+            // It could be that we trigger a job and then the browser crashed (or the user closed the page)
+            // before we had a chance to publish the new state => We neglect this, in the worst case it means we
+            // re-trigger a command and a command which was already carried out should fail. A user would then set the
+            // command to succeeded and carry on.
             is CommandState.Ready -> Promise.resolve(Unit)
             is CommandState.Queueing -> recoverStateQueueing(
                 modifiableState, jenkinsBaseUrl, project, command, lazyProjectJson, index
@@ -93,6 +91,7 @@ private fun mapCommandStates(
             is CommandState.RePolling,
             is CommandState.Succeeded,
             is CommandState.Failed,
+            is CommandState.Timeout,
             is CommandState.Deactivated,
             is CommandState.Disabled -> Promise.resolve(Unit)
         }

@@ -3,8 +3,8 @@ package ch.loewenfels.depgraph.gui.jobexecution
 import ch.loewenfels.depgraph.ConfigKey
 import ch.loewenfels.depgraph.data.*
 import ch.loewenfels.depgraph.data.maven.MavenProjectId
-import ch.loewenfels.depgraph.data.maven.jenkins.JenkinsUpdateDependency
 import ch.loewenfels.depgraph.data.maven.jenkins.JenkinsNextDevReleaseCommand
+import ch.loewenfels.depgraph.data.maven.jenkins.JenkinsUpdateDependency
 import ch.loewenfels.depgraph.gui.components.Pipeline
 
 private typealias GroupIdArtifactIdAndNewVersion = Triple<String, String, String>
@@ -99,34 +99,32 @@ class DryRunJobExecutionDataFactory(
         return !commandRanOnProjectOrSubmodules(project)
     }
 
-    private fun searchTopMultiModule(projectId: ProjectId): Project
-        = releasePlan.getAllSubmodules().entries
+    private fun searchTopMultiModule(projectId: ProjectId): Project =
+        releasePlan.getAllSubmodules().entries
             .find { (_, v) -> v.contains(projectId) }
-            .let { if(it != null) searchTopMultiModule(it.key) else releasePlan.getProject(projectId) }
+            .let { if (it != null) searchTopMultiModule(it.key) else releasePlan.getProject(projectId) }
 
     private fun commandRanOnProjectOrSubmodules(project: Project): Boolean {
-        var commandAlreadyRan = project.commands.withIndex().any { (index, command) ->
+        val projectHasCompletedCommands = project.commands.withIndex().any { (index, command) ->
             val state = getState(project, index, command)
-            state === CommandState.Succeeded || state === CommandState.Failed
+            CommandState.isEndState(state)
         }
-        val submodules = releasePlan.getSubmodules(project.id)
-        commandAlreadyRan = commandAlreadyRan || (submodules.isNotEmpty() && submodules.any {
-            commandRanOnProjectOrSubmodules(releasePlan.getProject(it))
-        })
-        return commandAlreadyRan
+        return if (projectHasCompletedCommands) {
+            projectHasCompletedCommands
+        } else {
+            val submodules = releasePlan.getSubmodules(project.id)
+            submodules.isNotEmpty() && submodules.any {
+                commandRanOnProjectOrSubmodules(releasePlan.getProject(it))
+            }
+        }
     }
 
-    private fun getState(
-        project: Project,
-        index: Int,
-        command: Command
-    ): CommandState {
-        return if (releasePlan.state != ReleaseState.IN_PROGRESS) {
+    private fun getState(project: Project, index: Int, command: Command): CommandState =
+        if (releasePlan.state != ReleaseState.IN_PROGRESS) {
             Pipeline.getCommandState(project.id, index)
         } else {
             command.state
         }
-    }
 
     private fun createJobExecutionData(
         jobName: String,

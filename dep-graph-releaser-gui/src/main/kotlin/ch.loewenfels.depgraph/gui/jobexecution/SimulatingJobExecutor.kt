@@ -4,6 +4,7 @@ import ch.loewenfels.depgraph.gui.showAlert
 import ch.loewenfels.depgraph.gui.sleep
 import ch.loewenfels.depgraph.gui.unwrapPromise
 import failAfterSteps
+import failWithTimeout
 import stepWise
 import waitBetweenSteps
 import kotlin.js.Promise
@@ -92,9 +93,16 @@ class SimulatingJobExecutor : JobExecutor {
     }
 
     private fun simulateJobFinished(jobExecutionData: JobExecutionData): Promise<Boolean> {
-        ++count
-        if (count > failAfterSteps) check(false) {
-            count = -3; "simulating a failure for ${jobExecutionData.jobName}"
+        if (!jobExecutionData.jobName.startsWith("publish")) {
+            ++count
+        }
+        if (count >= failAfterSteps) {
+            count = 0
+            if (failWithTimeout) {
+                throw PollTimeoutException("simulated timeout for ${jobExecutionData.jobName}", "no body")
+            } else {
+                throw IllegalArgumentException("simulating a failure for ${jobExecutionData.jobName}")
+            }
         }
         return informIfStepWise("job ${jobExecutionData.jobName} ended")
             .then { true }

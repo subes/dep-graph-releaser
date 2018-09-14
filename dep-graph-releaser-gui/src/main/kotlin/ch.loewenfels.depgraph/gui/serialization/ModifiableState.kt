@@ -50,8 +50,8 @@ class ModifiableState(defaultJenkinsBaseUrl: String?, json: String) {
 
     private fun initJsonDependentFields() {
         _releasePlan = deserialize(_json)
-        _releaseJobExecutionDataFactory = ReleaseJobExecutionDataFactory(defaultJenkinsBaseUrl, releasePlan)
-        _dryRunExecutionDataFactory = DryRunJobExecutionDataFactory(defaultJenkinsBaseUrl, releasePlan)
+        _releaseJobExecutionDataFactory = ReleaseJobExecutionDataFactory(defaultJenkinsBaseUrl, _releasePlan)
+        _dryRunExecutionDataFactory = DryRunJobExecutionDataFactory(defaultJenkinsBaseUrl, _releasePlan)
     }
 
     /**

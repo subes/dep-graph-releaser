@@ -16,7 +16,7 @@ class ProcessStarter(
     private val simulatingJobExecutor: SimulatingJobExecutor,
     releaserSupplier: (ProcessStarter) -> Releaser
 ) {
-    private val releaser by lazy { releaserSupplier(this) }
+    private val releaser : Releaser by lazy { releaserSupplier(this) }
 
     /**
      * Applies changes and publishes the new release.json with the help of the [publisher] which in turn uses the
@@ -88,7 +88,7 @@ class ProcessStarter(
     private fun turnCommandsIntoStateReadyToReTriggerAndReady(releasePlan: ReleasePlan, project: Project) {
         project.commands.forEachIndexed { index, _ ->
             val commandState = Pipeline.getCommandState(project.id, index)
-            if (commandState === CommandState.Failed) {
+            if (CommandState.isFailureState(commandState)) {
                 changeToStateReadyToReTrigger(project, index)
             } else if (commandState === CommandState.Succeeded) {
                 changeStateToReadyWithoutCheck(project, index)
@@ -102,7 +102,7 @@ class ProcessStarter(
 
     private fun Project.hasFailedCommandsOrSubmoduleHasFailedCommands(releasePlan: ReleasePlan): Boolean {
         return commands.mapWithIndex()
-            .any { (index, _) -> Pipeline.getCommandState(id, index) === CommandState.Failed }
+            .any { (index, _) -> CommandState.isFailureState(Pipeline.getCommandState(id, index)) }
             || releasePlan.getSubmodules(id).any {
             releasePlan.getProject(it).hasFailedCommandsOrSubmoduleHasFailedCommands(releasePlan)
         }
@@ -112,7 +112,7 @@ class ProcessStarter(
         releasePlan.iterator().forEach { project ->
             project.commands.forEachIndexed { index, _ ->
                 val commandState = Pipeline.getCommandState(project.id, index)
-                if (commandState === CommandState.Failed) {
+                if (CommandState.isFailureState(commandState)) {
                     changeToStateReadyToReTrigger(project, index)
                 }
             }
@@ -136,6 +136,6 @@ class ProcessStarter(
             TypeOfRun.DRY_RUN -> jenkinsJobExecutor to modifiableState.dryRunExecutionDataFactory
             TypeOfRun.RELEASE -> jenkinsJobExecutor to modifiableState.releaseJobExecutionDataFactory
         }
-        releaser.reTrigger(project, jobExecutor, dataFactory)
+        releaser.reProcess(project.id, jobExecutor, dataFactory)
     }
 }

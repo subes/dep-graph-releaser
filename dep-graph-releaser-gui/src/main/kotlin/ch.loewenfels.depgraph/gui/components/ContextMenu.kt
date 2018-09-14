@@ -207,8 +207,8 @@ class ContextMenu(
     private fun transitionToSucceededIfOkAndContinue(project: Project, index: Int) =
         reTriggerProject(project, index) { p, i ->
             transitionToSucceededWithCheck(p, i) { previousState, commandId ->
-                check(previousState == CommandState.Failed) {
-                    "Cannot set state to ${CommandState.Succeeded::class.simpleName} and continue, previous state needs to be ${CommandState.Failed::class.simpleName}" +
+                check(CommandState.isFailureState(previousState)) {
+                    "Cannot set state to ${CommandState.Succeeded::class.simpleName} and continue, previous state needs to be a failure state." +
                         Pipeline.failureDiagnosticsStateTransition(p, i, previousState, commandId)
                 }
                 CommandState.Succeeded
@@ -256,23 +256,25 @@ class ContextMenu(
         disableOrEnableContextMenuEntry(
             "$idPrefix$CONTEXT_MENU_COMMAND_DEACTIVATED",
             state == ReleaseState.IN_PROGRESS ||
-                isNotInStateToDeactivate(commandState)
+                isNotInStateToDeactivate(commandState),
+            "Can only deactivate if not in progress or watching (and not already deactivated/disabled/succeeded)"
         )
         disableOrEnableContextMenuEntry(
             "$idPrefix$CONTEXT_MENU_COMMAND_SUCCEEDED",
             state == ReleaseState.IN_PROGRESS ||
-                commandState === CommandState.Succeeded
+                commandState === CommandState.Succeeded,
+            "Can only set to Succeeded if not in progress or watching (and not already succeeded)"
         )
         disableOrEnableContextMenuEntry(
             "$idPrefix$CONTEXT_MENU_COMMAND_RE_TRIGGER",
             state != ReleaseState.IN_PROGRESS ||
-                commandState !== CommandState.Failed,
+                !CommandState.isFailureState(commandState),
             "Can only re-trigger if previously failed and process state is in progress."
         )
         disableOrEnableContextMenuEntry(
             "$idPrefix$CONTEXT_MENU_COMMAND_SUCCEEDED_CONTINUE",
             state != ReleaseState.IN_PROGRESS ||
-                commandState !== CommandState.Failed,
+                !CommandState.isFailureState(commandState),
             "Can only set to Succeeded and continue if previously failed and process state is in progress."
         )
     }
@@ -285,7 +287,7 @@ class ContextMenu(
     private fun disableOrEnableContextMenuEntry(
         id: String,
         disable: Boolean,
-        disabledReason: String = "Cannot apply this action."
+        disabledReason: String
     ) {
         val entry = elementById(id)
         if (Pipeline.getReleaseState() == ReleaseState.WATCHING || disable) {
