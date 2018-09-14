@@ -66,6 +66,11 @@ class ContextMenu(
                 title = "Forcibly sets the state of this command to ${CommandState.Succeeded::class.simpleName} and continues with the process. To be used with care.",
                 action = { transitionToSucceededIfOkAndContinue(project, index) }
             )
+            contextMenuEntryWithCssIcon(idPrefix, CONTEXT_MENU_COMMAND_RE_POLL,
+                text = "Re-Poll Command",
+                title = "Checks periodically again if the command ends without re-triggering it.",
+                action = { rePollProject(project, index) }
+            )
         }
     }
 
@@ -183,29 +188,16 @@ class ContextMenu(
             .any { notAllOtherCommandsSucceeded(modifiableState.releasePlan.getProject(it), null) }
     }
 
-    private fun reTriggerProject(project: Project, index: Int) =
-        reTriggerProject(project, index, ::transitionToReadyToReTriggerIfOk)
 
-    private fun reTriggerProject(project: Project, index: Int, stateTransition: (Project, index: Int) -> Unit) {
-        val processStarter = if (Pipeline.getTypeOfRun() == TypeOfRun.EXPLORE) {
-            App.givenOrFakeProcessStarter(this@ContextMenu.processStarter, modifiableState)
-        } else {
-            this@ContextMenu.processStarter
-        }
-        if (processStarter != null) {
-            stateTransition(project, index)
-            processStarter.reTrigger(project, modifiableState)
+    private fun reTriggerProject(project: Project, index: Int) {
+        reProcessProject(project, index) { p, i ->
+            //verifies that the transition is OK
+            Pipeline.changeStateOfCommand(p, i, CommandState.ReadyToReTrigger, Pipeline.STATE_READY_TO_BE_TRIGGER)
         }
     }
 
-    private fun transitionToReadyToReTriggerIfOk(project: Project, index: Int) {
-        //verifies that the transition is OK
-        Pipeline.changeStateOfCommand(project, index, CommandState.ReadyToReTrigger, Pipeline.STATE_READY_TO_BE_TRIGGER)
-    }
-
-
-    private fun transitionToSucceededIfOkAndContinue(project: Project, index: Int) =
-        reTriggerProject(project, index) { p, i ->
+    private fun transitionToSucceededIfOkAndContinue(project: Project, index: Int) {
+        reProcessProject(project, index) { p, i ->
             transitionToSucceededWithCheck(p, i) { previousState, commandId ->
                 check(CommandState.isFailureState(previousState)) {
                     "Cannot set state to ${CommandState.Succeeded::class.simpleName} and continue, previous state needs to be a failure state." +
@@ -214,6 +206,28 @@ class ContextMenu(
                 CommandState.Succeeded
             }
         }
+    }
+
+    private fun rePollProject(project: Project, index: Int) {
+        //TODO either RePolling or StillQueueing depending on when the timeout happened
+//        reProcessProject(project, index) { p, i ->
+//            verifies that the transition is OK
+//            Pipeline.changeStateOfCommand(p, i, CommandState.RePolling, Pipeline.STATE_RE_POLLING)
+//        }
+    }
+
+    private fun reProcessProject(project: Project, index: Int, stateTransition: (Project, index: Int) -> Unit) {
+        val processStarter = if (Pipeline.getTypeOfRun() == TypeOfRun.EXPLORE) {
+            App.givenOrFakeProcessStarter(this@ContextMenu.processStarter, modifiableState)
+        } else {
+            this@ContextMenu.processStarter
+        }
+        if (processStarter != null) {
+            stateTransition(project, index)
+            processStarter.reProcess(project, modifiableState)
+        }
+    }
+
 
     fun setUpOnContextMenuForProjectsAndCommands() {
         val projects = document.querySelectorAll(".project")
@@ -277,6 +291,12 @@ class ContextMenu(
                 !CommandState.isFailureState(commandState),
             "Can only set to Succeeded and continue if previously failed and process state is in progress."
         )
+        disableOrEnableContextMenuEntry(
+            "$idPrefix$CONTEXT_MENU_COMMAND_RE_POLL",
+            state != ReleaseState.IN_PROGRESS ||
+                commandState !== CommandState.Timeout,
+            "Can only re-poll if previously timed out and process state is in progress."
+        )
     }
 
     /**
@@ -335,6 +355,7 @@ class ContextMenu(
         private const val CONTEXT_MENU_COMMAND_SUCCEEDED = "succeeded"
         private const val CONTEXT_MENU_COMMAND_RE_TRIGGER = "reTrigger"
         private const val CONTEXT_MENU_COMMAND_SUCCEEDED_CONTINUE = "succeededContinue"
+        private const val CONTEXT_MENU_COMMAND_RE_POLL = "rePoll"
         private const val CSS_DISABLED = "disabled"
     }
 }
