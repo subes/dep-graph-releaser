@@ -241,6 +241,7 @@ class Releaser(
             is CommandState.InProgress,
             is CommandState.Succeeded,
             is CommandState.Failed,
+            is CommandState.Timeout,
             is CommandState.Deactivated,
             is CommandState.Disabled -> Promise.resolve(state)
         }

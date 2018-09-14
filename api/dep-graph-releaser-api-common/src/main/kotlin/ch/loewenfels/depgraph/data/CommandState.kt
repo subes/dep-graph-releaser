@@ -15,17 +15,23 @@ sealed class CommandState {
     /**
      * Command was queueing before we recovered an ongoing process and is still queueing now.
      */
-    object StillQueueing: CommandState()
+    object StillQueueing : CommandState()
 
     object InProgress : CommandState()
 
     /**
-     * Command has to be re-polled, meaning it has to be turned into InProgress again.
+     * Command has to be re-polled, meaning it should be kind of [InProgress] again
+     * but we want to track this state separately.
      */
     object RePolling : CommandState()
 
     object Succeeded : CommandState()
     object Failed : CommandState()
+    /**
+     * Command run into a timeout.
+     */
+    object Timeout : CommandState()
+
     data class Deactivated(val previous: CommandState) : CommandState()
 
     /**
@@ -63,10 +69,11 @@ sealed class CommandState {
             is InProgress -> checkNewStateIsAfter(newState, Queueing::class)
             is RePolling -> checkNewStateIsAfter(newState, InProgress::class)
             is Succeeded -> checkNewStateIsAfter(newState, InProgress::class, RePolling::class)
-            is CommandState.Waiting,
-            is CommandState.Failed,
-            is CommandState.Deactivated,
-            is CommandState.Disabled -> newState
+            is Timeout -> checkNewStateIsAfter(newState, InProgress::class, RePolling::class)
+            is Waiting,
+            is Failed,
+            is Deactivated,
+            is Disabled -> newState
         }
     }
 

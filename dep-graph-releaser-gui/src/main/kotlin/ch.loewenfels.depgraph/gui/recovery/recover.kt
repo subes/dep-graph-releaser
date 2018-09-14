@@ -93,6 +93,7 @@ private fun mapCommandStates(
             is CommandState.RePolling,
             is CommandState.Succeeded,
             is CommandState.Failed,
+            is CommandState.Timeout,
             is CommandState.Deactivated,
             is CommandState.Disabled -> Promise.resolve(Unit)
         }
