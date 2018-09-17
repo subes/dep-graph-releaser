@@ -4,6 +4,29 @@ import ch.loewenfels.depgraph.data.ReleasePlan
 import ch.loewenfels.depgraph.jobexecution.BuildWithParamFormat
 
 
+fun parseJobMapping(releasePlan: ReleasePlan): Map<String, String> =
+    parseJobMapping(releasePlan.getConfig(ConfigKey.JOB_MAPPING))
+
+
+fun parseJobMapping(mapping: String): Map<String, String> {
+    //TODO #14 do not associate immediately but first map to list and check if there are duplicates
+    return mapping.trim().split("\n").associate { pair ->
+        val index = pair.indexOf('=')
+        require(index > 0) {
+            "At least one mapping has no groupId and artifactId defined.\njobMapping: $mapping"
+        }
+        val groupIdAndArtifactId = pair.substring(0, index)
+        require(groupIdAndArtifactId.contains(':')) {
+            "At least one groupId and artifactId is erroneous, does not contain a `:`.\njobMapping: $mapping"
+        }
+        val jobName = pair.substring(index + 1)
+        require(jobName.isNotBlank()) {
+            "At least one groupId and artifactId is erroneous, has no job name defined.\njobMapping: $mapping"
+        }
+        groupIdAndArtifactId to jobName
+    }
+}
+
 fun parseRemoteRegex(releasePlan: ReleasePlan) =
     parseRemoteRegex(releasePlan.getConfig(ConfigKey.REMOTE_REGEX))
 
@@ -11,11 +34,11 @@ fun parseRemoteRegex(regex: String): List<Pair<Regex, String>> {
     return parseRegex(regex, "remoteRegex", ::requireHttpsDefined) { it }
 }
 
-fun parseRegexParameters(releasePlan: ReleasePlan) =
-    parseRegexParameters(releasePlan.getConfig(ConfigKey.REGEX_PARAMS))
+fun parseRegexParams(releasePlan: ReleasePlan) =
+    parseRegexParams(releasePlan.getConfig(ConfigKey.REGEX_PARAMS))
 
-fun parseRegexParameters(regex: String): List<Pair<Regex, List<String>>> {
-    return parseRegex(regex, "regexParameters", ::requireAtLeastOneParameter) { params ->
+fun parseRegexParams(regex: String): List<Pair<Regex, List<String>>> {
+    return parseRegex(regex, "regexParams", ::requireAtLeastOneParameter) { params ->
         params.split(';')
     }
 }
@@ -33,21 +56,22 @@ private fun <T> parseRegex(
     requireRightSideToBe: (String, String) -> Unit,
     rightSideConverter: (String) -> T
 ): List<Pair<Regex, T>> {
-    return if (configValue.isNotEmpty()) {
+    val trimmedValue = configValue.trim()
+    return if (trimmedValue.isNotEmpty()) {
         val mutableList = mutableListOf<Pair<Regex, T>>()
         var startIndex = 0
-        var endRegex = configValue.indexOf('#', startIndex)
-        checkEntryHasHash(endRegex, name, configValue)
+        var endRegex = trimmedValue.indexOf('#', startIndex)
+        checkEntryHasHash(endRegex, name, trimmedValue)
         while (endRegex >= 0) {
-            checkRegexNotEmpty(endRegex, name, configValue)
-            val regex = getUnescapedRegex(configValue, startIndex, endRegex)
-            val (endRightSide, rightSide) = getRightSide(configValue, endRegex)
-            requireRightSideToBe(rightSide, configValue)
+            checkRegexNotEmpty(endRegex, name, trimmedValue)
+            val regex = getUnescapedRegex(trimmedValue, startIndex, endRegex)
+            val (endRightSide, rightSide) = getRightSide(trimmedValue, endRegex)
+            requireRightSideToBe(rightSide, trimmedValue)
             mutableList.add(regex to rightSideConverter(rightSide))
-            startIndex = endRightSide + 2
-            endRegex = configValue.indexOf('#', startIndex)
-            if (startIndex < configValue.length) {
-                checkEntryHasHash(endRegex, name, configValue)
+            startIndex = endRightSide + 1
+            endRegex = trimmedValue.indexOf('#', startIndex)
+            if (startIndex < trimmedValue.length) {
+                checkEntryHasHash(endRegex, name, trimmedValue.substring(startIndex))
             }
         }
         mutableList
@@ -62,11 +86,11 @@ private fun checkEntryHasHash(endRegex: Int, name: String, configValue: String) 
 
 private fun getUnescapedRegex(value: String, startIndex: Int, endRegex: Int): Regex {
     val regexEscaped = value.substring(startIndex, endRegex)
-    return Regex(regexEscaped.replace(Regex("( |\t|\\\\n)"), ""))
+    return Regex(regexEscaped.replace(Regex("([ \t\n])"), ""))
 }
 
 private fun getRightSide(value: String, endRegex: Int): Pair<Int, String> {
-    val indexOf = value.indexOf("\\n", endRegex)
+    val indexOf = value.indexOf("\n", endRegex)
     val endRightSide = if (indexOf < 0) value.length else indexOf
     val rightSide = value.substring(endRegex + 1, endRightSide)
     return Pair(endRightSide, rightSide)
@@ -84,10 +108,21 @@ private fun requireHttpsDefined(jenkinsBaseUrl: String, remoteRegex: String) {
     }
 }
 
-private fun requireAtLeastOneParameter(pair: String, regexParameters: String) {
-    val index = pair.indexOf('=')
-    require(index > 0) {
-        "A regexParam requires at least one parameter.\nregexParameters: $regexParameters"
+private fun requireAtLeastOneParameter(pair: String, regexParams: String) {
+    require(pair.isNotEmpty()) {
+        "A regexParam requires at least one parameter.\nregexParams: $regexParams"
+    }
+    pair.split(';').forEach {
+        require(it.isNotEmpty()) {
+            "Param without name and value in regexParam.\nregexParams: $regexParams"
+        }
+        val index = it.indexOf('=')
+        require(index != 0) {
+            "Parameter without name in regexParam.\nregexParams: $regexParams"
+        }
+        require(index > 0) {
+            "Parameter $it in regexParam does not have a value (separated by =).\nregexParams: $regexParams"
+        }
     }
 }
 
