@@ -83,7 +83,8 @@ task json {
     def dryRunJobArg = 'dryRunJob'
     def defaultDryRunJob = "dgr-dry-run"
     def remoteRegexArg = 'remoteRegex'
-    def defaultRemoteRegex = "\".*#https://buildsystem.loewenfels.ch/jenkins\""
+    def libJobs = 'ch.loewenfels.depgraph:dgr-4'
+    def defaultRemoteRegex = "\"(?!$libJobs).*#https://buildsystem.loewenfels.ch/jenkins\""
     def relativePathExcludeProjectsRegexArg = 'relativePathExcludeProjectsRegex'
     def defaultRelativePathExcludeProjectsRegex = '[^/]+/[^/]+/.+'
     def relativePathToGitRepoRegexArg = "relativePathToGitRepoRegex"
@@ -93,7 +94,7 @@ task json {
     def regexParamsArg = 'regexParams'
     def defaultRegexParamsArg = /
         (?!ch.loewenfels.depgraph:dgr-4).*#branch.name=master
-        ch.loewenfels.depgraph:dgr-4#BRANCH=master
+        ch.loewenfels.depgraph:dgr-4#BRANCH=master;DO_RELEASE=true
         /.stripIndent()
     def disableRegexArg = 'disableRegex'
     def jobMappingArg = 'jobMapping'
@@ -138,7 +139,9 @@ task json {
                 """.stripIndent()
             ]
         def commitPrefix = findProperty(commitPrefixArg) != null ? ["-$commitPrefixArg=${findProperty(commitPrefixArg)}"] : []
-        def buildWithParamJobs = findProperty(buildWithParamJobsArg) != null ? ["-$buildWithParamJobsArg=${findProperty(buildWithParamJobsArg)}"] : []
+        def buildWithParamJobs = findProperty(buildWithParamJobsArg) != null ?
+            ["-$buildWithParamJobsArg=${findProperty(buildWithParamJobsArg)}"] :
+            ["-$buildWithParamJobsArg=\"$libJobs#maven#MVN_RELEASE_VERSION;MVN_DEV_VERSION;ADDITIONAL_PARAMS\""]
 
         execMain(
             ['json', groupId, artifactId, dir, jsonFile.absolutePath, updateDependencyJob, dryRunJob, remoteRegex, relativePathExcludeProjects, relativePathGitRepoRegex, relativePathGitRepoReplacement] +
