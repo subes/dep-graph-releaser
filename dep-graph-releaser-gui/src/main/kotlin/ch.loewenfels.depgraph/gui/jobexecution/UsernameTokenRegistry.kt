@@ -13,8 +13,8 @@ object UsernameTokenRegistry {
 
     private val usernameTokens = hashMapOf<String, UsernameAndApiToken>()
 
-    fun forHostOrThrow(jenkinsBaseUrl: String): UsernameAndApiToken
-        = forHost(jenkinsBaseUrl) ?: throw IllegalStateException("could not find usernameAndApiToken for $jenkinsBaseUrl")
+    fun forHostOrThrow(jenkinsBaseUrl: String): UsernameAndApiToken =
+        forHost(jenkinsBaseUrl) ?: throw IllegalStateException("could not find usernameAndApiToken for $jenkinsBaseUrl")
 
     fun forHost(jenkinsBaseUrl: String): UsernameAndApiToken? = usernameTokens[urlWithoutEndingSlash(jenkinsBaseUrl)]
 
@@ -33,16 +33,15 @@ object UsernameTokenRegistry {
      *
      * @return A pair consisting of the name and the [UsernameAndApiToken] of the logged in user.
      */
-    fun register(jenkinsBaseUrl: String): Promise<Pair<String, UsernameAndApiToken>?>
-        = retrieveUserAndApiTokenAndSaveToken(jenkinsBaseUrl)
+    fun register(jenkinsBaseUrl: String): Promise<Pair<String, UsernameAndApiToken>?> =
+        retrieveUserAndApiTokenAndSaveToken(jenkinsBaseUrl)
 
     private fun retrieveUserAndApiTokenAndSaveToken(jenkinsBaseUrl: String): Promise<Pair<String, UsernameAndApiToken>?> {
         val urlWithoutSlash = urlWithoutEndingSlash(jenkinsBaseUrl)
         return window.fetch("$urlWithoutSlash/me/configure", createFetchInitWithCredentials())
             .then(::checkStatusOkOr403)
             .catch<Pair<Response, String?>?> { t ->
-                showThrowable(Error("Could not retrieve user and API token for $urlWithoutSlash", t))
-                null
+                errorHandling(urlWithoutSlash, t)
             }
             .then { pair ->
                 val body = pair?.second
@@ -54,14 +53,25 @@ object UsernameTokenRegistry {
                     usernameTokens[urlWithoutSlash] = usernameToken
                     name to usernameToken
                 }
+            }.catch { t ->
+                errorHandling(urlWithoutSlash, t)
             }
+    }
+
+    private fun errorHandling(urlWithoutSlash: String, t: Throwable): Nothing? {
+        showThrowable(Error("Could not retrieve user and API token for $urlWithoutSlash", t))
+        return null
     }
 
 
     private fun extractNameAndApiToken(body: String): Triple<String, String, String> {
-        val usernameMatch = usernameRegex.find(body) ?: throw IllegalStateException("Could not find username")
-        val fullNameMatch = fullNameRegex.find(body) ?: throw IllegalStateException("Could not find user's name")
-        val apiTokenMatch = apiTokenRegex.find(body) ?: throw IllegalStateException("Could not find API token")
-        return Triple(usernameMatch.groupValues[1], fullNameMatch.groupValues[1], apiTokenMatch.groupValues[1])
+        val usernameMatch = usernameRegex.find(body) ?: throwCouldNotFind("username", body)
+        val fullNameMatch = fullNameRegex.find(body) ?: throwCouldNotFind("user's name", body)
+        //TODO remove API token in case it is really not used at all.
+//        val apiTokenMatch = apiTokenRegex.find(body) ?: throwCouldNotFind("API token", body)
+        return Triple(usernameMatch.groupValues[1], fullNameMatch.groupValues[1], "apiTokenShouldNotBeUsed")
     }
+
+    private fun throwCouldNotFind(what: String, body: String): Nothing =
+        throw IllegalStateException("Could not find $what in response.\n$body")
 }

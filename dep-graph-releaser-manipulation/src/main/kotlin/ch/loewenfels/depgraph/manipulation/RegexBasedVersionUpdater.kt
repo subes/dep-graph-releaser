@@ -182,7 +182,8 @@ object RegexBasedVersionUpdater {
                 }
                 require(propertiesParamObject.newVersion != version) {
                     "$ERROR_MESSAGE Given: $version" +
-                        "\nIt could be that the property is shared among different dependencies and that it was updated by a previous update command. Check the SCM history (e.g. `git log`)."
+                        "\nIt could be that the property is shared among different dependencies and that it was updated by a previous update command." +
+                        "\nCheck the SCM history (e.g. `git log`), if that was the case, then you can `Set Command to Succeeded` on the dep-graph-releaser pipeline via context menu (usually right click) of the command."
                 }
                 appendNewVersionAndSetUpdated(propertiesParamObject)
             }

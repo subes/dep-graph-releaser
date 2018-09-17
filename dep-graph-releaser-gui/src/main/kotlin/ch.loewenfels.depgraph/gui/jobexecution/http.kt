@@ -51,8 +51,10 @@ fun createHeaderWithAuthAndCrumb(authData: AuthData): dynamic {
 }
 
 fun addAuthentication(headers: dynamic, usernameAndApiToken: UsernameAndApiToken) {
-    val base64UsernameAndToken = window.btoa("${usernameAndApiToken.username}:${usernameAndApiToken.token}")
-    headers["Authorization"] = "Basic $base64UsernameAndToken"
+    //TODO we disabled the following due to https://github.com/loewenfels/dep-graph-releaser/issues/57
+    // if the cookie only approach was ok, then we could remove this and corresponding calls
+//    val base64UsernameAndToken = window.btoa("${usernameAndApiToken.username}:${usernameAndApiToken.token}")
+//    headers["Authorization"] = "Basic $base64UsernameAndToken"
 }
 
 @Suppress("NESTED_CLASS_IN_EXTERNAL_INTERFACE")

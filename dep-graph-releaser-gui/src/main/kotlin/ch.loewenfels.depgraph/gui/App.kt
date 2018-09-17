@@ -122,8 +122,10 @@ class App {
         } else {
             UsernameTokenRegistry.register(defaultJenkinsBaseUrl).then { pair ->
                 if (pair == null) {
-                    val info = "You need to log in if you want to use other functionality than Download."
-                    menu.disableButtonsDueToNoAuth(info, "$info\n$defaultJenkinsBaseUrl/login?from=" + window.location)
+                    menu.disableButtonsDueToNoAuth(
+                        "You need to log in if you want to use this functionality.",
+                        "You need to log in if you want to use all functionality and not only a limited set." +
+                            "\n$defaultJenkinsBaseUrl/login?from=" + window.location)
                     null
                 } else {
                     val (name, usernameToken) = pair
@@ -182,9 +184,9 @@ class App {
             val headers = js("({})")
             // if &publishJob is not specified, then we don't have usernameAndApiToken but we can still
             // load the json and display it as pipeline
-            if (usernameAndApiToken != null) {
-                addAuthentication(headers, usernameAndApiToken)
-            }
+//            if (usernameAndApiToken != null) {
+//                addAuthentication(headers, usernameAndApiToken)
+//            }
             init.headers = headers
             return window.fetch(jsonUrl, init)
         }
