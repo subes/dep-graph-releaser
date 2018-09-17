@@ -1,16 +1,13 @@
 package ch.loewenfels.depgraph.gui.jobexecution
 
-import ch.loewenfels.depgraph.ConfigKey
+import ch.loewenfels.depgraph.*
 import ch.loewenfels.depgraph.data.Command
-import ch.loewenfels.depgraph.jobexecution.BuildWithParamFormat
 import ch.loewenfels.depgraph.data.Project
 import ch.loewenfels.depgraph.data.ReleasePlan
 import ch.loewenfels.depgraph.data.maven.MavenProjectId
-import ch.loewenfels.depgraph.data.maven.jenkins.JenkinsUpdateDependency
 import ch.loewenfels.depgraph.data.maven.jenkins.JenkinsNextDevReleaseCommand
-import ch.loewenfels.depgraph.parseBuildWithParamJobs
-import ch.loewenfels.depgraph.parseRegexParams
-import ch.loewenfels.depgraph.parseRemoteRegex
+import ch.loewenfels.depgraph.data.maven.jenkins.JenkinsUpdateDependency
+import ch.loewenfels.depgraph.jobexecution.BuildWithParamFormat
 import ch.tutteli.kbox.appendToStringBuilder
 
 class ReleaseJobExecutionDataFactory(
@@ -27,7 +24,7 @@ class ReleaseJobExecutionDataFactory(
         checkConfig(releasePlan.config)
         remoteRegex = parseRemoteRegex(releasePlan)
         regexParametersList = parseRegexParams(releasePlan)
-        jobMapping = parseJobMapping()
+        jobMapping = parseJobMapping(releasePlan)
         buildWithParamJobsList = parseBuildWithParamJobs(releasePlan)
     }
 
@@ -35,30 +32,6 @@ class ReleaseJobExecutionDataFactory(
         requireConfigEntry(config, ConfigKey.UPDATE_DEPENDENCY_JOB)
         requireConfigEntry(config, ConfigKey.REMOTE_REGEX)
         requireConfigEntry(config, ConfigKey.COMMIT_PREFIX)
-    }
-
-    private fun parseJobMapping(): Map<String, String> {
-        val mapping = getConfig(ConfigKey.JOB_MAPPING)
-        return mapping.split("\\n").associate { pair ->
-            val index = pair.indexOf('=')
-            check(index > 0) {
-                "At least one mapping has no groupId and artifactId defined.\njobMapping: $mapping"
-            }
-            val groupIdAndArtifactId = pair.substring(0, index)
-            check(groupIdAndArtifactId.contains(':')) {
-                "At least one groupId and artifactId is erroneous, does not contain a `:`.\njobMapping: $mapping"
-            }
-            val jobName = pair.substring(index + 1)
-            check(jobName.isNotBlank()) {
-                "At least one groupId and artifactId is erroneous, has no job name defined.\njobMapping: $mapping"
-            }
-            groupIdAndArtifactId to jobName
-        }
-    }
-
-    private fun getJobName(project: Project): String {
-        val mavenProjectId = project.id as MavenProjectId
-        return jobMapping[mavenProjectId.identifier] ?: mavenProjectId.artifactId
     }
 
     override fun create(project: Project, command: Command): JobExecutionData {
@@ -104,6 +77,11 @@ class ReleaseJobExecutionDataFactory(
         }
     }
 
+    private fun getJobName(project: Project): String {
+        val mavenProjectId = project.id as MavenProjectId
+        return jobMapping[mavenProjectId.identifier] ?: mavenProjectId.artifactId
+    }
+
     private fun triggerBuildWithParamRelease(
         buildWithParamFormat: BuildWithParamFormat,
         relevantParams: Sequence<String>,
@@ -115,7 +93,7 @@ class ReleaseJobExecutionDataFactory(
         return JobExecutionData.buildWithParameters(
             "release ${project.id.identifier}",
             jobUrl,
-            toQueryParameters(identifyingParams) + "&" + relevantParams.joinToString("&") ,
+            toQueryParameters(identifyingParams) + "&" + relevantParams.joinToString("&"),
             identifyingParams
         )
     }

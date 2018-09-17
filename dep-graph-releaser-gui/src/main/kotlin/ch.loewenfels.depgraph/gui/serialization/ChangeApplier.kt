@@ -100,21 +100,8 @@ object ChangeApplier {
             ConfigKey.REGEX_PARAMS.asString(),
             ConfigKey.REMOTE_REGEX.asString(),
             ConfigKey.BUILD_WITH_PARAM_JOBS.asString(),
-            ConfigKey.JOB_MAPPING.asString() ->
-                getTextAreaValueEscaped((input as HTMLTextAreaElement))
+            ConfigKey.JOB_MAPPING.asString() -> (input as HTMLTextAreaElement).value
             else -> (input as HTMLInputElement).value
-        }
-    }
-
-    private fun getTextAreaValueEscaped(textArea: HTMLTextAreaElement): String {
-        val regex = Regex("^( +)(.+)")
-        return textArea.value.lineSequence().joinToString("\\n") {
-            val matchResult = regex.find(it)
-            if (matchResult != null) {
-                "\t".repeat(matchResult.groupValues[1].length / 2) + matchResult.groupValues[2].trimEnd()
-            } else {
-                it.trim()
-            }
         }
     }
 

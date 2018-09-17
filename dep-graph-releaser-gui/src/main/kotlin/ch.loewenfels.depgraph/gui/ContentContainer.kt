@@ -83,7 +83,6 @@ class ContentContainer(modifiableState: ModifiableState, private val menu: Menu,
     private fun DIV.configTextArea(config: Map<ConfigKey, String>): (ConfigKey) -> Unit {
         return { key ->
             val value = config[key]
-                ?.replace("\\n", "\n")
                 ?.replace("\t", "  ")
                 ?.trim()
                 ?: ""

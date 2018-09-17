@@ -129,13 +129,13 @@ task json {
         def disableRegex = findProperty(disableRegexArg) != null ? ["-$disableRegexArg=${findProperty(disableRegexArg)}"] : []
         def jobMapping = findProperty(jobMappingArg) != null ?
             ["-$jobMappingArg=${findProperty(jobMappingArg)}"] :
-            ["-$jobMappingArg=" + """\
+            ["-$jobMappingArg=" + """
                 ch.loewenfels.depgraph:dgr-1=apnoea-test-1
                 ch.loewenfels.depgraph:dgr-2=apnoea-test-2
                 ch.loewenfels.depgraph:dgr-3=apnoea-test-3
                 ch.loewenfels.depgraph:dgr-4=apnoea-test-4
-                ch.loewenfels.depgraph:dgr-5=apnoea-test-5"""
-                .stripIndent().replace('\n', '\\n')
+                ch.loewenfels.depgraph:dgr-5=apnoea-test-5
+                """.stripIndent()
             ]
         def commitPrefix = findProperty(commitPrefixArg) != null ? ["-$commitPrefixArg=${findProperty(commitPrefixArg)}"] : []
         def buildWithParamJobs = findProperty(buildWithParamJobsArg) != null ? ["-$buildWithParamJobsArg=${findProperty(buildWithParamJobsArg)}"] : []

@@ -1,11 +1,8 @@
 package ch.loewenfels.depgraph.runner.commands
 
-import ch.loewenfels.depgraph.ConfigKey
+import ch.loewenfels.depgraph.*
 import ch.loewenfels.depgraph.data.maven.MavenProjectId
 import ch.loewenfels.depgraph.maven.JenkinsReleasePlanCreator
-import ch.loewenfels.depgraph.parseBuildWithParamJobs
-import ch.loewenfels.depgraph.parseRegexParams
-import ch.loewenfels.depgraph.parseRemoteRegex
 import ch.loewenfels.depgraph.runner.Orchestrator
 import ch.loewenfels.depgraph.runner.console.ErrorHandler
 import ch.loewenfels.depgraph.runner.console.toOptionalArgs
@@ -25,9 +22,9 @@ object Json : ConsoleCommand {
         "dgr-updater dgr-dry-run \"ch\\..*#https://example.com/jenkins\ncom\\..*#https://jenkins.example.com\" " +
         "\"[^/]+/[^/]+/.+\" \"^(.*)/\$\" https://github.com/\$1" +
         "$REGEX_PARAMS_ARG\".*#branch.name=master\" $DISABLE_RELEASE_FOR\"ch\\.loewenfels:dist.*\" " +
-        "${JOB_MAPPING_ARG}com.example:a=exampleA\\nch.loewenfels:dgr-1=apnoea-test-1" +
+        "${JOB_MAPPING_ARG}com.example:a=exampleA\nch.loewenfels:dgr-1=apnoea-test-1" +
         "$COMMIT_PREFIX_ARG[RELEASE]" +
-        "${BUILD_WITH_PARAM_JOBS_ARG}ch.loewenfels.depgraph:.*#maven#releaseVersion;nextDevVersion;additional\\n.*#query#RELEASE_VERSION;DEVELOPMENT_VERSION"
+        "${BUILD_WITH_PARAM_JOBS_ARG}ch.loewenfels.depgraph:.*#maven#releaseVersion;nextDevVersion;additional\n.*#query#RELEASE_VERSION;DEVELOPMENT_VERSION"
 
     override val arguments by lazy {
         """
@@ -115,6 +112,7 @@ object Json : ConsoleCommand {
         //will all throw if there is a validation error
         parseRemoteRegex(remoteRegex)
         if (regexParameters != null) parseRegexParams(regexParameters)
+        if (jobMapping != null) parseJobMapping(jobMapping)
         if (buildWithParamJobs != null) parseBuildWithParamJobs(buildWithParamJobs)
 
         val config = mapOf(

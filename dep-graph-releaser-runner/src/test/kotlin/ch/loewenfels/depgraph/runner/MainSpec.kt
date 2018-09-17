@@ -39,7 +39,7 @@ object MainSpec : Spek({
                 val relativePathToGitRepoRegex = "^(.*)/\$"
                 val relativePathToGitRepoReplacement = "https://github.com/$1"
                 val regexParams = ".*#branch.name=master\na.*#param1=2;param2=3"
-                val jobMapping = "com.example.project=ownJobName"
+                val jobMapping = "com.example:project=ownJobName"
                 val commitPrefix = "[DGR] DEV-12345"
                 val buildWithParamsJob = "^$#maven#r;n;a\n.*#query#releaseVersion;nextDevVersion"
                 Main.main(

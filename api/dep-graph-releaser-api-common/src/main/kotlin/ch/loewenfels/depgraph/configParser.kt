@@ -4,6 +4,29 @@ import ch.loewenfels.depgraph.data.ReleasePlan
 import ch.loewenfels.depgraph.jobexecution.BuildWithParamFormat
 
 
+fun parseJobMapping(releasePlan: ReleasePlan): Map<String, String> =
+    parseJobMapping(releasePlan.getConfig(ConfigKey.JOB_MAPPING))
+
+
+fun parseJobMapping(mapping: String): Map<String, String> {
+    //TODO #14 do not associate immediately but first map to list and check if there are duplicates
+    return mapping.trim().split("\n").associate { pair ->
+        val index = pair.indexOf('=')
+        require(index > 0) {
+            "At least one mapping has no groupId and artifactId defined.\njobMapping: $mapping"
+        }
+        val groupIdAndArtifactId = pair.substring(0, index)
+        require(groupIdAndArtifactId.contains(':')) {
+            "At least one groupId and artifactId is erroneous, does not contain a `:`.\njobMapping: $mapping"
+        }
+        val jobName = pair.substring(index + 1)
+        require(jobName.isNotBlank()) {
+            "At least one groupId and artifactId is erroneous, has no job name defined.\njobMapping: $mapping"
+        }
+        groupIdAndArtifactId to jobName
+    }
+}
+
 fun parseRemoteRegex(releasePlan: ReleasePlan) =
     parseRemoteRegex(releasePlan.getConfig(ConfigKey.REMOTE_REGEX))
 
@@ -63,7 +86,7 @@ private fun checkEntryHasHash(endRegex: Int, name: String, configValue: String) 
 
 private fun getUnescapedRegex(value: String, startIndex: Int, endRegex: Int): Regex {
     val regexEscaped = value.substring(startIndex, endRegex)
-    return Regex(regexEscaped.replace(Regex("([ \t\\n])"), ""))
+    return Regex(regexEscaped.replace(Regex("([ \t\n])"), ""))
 }
 
 private fun getRightSide(value: String, endRegex: Int): Pair<Int, String> {
@@ -86,11 +109,11 @@ private fun requireHttpsDefined(jenkinsBaseUrl: String, remoteRegex: String) {
 }
 
 private fun requireAtLeastOneParameter(pair: String, regexParams: String) {
-    require(pair.isNotEmpty()){
+    require(pair.isNotEmpty()) {
         "A regexParam requires at least one parameter.\nregexParams: $regexParams"
     }
     pair.split(';').forEach {
-        require(it.isNotEmpty()){
+        require(it.isNotEmpty()) {
             "Param without name and value in regexParam.\nregexParams: $regexParams"
         }
         val index = it.indexOf('=')

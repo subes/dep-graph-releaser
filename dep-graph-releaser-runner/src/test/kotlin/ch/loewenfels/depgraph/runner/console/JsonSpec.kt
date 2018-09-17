@@ -42,7 +42,7 @@ class JsonSpec : Spek({
                 "https://github.com/$1",
                 "${Json.REGEX_PARAMS_ARG}.*#branch.name=master",
                 "${Json.DISABLE_RELEASE_FOR}ch.loewenfels.*",
-                "${Json.JOB_MAPPING_ARG}com.example.project=ownJobName|com.example.anotherProject=another-project",
+                "${Json.JOB_MAPPING_ARG}com.example:project=ownJobName\ncom.example:anotherProject=another-project",
                 "${Json.COMMIT_PREFIX_ARG}[TEST]",
                 "${Json.BUILD_WITH_PARAM_JOBS_ARG}$regex"
             )
