@@ -22,7 +22,7 @@ object Json : ConsoleCommand {
     override val name = "json"
     override val description = "analyse projects, create a release plan and serialize it to json"
     override val example = "./dgr $name com.example example-project ./repo ./release.json " +
-        "dgr-updater dgr-dry-run \"ch\\..*#https://example.com/jenkins\\ncom\\..*#https://jenkins.example.com\" " +
+        "dgr-updater dgr-dry-run \"ch\\..*#https://example.com/jenkins\ncom\\..*#https://jenkins.example.com\" " +
         "\"[^/]+/[^/]+/.+\" \"^(.*)/\$\" https://github.com/\$1" +
         "$REGEX_PARAMS_ARG\".*#branch.name=master\" $DISABLE_RELEASE_FOR\"ch\\.loewenfels:dist.*\" " +
         "${JOB_MAPPING_ARG}com.example:a=exampleA\\nch.loewenfels:dgr-1=apnoea-test-1" +

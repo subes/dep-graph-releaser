@@ -86,33 +86,46 @@ class ConfigParserSpec : Spek({
                 }
             }
 
-            given("second config value does not have a #"){
+            given("second config value does not have a #") {
                 it("throws an IllegalArgumentException mentioning # is missing") {
                     expect {
-                        parseRemoteRegex(".*#https://test.com\\n.*https://test2.com")
+                        parseRemoteRegex(".*#https://test.com\n.*https://test2.com")
                     }.toThrow<IllegalArgumentException> { messageContains("You forgot to separate regex from the rest with #") }
                 }
             }
         }
 
-        describe("regex with \\n, whitespace and tabs") {
-            it("removes them from resulting regex"){
-                val (regex, _) = parseRemoteRegex("\\nhello\t  sister#https://example.com")[0]
+        describe("regex with newline, whitespace and tabs") {
+            it("removes them from resulting regex") {
+                val result = parseRemoteRegex("\nhello\t  sister#https://example.com")
+                assert(result).hasSize(1)
+                val (regex, _) = result[0]
                 assert(regex.pattern).toBe("hellosister")
             }
         }
 
         describe("url with whitespace and tabs") {
-            it("they remain in the url"){
+            it("they remain in the url") {
                 val expectedUrl = "https://example.com/\thello  sister"
-                val (_, url) = parseRemoteRegex(".*#$expectedUrl")[0]
+                val result = parseRemoteRegex(".*#$expectedUrl")
+                assert(result).hasSize(1)
+                val (_, url) = result[0]
                 assert(url).toBe(expectedUrl)
             }
         }
 
-        describe("two config separated by \\n") {
-            it("returns list with two pairs"){
-                val result = parseRemoteRegex("a#https://example.com\\nb#https://example2.com")
+        describe("newline and whitespace at the beginning and at the end") {
+            it("white space and newline is removed") {
+                val result = parseRemoteRegex("\n              hello\t  sister#https://example.com\n            ")
+                assert(result).hasSize(1)
+                val (regex, _) = result[0]
+                assert(regex.pattern).toBe("hellosister")
+            }
+        }
+
+        describe("two config separated by newline") {
+            it("returns list with two pairs") {
+                val result = parseRemoteRegex("a#https://example.com\nb#https://example2.com")
                 //TODO simplify if Atrium provides shortcut accessors for first, second
                 assert(result).containsStrictly(
                     {

@@ -91,7 +91,10 @@ task json {
     def relativePathToGitRepoReplacementArg = 'relativePathToGitRepoReplacement'
     def defaultRelativePathToGitRepoReplacement = 'ssh://gerrit.loewenfels.ch:29418/$1'
     def regexParamsArg = 'regexParams'
-    def defaultRegexParamsArg = ".*#branch.name=master"
+    def defaultRegexParamsArg = /
+        (?!ch.loewenfels.depgraph:dgr-4).*#branch.name=master
+        ch.loewenfels.depgraph:dgr-4#BRANCH=master
+        /.stripIndent()
     def disableRegexArg = 'disableRegex'
     def jobMappingArg = 'jobMapping'
     def commitPrefixArg = 'commitPrefix'

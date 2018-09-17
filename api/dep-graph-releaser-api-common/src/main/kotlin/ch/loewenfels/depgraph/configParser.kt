@@ -33,21 +33,22 @@ private fun <T> parseRegex(
     requireRightSideToBe: (String, String) -> Unit,
     rightSideConverter: (String) -> T
 ): List<Pair<Regex, T>> {
-    return if (configValue.isNotEmpty()) {
+    val trimmedValue = configValue.trim()
+    return if (trimmedValue.isNotEmpty()) {
         val mutableList = mutableListOf<Pair<Regex, T>>()
         var startIndex = 0
-        var endRegex = configValue.indexOf('#', startIndex)
-        checkEntryHasHash(endRegex, name, configValue)
+        var endRegex = trimmedValue.indexOf('#', startIndex)
+        checkEntryHasHash(endRegex, name, trimmedValue)
         while (endRegex >= 0) {
-            checkRegexNotEmpty(endRegex, name, configValue)
-            val regex = getUnescapedRegex(configValue, startIndex, endRegex)
-            val (endRightSide, rightSide) = getRightSide(configValue, endRegex)
-            requireRightSideToBe(rightSide, configValue)
+            checkRegexNotEmpty(endRegex, name, trimmedValue)
+            val regex = getUnescapedRegex(trimmedValue, startIndex, endRegex)
+            val (endRightSide, rightSide) = getRightSide(trimmedValue, endRegex)
+            requireRightSideToBe(rightSide, trimmedValue)
             mutableList.add(regex to rightSideConverter(rightSide))
-            startIndex = endRightSide + 2
-            endRegex = configValue.indexOf('#', startIndex)
-            if (startIndex < configValue.length) {
-                checkEntryHasHash(endRegex, name, configValue)
+            startIndex = endRightSide + 1
+            endRegex = trimmedValue.indexOf('#', startIndex)
+            if (startIndex < trimmedValue.length) {
+                checkEntryHasHash(endRegex, name, trimmedValue.substring(startIndex))
             }
         }
         mutableList
@@ -62,11 +63,11 @@ private fun checkEntryHasHash(endRegex: Int, name: String, configValue: String) 
 
 private fun getUnescapedRegex(value: String, startIndex: Int, endRegex: Int): Regex {
     val regexEscaped = value.substring(startIndex, endRegex)
-    return Regex(regexEscaped.replace(Regex("( |\t|\\\\n)"), ""))
+    return Regex(regexEscaped.replace(Regex("([ \t\\n])"), ""))
 }
 
 private fun getRightSide(value: String, endRegex: Int): Pair<Int, String> {
-    val indexOf = value.indexOf("\\n", endRegex)
+    val indexOf = value.indexOf("\n", endRegex)
     val endRightSide = if (indexOf < 0) value.length else indexOf
     val rightSide = value.substring(endRegex + 1, endRightSide)
     return Pair(endRightSide, rightSide)
