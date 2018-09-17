@@ -123,8 +123,8 @@ class App {
             UsernameTokenRegistry.register(defaultJenkinsBaseUrl).then { pair ->
                 if (pair == null) {
                     menu.disableButtonsDueToNoAuth(
-                        "You need to authenticate if you want to use this functionality.",
-                        "You need to authenticate if you want to use all functionality and not only a limited set." +
+                        "You need to log in if you want to use this functionality.",
+                        "You need to log in if you want to use all functionality and not only a limited set." +
                             "\n$defaultJenkinsBaseUrl/login?from=" + window.location)
                     null
                 } else {
