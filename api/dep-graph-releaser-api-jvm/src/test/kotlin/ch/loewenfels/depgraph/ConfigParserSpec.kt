@@ -14,7 +14,7 @@ import kotlin.reflect.KFunction1
 class ConfigParserSpec : Spek({
     val fns = listOf<KFunction1<String, List<Pair<Regex, *>>>>(
         ::parseRemoteRegex,
-        ::parseRegexParameters,
+        ::parseRegexParams,
         ::parseBuildWithParamJobs
     )
 
@@ -31,7 +31,7 @@ class ConfigParserSpec : Spek({
     describe("common validation errors in regex") {
         listOf<(String) -> Any>(
             ::parseRemoteRegex,
-            ::parseRegexParameters,
+            ::parseRegexParams,
             ::parseBuildWithParamJobs
         ).forEach { fn ->
             given("empty regex") {
@@ -137,6 +137,57 @@ class ConfigParserSpec : Spek({
                         property(subject::second).toBe("https://example2.com")
                     }
                 )
+            }
+        }
+    }
+
+    describe("fun parseRegexParams") {
+        describe("validation errors") {
+            listOf("", ".*#a=b\n").forEach { prefix ->
+                context("first regex is `$prefix`") {
+                    given("no parameters defined") {
+                        it("throws an IllegalArgumentException mentioning parameters required") {
+                            expect {
+                                parseRegexParams("$prefix.*#")
+                            }.toThrow<IllegalArgumentException> { messageContains("A regexParam requires at least one parameter") }
+                        }
+                    }
+                    given("one parameter defined but without name") {
+                        it("throws an IllegalArgumentException mentioning parameters required") {
+                            expect {
+                                parseRegexParams("$prefix.*#=a")
+                            }.toThrow<IllegalArgumentException> { messageContains("Parameter without name") }
+                        }
+                    }
+                    given("one parameter defined but without value") {
+                        it("throws an IllegalArgumentException mentioning parameters required") {
+                            expect {
+                                parseRegexParams("$prefix.*#a")
+                            }.toThrow<IllegalArgumentException> { messageContains("regexParam does not have a value") }
+                        }
+                    }
+                    given("second parameter without name") {
+                        it("throws an IllegalArgumentException mentioning parameters required") {
+                            expect {
+                                parseRegexParams("$prefix.*#a=b;=c")
+                            }.toThrow<IllegalArgumentException> { messageContains("Parameter without name") }
+                        }
+                    }
+                    given("second parameter without value") {
+                        it("throws an IllegalArgumentException mentioning parameters required") {
+                            expect {
+                                parseRegexParams("$prefix.*#a=b;c")
+                            }.toThrow<IllegalArgumentException> { messageContains("regexParam does not have a value") }
+                        }
+                    }
+                    given("second parameter without name and value") {
+                        it("throws an IllegalArgumentException mentioning parameters required") {
+                            expect {
+                                parseRegexParams("$prefix.*#a=b;;c=d")
+                            }.toThrow<IllegalArgumentException> { messageContains("Param without name and value") }
+                        }
+                    }
+                }
             }
         }
     }

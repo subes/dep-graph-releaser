@@ -9,7 +9,7 @@ import ch.loewenfels.depgraph.data.maven.MavenProjectId
 import ch.loewenfels.depgraph.data.maven.jenkins.JenkinsUpdateDependency
 import ch.loewenfels.depgraph.data.maven.jenkins.JenkinsNextDevReleaseCommand
 import ch.loewenfels.depgraph.parseBuildWithParamJobs
-import ch.loewenfels.depgraph.parseRegexParameters
+import ch.loewenfels.depgraph.parseRegexParams
 import ch.loewenfels.depgraph.parseRemoteRegex
 import ch.tutteli.kbox.appendToStringBuilder
 
@@ -26,7 +26,7 @@ class ReleaseJobExecutionDataFactory(
     init {
         checkConfig(releasePlan.config)
         remoteRegex = parseRemoteRegex(releasePlan)
-        regexParametersList = parseRegexParameters(releasePlan)
+        regexParametersList = parseRegexParams(releasePlan)
         jobMapping = parseJobMapping()
         buildWithParamJobsList = parseBuildWithParamJobs(releasePlan)
     }

@@ -11,11 +11,11 @@ fun parseRemoteRegex(regex: String): List<Pair<Regex, String>> {
     return parseRegex(regex, "remoteRegex", ::requireHttpsDefined) { it }
 }
 
-fun parseRegexParameters(releasePlan: ReleasePlan) =
-    parseRegexParameters(releasePlan.getConfig(ConfigKey.REGEX_PARAMS))
+fun parseRegexParams(releasePlan: ReleasePlan) =
+    parseRegexParams(releasePlan.getConfig(ConfigKey.REGEX_PARAMS))
 
-fun parseRegexParameters(regex: String): List<Pair<Regex, List<String>>> {
-    return parseRegex(regex, "regexParameters", ::requireAtLeastOneParameter) { params ->
+fun parseRegexParams(regex: String): List<Pair<Regex, List<String>>> {
+    return parseRegex(regex, "regexParams", ::requireAtLeastOneParameter) { params ->
         params.split(';')
     }
 }
@@ -85,10 +85,21 @@ private fun requireHttpsDefined(jenkinsBaseUrl: String, remoteRegex: String) {
     }
 }
 
-private fun requireAtLeastOneParameter(pair: String, regexParameters: String) {
-    val index = pair.indexOf('=')
-    require(index > 0) {
-        "A regexParam requires at least one parameter.\nregexParameters: $regexParameters"
+private fun requireAtLeastOneParameter(pair: String, regexParams: String) {
+    require(pair.isNotEmpty()){
+        "A regexParam requires at least one parameter.\nregexParams: $regexParams"
+    }
+    pair.split(';').forEach {
+        require(it.isNotEmpty()){
+            "Param without name and value in regexParam.\nregexParams: $regexParams"
+        }
+        val index = it.indexOf('=')
+        require(index != 0) {
+            "Parameter without name in regexParam.\nregexParams: $regexParams"
+        }
+        require(index > 0) {
+            "Parameter $it in regexParam does not have a value (separated by =).\nregexParams: $regexParams"
+        }
     }
 }
 

@@ -4,7 +4,7 @@ import ch.loewenfels.depgraph.ConfigKey
 import ch.loewenfels.depgraph.data.maven.MavenProjectId
 import ch.loewenfels.depgraph.maven.JenkinsReleasePlanCreator
 import ch.loewenfels.depgraph.parseBuildWithParamJobs
-import ch.loewenfels.depgraph.parseRegexParameters
+import ch.loewenfels.depgraph.parseRegexParams
 import ch.loewenfels.depgraph.parseRemoteRegex
 import ch.loewenfels.depgraph.runner.Orchestrator
 import ch.loewenfels.depgraph.runner.console.ErrorHandler
@@ -114,7 +114,7 @@ object Json : ConsoleCommand {
 
         //will all throw if there is a validation error
         parseRemoteRegex(remoteRegex)
-        if (regexParameters != null) parseRegexParameters(regexParameters)
+        if (regexParameters != null) parseRegexParams(regexParameters)
         if (buildWithParamJobs != null) parseBuildWithParamJobs(buildWithParamJobs)
 
         val config = mapOf(
