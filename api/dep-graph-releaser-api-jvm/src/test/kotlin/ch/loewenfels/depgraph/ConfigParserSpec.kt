@@ -78,10 +78,18 @@ class ConfigParserSpec : Spek({
                 }
             }
 
+            given("url starts with http://") {
+                it("throws an IllegalArgumentException mentioning url requires https") {
+                    expect {
+                        parseRemoteRegex(".*#http://example.com")
+                    }.toThrow<IllegalArgumentException> { messageContains("remoteRegex requires", "https") }
+                }
+            }
+
             given("second config value does not have a #"){
                 it("throws an IllegalArgumentException mentioning # is missing") {
                     expect {
-                        parseRemoteRegex(".*#test\\n.*test2")
+                        parseRemoteRegex(".*#https://test.com\\n.*https://test2.com")
                     }.toThrow<IllegalArgumentException> { messageContains("You forgot to separate regex from the rest with #") }
                 }
             }
@@ -89,7 +97,7 @@ class ConfigParserSpec : Spek({
 
         describe("regex with \\n, whitespace and tabs") {
             it("removes them from resulting regex"){
-                val (regex, _) = parseRemoteRegex("\\nhello\t  sister#a=b")[0]
+                val (regex, _) = parseRemoteRegex("\\nhello\t  sister#https://example.com")[0]
                 assert(regex.pattern).toBe("hellosister")
             }
         }
@@ -104,16 +112,16 @@ class ConfigParserSpec : Spek({
 
         describe("two config separated by \\n") {
             it("returns list with two pairs"){
-                val result = parseRemoteRegex("a#url\\nb#url2")
+                val result = parseRemoteRegex("a#https://example.com\\nb#https://example2.com")
                 //TODO simplify if Atrium provides shortcut accessors for first, second
                 assert(result).containsStrictly(
                     {
                         property(subject::first).property(Regex::pattern).toBe("a")
-                        property(subject::second).toBe("url")
+                        property(subject::second).toBe("https://example.com")
                     },
                     {
                         property(subject::first).property(Regex::pattern).toBe("b")
-                        property(subject::second).toBe("url2")
+                        property(subject::second).toBe("https://example2.com")
                     }
                 )
             }
