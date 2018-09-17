@@ -67,8 +67,9 @@ object UsernameTokenRegistry {
     private fun extractNameAndApiToken(body: String): Triple<String, String, String> {
         val usernameMatch = usernameRegex.find(body) ?: throwCouldNotFind("username", body)
         val fullNameMatch = fullNameRegex.find(body) ?: throwCouldNotFind("user's name", body)
-        val apiTokenMatch = apiTokenRegex.find(body) ?: throwCouldNotFind("API token", body)
-        return Triple(usernameMatch.groupValues[1], fullNameMatch.groupValues[1], apiTokenMatch.groupValues[1])
+        //TODO remove API token in case it is really not used at all.
+//        val apiTokenMatch = apiTokenRegex.find(body) ?: throwCouldNotFind("API token", body)
+        return Triple(usernameMatch.groupValues[1], fullNameMatch.groupValues[1], "apiTokenShouldNotBeUsed")
     }
 
     private fun throwCouldNotFind(what: String, body: String): Nothing =
