@@ -21,13 +21,17 @@ class App {
     private val menu: Menu
 
     init {
-        Loader.updateLoaderToLoadApiToken()
+        try {
+            Loader.updateLoaderToLoadApiToken()
+            val jsonUrl = determineJsonUrlOrThrow()
+            publishJobUrl = determinePublishJob()
 
-        val jsonUrl = determineJsonUrlOrThrow()
-        publishJobUrl = determinePublishJob()
-        defaultJenkinsBaseUrl = publishJobUrl?.substringBefore("/job/")
-        menu = Menu(UsernameTokenRegistry, defaultJenkinsBaseUrl)
-        start(jsonUrl)
+            defaultJenkinsBaseUrl = publishJobUrl?.substringBefore("/job/")
+            menu = Menu(UsernameTokenRegistry, defaultJenkinsBaseUrl)
+            start(jsonUrl)
+        } catch (t: Throwable) {
+            showThrowableAndThrow(t)
+        }
     }
 
     private fun determinePublishJob(): String? {
@@ -39,14 +43,17 @@ class App {
     }
 
     private fun getJobUrl(possiblyRelativePublishJobUrl: String): String {
-        require(!possiblyRelativePublishJobUrl.contains("://") || possiblyRelativePublishJobUrl.startsWith("http")) {
-            "The publish job URL does not start with http but contains ://"
+        require(!possiblyRelativePublishJobUrl.contains("://") || possiblyRelativePublishJobUrl.startsWith("https")) {
+            "The publish job URL does not start with https but contains ://"
         }
 
         val prefix = window.location.protocol + "//" + window.location.hostname + "/"
         val tmpUrl = if (possiblyRelativePublishJobUrl.contains("://")) {
             possiblyRelativePublishJobUrl
         } else {
+            require(window.location.protocol == "https") {
+                "The host needs to use the https protocol if publishJob is defined as relative path"
+            }
             prefix + possiblyRelativePublishJobUrl
         }
         return if (tmpUrl.endsWith("/")) tmpUrl else "$tmpUrl/"
@@ -125,7 +132,8 @@ class App {
                     menu.disableButtonsDueToNoAuth(
                         "You need to log in if you want to use this functionality.",
                         "You need to log in if you want to use all functionality and not only a limited set." +
-                            "\n$defaultJenkinsBaseUrl/login?from=" + window.location)
+                            "\n$defaultJenkinsBaseUrl/login?from=" + window.location
+                    )
                     null
                 } else {
                     val (name, usernameToken) = pair
@@ -151,11 +159,9 @@ class App {
         const val PUBLISH_JOB = "&publishJob="
 
         fun determineJsonUrlOrThrow(): String {
-            return determineJsonUrl() ?: showThrowableAndThrow(
-                IllegalStateException(
-                    "You need to specify a release.json." +
-                        "\nAppend the path with preceding # to the url, e.g., ${window.location}#release.json"
-                )
+            return determineJsonUrl() ?: throw IllegalStateException(
+                "You need to specify a release.json." +
+                    "\nAppend the path with preceding # to the url, e.g., ${window.location}#release.json"
             )
         }
 
