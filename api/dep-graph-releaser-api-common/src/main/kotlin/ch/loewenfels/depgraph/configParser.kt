@@ -8,7 +8,7 @@ fun parseRemoteRegex(releasePlan: ReleasePlan) =
     parseRemoteRegex(releasePlan.getConfig(ConfigKey.REMOTE_REGEX))
 
 fun parseRemoteRegex(regex: String): List<Pair<Regex, String>> {
-    return parseRegex(regex, "remoteRegex", ::requireUrlDefined) { it }
+    return parseRegex(regex, "remoteRegex", ::requireHttpsDefined) { it }
 }
 
 fun parseRegexParameters(releasePlan: ReleasePlan) =
@@ -78,9 +78,9 @@ private fun checkRegexNotEmpty(index: Int, name: String, input: String) {
     }
 }
 
-private fun requireUrlDefined(jenkinsBaseUrl: String, remoteRegex: String) {
-    require(jenkinsBaseUrl.isNotBlank()) {
-        "A remoteRegex requires a related jenkins base url.\nremoteRegex: $remoteRegex"
+private fun requireHttpsDefined(jenkinsBaseUrl: String, remoteRegex: String) {
+    require(jenkinsBaseUrl.startsWith("https")) {
+        "A remoteRegex requires a related jenkins base url which starts with https.\nremoteRegex: $remoteRegex"
     }
 }
 

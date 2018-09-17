@@ -36,7 +36,7 @@ class JsonSpec : Spek({
                 jsonFile.absolutePath,
                 "dgr-updater",
                 "dgr-dry-run",
-                "^$#none",
+                "^$#https://none.com",
                 "[^/]+/[^/]+/.+",
                 "^(.*)/\$",
                 "https://github.com/$1",

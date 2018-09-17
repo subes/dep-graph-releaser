@@ -34,7 +34,7 @@ object MainSpec : Spek({
                 val jsonFile = File(tempFolder.tmpDir, "test.json")
                 val dryRunJob = "dgr-dry-run"
                 val updateJob = "dgr-updater"
-                val remoteRegex = "^$#none\\n(a\\n\tcomplicated|regex)(?!\\n\ta|\\n\tb).*#https://somewhere.else.com/\\nb#https://test"
+                val remoteRegex = "^$#https://none.com\\n(a\\n\tcomplicated|regex)(?!\\n\ta|\\n\tb).*#https://somewhere.else.com/\\nb#https://test"
                 val relativePathExcludeProjectRegex = "[^/]+/[^/]+/.+"
                 val relativePathToGitRepoRegex = "^(.*)/\$"
                 val relativePathToGitRepoReplacement = "https://github.com/$1"
