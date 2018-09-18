@@ -18,6 +18,13 @@ It will start of with supporting only maven projects and requires Jenkins integr
 
 Have a look at the [Wiki](https://github.com/loewenfels/dep-graph-releaser/wiki) 
 for more information and try out the [online example](https://loewenfels.github.io/dep-graph-releaser/#./release.json).
+
+# Key Features
+- Release pipeline based on dependencies (no need to adopt your pipeline if a dependency changes)
+- Dry Run included
+- The flexible process design lets you use Dependent Graph Releaser as supportive tool which does not constrict you.
+- Interact with the process to fix failing releases before the release process as a whole has ended.
+- Integration of multiple jenkins instances possible (e.g. eases the migration from Jenkins 1.x to 2.x)
    
 # Design Decisions   
 - In case a dependency has specified `${project.version}` as `<version>` then it will be replaced with the new version.
