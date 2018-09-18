@@ -3,6 +3,7 @@ version = "1.1.0-SNAPSHOT"
 buildscript {
     ext {
         ghPages_version = version
+        //TODO update to 1.2.70 or higher if https://youtrack.jetbrains.com/issue/KT-26922 is fixed
         kotlin_version = '1.2.61'
         pom_explorer_version = '1.3.21'
         moshi_version = '1.6.0'
