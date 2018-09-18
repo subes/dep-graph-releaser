@@ -386,21 +386,28 @@ input:disabled {
 .command.inProgress > .fields > .toggle,
 .command.succeeded > .fields > .toggle,
 .command.failed > .fields > .toggle,
+.command.timeout > .fields > .toggle,
 .command.disabled > .fields > .toggle {
     display: none;
 }
-
 .command.ready > .fields > .state,
-.command.readyToReTrigger > .fields > .state {
+.command.readyToReTrigger > .fields > .state,
+.command.queueing > .fields > .state,
+.command.rePolling > .fields > .state,
+.command.inProgress > .fields > .state,
+.command.succeeded > .fields > .state,
+.command.failed > .fields > .state,
+.command.timeout > .fields > .state,
+.command.disabled > .fields > .state {
     display: inline-block;
 }
 
-.command.readyToReTrigger > .fields > .state .material-icons span::after {
+.command.readyToReTrigger > .fields > .state .material-icons span::after,
+.contextMenu .reTrigger > .material-icons span::after {
     content: 'playlist_play';
 }
 
 .command.queueing > .fields > .state {
-    display: inline-block;
     animation: queueing 1s infinite alternate linear;
     -webkit-animation: queueing 1s infinite alternate linear;
     animation-delay: 0.2s;
@@ -421,7 +428,6 @@ input:disabled {
 .command.rePolling > .fields > .state,
 .command.inProgress > .fields > .state {
     cursor: pointer;
-    display: inline-block;
     animation: inProgress 1.2s infinite alternate ease-out;
     -webkit-animation: inProgress 1.2s infinite alternate ease-out;
 }
@@ -436,22 +442,24 @@ input:disabled {
 .command.inProgress > .fields > .state .material-icons span::after {
     content: 'play_arrow';
 }
-.command.rePolling .state {
+.command.rePolling .state,
+.contextMenu .rePoll > .material-icons{
     -moz-transform: scale(-1, 1);
     -webkit-transform: scale(-1, 1);
     transform: scale(-1, 1);
 }
-.command.rePolling > .fields > .state .material-icons span::after {
+.command.rePolling > .fields > .state .material-icons span::after,
+.contextMenu .rePoll > .material-icons span::after {
     content: 'reply';
 }
 
 .command.succeeded > .fields > .state .material-icons span::after,
-.contextMenu .succeeded > .material-icons span::after {
+.contextMenu .succeeded > .material-icons span::after,
+.contextMenu .succeededContinue > .material-icons span::after {
     content: 'check';
 }
 .command.succeeded > .fields > .state {
     cursor: pointer;
-    display: inline-block;
     border-color: #008000;
     color: #008000;
     background-color: #c9fdc9;
@@ -462,25 +470,23 @@ input:disabled {
 .command.failed > .fields > .state .material-icons span::after {
     content: 'error';
 }
-.command.failed > .fields > .state {
+.command.failed > .fields > .state,
+.command.timeout > .fields > .state {
     cursor: pointer;
-    display: inline-block;
     border-color: #a01c1c;
     color: #a01c1c;
     background-color: #f7dede;
     animation: none;
     -webkit-animation: none;
 }
-.command.failed > .fields > .state {
-    display: inline-block;
+
+.command.timeout > .fields > .state .material-icons span::after {
+    content: 'alarm';
 }
 
 .command.disabled > .fields > .state .material-icons span::after {
     content: 'do_not_disturb';
     color: #a01c1c;
-}
-.command.disabled > .fields > .state {
-    display: inline-block;
 }
 .command.disabled > .fields > .state .material-icons {
     font-size: 21px;
@@ -510,7 +516,7 @@ input:disabled {
     min-width: 135px;
 }
 .fields .contextMenu {
-    min-width: 211px;
+    min-width: 280px;
 }
 .contextMenu div {
     cursor: pointer;
@@ -556,6 +562,24 @@ input:disabled {
 }
 .contextMenu .gitClone > .material-icons {
     color: #f34f29;
+}
+.contextMenu .reTrigger > .material-icons,
+.contextMenu .succeededContinue > .material-icons,
+.contextMenu .rePoll > .material-icons {
+    color: #e6930d;
+}
+.contextMenu .reTrigger > .material-icons{
+    width: 24px;
+    height: 24px;
+    font-size: 24px;
+}
+.contextMenu .succeededContinue > .material-icons span::before {
+    content: 'play_arrow';
+    font-size: 10px;
+    margin-left: 11px;
+}
+.contextMenu .succeededContinue > .material-icons span::after {
+    margin-left: -21px;
 }
 
 #poweredBy,

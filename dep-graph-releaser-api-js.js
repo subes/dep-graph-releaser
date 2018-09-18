@@ -20,21 +20,23 @@
   var Enum = Kotlin.kotlin.Enum;
   var Kind_CLASS = Kotlin.Kind.CLASS;
   var throwISE = Kotlin.throwISE;
+  var split = Kotlin.kotlin.text.split_ip8yn$;
+  var indexOf = Kotlin.kotlin.text.indexOf_8eortd$;
+  var contains = Kotlin.kotlin.text.contains_sgbm27$;
+  var to = Kotlin.kotlin.to_ujzrz7$;
   var Unit = Kotlin.kotlin.Unit;
   var getCallableRef = Kotlin.getCallableRef;
-  var split = Kotlin.kotlin.text.split_o64adg$;
-  var replace = Kotlin.kotlin.text.replace_680rmw$;
-  var indexOf = Kotlin.kotlin.text.indexOf_8eortd$;
-  var to = Kotlin.kotlin.to_ujzrz7$;
+  var split_0 = Kotlin.kotlin.text.split_o64adg$;
   var emptyList = Kotlin.kotlin.collections.emptyList_287e2$;
   var Regex_init = Kotlin.kotlin.text.Regex_init_61zpoe$;
   var indexOf_0 = Kotlin.kotlin.text.indexOf_l5u8uk$;
   var Pair = Kotlin.kotlin.Pair;
+  var startsWith = Kotlin.kotlin.text.startsWith_7epoxm$;
   var IllegalArgumentException_init = Kotlin.kotlin.IllegalArgumentException_init_pdl1vj$;
+  var ensureNotNull = Kotlin.ensureNotNull;
   var Kind_INTERFACE = Kotlin.Kind.INTERFACE;
   var getKClass = Kotlin.getKClass;
   var toString = Kotlin.toString;
-  var ensureNotNull = Kotlin.ensureNotNull;
   var joinToString = Kotlin.kotlin.collections.joinToString_cgipc5$;
   var mutableListOf = Kotlin.kotlin.collections.mutableListOf_i5x0yv$;
   var asSequence = Kotlin.kotlin.collections.asSequence_7wnvza$;
@@ -72,6 +74,8 @@
   CommandState$Succeeded.prototype.constructor = CommandState$Succeeded;
   CommandState$Failed.prototype = Object.create(CommandState.prototype);
   CommandState$Failed.prototype.constructor = CommandState$Failed;
+  CommandState$Timeout.prototype = Object.create(CommandState.prototype);
+  CommandState$Timeout.prototype.constructor = CommandState$Timeout;
   CommandState$Deactivated.prototype = Object.create(CommandState.prototype);
   CommandState$Deactivated.prototype.constructor = CommandState$Deactivated;
   CommandState$Disabled.prototype = Object.create(CommandState.prototype);
@@ -236,6 +240,46 @@
     }
   }
   ConfigKey.valueOf_61zpoe$ = ConfigKey$valueOf;
+  function parseJobMapping(releasePlan) {
+    return parseJobMapping_0(releasePlan.getConfig_udzor3$(ConfigKey$JOB_MAPPING_getInstance()));
+  }
+  var isBlank = Kotlin.kotlin.text.isBlank_gw00vp$;
+  var throwCCE = Kotlin.throwCCE;
+  var trim = Kotlin.kotlin.text.trim_gw00vp$;
+  var collectionSizeOrDefault = Kotlin.kotlin.collections.collectionSizeOrDefault_ba2ldo$;
+  var mapCapacity = Kotlin.kotlin.collections.mapCapacity_za3lpa$;
+  var coerceAtLeast = Kotlin.kotlin.ranges.coerceAtLeast_dqglrj$;
+  var LinkedHashMap_init = Kotlin.kotlin.collections.LinkedHashMap_init_bwtc7$;
+  function parseJobMapping_0(mapping) {
+    var tmp$;
+    var $receiver = split(trim(Kotlin.isCharSequence(tmp$ = mapping) ? tmp$ : throwCCE()).toString(), ['\n']);
+    var capacity = coerceAtLeast(mapCapacity(collectionSizeOrDefault($receiver, 10)), 16);
+    var destination = LinkedHashMap_init(capacity);
+    var tmp$_0;
+    tmp$_0 = $receiver.iterator();
+    while (tmp$_0.hasNext()) {
+      var element = tmp$_0.next();
+      var index = indexOf(element, 61);
+      if (!(index > 0)) {
+        var message = 'At least one mapping has no groupId and artifactId defined.' + '\n' + 'jobMapping: ' + mapping;
+        throw IllegalArgumentException_init(message.toString());
+      }
+      var groupIdAndArtifactId = element.substring(0, index);
+      if (!contains(groupIdAndArtifactId, 58)) {
+        var message_0 = 'At least one groupId and artifactId is erroneous, does not contain a `:`.' + '\n' + 'jobMapping: ' + mapping;
+        throw IllegalArgumentException_init(message_0.toString());
+      }
+      var startIndex = index + 1 | 0;
+      var jobName = element.substring(startIndex);
+      if (!!isBlank(jobName)) {
+        var message_1 = 'At least one groupId and artifactId is erroneous, has no job name defined.' + '\n' + 'jobMapping: ' + mapping;
+        throw IllegalArgumentException_init(message_1.toString());
+      }
+      var pair = to(groupIdAndArtifactId, jobName);
+      destination.put_xwzc9p$(pair.first, pair.second);
+    }
+    return destination;
+  }
   function parseRemoteRegex(releasePlan) {
     return parseRemoteRegex_0(releasePlan.getConfig_udzor3$(ConfigKey$REMOTE_REGEX_getInstance()));
   }
@@ -243,20 +287,20 @@
     return it;
   }
   function parseRemoteRegex_0(regex) {
-    return parseRegex(regex, 'remoteRegex', getCallableRef('requireUrlDefined', function (jenkinsBaseUrl, remoteRegex) {
-      return requireUrlDefined(jenkinsBaseUrl, remoteRegex), Unit;
+    return parseRegex(regex, 'remoteRegex', getCallableRef('requireHttpsDefined', function (jenkinsBaseUrl, remoteRegex) {
+      return requireHttpsDefined(jenkinsBaseUrl, remoteRegex), Unit;
     }), parseRemoteRegex$lambda);
   }
-  function parseRegexParameters(releasePlan) {
-    return parseRegexParameters_0(releasePlan.getConfig_udzor3$(ConfigKey$REGEX_PARAMS_getInstance()));
+  function parseRegexParams(releasePlan) {
+    return parseRegexParams_0(releasePlan.getConfig_udzor3$(ConfigKey$REGEX_PARAMS_getInstance()));
   }
-  function parseRegexParameters$lambda(params) {
-    return split(params, Kotlin.charArrayOf(59));
+  function parseRegexParams$lambda(params) {
+    return split_0(params, Kotlin.charArrayOf(59));
   }
-  function parseRegexParameters_0(regex) {
-    return parseRegex(regex, 'regexParameters', getCallableRef('requireAtLeastOneParameter', function (pair, regexParameters) {
-      return requireAtLeastOneParameter(pair, regexParameters), Unit;
-    }), parseRegexParameters$lambda);
+  function parseRegexParams_0(regex) {
+    return parseRegex(regex, 'regexParams', getCallableRef('requireAtLeastOneParameter', function (pair, regexParams) {
+      return requireAtLeastOneParameter(pair, regexParams), Unit;
+    }), parseRegexParams$lambda);
   }
   function parseBuildWithParamJobs(releasePlan) {
     return parseBuildWithParamJobs_0(releasePlan.getConfig_udzor3$(ConfigKey$BUILD_WITH_PARAM_JOBS_getInstance()));
@@ -271,21 +315,28 @@
   var ArrayList_init = Kotlin.kotlin.collections.ArrayList_init_287e2$;
   function parseRegex(configValue, name, requireRightSideToBe, rightSideConverter) {
     var tmp$;
-    if (configValue.length > 0) {
-      var value = replace(configValue, '\t', '');
+    var tmp$_0;
+    var trimmedValue = trim(Kotlin.isCharSequence(tmp$_0 = configValue) ? tmp$_0 : throwCCE()).toString();
+    if (trimmedValue.length > 0) {
       var mutableList = ArrayList_init();
       var startIndex = 0;
-      var endRegex = indexOf(value, 35, startIndex);
+      var endRegex = indexOf(trimmedValue, 35, startIndex);
+      checkEntryHasHash(endRegex, name, trimmedValue);
       while (endRegex >= 0) {
-        checkRegexNotEmpty(endRegex, name, configValue);
-        var regex = getUnescapedRegex(value, startIndex, endRegex);
-        var tmp$_0 = getRightSide(value, endRegex);
-        var endRightSide = tmp$_0.component1()
-        , rightSide = tmp$_0.component2();
-        requireRightSideToBe(rightSide, configValue);
+        checkRegexNotEmpty(endRegex, name, trimmedValue);
+        var regex = getUnescapedRegex(trimmedValue, startIndex, endRegex);
+        var tmp$_1 = getRightSide(trimmedValue, endRegex);
+        var endRightSide = tmp$_1.component1()
+        , rightSide = tmp$_1.component2();
+        requireRightSideToBe(rightSide, trimmedValue);
         mutableList.add_11rb$(to(regex, rightSideConverter(rightSide)));
-        startIndex = endRightSide + 2 | 0;
-        endRegex = indexOf(value, 35, startIndex);
+        startIndex = endRightSide + 1 | 0;
+        endRegex = indexOf(trimmedValue, 35, startIndex);
+        if (startIndex < trimmedValue.length) {
+          var tmp$_2 = endRegex;
+          var startIndex_0 = startIndex;
+          checkEntryHasHash(tmp$_2, name, trimmedValue.substring(startIndex_0));
+        }
       }
       tmp$ = mutableList;
     }
@@ -294,12 +345,18 @@
     }
     return tmp$;
   }
+  function checkEntryHasHash(endRegex, name, configValue) {
+    if (!(endRegex >= 0)) {
+      var message = 'You forgot to separate regex from the rest with #' + '\n' + name + ': ' + configValue;
+      throw IllegalArgumentException_init(message.toString());
+    }
+  }
   function getUnescapedRegex(value, startIndex, endRegex) {
     var regexEscaped = value.substring(startIndex, endRegex);
-    return Regex_init(replace(regexEscaped, '\\n', ''));
+    return Regex_init(Regex_init('([ \t\n])').replace_x2uqeu$(regexEscaped, ''));
   }
   function getRightSide(value, endRegex) {
-    var indexOf = indexOf_0(value, '\\n', endRegex);
+    var indexOf = indexOf_0(value, '\n', endRegex);
     var endRightSide = indexOf < 0 ? value.length : indexOf;
     var startIndex = endRegex + 1 | 0;
     var rightSide = value.substring(startIndex, endRightSide);
@@ -311,23 +368,39 @@
       throw IllegalArgumentException_init(message.toString());
     }
   }
-  var isBlank = Kotlin.kotlin.text.isBlank_gw00vp$;
-  function requireUrlDefined(jenkinsBaseUrl, remoteRegex) {
-    if (!!isBlank(jenkinsBaseUrl)) {
-      var message = 'A remoteRegex requires a related jenkins base url.' + '\r' + 'emoteRegex: ' + remoteRegex;
+  function requireHttpsDefined(jenkinsBaseUrl, remoteRegex) {
+    if (!startsWith(jenkinsBaseUrl, 'https')) {
+      var message = 'A remoteRegex requires a related jenkins base url which starts with https.' + '\n' + 'remoteRegex: ' + remoteRegex;
       throw IllegalArgumentException_init(message.toString());
     }
   }
-  function requireAtLeastOneParameter(pair, regexParameters) {
-    var index = indexOf(pair, 61);
-    if (!(index > 0)) {
-      var message = 'A regexParam requires at least one parameter.' + '\n' + 'regexParameters: ' + regexParameters;
+  function requireAtLeastOneParameter(pair, regexParams) {
+    if (!(pair.length > 0)) {
+      var message = 'A regexParam requires at least one parameter.' + '\n' + 'regexParams: ' + regexParams;
       throw IllegalArgumentException_init(message.toString());
+    }
+    var tmp$;
+    tmp$ = split_0(pair, Kotlin.charArrayOf(59)).iterator();
+    while (tmp$.hasNext()) {
+      var element = tmp$.next();
+      if (!(element.length > 0)) {
+        var message_0 = 'Param without name and value in regexParam.' + '\n' + 'regexParams: ' + regexParams;
+        throw IllegalArgumentException_init(message_0.toString());
+      }
+      var index = indexOf(element, 61);
+      if (!(index !== 0)) {
+        var message_1 = 'Parameter without name in regexParam.' + '\n' + 'regexParams: ' + regexParams;
+        throw IllegalArgumentException_init(message_1.toString());
+      }
+      if (!(index > 0)) {
+        var message_2 = 'Parameter ' + element + ' in regexParam does not have a value (separated by =).' + '\n' + 'regexParams: ' + regexParams;
+        throw IllegalArgumentException_init(message_2.toString());
+      }
     }
   }
   function requireFormatAndNames(formatAndNames, buildWithParamJobs) {
     var tmp$;
-    var tmp$_0 = split(formatAndNames, Kotlin.charArrayOf(35));
+    var tmp$_0 = split_0(formatAndNames, Kotlin.charArrayOf(35));
     var format = tmp$_0.get_za3lpa$(0);
     var namesAsString = tmp$_0.get_za3lpa$(1);
     switch (format) {
@@ -340,7 +413,7 @@
       default:throw IllegalArgumentException_init('Illegal format `' + format + '` provided, only `query` and `maven` supported.' + '\n' + 'buildWithParamJobs: ' + buildWithParamJobs);
     }
     var numOfNames = tmp$;
-    var names = split(namesAsString, Kotlin.charArrayOf(59));
+    var names = split_0(namesAsString, Kotlin.charArrayOf(59));
     if (!(names.size === numOfNames)) {
       var message = 'Format `' + format + '` requires ' + numOfNames + ' names, ' + names.size + ' given.' + '\n' + 'buildWithParamJobs: ' + buildWithParamJobs;
       throw IllegalArgumentException_init(message.toString());
@@ -348,18 +421,18 @@
   }
   function createBuildWithParamFormat(formatAndNames) {
     var tmp$;
-    var tmp$_0 = split(formatAndNames, Kotlin.charArrayOf(35));
+    var tmp$_0 = split_0(formatAndNames, Kotlin.charArrayOf(35));
     var format = tmp$_0.get_za3lpa$(0);
     var namesAsString = tmp$_0.get_za3lpa$(1);
     switch (format) {
       case 'query':
-        var tmp$_1 = split(namesAsString, Kotlin.charArrayOf(59));
+        var tmp$_1 = split_0(namesAsString, Kotlin.charArrayOf(59));
         var releaseVersion = tmp$_1.get_za3lpa$(0);
         var nextDevVersion = tmp$_1.get_za3lpa$(1);
         tmp$ = new BuildWithParamFormat$Query(releaseVersion, nextDevVersion);
         break;
       case 'maven':
-        var tmp$_2 = split(namesAsString, Kotlin.charArrayOf(59));
+        var tmp$_2 = split_0(namesAsString, Kotlin.charArrayOf(59));
         var releaseVersion_0 = tmp$_2.get_za3lpa$(0);
         var nextDevVersion_0 = tmp$_2.get_za3lpa$(1);
         var parameterName = tmp$_2.get_za3lpa$(2);
@@ -368,6 +441,10 @@
       default:throw IllegalArgumentException_init('Illegal format ' + format);
     }
     return tmp$;
+  }
+  function getToStringRepresentation($receiver) {
+    var representation = $receiver.toString();
+    return equals(representation, '[object Object]') ? ensureNotNull(Kotlin.getKClassFromExpression($receiver).simpleName) : representation;
   }
   function Command() {
   }
@@ -389,9 +466,10 @@
   Command.$metadata$ = {
     kind: Kind_INTERFACE,
     simpleName: 'Command',
-    interfaces: []
+    interfaces: [PolymorphSerializable]
   };
   function CommandState() {
+    CommandState$Companion_getInstance();
   }
   function CommandState$Waiting(dependencies) {
     CommandState.call(this);
@@ -547,6 +625,32 @@
     }
     return CommandState$Failed_instance;
   }
+  function CommandState$Timeout(previous) {
+    CommandState.call(this);
+    this.previous = previous;
+  }
+  CommandState$Timeout.$metadata$ = {
+    kind: Kind_CLASS,
+    simpleName: 'Timeout',
+    interfaces: [CommandState]
+  };
+  CommandState$Timeout.prototype.component1 = function () {
+    return this.previous;
+  };
+  CommandState$Timeout.prototype.copy_m86w84$ = function (previous) {
+    return new CommandState$Timeout(previous === void 0 ? this.previous : previous);
+  };
+  CommandState$Timeout.prototype.toString = function () {
+    return 'Timeout(previous=' + Kotlin.toString(this.previous) + ')';
+  };
+  CommandState$Timeout.prototype.hashCode = function () {
+    var result = 0;
+    result = result * 31 + Kotlin.hashCode(this.previous) | 0;
+    return result;
+  };
+  CommandState$Timeout.prototype.equals = function (other) {
+    return this === other || (other !== null && (typeof other === 'object' && (Object.getPrototypeOf(this) === Object.getPrototypeOf(other) && Kotlin.equals(this.previous, other.previous))));
+  };
   function CommandState$Deactivated(previous) {
     CommandState.call(this);
     this.previous = previous;
@@ -605,7 +709,7 @@
       throw IllegalStateException_init(message_0.toString());
     }
     if (Kotlin.isType(newState, CommandState$ReadyToReTrigger))
-      tmp$_0 = this.checkNewStateIsAfter_jb7wuq$_0(newState, [getKClass(CommandState$Failed)]);
+      tmp$_0 = this.checkNewStateIsAfter_jb7wuq$_0(newState, [getKClass(CommandState$Failed), getKClass(CommandState$Timeout)]);
     else if (Kotlin.isType(newState, CommandState$Ready)) {
       this.checkNewStateIsAfter_jb7wuq$_0(newState, [getKClass(CommandState$Waiting)]);
       if (Kotlin.isType(this, CommandState$Waiting)) {
@@ -619,13 +723,15 @@
      else if (Kotlin.isType(newState, CommandState$Queueing))
       tmp$_0 = this.checkNewStateIsAfter_jb7wuq$_0(newState, [getKClass(CommandState$Ready), getKClass(CommandState$ReadyToReTrigger)]);
     else if (Kotlin.isType(newState, CommandState$StillQueueing))
-      tmp$_0 = this.checkNewStateIsAfter_jb7wuq$_0(newState, [getKClass(CommandState$Queueing)]);
+      tmp$_0 = this.checkNewStateIsAfter_jb7wuq$_0(newState, [getKClass(CommandState$Queueing), getKClass(CommandState$Timeout)]);
     else if (Kotlin.isType(newState, CommandState$InProgress))
-      tmp$_0 = this.checkNewStateIsAfter_jb7wuq$_0(newState, [getKClass(CommandState$Queueing)]);
+      tmp$_0 = this.checkNewStateIsAfter_jb7wuq$_0(newState, [getKClass(CommandState$Queueing), getKClass(CommandState$StillQueueing)]);
     else if (Kotlin.isType(newState, CommandState$RePolling))
-      tmp$_0 = this.checkNewStateIsAfter_jb7wuq$_0(newState, [getKClass(CommandState$InProgress)]);
+      tmp$_0 = this.checkNewStateIsAfter_jb7wuq$_0(newState, [getKClass(CommandState$InProgress), getKClass(CommandState$Timeout)]);
     else if (Kotlin.isType(newState, CommandState$Succeeded))
       tmp$_0 = this.checkNewStateIsAfter_jb7wuq$_0(newState, [getKClass(CommandState$InProgress), getKClass(CommandState$RePolling)]);
+    else if (Kotlin.isType(newState, CommandState$Timeout))
+      tmp$_0 = this.checkNewStateIsAfter_jb7wuq$_0(newState, [getKClass(CommandState$Queueing), getKClass(CommandState$InProgress), getKClass(CommandState$RePolling)]);
     else if (Kotlin.isType(newState, CommandState$Waiting) || Kotlin.isType(newState, CommandState$Failed) || Kotlin.isType(newState, CommandState$Deactivated) || Kotlin.isType(newState, CommandState$Disabled))
       tmp$_0 = newState;
     else
@@ -677,15 +783,32 @@
     }
     return newState;
   };
+  function CommandState$Companion() {
+    CommandState$Companion_instance = this;
+  }
+  CommandState$Companion.prototype.isFailureState_m86w84$ = function (state) {
+    return state === CommandState$Failed_getInstance() || Kotlin.isType(state, CommandState$Timeout);
+  };
+  CommandState$Companion.prototype.isEndState_m86w84$ = function (state) {
+    return state === CommandState$Succeeded_getInstance() || this.isFailureState_m86w84$(state);
+  };
+  CommandState$Companion.$metadata$ = {
+    kind: Kind_OBJECT,
+    simpleName: 'Companion',
+    interfaces: []
+  };
+  var CommandState$Companion_instance = null;
+  function CommandState$Companion_getInstance() {
+    if (CommandState$Companion_instance === null) {
+      new CommandState$Companion();
+    }
+    return CommandState$Companion_instance;
+  }
   CommandState.$metadata$ = {
     kind: Kind_CLASS,
     simpleName: 'CommandState',
     interfaces: []
   };
-  function getToStringRepresentation($receiver) {
-    var representation = $receiver.toString();
-    return equals(representation, '[object Object]') ? ensureNotNull(Kotlin.getKClassFromExpression($receiver).simpleName) : representation;
-  }
   function Project(id, isSubmodule, currentVersion, releaseVersion, level, commands, relativePath) {
     this.id = id;
     this.isSubmodule = isSubmodule;
@@ -756,7 +879,7 @@
   ProjectId.$metadata$ = {
     kind: Kind_INTERFACE,
     simpleName: 'ProjectId',
-    interfaces: []
+    interfaces: [PolymorphSerializable]
   };
   function Relation(id, currentVersion, isDependencyVersionSelfManaged) {
     this.id = id;
@@ -851,7 +974,6 @@
     return tmp$;
   };
   var HashSet_init = Kotlin.kotlin.collections.HashSet_init_287e2$;
-  var collectionSizeOrDefault = Kotlin.kotlin.collections.collectionSizeOrDefault_ba2ldo$;
   var ArrayList_init_0 = Kotlin.kotlin.collections.ArrayList_init_ww73n8$;
   ReleasePlan.prototype.collectDependentsInclDependentsOfAllSubmodules_lljhqa$ = function (multiModuleId) {
     var projectIds = HashSet_init();
@@ -1128,8 +1250,9 @@
     CommandStateJson$State$RE_POLLING_instance = new CommandStateJson$State('RE_POLLING', 6);
     CommandStateJson$State$SUCCEEDED_instance = new CommandStateJson$State('SUCCEEDED', 7);
     CommandStateJson$State$FAILED_instance = new CommandStateJson$State('FAILED', 8);
-    CommandStateJson$State$DEACTIVATED_instance = new CommandStateJson$State('DEACTIVATED', 9);
-    CommandStateJson$State$DISABLED_instance = new CommandStateJson$State('DISABLED', 10);
+    CommandStateJson$State$TIMEOUT_instance = new CommandStateJson$State('TIMEOUT', 9);
+    CommandStateJson$State$DEACTIVATED_instance = new CommandStateJson$State('DEACTIVATED', 10);
+    CommandStateJson$State$DISABLED_instance = new CommandStateJson$State('DISABLED', 11);
   }
   var CommandStateJson$State$WAITING_instance;
   function CommandStateJson$State$WAITING_getInstance() {
@@ -1176,6 +1299,11 @@
     CommandStateJson$State_initFields();
     return CommandStateJson$State$FAILED_instance;
   }
+  var CommandStateJson$State$TIMEOUT_instance;
+  function CommandStateJson$State$TIMEOUT_getInstance() {
+    CommandStateJson$State_initFields();
+    return CommandStateJson$State$TIMEOUT_instance;
+  }
   var CommandStateJson$State$DEACTIVATED_instance;
   function CommandStateJson$State$DEACTIVATED_getInstance() {
     CommandStateJson$State_initFields();
@@ -1192,7 +1320,7 @@
     interfaces: [Enum]
   };
   function CommandStateJson$State$values() {
-    return [CommandStateJson$State$WAITING_getInstance(), CommandStateJson$State$READY_getInstance(), CommandStateJson$State$READY_TO_RE_TRIGGER_getInstance(), CommandStateJson$State$QUEUEING_getInstance(), CommandStateJson$State$STILL_QUEUEING_getInstance(), CommandStateJson$State$IN_PROGRESS_getInstance(), CommandStateJson$State$RE_POLLING_getInstance(), CommandStateJson$State$SUCCEEDED_getInstance(), CommandStateJson$State$FAILED_getInstance(), CommandStateJson$State$DEACTIVATED_getInstance(), CommandStateJson$State$DISABLED_getInstance()];
+    return [CommandStateJson$State$WAITING_getInstance(), CommandStateJson$State$READY_getInstance(), CommandStateJson$State$READY_TO_RE_TRIGGER_getInstance(), CommandStateJson$State$QUEUEING_getInstance(), CommandStateJson$State$STILL_QUEUEING_getInstance(), CommandStateJson$State$IN_PROGRESS_getInstance(), CommandStateJson$State$RE_POLLING_getInstance(), CommandStateJson$State$SUCCEEDED_getInstance(), CommandStateJson$State$FAILED_getInstance(), CommandStateJson$State$TIMEOUT_getInstance(), CommandStateJson$State$DEACTIVATED_getInstance(), CommandStateJson$State$DISABLED_getInstance()];
   }
   CommandStateJson$State.values = CommandStateJson$State$values;
   function CommandStateJson$State$valueOf(name) {
@@ -1215,6 +1343,8 @@
         return CommandStateJson$State$SUCCEEDED_getInstance();
       case 'FAILED':
         return CommandStateJson$State$FAILED_getInstance();
+      case 'TIMEOUT':
+        return CommandStateJson$State$TIMEOUT_getInstance();
       case 'DEACTIVATED':
         return CommandStateJson$State$DEACTIVATED_getInstance();
       case 'DISABLED':
@@ -1287,6 +1417,8 @@
       return CommandStateJson_init(CommandStateJson$State$SUCCEEDED_getInstance());
     else if (Kotlin.isType(state, CommandState$Failed))
       return CommandStateJson_init(CommandStateJson$State$FAILED_getInstance());
+    else if (Kotlin.isType(state, CommandState$Timeout))
+      return CommandStateJson_init_1(CommandStateJson$State$TIMEOUT_getInstance(), toJson(state.previous));
     else if (Kotlin.isType(state, CommandState$Deactivated))
       return CommandStateJson_init_1(CommandStateJson$State$DEACTIVATED_getInstance(), toJson(state.previous));
     else if (Kotlin.isType(state, CommandState$Disabled))
@@ -1295,7 +1427,7 @@
       return Kotlin.noWhenBranchMatched();
   }
   function fromJson(json) {
-    var tmp$, tmp$_0;
+    var tmp$, tmp$_0, tmp$_1;
     switch (json.state.name) {
       case 'WAITING':
         return new CommandState$Waiting((tmp$ = json.dependencies) != null ? tmp$ : throwIllegal('dependencies', CommandStateJson$State$WAITING_getInstance().name));
@@ -1315,8 +1447,10 @@
         return CommandState$Succeeded_getInstance();
       case 'FAILED':
         return CommandState$Failed_getInstance();
+      case 'TIMEOUT':
+        return new CommandState$Timeout(fromJson((tmp$_0 = json.previous) != null ? tmp$_0 : throwIllegal('previous', CommandStateJson$State$TIMEOUT_getInstance().name)));
       case 'DEACTIVATED':
-        return new CommandState$Deactivated(fromJson((tmp$_0 = json.previous) != null ? tmp$_0 : throwIllegal('previous', CommandStateJson$State$DEACTIVATED_getInstance().name)));
+        return new CommandState$Deactivated(fromJson((tmp$_1 = json.previous) != null ? tmp$_1 : throwIllegal('previous', CommandStateJson$State$DEACTIVATED_getInstance().name)));
       case 'DISABLED':
         return CommandState$Disabled_getInstance();
       default:return Kotlin.noWhenBranchMatched();
@@ -1325,6 +1459,34 @@
   function throwIllegal(fieldName, stateName) {
     throw IllegalArgumentException_init(fieldName + ' must be defined for state ' + stateName);
   }
+  function CommandTypeIdMapper() {
+  }
+  CommandTypeIdMapper.$metadata$ = {
+    kind: Kind_INTERFACE,
+    simpleName: 'CommandTypeIdMapper',
+    interfaces: [TypeIdMapper]
+  };
+  function PolymorphSerializable() {
+  }
+  PolymorphSerializable.$metadata$ = {
+    kind: Kind_INTERFACE,
+    simpleName: 'PolymorphSerializable',
+    interfaces: []
+  };
+  function ProjectIdTypeIdMapper() {
+  }
+  ProjectIdTypeIdMapper.$metadata$ = {
+    kind: Kind_INTERFACE,
+    simpleName: 'ProjectIdTypeIdMapper',
+    interfaces: [TypeIdMapper]
+  };
+  function TypeIdMapper() {
+  }
+  TypeIdMapper.$metadata$ = {
+    kind: Kind_INTERFACE,
+    simpleName: 'TypeIdMapper',
+    interfaces: []
+  };
   function TypeOfRun(name, ordinal) {
     Enum.call(this);
     this.name$ = name;
@@ -1501,10 +1663,10 @@
     var value = pair.second;
     $receiver.put_xwzc9p$(key, value);
   };
-  var LinkedHashMap_init = Kotlin.kotlin.collections.LinkedHashMap_init_q3lmfv$;
+  var LinkedHashMap_init_0 = Kotlin.kotlin.collections.LinkedHashMap_init_q3lmfv$;
   LevelIterator.prototype.addToNextLevel_ew669y$ = function (pair) {
     if (this.itemsToVisit_0.size <= 1) {
-      this.itemsToVisit_0.add_11rb$(LinkedHashMap_init());
+      this.itemsToVisit_0.add_11rb$(LinkedHashMap_init_0());
     }
     var nextLevelProjects = last(this.itemsToVisit_0);
     var key = pair.first;
@@ -1566,14 +1728,16 @@
   var package$loewenfels = package$ch.loewenfels || (package$ch.loewenfels = {});
   var package$depgraph = package$loewenfels.depgraph || (package$loewenfels.depgraph = {});
   package$depgraph.ConfigKey = ConfigKey;
+  package$depgraph.parseJobMapping_429wai$ = parseJobMapping;
+  package$depgraph.parseJobMapping_61zpoe$ = parseJobMapping_0;
   package$depgraph.parseRemoteRegex_429wai$ = parseRemoteRegex;
   package$depgraph.parseRemoteRegex_61zpoe$ = parseRemoteRegex_0;
-  package$depgraph.parseRegexParameters_429wai$ = parseRegexParameters;
-  package$depgraph.parseRegexParameters_61zpoe$ = parseRegexParameters_0;
+  package$depgraph.parseRegexParams_429wai$ = parseRegexParams;
+  package$depgraph.parseRegexParams_61zpoe$ = parseRegexParams_0;
   package$depgraph.parseBuildWithParamJobs_429wai$ = parseBuildWithParamJobs;
   package$depgraph.parseBuildWithParamJobs_61zpoe$ = parseBuildWithParamJobs_0;
-  package$depgraph.createBuildWithParamFormat_61zpoe$ = createBuildWithParamFormat;
   var package$data = package$depgraph.data || (package$depgraph.data = {});
+  package$data.getToStringRepresentation_s8jyvk$ = getToStringRepresentation;
   package$data.Command = Command;
   CommandState.Waiting = CommandState$Waiting;
   Object.defineProperty(CommandState, 'Ready', {
@@ -1600,12 +1764,15 @@
   Object.defineProperty(CommandState, 'Failed', {
     get: CommandState$Failed_getInstance
   });
+  CommandState.Timeout = CommandState$Timeout;
   CommandState.Deactivated = CommandState$Deactivated;
   Object.defineProperty(CommandState, 'Disabled', {
     get: CommandState$Disabled_getInstance
   });
+  Object.defineProperty(CommandState, 'Companion', {
+    get: CommandState$Companion_getInstance
+  });
   package$data.CommandState = CommandState;
-  package$data.getToStringRepresentation_s8jyvk$ = getToStringRepresentation;
   package$data.Project_init_grjrm5$ = Project_init;
   package$data.Project_init_xgsuvp$ = Project_init_0;
   package$data.Project = Project;
@@ -1657,6 +1824,9 @@
   Object.defineProperty(CommandStateJson$State, 'FAILED', {
     get: CommandStateJson$State$FAILED_getInstance
   });
+  Object.defineProperty(CommandStateJson$State, 'TIMEOUT', {
+    get: CommandStateJson$State$TIMEOUT_getInstance
+  });
   Object.defineProperty(CommandStateJson$State, 'DEACTIVATED', {
     get: CommandStateJson$State$DEACTIVATED_getInstance
   });
@@ -1671,6 +1841,10 @@
   package$serialization.CommandStateJson = CommandStateJson;
   package$serialization.toJson_m86w84$ = toJson;
   package$serialization.fromJson_v4rmea$ = fromJson;
+  package$serialization.CommandTypeIdMapper = CommandTypeIdMapper;
+  package$serialization.PolymorphSerializable = PolymorphSerializable;
+  package$serialization.ProjectIdTypeIdMapper = ProjectIdTypeIdMapper;
+  package$serialization.TypeIdMapper = TypeIdMapper;
   Object.defineProperty(TypeOfRun, 'EXPLORE', {
     get: TypeOfRun$EXPLORE_getInstance
   });
