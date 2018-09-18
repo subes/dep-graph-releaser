@@ -1002,8 +1002,8 @@
       tmp$ = possiblyRelativePublishJobUrl;
     }
      else {
-      if (!equals(window.location.protocol, 'https')) {
-        var message_0 = 'The host needs to use the https protocol if publishJob is defined as relative path';
+      if (!equals(window.location.protocol, 'https:')) {
+        var message_0 = 'The host needs to use the https protocol if publishJob is defined as relative path.';
         throw IllegalArgumentException_init(message_0.toString());
       }
       tmp$ = prefix + possiblyRelativePublishJobUrl;
