@@ -443,13 +443,13 @@ input:disabled {
     content: 'play_arrow';
 }
 .command.rePolling .state,
-.contextMenu .rePoll > .material-icons{
+.contextMenu .rePollContinue > .material-icons span::after {
     -moz-transform: scale(-1, 1);
     -webkit-transform: scale(-1, 1);
     transform: scale(-1, 1);
 }
 .command.rePolling > .fields > .state .material-icons span::after,
-.contextMenu .rePoll > .material-icons span::after {
+.contextMenu .rePollContinue > .material-icons span::after {
     content: 'reply';
 }
 
@@ -565,7 +565,7 @@ input:disabled {
 }
 .contextMenu .reTrigger > .material-icons,
 .contextMenu .succeededContinue > .material-icons,
-.contextMenu .rePoll > .material-icons {
+.contextMenu .rePollContinue > .material-icons {
     color: #e6930d;
 }
 .contextMenu .reTrigger > .material-icons{
@@ -580,6 +580,19 @@ input:disabled {
 }
 .contextMenu .succeededContinue > .material-icons span::after {
     margin-left: -21px;
+}
+
+.contextMenu .rePollContinue > .material-icons span::before {
+    content: 'play_arrow';
+    font-size: 10px;
+    margin-left: 9px;
+}
+.contextMenu .rePollContinue > .material-icons span::after{
+    display: inline-block;
+    height: 24px;
+    vertical-align: text-bottom;
+    margin-top: -4px;
+    margin-left: -16px;
 }
 
 #poweredBy,

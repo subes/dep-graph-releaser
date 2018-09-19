@@ -66,9 +66,9 @@ class ContextMenu(
                 title = "Forcibly sets the state of this command to ${CommandState.Succeeded::class.simpleName} and continues with the process. To be used with care.",
                 action = { transitionToSucceededIfOkAndContinue(project, index) }
             )
-            contextMenuEntryWithCssIcon(idPrefix, CONTEXT_MENU_COMMAND_RE_POLL,
-                text = "Re-Poll Command",
-                title = "Checks periodically again if the command ends without re-triggering it.",
+            contextMenuEntryWithCssIcon(idPrefix, CONTEXT_MENU_COMMAND_RE_POLL_CONTINUE,
+                text = "Re-Poll Command and Continue",
+                title = "Continues with the process by checking periodically again if the command ends.",
                 action = { rePollProject(project, index) }
             )
         }
@@ -310,7 +310,7 @@ class ContextMenu(
             "Can only set to Succeeded and continue if previously failed and process state is in progress."
         )
         disableOrEnableContextMenuEntry(
-            "$idPrefix$CONTEXT_MENU_COMMAND_RE_POLL",
+            "$idPrefix$CONTEXT_MENU_COMMAND_RE_POLL_CONTINUE",
             state != ReleaseState.IN_PROGRESS ||
                 commandState !is CommandState.Timeout,
             "Can only re-poll if previously timed out and process state is in progress."
@@ -373,7 +373,7 @@ class ContextMenu(
         private const val CONTEXT_MENU_COMMAND_SUCCEEDED = "succeeded"
         private const val CONTEXT_MENU_COMMAND_RE_TRIGGER = "reTrigger"
         private const val CONTEXT_MENU_COMMAND_SUCCEEDED_CONTINUE = "succeededContinue"
-        private const val CONTEXT_MENU_COMMAND_RE_POLL = "rePoll"
+        private const val CONTEXT_MENU_COMMAND_RE_POLL_CONTINUE = "rePollContinue"
         private const val CSS_DISABLED = "disabled"
     }
 }
