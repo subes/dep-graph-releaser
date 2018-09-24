@@ -83,10 +83,13 @@ private fun mapCommandStates(
             is CommandState.Queueing -> recoverStateQueueing(
                 modifiableState, jenkinsBaseUrl, project, command, lazyProjectJson, index
             )
-            is CommandState.InProgress -> recoverStateTo(lazyProjectJson, index, CommandStateJson.State.RE_POLLING)
+            is CommandState.InProgress -> recoverStateTo(
+                lazyProjectJson, index, CommandStateJson.State.READY_TO_RE_POLL
+            )
 
             is CommandState.Waiting,
             is CommandState.ReadyToReTrigger,
+            is CommandState.ReadyToRePoll,
             is CommandState.StillQueueing,
             is CommandState.RePolling,
             is CommandState.Succeeded,
@@ -122,22 +125,12 @@ private fun recoverStateQueueing(
     return issueCrumb(jenkinsBaseUrl, usernameAndApiToken).then { authData ->
         val jobExecutionData = recoverJobExecutionData(modifiableState, project, command)
         val nullableQueuedItemUrl = command.buildUrl
-        recoverToStillQueueingOrRePolling(nullableQueuedItemUrl, authData, jobExecutionData, lazyProjectJson, index)
+        recoverToStillQueueingOrReadyToRePoll(nullableQueuedItemUrl, authData, jobExecutionData, lazyProjectJson, index)
             .catch { t ->
                 showThrowable(IllegalStateException("job ${jobExecutionData.jobName} could not be recovered", t))
                 recoverStateTo(lazyProjectJson, index, CommandStateJson.State.FAILED)
             }
     }
-}
-
-private fun updateBuildUrlAndTransitionToRePolling(
-    jobExecutionData: JobExecutionData,
-    lazyProjectJson: ProjectJson,
-    index: Int,
-    buildNumber: Int
-): Promise<*> {
-    lazyProjectJson.commands[index].p.asDynamic().buildUrl = jobExecutionData.jobBaseUrl + buildNumber
-    return recoverStateTo(lazyProjectJson, index, CommandStateJson.State.RE_POLLING)
 }
 
 private fun recoverJobExecutionData(
@@ -152,7 +145,7 @@ private fun recoverJobExecutionData(
     return jobExecutionDataFactory.create(project, command)
 }
 
-private fun recoverToStillQueueingOrRePolling(
+private fun recoverToStillQueueingOrReadyToRePoll(
     nullableQueuedItemUrl: String?,
     authData: AuthData,
     jobExecutionData: JobExecutionData,
@@ -169,15 +162,25 @@ private fun recoverToStillQueueingOrRePolling(
             )
             is RecoveredBuildNumber.Undetermined -> {
                 BuildHistoryBasedBuildNumberExtractor(authData, jobExecutionData)
-                    .extract().then { buildNumber ->
-                        updateBuildUrlAndTransitionToRePolling(
-                            jobExecutionData, lazyProjectJson, index, buildNumber
-                        )
+                    .extract()
+                    .then { buildNumber ->
+                        updateBuildUrlAndTransitionToRePolling(jobExecutionData, lazyProjectJson, index, buildNumber)
                     }
             }
         }
     }
 }
+
+private fun updateBuildUrlAndTransitionToRePolling(
+    jobExecutionData: JobExecutionData,
+    lazyProjectJson: ProjectJson,
+    index: Int,
+    buildNumber: Int
+): Promise<*> {
+    lazyProjectJson.commands[index].p.asDynamic().buildUrl = jobExecutionData.jobBaseUrl + buildNumber
+    return recoverStateTo(lazyProjectJson, index, CommandStateJson.State.READY_TO_RE_POLL)
+}
+
 
 private fun recoverBuildNumberFromQueue(
     nullableQueuedItemUrl: String?,

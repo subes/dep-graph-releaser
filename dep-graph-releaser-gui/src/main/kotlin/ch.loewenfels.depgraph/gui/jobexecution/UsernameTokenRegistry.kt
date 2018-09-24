@@ -59,7 +59,7 @@ object UsernameTokenRegistry {
     }
 
     private fun errorHandling(urlWithoutSlash: String, t: Throwable): Nothing? {
-        showThrowable(Error("Could not retrieve user and API token for $urlWithoutSlash", t))
+        showThrowable(Error("Could not verify login (and retrieve user) for $urlWithoutSlash", t))
         return null
     }
 
