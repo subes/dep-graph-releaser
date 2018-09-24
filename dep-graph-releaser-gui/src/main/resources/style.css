@@ -409,12 +409,14 @@ input:disabled {
     content: 'playlist_play';
 }
 
-.command.readyToRePoll > .fields > .state .material-icons span::before{
+.command.readyToRePoll > .fields > .state .material-icons span::before,
+.contextMenu .rePoll > .material-icons span::before {
     display: inline-block;
     font-size: 14px;
     margin-left: 9px;
 }
-.command.readyToRePoll > .fields > .state .material-icons span::after{
+.command.readyToRePoll > .fields > .state .material-icons span::after,
+.contextMenu .rePoll > .material-icons span::after {
     content: 'list';
     display: inline-block;
     height: 25px;
@@ -463,12 +465,15 @@ input:disabled {
 }
 
 .command.readyToRePoll .state .material-icons span::before,
+.contextMenu .rePoll > .material-icons span::before,
 .command.rePolling .state,
 .contextMenu .rePollContinue > .material-icons span::after {
     -moz-transform: scale(-1, 1);
     -webkit-transform: scale(-1, 1);
     transform: scale(-1, 1);
 }
+.command.readyToRePoll .state .material-icons span::before,
+.contextMenu .rePoll > .material-icons span::before,
 .command.rePolling > .fields > .state .material-icons span::after,
 .contextMenu .rePollContinue > .material-icons span::after {
     content: 'reply';
@@ -575,7 +580,8 @@ input:disabled {
 .contextMenu .succeeded .material-icons {
     color: #008000;
 }
-.contextMenu .deactivated .material-icons {
+.contextMenu .deactivated .material-icons,
+ .contextMenu .rePoll .material-icons {
     color: #666;
 }
 .contextMenu .deactivated > .material-icons span::after {
