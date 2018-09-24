@@ -63,7 +63,7 @@ class Toggler(private val modifiableState: ModifiableState, private val menu: Me
             Pipeline.changeStateOfCommand(project, index, oldState.previous)
             slider.title = "Click to deactivate command."
         }
-        menu.activateSaveButton()
+        menu.activateSaveButtonAndDeactivateOthers()
     }
 
     private fun disallowClickIfNotAllCommandsOrSubmodulesActive(project: Project, toggle: HTMLInputElement) {

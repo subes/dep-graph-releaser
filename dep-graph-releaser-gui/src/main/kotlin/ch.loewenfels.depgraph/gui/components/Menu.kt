@@ -157,7 +157,7 @@ class Menu(
     }
 
     private fun initSaveAndDownloadButton(downloader: Downloader, processStarter: ProcessStarter?) {
-        deactivateSaveButton()
+        deactivateSaveButtonAndReactivateOthers()
         if (processStarter != null) {
             saveButton.addClickEventListenerIfNotDeactivatedNorDisabled {
                 save(processStarter)
@@ -390,7 +390,7 @@ class Menu(
         this.setTitleSaveOld(reason)
     }
 
-    private fun deactivateSaveButton() {
+    private fun deactivateSaveButtonAndReactivateOthers() {
         saveButton.deactivate("Nothing to save, no changes were made")
         listOf(dryRunButton, releaseButton, exploreButton).forEach {
             val oldTitle = it.getOldTitleOrNull()
@@ -401,7 +401,7 @@ class Menu(
         }
     }
 
-    fun activateSaveButton() {
+    fun activateSaveButtonAndDeactivateOthers() {
         if (saveButton.isDisabled()) return
 
         saveButton.removeClass(DEACTIVATED)
@@ -444,7 +444,7 @@ class Menu(
     }
 
     private fun save(processStarter: ProcessStarter?): Promise<Unit> {
-        deactivateSaveButton()
+        saveButton.deactivate("Save in progress, please wait for the publish job to complete.")
         val nonNullProcessStarter = processStarter ?: showThrowableAndThrow(
             IllegalStateException(
                 "Save button should not be activated if no publish job url was specified." +
@@ -453,6 +453,13 @@ class Menu(
         )
         return nonNullProcessStarter.publishChanges(verbose = true).then { hadChanges ->
             if (!hadChanges) showInfo("Seems like all changes have been reverted manually. Will not save anything.")
+        }.finally { unit ->
+            val noError = unit != null
+            if (noError) {
+                deactivateSaveButtonAndReactivateOthers()
+            } else {
+                activateSaveButtonAndDeactivateOthers()
+            }
         }
     }
 

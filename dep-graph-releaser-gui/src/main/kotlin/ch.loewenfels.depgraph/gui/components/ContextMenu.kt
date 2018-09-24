@@ -149,14 +149,14 @@ class ContextMenu(
                 ).then { setAllToSucceeded ->
                     if (setAllToSucceeded) {
                         transitionAllCommandsToSucceeded(project)
-                        menu.activateSaveButton()
+                        menu.activateSaveButtonAndDeactivateOthers()
                     }
                 }
                 return
             }
         }
         transitionToSucceededWithoutCheck(project, index)
-        menu.activateSaveButton()
+        menu.activateSaveButtonAndDeactivateOthers()
     }
 
     private fun transitionAllCommandsToSucceeded(project: Project) {
