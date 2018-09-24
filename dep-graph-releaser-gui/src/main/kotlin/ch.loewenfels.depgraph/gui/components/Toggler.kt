@@ -5,9 +5,9 @@ import ch.loewenfels.depgraph.data.Project
 import ch.loewenfels.depgraph.data.ReleaseCommand
 import ch.loewenfels.depgraph.gui.addChangeEventListener
 import ch.loewenfels.depgraph.gui.addClickEventListener
+import ch.loewenfels.depgraph.gui.components.Messages.Companion.showInfo
 import ch.loewenfels.depgraph.gui.elementById
 import ch.loewenfels.depgraph.gui.serialization.ModifiableState
-import ch.loewenfels.depgraph.gui.showInfo
 import ch.tutteli.kbox.mapWithIndex
 import org.w3c.dom.CustomEvent
 import org.w3c.dom.CustomEventInit

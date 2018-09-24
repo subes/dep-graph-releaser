@@ -8,7 +8,7 @@ import ch.loewenfels.depgraph.data.maven.jenkins.JenkinsSingleMavenReleaseComman
 import ch.loewenfels.depgraph.data.maven.jenkins.JenkinsUpdateDependency
 import ch.loewenfels.depgraph.data.serialization.CommandStateJson
 import ch.loewenfels.depgraph.data.serialization.fromJson
-import ch.loewenfels.depgraph.gui.showWarning
+import ch.loewenfels.depgraph.gui.components.Messages.Companion.showWarning
 
 fun deserialize(body: String): ReleasePlan {
     val releasePlanJson = JSON.parse<ReleasePlanJson>(body)

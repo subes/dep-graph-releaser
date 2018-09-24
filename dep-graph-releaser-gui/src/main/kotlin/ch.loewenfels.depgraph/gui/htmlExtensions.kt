@@ -1,5 +1,6 @@
 package ch.loewenfels.depgraph.gui
 
+import ch.loewenfels.depgraph.gui.components.Messages.Companion.showThrowableAndThrow
 import ch.loewenfels.depgraph.gui.jobexecution.GITHUB_NEW_ISSUE
 import kotlinx.html.HTMLTag
 import org.w3c.dom.HTMLElement
