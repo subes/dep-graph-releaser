@@ -681,6 +681,12 @@ input:disabled {
     margin-top: -4px;
 }
 
+#messages .timestamp {
+    margin-top: -1px;
+    font-size: 10px;
+    float: right;
+    margin-right: 30px;
+}
 #messages .text {
     padding-left: 33px;
 }

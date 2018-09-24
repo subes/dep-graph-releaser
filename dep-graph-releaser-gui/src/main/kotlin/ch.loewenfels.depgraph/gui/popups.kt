@@ -7,6 +7,7 @@ import kotlinx.html.js.div
 import org.w3c.dom.HTMLElement
 import kotlin.browser.document
 import kotlin.browser.window
+import kotlin.js.Date
 import kotlin.js.Promise
 
 fun showSuccess(message: String, autoCloseAfterMs: Int? = null) =
@@ -31,6 +32,11 @@ private fun showMessageOfType(type: String, icon: String, message: String, autoC
             val span = getUnderlyingHtmlElement()
             span.addEventListener("click", { closeMessage(msgId) })
         }
+        div("timestamp") {
+            val now = Date()
+            +"${now.getFullYear().toString().substring(2)}-${padWithZero(now.getMonth() + 1)}-${padWithZero(now.getDay())} "
+            +"${now.getHours()}:${padWithZero(now.getMinutes())}:${padWithZero(now.getSeconds())}"
+        }
         i("material-icons") {
             +icon
         }
@@ -45,6 +51,8 @@ private fun showMessageOfType(type: String, icon: String, message: String, autoC
     messages.insertBefore(div, hideMessagesButton.nextSibling)
     return div
 }
+
+private fun padWithZero(int: Int) = int.toString().padStart(2, '0')
 
 private fun closeMessage(msgId: String) {
     elementByIdOrNull<HTMLElement>(msgId)?.remove()
