@@ -254,6 +254,7 @@ class Menu(
 
     private fun triggerProcess(action: () -> Promise<Boolean>): Promise<*> {
         dispatchProcessStart()
+        Messages.putMessagesInHolder(Pipeline.getTypeOfRun())
         if (Pipeline.getReleaseState() === ReleaseState.SUCCEEDED) {
             dispatchProcessContinue()
         }

@@ -1,10 +1,13 @@
 package ch.loewenfels.depgraph.gui.components
 
 import ch.loewenfels.depgraph.data.ReleasePlan
+import ch.loewenfels.depgraph.data.TypeOfRun
+import ch.loewenfels.depgraph.data.toProcessName
 import ch.loewenfels.depgraph.gui.*
 import kotlinx.html.*
 import kotlinx.html.dom.create
 import kotlinx.html.js.div
+import org.w3c.dom.HTMLDivElement
 import org.w3c.dom.HTMLElement
 import org.w3c.dom.asList
 import kotlin.browser.document
@@ -38,6 +41,34 @@ class Messages(releasePlan: ReleasePlan) {
     companion object {
         private const val MESSAGES_ID = "messages"
 
+        fun putMessagesInHolder(lastProcess: TypeOfRun) {
+            val messagesDiv = elementById(MESSAGES_ID)
+            val messages = getMessages(messagesDiv)
+            if (messages.isNotEmpty()) {
+                val holderId = nextMessageId()
+                val timestamp = (messages[0].childNodes.asList()
+                    .find { it is HTMLDivElement && it.className == "timestamp" } as HTMLDivElement).innerText
+
+                val holder = document.create.div("holder") {
+                    id = holderId
+                    appendClose(holderId)
+                    +"Click here to see messages of a previous '${lastProcess.toProcessName()}' process - last message with timestamp $timestamp"
+                    title = "Click to see the messages of a previous process."
+                    getUnderlyingHtmlElement().addClickOnceEventListener {
+                        val holder = elementById(holderId)
+                        getMessages(holder).forEach { messagesDiv.insertBefore(it, holder) }
+                        messagesDiv.removeChild(holder)
+                    }
+                }
+                holder.className = "holder"
+                messagesDiv.insertBefore(holder, messages[0])
+                messages.forEach { holder.appendChild(it) }
+            }
+        }
+
+        private fun getMessages(node: HTMLElement) =
+            node.childNodes.asList().filter { it is HTMLDivElement && it.className != "holder" }
+
         fun showSuccess(message: String, autoCloseAfterMs: Int? = null) =
             showMessageOfType("success", "check_circle", message, autoCloseAfterMs)
 
@@ -58,13 +89,9 @@ class Messages(releasePlan: ReleasePlan) {
         ): HTMLElement {
             val messages = elementById(MESSAGES_ID)
             val div = document.create.div(type) {
-                val msgId = "msg${msgCounter++}"
+                val msgId = nextMessageId()
                 this.id = msgId
-                span("close") {
-                    title = "close this message"
-                    val span = getUnderlyingHtmlElement()
-                    span.addEventListener("click", { closeMessage(msgId) })
-                }
+                appendClose(msgId)
                 div("timestamp") {
                     val now = Date()
                     +"${now.getFullYear().toString().substring(2)}-${padWithZero(now.getMonth() + 1)}-${padWithZero(now.getDay())} "
@@ -83,6 +110,16 @@ class Messages(releasePlan: ReleasePlan) {
             val hideMessagesButton = elementById(ContentContainer.HIDE_MESSAGES_HTML_ID)
             messages.insertBefore(div, hideMessagesButton.nextSibling)
             return div
+        }
+
+        private fun nextMessageId() = "msg${msgCounter++}"
+
+        private fun DIV.appendClose(msgId: String) {
+            span("close") {
+                title = "close this message"
+                val span = getUnderlyingHtmlElement()
+                span.addEventListener("click", { closeMessage(msgId) })
+            }
         }
 
         private fun padWithZero(int: Int) = int.toString().padStart(2, '0')

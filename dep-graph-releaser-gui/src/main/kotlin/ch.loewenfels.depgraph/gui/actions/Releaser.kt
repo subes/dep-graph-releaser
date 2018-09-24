@@ -430,7 +430,6 @@ class Releaser(
                 result
             }
         } else {
-            console.log("wait for lock of project $projectId")
             lock.then {
                 withLockForProject(projectId, act)
             }.unwrapPromise()

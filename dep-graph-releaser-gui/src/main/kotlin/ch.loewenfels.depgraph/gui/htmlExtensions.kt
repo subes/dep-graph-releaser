@@ -24,6 +24,9 @@ fun HTMLTag.getUnderlyingHtmlElement(): HTMLElement {
     return arr[arr.size - 1]
 }
 
+fun HTMLElement.addClickOnceEventListener(options: dynamic = js("{once: true}"), action: (Event) -> Any) =
+    addClickEventListener(options, action)
+
 fun HTMLElement.addClickEventListener(options: dynamic = js("({})"), action: (Event) -> Any) {
     this.addEventListener("click", { withErrorHandling(it, action) }, options)
 }
