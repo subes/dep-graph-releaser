@@ -381,6 +381,7 @@ input:disabled {
 
 .command.ready > .fields > .toggle,
 .command.readyToReTrigger > .fields > .toggle,
+.command.readyToRePoll > .fields > .toggle,
 .command.queueing > .fields > .toggle,
 .command.rePolling > .fields > .toggle,
 .command.inProgress > .fields > .toggle,
@@ -392,6 +393,7 @@ input:disabled {
 }
 .command.ready > .fields > .state,
 .command.readyToReTrigger > .fields > .state,
+.command.readyToRePoll > .fields > .state,
 .command.queueing > .fields > .state,
 .command.rePolling > .fields > .state,
 .command.inProgress > .fields > .state,
@@ -405,6 +407,23 @@ input:disabled {
 .command.readyToReTrigger > .fields > .state .material-icons span::after,
 .contextMenu .reTrigger > .material-icons span::after {
     content: 'playlist_play';
+}
+
+.command.readyToRePoll > .fields > .state .material-icons span::before{
+    display: inline-block;
+    font-size: 14px;
+    margin-left: 9px;
+}
+.command.readyToRePoll > .fields > .state .material-icons span::after{
+    content: 'list';
+    display: inline-block;
+    height: 25px;
+    vertical-align: text-bottom;
+    margin-top: -4px;
+    margin-left: -26px;
+    font-size: 24px;
+    -webkit-clip-path: polygon(80% 0, 80% 55%, 61% 55%, 65% 100%, 25% 80%, 25% 0);
+    clip-path: polygon(80% 0, 80% 55%, 61% 55%, 65% 100%, 25% 80%, 25% 0);
 }
 
 .command.queueing > .fields > .state {
@@ -442,6 +461,8 @@ input:disabled {
 .command.inProgress > .fields > .state .material-icons span::after {
     content: 'play_arrow';
 }
+
+.command.readyToRePoll .state .material-icons span::before,
 .command.rePolling .state,
 .contextMenu .rePollContinue > .material-icons span::after {
     -moz-transform: scale(-1, 1);

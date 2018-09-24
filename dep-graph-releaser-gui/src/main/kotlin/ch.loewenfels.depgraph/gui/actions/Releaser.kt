@@ -234,10 +234,11 @@ class Releaser(
         return when (state) {
             is CommandState.Ready, is CommandState.ReadyToReTrigger -> triggerCommand(paramObject, command, index)
             is CommandState.StillQueueing -> rePollQueueing(paramObject, command, index)
-            is CommandState.RePolling -> rePollCommand(paramObject, command, index)
+            is CommandState.ReadyToRePoll -> rePollCommand(paramObject, command, index)
 
             is CommandState.Queueing,
-            is CommandState.InProgress -> throw IllegalStateException(
+            is CommandState.InProgress,
+            is CommandState.RePolling -> throw IllegalStateException(
                 "Seems like locking did not work properly, invalid state. Please report a bug $GITHUB_NEW_ISSUE" +
                     Pipeline.failureDiagnosticsStateTransition(
                         paramObject.project, index, state, Pipeline.getCommandId(paramObject.project, index)
@@ -283,6 +284,7 @@ class Releaser(
         val buildUrl = command.buildUrl
             ?: throw IllegalStateException("We do not know how to re-poll a Jenkins command if it does not have a specified build url.\nGiven Command: $command")
 
+        Pipeline.changeStateOfCommandAndAddBuildUrlIfSet(paramObject.project, index, CommandState.RePolling, buildUrl)
         val jobExecutionData = paramObject.jobExecutionDataFactory.create(paramObject.project, command)
         val buildNumber = extractBuildNumberFromUrl(buildUrl, jobExecutionData, paramObject.project, index)
         return paramObject.jobExecutor.rePoll(

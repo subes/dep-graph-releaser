@@ -264,7 +264,8 @@ class Pipeline(private val modifiableState: ModifiableState, private val menu: M
 
         private const val STATE_WAITING = "Wait for dependent projects to complete."
         private const val STATE_READY = "Ready to be queued for execution."
-        private const val STATE_READY_TO_BE_TRIGGER = "Ready to be re-scheduled"
+        private const val STATE_READY_TO_BE_TRIGGER = "Ready to be re-scheduled."
+        private const val STATE_READY_TO_RE_POLL = "Ready to be re-polled."
         private const val STATE_QUEUEING = "Currently queueing the job."
         private const val STATE_RE_POLLING = "Job is being re-polled."
         private const val STATE_IN_PROGRESS = "Job is running."
@@ -378,6 +379,7 @@ class Pipeline(private val modifiableState: ModifiableState, private val menu: M
             is CommandState.Waiting -> "waiting"
             CommandState.Ready -> "ready"
             CommandState.ReadyToReTrigger -> "readyToReTrigger"
+            CommandState.ReadyToRePoll -> "readyToRePoll"
             CommandState.Queueing,
             CommandState.StillQueueing -> "queueing"
             CommandState.RePolling -> "rePolling"
@@ -393,6 +395,7 @@ class Pipeline(private val modifiableState: ModifiableState, private val menu: M
             is CommandState.Waiting -> STATE_WAITING
             CommandState.Ready -> STATE_READY
             CommandState.ReadyToReTrigger -> STATE_READY_TO_BE_TRIGGER
+            CommandState.ReadyToRePoll -> STATE_READY_TO_RE_POLL
             CommandState.Queueing,
             CommandState.StillQueueing -> STATE_QUEUEING
             CommandState.RePolling -> STATE_RE_POLLING
