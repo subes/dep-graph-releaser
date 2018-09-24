@@ -4,15 +4,15 @@ import ch.loewenfels.depgraph.data.*
 import ch.loewenfels.depgraph.data.maven.jenkins.JenkinsCommand
 import ch.loewenfels.depgraph.data.serialization.CommandStateJson
 import ch.loewenfels.depgraph.gui.App
+import ch.loewenfels.depgraph.gui.components.Messages.Companion.showInfo
+import ch.loewenfels.depgraph.gui.components.Messages.Companion.showThrowable
 import ch.loewenfels.depgraph.gui.jobexecution.*
 import ch.loewenfels.depgraph.gui.jobexecution.BuilderNumberExtractor.Companion.numberRegex
 import ch.loewenfels.depgraph.gui.serialization.ModifiableState
 import ch.loewenfels.depgraph.gui.serialization.ProjectJson
 import ch.loewenfels.depgraph.gui.serialization.ReleasePlanJson
 import ch.loewenfels.depgraph.gui.serialization.deserializeProjectId
-import ch.loewenfels.depgraph.gui.showDialog
-import ch.loewenfels.depgraph.gui.showInfo
-import ch.loewenfels.depgraph.gui.showThrowable
+import ch.loewenfels.depgraph.gui.components.showDialog
 import kotlin.browser.window
 import kotlin.js.*
 

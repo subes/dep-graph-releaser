@@ -8,7 +8,11 @@ import ch.loewenfels.depgraph.generateListOfDependentsWithoutSubmoduleAndExclude
 import ch.loewenfels.depgraph.gui.*
 import ch.loewenfels.depgraph.gui.ContentContainer.Companion.RELEASE_ID_HTML_ID
 import ch.loewenfels.depgraph.gui.actions.Downloader
-import ch.loewenfels.depgraph.gui.components.Pipeline.Companion.stateToTitle
+import ch.loewenfels.depgraph.gui.components.Messages.Companion.showError
+import ch.loewenfels.depgraph.gui.components.Messages.Companion.showInfo
+import ch.loewenfels.depgraph.gui.components.Messages.Companion.showSuccess
+import ch.loewenfels.depgraph.gui.components.Messages.Companion.showThrowableAndThrow
+import ch.loewenfels.depgraph.gui.components.Messages.Companion.showWarning
 import ch.loewenfels.depgraph.gui.jobexecution.*
 import ch.loewenfels.depgraph.gui.serialization.ModifiableState
 import ch.loewenfels.depgraph.gui.serialization.deserialize
@@ -250,6 +254,7 @@ class Menu(
 
     private fun triggerProcess(action: () -> Promise<Boolean>): Promise<*> {
         dispatchProcessStart()
+        Messages.putMessagesInHolder(Pipeline.getTypeOfRun())
         if (Pipeline.getReleaseState() === ReleaseState.SUCCEEDED) {
             dispatchProcessContinue()
         }

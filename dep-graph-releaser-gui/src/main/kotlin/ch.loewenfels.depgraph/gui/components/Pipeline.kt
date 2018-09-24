@@ -6,13 +6,13 @@ import ch.loewenfels.depgraph.data.maven.jenkins.JenkinsCommand
 import ch.loewenfels.depgraph.data.maven.jenkins.JenkinsMultiMavenReleasePlugin
 import ch.loewenfels.depgraph.data.maven.jenkins.JenkinsSingleMavenReleaseCommand
 import ch.loewenfels.depgraph.data.maven.jenkins.JenkinsUpdateDependency
+import ch.loewenfels.depgraph.gui.components.Messages.Companion.showError
 import ch.loewenfels.depgraph.gui.elementById
 import ch.loewenfels.depgraph.gui.getCheckbox
 import ch.loewenfels.depgraph.gui.getUnderlyingHtmlElement
 import ch.loewenfels.depgraph.gui.jobexecution.GITHUB_NEW_ISSUE
 import ch.loewenfels.depgraph.gui.jobexecution.ProcessStarter
 import ch.loewenfels.depgraph.gui.serialization.ModifiableState
-import ch.loewenfels.depgraph.gui.showError
 import ch.loewenfels.depgraph.hasNextOnTheSameLevel
 import ch.tutteli.kbox.toPeekingIterator
 import kotlinx.html.*

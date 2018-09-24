@@ -681,28 +681,34 @@ input:disabled {
     margin-top: -4px;
 }
 
+#messages .timestamp {
+    margin-top: -1px;
+    font-size: 10px;
+    float: right;
+    margin-right: 30px;
+}
 #messages .text {
     padding-left: 33px;
 }
 
-#messages > .error {
+#messages .error {
     border-color: #a01c1c;
     background-color: #f7dede;
     color: #a01c1c;
     font-size: 1.2em;
 }
-#messages > .error .material-icons {
+#messages .error .material-icons {
     color: #a01c1c;
 }
 
-#messages > .warning {
+#messages .warning {
     border-color: #d6c500;
     background-color: #fdfcd1;
     color: #272525;
     font-size: 1.1em;
 }
 
-#messages > .warning .material-icons {
+#messages .warning .material-icons {
     color: #caa900;
 }
 
@@ -713,14 +719,14 @@ input:disabled {
     border-color: #caa900;
 }
 
-#messages > .info {
+#messages .info {
     border-color: #a3a3ff;
     background-color: #dae0ff;
     color: #272525;
     font-size: 1em;
 }
 
-#messages > .info .material-icons {
+#messages .info .material-icons {
     color: #5454d4;
 }
 
@@ -731,14 +737,14 @@ input:disabled {
     border-color: #5454d4;
 }
 
-#messages > .success {
+#messages .success {
     border-color: #008000;
     background-color: #c9fdc9;
     color: #272525;
     font-size: 1em;
 }
 
-#messages > .success .material-icons {
+#messages .success .material-icons {
     color: #008000;
 }
 
@@ -770,6 +776,15 @@ input:disabled {
 }
 .close:after {
     transform: rotate(-45deg);
+}
+
+#messages .holder {
+    background-color: #DDD;
+    border-color: #999;
+    cursor: pointer;
+}
+#messages .holder > div {
+    display: none;
 }
 
 

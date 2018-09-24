@@ -1,5 +1,6 @@
 package ch.loewenfels.depgraph.gui
 
+import ch.loewenfels.depgraph.gui.components.Messages.Companion.showThrowableAndThrow
 import ch.loewenfels.depgraph.gui.jobexecution.GITHUB_NEW_ISSUE
 import kotlinx.html.HTMLTag
 import org.w3c.dom.HTMLElement
@@ -22,6 +23,9 @@ fun HTMLTag.getUnderlyingHtmlElement(): HTMLElement {
     val arr = d.path_0.toArray() as Array<HTMLElement>
     return arr[arr.size - 1]
 }
+
+fun HTMLElement.addClickOnceEventListener(options: dynamic = js("{once: true}"), action: (Event) -> Any) =
+    addClickEventListener(options, action)
 
 fun HTMLElement.addClickEventListener(options: dynamic = js("({})"), action: (Event) -> Any) {
     this.addEventListener("click", { withErrorHandling(it, action) }, options)

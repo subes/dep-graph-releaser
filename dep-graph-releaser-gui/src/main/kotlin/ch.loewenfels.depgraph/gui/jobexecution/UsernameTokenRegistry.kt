@@ -1,6 +1,6 @@
 package ch.loewenfels.depgraph.gui.jobexecution
 
-import ch.loewenfels.depgraph.gui.showThrowable
+import ch.loewenfels.depgraph.gui.components.Messages.Companion.showThrowable
 import org.w3c.fetch.Response
 import kotlin.browser.window
 import kotlin.js.Promise

@@ -7,6 +7,7 @@ import ch.loewenfels.depgraph.gui.actions.Publisher
 import ch.loewenfels.depgraph.gui.actions.Releaser
 import ch.loewenfels.depgraph.gui.components.Loader
 import ch.loewenfels.depgraph.gui.components.Menu
+import ch.loewenfels.depgraph.gui.components.Messages.Companion.showThrowableAndThrow
 import ch.loewenfels.depgraph.gui.jobexecution.*
 import ch.loewenfels.depgraph.gui.recovery.recover
 import ch.loewenfels.depgraph.gui.serialization.ModifiableState

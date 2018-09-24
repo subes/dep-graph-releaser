@@ -3,10 +3,9 @@ package ch.loewenfels.depgraph.gui
 import ch.loewenfels.depgraph.ConfigKey
 import ch.loewenfels.depgraph.data.ReleasePlan
 import ch.loewenfels.depgraph.data.maven.MavenProjectId
-import ch.loewenfels.depgraph.gui.components.Menu
-import ch.loewenfels.depgraph.gui.components.Pipeline
-import ch.loewenfels.depgraph.gui.components.textAreaWithLabel
-import ch.loewenfels.depgraph.gui.components.textFieldWithLabel
+import ch.loewenfels.depgraph.gui.components.*
+import ch.loewenfels.depgraph.gui.components.Messages.Companion.showInfo
+import ch.loewenfels.depgraph.gui.components.Messages.Companion.showWarning
 import ch.loewenfels.depgraph.gui.jobexecution.ProcessStarter
 import ch.loewenfels.depgraph.gui.serialization.ModifiableState
 import kotlinx.html.DIV
@@ -16,33 +15,14 @@ import org.w3c.dom.asList
 import kotlin.browser.document
 
 class ContentContainer(modifiableState: ModifiableState, private val menu: Menu, processStarter: ProcessStarter?) {
-
     init {
         val releasePlan = modifiableState.releasePlan
         val rootProjectId = releasePlan.rootProjectId
         val htmlTitle = (rootProjectId as? MavenProjectId)?.artifactId ?: rootProjectId.identifier
         document.title = "Release $htmlTitle"
-        releasePlan.warnings.forEach { showWarning(it) }
-        setInfoBubble(releasePlan.infos)
+        Messages(releasePlan)
         setUpConfig(releasePlan)
         Pipeline(modifiableState, menu, processStarter)
-    }
-
-    private fun setInfoBubble(messages: List<String>) {
-        if (messages.isNotEmpty()) {
-            val minimized = elementById("infosMinimized")
-            minimized.style.display = "block"
-            minimized.addEventListener("click", {
-                minimized.style.display = "none"
-                messages.forEach { showInfo(it) }
-            })
-        }
-        val messagesDiv = elementById("messages")
-        elementById(HIDE_MESSAGES_HTML_ID).addClickEventListener {
-            document.querySelectorAll("#messages > div")
-                .asList()
-                .forEach { messagesDiv.removeChild(it) }
-        }
     }
 
     private fun setUpConfig(releasePlan: ReleasePlan) {

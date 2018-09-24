@@ -1,6 +1,8 @@
 package ch.loewenfels.depgraph.gui.actions
 
 import ch.loewenfels.depgraph.gui.*
+import ch.loewenfels.depgraph.gui.components.Messages.Companion.showSuccess
+import ch.loewenfels.depgraph.gui.components.Messages.Companion.showWarning
 import ch.loewenfels.depgraph.gui.jobexecution.*
 import ch.loewenfels.depgraph.gui.serialization.ModifiableState
 import kotlin.browser.window

@@ -1,6 +1,7 @@
 package ch.loewenfels.depgraph.gui.jobexecution
 
 import ch.loewenfels.depgraph.gui.*
+import ch.loewenfels.depgraph.gui.components.Messages.Companion.showInfo
 import org.w3c.fetch.Response
 import kotlin.browser.window
 import kotlin.js.Promise

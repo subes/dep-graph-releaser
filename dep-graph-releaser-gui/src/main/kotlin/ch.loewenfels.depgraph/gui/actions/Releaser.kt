@@ -3,6 +3,9 @@ package ch.loewenfels.depgraph.gui.actions
 import ch.loewenfels.depgraph.data.*
 import ch.loewenfels.depgraph.data.maven.jenkins.JenkinsCommand
 import ch.loewenfels.depgraph.gui.*
+import ch.loewenfels.depgraph.gui.components.Messages.Companion.showError
+import ch.loewenfels.depgraph.gui.components.Messages.Companion.showThrowable
+import ch.loewenfels.depgraph.gui.components.Messages.Companion.showWarning
 import ch.loewenfels.depgraph.gui.components.Pipeline
 import ch.loewenfels.depgraph.gui.jobexecution.*
 import ch.loewenfels.depgraph.gui.serialization.ModifiableState
@@ -427,7 +430,6 @@ class Releaser(
                 result
             }
         } else {
-            console.log("wait for lock of project $projectId")
             lock.then {
                 withLockForProject(projectId, act)
             }.unwrapPromise()
