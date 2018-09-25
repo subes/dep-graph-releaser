@@ -13,6 +13,7 @@ import ch.loewenfels.depgraph.gui.recovery.recover
 import ch.loewenfels.depgraph.gui.serialization.ModifiableState
 import ch.loewenfels.depgraph.parseRemoteRegex
 import org.w3c.fetch.Response
+import org.w3c.notifications.Notification
 import kotlin.browser.window
 import kotlin.js.Promise
 
@@ -86,13 +87,11 @@ class App {
                     promise
                 }.then { modifiableState ->
                     Loader.updateToLoadPipeline()
-                    val processStarter = createProcessStarter(
-                        defaultJenkinsBaseUrl, publishJobUrl, modifiableState
-                    )
+                    val processStarter = createProcessStarter(defaultJenkinsBaseUrl, publishJobUrl, modifiableState)
                     ContentContainer(modifiableState, menu, processStarter)
-
                     menu.initDependencies(Downloader(modifiableState), modifiableState, processStarter)
                     switchLoaderWithPipeline()
+                    Notification.requestPermission()
                 }
                 .catch {
                     showThrowableAndThrow(it)

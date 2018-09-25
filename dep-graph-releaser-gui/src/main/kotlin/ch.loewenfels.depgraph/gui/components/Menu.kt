@@ -16,11 +16,11 @@ import ch.loewenfels.depgraph.gui.components.Messages.Companion.showWarning
 import ch.loewenfels.depgraph.gui.jobexecution.*
 import ch.loewenfels.depgraph.gui.serialization.ModifiableState
 import ch.loewenfels.depgraph.gui.serialization.deserialize
-import org.w3c.dom.CustomEvent
-import org.w3c.dom.CustomEventInit
-import org.w3c.dom.HTMLElement
-import org.w3c.dom.HTMLInputElement
+import org.w3c.dom.*
 import org.w3c.dom.events.Event
+import org.w3c.notifications.GRANTED
+import org.w3c.notifications.Notification
+import org.w3c.notifications.NotificationPermission
 import kotlin.browser.window
 import kotlin.dom.addClass
 import kotlin.dom.hasClass
@@ -214,6 +214,7 @@ class Menu(
                 } else {
                     ""
                 }
+                createNotification("DGR: $processName succeeded :)")
                 showSuccess(
                     """
                     |Process '$processName' ended successfully :) you can now close the window or continue with the process.
@@ -227,6 +228,7 @@ class Menu(
                 button.title = "Continue with the process '$processName'."
                 button.addClass(DEACTIVATED)
             } else {
+                createNotification("DGR: $processName failed :(")
                 showError(
                     """
                     |Process '$processName' ended with failure :(
@@ -237,6 +239,17 @@ class Menu(
                 )
                 buttonText.innerText = "Re-trigger failed Jobs"
                 button.title = "Continue with the process '$processName' by re-processing previously failed projects."
+            }
+        }
+    }
+
+    private fun createNotification(title: String) {
+        if (Notification.permission == NotificationPermission.GRANTED && !window.document.hasFocus()) {
+            val notification = Notification(title)
+            notification.onclick = {
+                js("parent.focus()")
+                window.focus()
+                notification.close()
             }
         }
     }
@@ -253,8 +266,9 @@ class Menu(
     }
 
     private fun triggerProcess(action: () -> Promise<Boolean>): Promise<*> {
-        dispatchProcessStart()
         Messages.putMessagesInHolder(Pipeline.getTypeOfRun())
+
+        dispatchProcessStart()
         if (Pipeline.getReleaseState() === ReleaseState.SUCCEEDED) {
             dispatchProcessContinue()
         }
