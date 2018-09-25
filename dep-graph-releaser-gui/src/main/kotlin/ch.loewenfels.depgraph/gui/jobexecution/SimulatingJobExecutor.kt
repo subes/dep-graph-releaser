@@ -106,7 +106,7 @@ class SimulatingJobExecutor : JobExecutor {
     }
 
     private fun checkIfNeedsToFail(jobExecutionData: JobExecutionData) {
-        if (count >= failAfterSteps) {
+        if (!jobExecutionData.jobName.startsWith("publish") && count >= failAfterSteps) {
             count = 0
             if (failWithTimeout) {
                 throw PollTimeoutException("simulated timeout for ${jobExecutionData.jobName}", "no body")
