@@ -24,10 +24,10 @@ object Orchestrator {
     fun analyseAndCreateJson(
         directoryToAnalyse: File,
         outputFile: File,
-        projectToRelease: MavenProjectId,
+        projectsToRelease: List<MavenProjectId>,
         releasePlanCreatorOptions: JenkinsReleasePlanCreator.Options
     ) {
-        val releasePlan = createReleasePlan(directoryToAnalyse, projectToRelease, releasePlanCreatorOptions)
+        val releasePlan = createReleasePlan(directoryToAnalyse, projectsToRelease, releasePlanCreatorOptions)
 
         logger.info("Going to serialize the release plan to a json file.")
         logIfFileExists(outputFile, "resulting json file")
@@ -39,16 +39,16 @@ object Orchestrator {
 
     private fun createReleasePlan(
         directoryToAnalyse: File,
-        rootProject: MavenProjectId,
+        rootProjects: List<MavenProjectId>,
         releasePlanCreatorOptions: JenkinsReleasePlanCreator.Options
     ): ReleasePlan {
         logger.info { "Going to analyse: ${directoryToAnalyse.absolutePath}" }
         val analyser = Analyser(directoryToAnalyse, Analyser.Options())
         logger.info { "Analysed ${analyser.getNumberOfProjects()} projects." }
 
-        logger.info("Going to create the release plan with ${rootProject.identifier} as root.")
+        logger.info("Going to create the release plan with ${rootProjects.joinToString { it.identifier }} as root.")
         val releasePlaner = JenkinsReleasePlanCreator(VersionDeterminer(), releasePlanCreatorOptions)
-        val releasePlan = releasePlaner.create(rootProject, analyser)
+        val releasePlan = releasePlaner.create(rootProjects, analyser)
         logger.info("Release plan created.")
         return releasePlan
     }
@@ -58,7 +58,7 @@ object Orchestrator {
         logger.info { "Going to analyse: ${directoryToAnalyse.absolutePath}" }
         val analyser = Analyser(directoryToAnalyse, Analyser.Options(false))
         logger.info { "Analysed ${analyser.getNumberOfProjects()} projects." }
-        val list = analyser.getAllReleasableProjects().sortedBy { it.artifactId }.joinToString("\n") {
+        val list = analyser.getAllReleasableProjects().asSequence().sortedBy { it.artifactId }.joinToString("\n") {
             it.artifactId.padEnd(30, " -") + " groupId: " + it.groupId
         }
         println(list)
@@ -130,7 +130,7 @@ object Orchestrator {
         projectToAnalyse: MavenProjectId,
         excludeRegex: Regex
     ) {
-        val releasePlan = createReleasePlanForAnalysisOnly(directoryToAnalyse, projectToAnalyse)
+        val releasePlan = createReleasePlanForAnalysisOnly(directoryToAnalyse, listOf(projectToAnalyse))
         val list = generateListOfDependentsWithoutSubmoduleAndExcluded(releasePlan, excludeRegex)
 
         println(
@@ -146,7 +146,7 @@ object Orchestrator {
         transformerRegex: Regex,
         transformerReplacement: String
     ) {
-        val releasePlan = createReleasePlanForAnalysisOnly(directoryToAnalyse, projectToAnalyse)
+        val releasePlan = createReleasePlanForAnalysisOnly(directoryToAnalyse, listOf(projectToAnalyse))
         val gitCloneCommands = generateGitCloneCommands(
             releasePlan, excludeRegex, transformerRegex, transformerReplacement
         )
@@ -164,7 +164,7 @@ object Orchestrator {
         transformerReplacement: String,
         outputFile: File
     ) {
-        val releasePlan = createReleasePlanForAnalysisOnly(directoryToAnalyse, projectToAnalyse)
+        val releasePlan = createReleasePlanForAnalysisOnly(directoryToAnalyse, listOf(projectToAnalyse))
         logger.info("Going to create the psf file.")
         val psfContent = generateEclipsePsf(releasePlan, excludeRegex, transformerRegex, transformerReplacement)
         outputFile.writeText(psfContent)
@@ -173,6 +173,6 @@ object Orchestrator {
 
     private fun createReleasePlanForAnalysisOnly(
         directoryToAnalyse: File,
-        projectToAnalyse: MavenProjectId
+        projectToAnalyse: List<MavenProjectId>
     ) = createReleasePlan(directoryToAnalyse, projectToAnalyse, JenkinsReleasePlanCreator.Options("list", "^$"))
 }

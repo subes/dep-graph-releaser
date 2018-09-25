@@ -8,6 +8,7 @@ import ch.loewenfels.depgraph.data.maven.jenkins.JenkinsMultiMavenReleasePlugin
 import ch.tutteli.atrium.api.cc.en_GB.*
 import org.jetbrains.spek.api.dsl.TestContainer
 
+val syntheticRoot = IdAndVersions(MavenProjectId("ch.loewenfels", "synthetic-root"), "0.0.0-SNAPSHOT", "0.0.0", "0.1.0-SNAPSHOT")
 val exampleA = IdAndVersions(MavenProjectId("com.example", "a"), "1.1.1-SNAPSHOT", "1.1.1", "1.1.2-SNAPSHOT")
 val exampleB = IdAndVersions(MavenProjectId("com.example", "b"), "1.0.1-SNAPSHOT", "1.0.1", "1.0.2-SNAPSHOT")
 val exampleC = IdAndVersions(MavenProjectId("com.example", "c"), "3.0.0-SNAPSHOT", "3.0.0", "3.1.0-SNAPSHOT")
@@ -167,6 +168,21 @@ fun TestContainer.assertRootProjectOnlyReleaseCommand(
     }
 }
 
+
+fun TestContainer.assertSyntheticRootProject(releasePlan: ReleasePlan){
+    val rootProject = assertRootProject(releasePlan, syntheticRoot)
+    test("synthetic root project contains just the ${JenkinsSingleMavenReleaseCommand::class.simpleName} command, which is Succeeded with ${JenkinsSingleMavenReleaseCommand::nextDevVersion.name} = ${syntheticRoot.nextDevVersion}") {
+        assert(rootProject) {
+            property(subject::commands).containsStrictly({
+                isA<JenkinsSingleMavenReleaseCommand> {
+                    isStateSucceeded()
+                    property(subject::nextDevVersion).toBe(syntheticRoot.nextDevVersion)
+                }
+            })
+        }
+    }
+    assertHasRelativePath(releasePlan, "synthetic root", syntheticRoot, "::nonExistingPath::")
+}
 
 fun TestContainer.assertRootProject(releasePlan: ReleasePlan, rootProjectIdAndVersions: IdAndVersions): Project {
     test("${ReleasePlan::rootProjectId.name} is expected rootProject") {

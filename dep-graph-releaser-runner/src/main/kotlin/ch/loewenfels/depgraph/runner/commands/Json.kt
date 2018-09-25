@@ -129,14 +129,14 @@ object Json : ConsoleCommand {
             ConfigKey.INITIAL_RELEASE_JSON to ""
         )
 
-        val mavenProjectId = MavenProjectId(groupId, artifactId)
+        val projectsToRelease = MavenProjectId(groupId, artifactId)
         val publishId = UUID.randomUUID().toString().replace("-", "").take(15)
         val releasePlanCreatorOptions = JenkinsReleasePlanCreator.Options(publishId, disableReleaseForRegex, config)
 
         Orchestrator.analyseAndCreateJson(
             directoryToAnalyse,
             json,
-            mavenProjectId,
+            listOf(projectsToRelease),
             releasePlanCreatorOptions
         )
     }
