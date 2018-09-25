@@ -191,12 +191,12 @@ class Releaser(
             .asSequence()
             .mapWithIndex()
             .filter { it.value !is ReleaseCommand }
-            .doSequentially(mutableListOf()) { (index, command) ->
+            .doSequentiallyWithFailFast(false, mutableListOf()) { (index, command) ->
                 createCommandPromise(paramObject, command, index)
             }.then { jobsResults ->
                 paramObject.releasePlan.getSubmodules(paramObject.project.id)
                     .asSequence()
-                    .doSequentially(jobsResults as MutableList<CommandState>) { submoduleId ->
+                    .doSequentiallyWithFailFast(false, jobsResults as MutableList<CommandState>) { submoduleId ->
                         triggerNonReleaseCommandsInclSubmoduleCommands(ParamObject(paramObject, submoduleId))
                     }
             }.then { jobsResults ->
@@ -204,7 +204,8 @@ class Releaser(
             }
     }
 
-    private fun <T> Sequence<T>.doSequentially(
+    private fun <T> Sequence<T>.doSequentiallyWithFailFast(
+        failFast: Boolean,
         initial: MutableList<CommandState>,
         action: (T) -> Promise<CommandState>
     ): Promise<List<CommandState>> {
@@ -212,7 +213,7 @@ class Releaser(
             acc.then { list ->
                 action(element).then { jobResult ->
                     //do not continue with next command if a previous was not successful
-                    if (CommandState.isFailureState(jobResult)) throw ReleaseFailure
+                    if (failFast && CommandState.isFailureState(jobResult)) throw ReleaseFailure
                     list.add(jobResult)
                     list
                 }
@@ -225,7 +226,7 @@ class Releaser(
             .asSequence()
             .mapWithIndex()
             .filter { it.value is ReleaseCommand }
-            .doSequentially(mutableListOf()) { (index, command) ->
+            .doSequentiallyWithFailFast(true, mutableListOf()) { (index, command) ->
                 createCommandPromise(paramObject, command, index)
             }.then { jobsResults ->
                 jobsResults.firstOrNull { it !== CommandState.Succeeded } ?: CommandState.Succeeded
