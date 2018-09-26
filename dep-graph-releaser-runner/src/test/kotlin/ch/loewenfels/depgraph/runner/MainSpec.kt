@@ -43,7 +43,7 @@ object MainSpec : Spek({
                 val commitPrefix = "[DGR] DEV-12345"
                 val buildWithParamsJob = "^$#maven#r;n;a\n.*#query#releaseVersion;nextDevVersion"
                 Main.main(
-                    "json", "com.example", "a",
+                    "json", "com.example:a;com.example:b",
                     getTestDirectory("managingVersions/inDependency").absolutePath,
                     jsonFile.absolutePath,
                     updateJob,

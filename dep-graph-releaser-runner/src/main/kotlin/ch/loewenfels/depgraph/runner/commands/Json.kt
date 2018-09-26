@@ -18,7 +18,7 @@ object Json : ConsoleCommand {
 
     override val name = "json"
     override val description = "analyse projects, create a release plan and serialize it to json"
-    override val example = "./dgr $name com.example example-project ./repo ./release.json " +
+    override val example = "./dgr $name com.example:project1;com.example:project2 ./repo ./release.json " +
         "dgr-updater dgr-dry-run \"ch\\..*#https://example.com/jenkins\ncom\\..*#https://jenkins.example.com\" " +
         "\"[^/]+/[^/]+/.+\" \"^(.*)/\$\" https://github.com/\$1" +
         "$REGEX_PARAMS_ARG\".*#branch.name=master\" $DISABLE_RELEASE_FOR\"ch\\.loewenfels:dist.*\" " +
@@ -29,8 +29,8 @@ object Json : ConsoleCommand {
     override val arguments by lazy {
         """
         |$name requires the following arguments in the given order:
-        |gId                       // maven groupId of the project which shall be released
-        |aId                       // maven artifactId of the project which shall be released
+        |mvnIds                    // maven projects which should be released, separated by ; in the form:
+        |                          // groupId:artifactId;groupId2:artifactId2;...
         |dir                       // path to the directory where all projects are
         |json                      // path + file name for the resulting json file
         |${ConfigKey.UPDATE_DEPENDENCY_JOB.asString()}       // the name of the update dependency job
@@ -80,15 +80,14 @@ object Json : ConsoleCommand {
         """.trimMargin()
     }
 
-    override fun numOfArgsNotOk(number: Int) = number < 11 || number > 16
+    override fun numOfArgsNotOk(number: Int) = number < 10 || number > 15
 
     override fun execute(args: Array<out String>, errorHandler: ErrorHandler) {
-        val (_, groupId, artifactId, unsafeDirectoryToAnalyse, jsonFile) = args
+        val (_, mvnIds, unsafeDirectoryToAnalyse, jsonFile, updateDependencyJob) = args
         val afterFirst5 = args.drop(5)
-        val (updateDependencyJob, dryRunJob, remoteRegex) = afterFirst5
-        val afterFirstEight = afterFirst5.drop(3)
-        val (excludeRegex, gitRepoRegex, gitRepoReplacement) = afterFirstEight
-        val optionalArgs = afterFirstEight.drop(3).toOptionalArgs(
+        val (dryRunJob, remoteRegex, excludeRegex, gitRepoRegex, gitRepoReplacement) = afterFirst5
+        val afterFirst10 = afterFirst5.drop(5)
+        val optionalArgs = afterFirst10.toOptionalArgs(
             errorHandler,
             REGEX_PARAMS_ARG,
             DISABLE_RELEASE_FOR,
@@ -103,6 +102,8 @@ object Json : ConsoleCommand {
         } else {
             Regex("^$") //does only match the empty string
         }
+
+        val projectsToRelease = toMavenProjectIds(mvnIds, errorHandler)
 
         val directoryToAnalyse = toVerifiedExistingFile(
             unsafeDirectoryToAnalyse, "directory to analyse", this, args, errorHandler
@@ -129,15 +130,31 @@ object Json : ConsoleCommand {
             ConfigKey.INITIAL_RELEASE_JSON to ""
         )
 
-        val projectsToRelease = MavenProjectId(groupId, artifactId)
         val publishId = UUID.randomUUID().toString().replace("-", "").take(15)
         val releasePlanCreatorOptions = JenkinsReleasePlanCreator.Options(publishId, disableReleaseForRegex, config)
 
         Orchestrator.analyseAndCreateJson(
             directoryToAnalyse,
             json,
-            listOf(projectsToRelease),
+            projectsToRelease,
             releasePlanCreatorOptions
         )
+    }
+
+    private fun toMavenProjectIds(mvnIds: String, errorHandler: ErrorHandler): List<MavenProjectId> {
+        if (mvnIds.isBlank()) {
+            errorHandler.error("You need to specify at least one mvn project")
+        }
+        return mvnIds.splitToSequence(';').map {
+            val split = it.split(':')
+            if (split.size < 2) {
+                errorHandler.error("At least one maven project did not have a groupId.\nmvnIds: $mvnIds")
+            }
+            if (split.size > 2) {
+                errorHandler.error("At least one maven project was invalid, had more than one : in its identifier.\nmvnIds: $mvnIds")
+            }
+            val (groupId, artifactId) = split
+            MavenProjectId(groupId, artifactId)
+        }.toList()
     }
 }

@@ -24,7 +24,7 @@ abstract class CommandSpec(
         override fun file(path: String, fileDescription: String) = File(path)
     }
 
-    describe("validation errors") {
+    describe("[CommandSpec] validation errors") {
 
         it("throws an error if not enough arguments are supplied") {
             expect {

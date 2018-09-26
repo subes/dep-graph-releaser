@@ -58,8 +58,7 @@
                         <configuration>
                             <arguments>
                                 <argument>json</argument>
-                                <argument>${gId}</argument>
-                                <argument>${aId}</argument>
+                                <argument>${mvnIds}</argument>
                                 <argument>${dir}</argument>
                                 <argument>${json}</argument>
                                 <argument>${updateDependencyJob}</argument>

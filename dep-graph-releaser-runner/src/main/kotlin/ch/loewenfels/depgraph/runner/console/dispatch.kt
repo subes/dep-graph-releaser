@@ -18,6 +18,7 @@ fun dispatch(
         errorHandler.error("No arguments supplied.\n\n${manCommand.showAllCommands()}")
     }
     val commandName = args[0]
+    //TODO change to isNullOrBlank with Kotlin 1.3 where smart cast for isNullOrBlank should be supported
     if (commandName == null || commandName.isBlank()) {
         errorHandler.error(
             "The first argument needs to be specified, null or a blank given." +
@@ -27,7 +28,6 @@ fun dispatch(
 
     val nonBlankArgs = args.asSequence()
         .filterNotNull()
-        .filter { it.isNotBlank() }
         .toList()
         .toTypedArray()
 
