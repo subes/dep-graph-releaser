@@ -64,12 +64,12 @@ class JenkinsReleasePlanCreator(
     }
 
     private fun createRootProject(analyser: Analyser, projectsToRelease: List<MavenProjectId>): Project {
-        val (projectToRelease, commandState) = if (projectsToRelease.size == 1) {
-            projectsToRelease[0] to CommandState.Ready
+        return if (projectsToRelease.size == 1) {
+            createRootProject(analyser, projectsToRelease[0], CommandState.Ready)
         } else {
-            analyser.createSyntheticRoot(projectsToRelease) to CommandState.Succeeded
+            val syntheticRoot = analyser.createSyntheticRoot(projectsToRelease)
+            createRootProject(analyser, syntheticRoot, listOf())
         }
-        return createRootProject(analyser, projectToRelease, commandState)
     }
 
     private fun createRootProject(
@@ -81,8 +81,13 @@ class JenkinsReleasePlanCreator(
         val commands = mutableListOf(
             createJenkinsReleasePlugin(analyser, rootProjectId, currentVersion!!, commandState)
         )
+        return createRootProject(analyser, rootProjectId, commands)
+    }
+
+    private fun createRootProject(analyser: Analyser, rootProjectId: MavenProjectId, commands: List<Command>): Project {
+        val currentVersion = analyser.getCurrentVersion(rootProjectId)
         val relativePath = analyser.getRelativePath(rootProjectId)
-        return createInitialProject(rootProjectId, false, currentVersion, 0, commands, relativePath)
+        return createInitialProject(rootProjectId, false, currentVersion!!, 0, commands, relativePath)
     }
 
     private fun createJenkinsReleasePlugin(
@@ -248,6 +253,9 @@ class JenkinsReleasePlanCreator(
         // we do not have to update the commands because we already have the dependency (only the level changed)
         if (paramObject.isRelationAlreadyDependentOfDependencyAndWaitsInCommand()) return
 
+        // if the dependency is the synthetic root, then we do not need an update command
+        if(paramObject.isDependencySyntheticRoot()) return
+
         val dependencyId = paramObject.dependencyId
         val list = dependent.commands as MutableList
         if (paramObject.isRelationNotSubmodule()) {
@@ -324,13 +332,13 @@ class JenkinsReleasePlanCreator(
             paramObject.getDependents(dependentId).forEach {
                 if (it == dependencyId) {
                     if (paramObject.isRelationNotInSameMultiModuleCircleAsDependency()) {
-                        val map = paramObject.cyclicDependents.getOrPut(existingDependent.id, { linkedMapOf() })
+                        val map = paramObject.cyclicDependents.getOrPut(existingDependent.id) { linkedMapOf() }
                         map[dependencyId] = dependentBranch
                         return
                     } else {
-                        val map = paramObject.interModuleCyclicDependents.getOrPut(
-                            existingDependent.id, { linkedMapOf() }
-                        )
+                        val map = paramObject.interModuleCyclicDependents.getOrPut(existingDependent.id) {
+                            linkedMapOf()
+                        }
                         map[dependencyId] = dependentBranch
                         //we cannot stop here because cyclic inter module dependencies can be dealt with others not (yet)
                     }
@@ -403,7 +411,7 @@ class JenkinsReleasePlanCreator(
                 "Deactivated release commands of the following projects " +
                     "due to the specified disableReleaseFor regex." +
                     "\nRegex: ${options.disableReleaseFor.pattern}" +
-                    "\nProjects:\n" + deactivatedProjects.sorted().joinToString("\n")
+                    "\nProjects:\n" + deactivatedProjects.asSequence().sorted().joinToString("\n")
             )
         }
         return transformedReleasePlan
@@ -464,6 +472,7 @@ class JenkinsReleasePlanCreator(
         fun isRelationNotSubmodule() = !analyser.isSubmodule(relation.id)
         fun isRelationNotSubmoduleOfDependency() = !analyser.isSubmoduleOf(relation.id, dependencyId)
         fun isDependencyNotSubmoduleOfRelation() = !analyser.isSubmoduleOf(dependencyId, relation.id)
+        fun isDependencySyntheticRoot() = analyser.isSyntheticRoot(dependencyId)
 
         private fun relationAndDependencyHaveNotCommonMultiModule(): Boolean {
             val multiModulesOfDependency = analyser.getMultiModules(dependencyId)

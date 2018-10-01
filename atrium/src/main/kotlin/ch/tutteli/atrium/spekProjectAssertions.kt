@@ -170,17 +170,8 @@ fun TestContainer.assertRootProjectOnlyReleaseCommand(
 
 
 fun TestContainer.assertSyntheticRootProject(releasePlan: ReleasePlan){
-    val rootProject = assertRootProject(releasePlan, syntheticRoot)
-    test("synthetic root project contains just the ${JenkinsSingleMavenReleaseCommand::class.simpleName} command, which is Succeeded with ${JenkinsSingleMavenReleaseCommand::nextDevVersion.name} = ${syntheticRoot.nextDevVersion}") {
-        assert(rootProject) {
-            property(subject::commands).containsStrictly({
-                isA<JenkinsSingleMavenReleaseCommand> {
-                    isStateSucceeded()
-                    property(subject::nextDevVersion).toBe(syntheticRoot.nextDevVersion)
-                }
-            })
-        }
-    }
+    assertRootProject(releasePlan, syntheticRoot)
+    assertHasNoCommands(releasePlan, "synthetic root", syntheticRoot)
     assertHasRelativePath(releasePlan, "synthetic root", syntheticRoot, "::nonExistingPath::")
 }
 
@@ -324,6 +315,22 @@ fun TestContainer.assertOneUpdateAndOneReleaseCommand(
             property(subject::commands).containsStrictly(
                 { isJenkinsUpdateDependencyWaiting(dependency) },
                 { isJenkinsMavenReleaseWaiting(project.nextDevVersion, dependency) }
+            )
+        }
+    }
+}
+
+
+fun TestContainer.assertOneReleaseCommandWaitingForSyntheticRoot(
+    releasePlan: ReleasePlan,
+    name: String,
+    project: IdAndVersions
+) {
+    test("$name project has only one waiting Release command") {
+        assert(releasePlan.getProject(project.id)) {
+            idAndVersions(project)
+            property(subject::commands).containsStrictly(
+                { isJenkinsMavenReleaseWaiting(project.nextDevVersion, syntheticRoot) }
             )
         }
     }

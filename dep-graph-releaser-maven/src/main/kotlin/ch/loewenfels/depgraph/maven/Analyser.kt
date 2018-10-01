@@ -283,7 +283,7 @@ class Analyser internal constructor(
     }
 
     fun createSyntheticRoot(projectsToRelease: List<MavenProjectId>): MavenProjectId {
-        val syntheticRoot = projectsData.createSyntheticRoot()
+        projectsData.registerSyntheticRoot()
         val mutableDependents = dependents as MutableMap<String, Set<Relation<MavenProjectId>>>
         mutableDependents[syntheticRoot.identifier] = projectsToRelease.asSequence().map {
             val currentVersion = getCurrentVersion(it) ?: throwProjectNotPartOfAnalysis(it)
@@ -293,7 +293,10 @@ class Analyser internal constructor(
         return syntheticRoot
     }
 
+    fun isSyntheticRoot(id: MavenProjectId): Boolean = id == syntheticRoot
+
     companion object {
+        private val syntheticRoot = MavenProjectId("ch.loewenfels", "synthetic-root")
         private val Project.isNotExternal get() = !isExternal
 
         private fun Gav.toRelation(isVersionSelfManaged: Boolean): Relation<MavenProjectId> =
@@ -391,10 +394,8 @@ class Analyser internal constructor(
             }
         }
 
-        fun createSyntheticRoot(): MavenProjectId{
-            val syntheticRoot = MavenProjectId("ch.loewenfels", "synthetic-root")
+        fun registerSyntheticRoot() {
             projects[syntheticRoot] = ProjectData("0.0.0-SNAPSHOT", setOf(), linkedSetOf(), "::nonExistingPath::")
-            return syntheticRoot
         }
     }
 

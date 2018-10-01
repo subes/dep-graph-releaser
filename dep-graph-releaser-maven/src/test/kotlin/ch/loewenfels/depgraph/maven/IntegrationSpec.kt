@@ -341,11 +341,11 @@ object IntegrationSpec : Spek({
 
                 assertHasTwoDependentsAndIsOnLevel(releasePlan, "synthetic root", syntheticRoot, exampleA, exampleB, 0)
 
-                assertOneUpdateAndOneReleaseCommand(releasePlan, "project A", exampleA, syntheticRoot)
+                assertOneReleaseCommandWaitingForSyntheticRoot(releasePlan, "project A", exampleA)
                 assertHasNoDependentsAndIsOnLevel(releasePlan, "project A", exampleA, 1)
                 assertHasRelativePath(releasePlan,  "project A", exampleA, "./")
 
-                assertOneUpdateAndOneReleaseCommand(releasePlan, "project B", exampleB, syntheticRoot)
+                assertOneReleaseCommandWaitingForSyntheticRoot(releasePlan, "project B", exampleB)
                 assertHasNoDependentsAndIsOnLevel(releasePlan, "project B", exampleB, 1)
                 assertHasRelativePath(releasePlan,  "project B", exampleB, "./")
 
