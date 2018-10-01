@@ -78,6 +78,7 @@ def dirArg = 'dir'
 def defaultDirArg = "${rootProject.projectDir}/repos"
 
 task json {
+    def mvnIdsArg = 'mvnIds'
     def updateDependencyJobArg = 'updateDependencyJob'
     def defaultUpdateJob = "dgr-updater"
     def dryRunJobArg = 'dryRunJob'
@@ -100,8 +101,7 @@ task json {
     def jobMappingArg = 'jobMapping'
     def commitPrefixArg = 'commitPrefix'
     def buildWithParamJobsArg = 'buildWithParamJobs'
-    inputs.property(groupIdArg, findProperty(groupIdArg) ?: '')
-    inputs.property(artifactIdArg, findProperty(artifactIdArg) ?: '')
+    inputs.property(mvnIdsArg, findProperty(mvnIdsArg) ?: '')
     inputs.property(dirArg, findProperty(dirArg) ?: defaultDirArg)
     inputs.property(updateDependencyJobArg, findProperty(updateDependencyJobArg) ?: defaultUpdateJob)
     inputs.property(dryRunJobArg, findProperty(dryRunJobArg) ?: defaultDryRunJob)
@@ -117,8 +117,7 @@ task json {
     inputs.files dist
     outputs.file jsonFile
     doLast {
-        def groupId = getDefinedParam(groupIdArg, "groupId")
-        def artifactId = getDefinedParam(artifactIdArg, "artifactId")
+        def mvnIds = getDefinedParam(mvnIdsArg, "mvnIds")
         def dir = findProperty(dirArg) ?: defaultDirArg
         def updateDependencyJob = findProperty(updateDependencyJobArg) ?: defaultUpdateJob
         def dryRunJob = findProperty(dryRunJobArg) ?: defaultDryRunJob
@@ -144,7 +143,7 @@ task json {
             ["-$buildWithParamJobsArg=\"$libJobs#maven#MVN_RELEASE_VERSION;MVN_DEV_VERSION;ADDITIONAL_PARAMS\""]
 
         execMain(
-            ['json', groupId, artifactId, dir, jsonFile.absolutePath, updateDependencyJob, dryRunJob, remoteRegex, relativePathExcludeProjects, relativePathGitRepoRegex, relativePathGitRepoReplacement] +
+            ['json', mvnIds, dir, jsonFile.absolutePath, updateDependencyJob, dryRunJob, remoteRegex, relativePathExcludeProjects, relativePathGitRepoRegex, relativePathGitRepoReplacement] +
                 params + disableRegex + jobMapping + commitPrefix + buildWithParamJobs
         )
     }

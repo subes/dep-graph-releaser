@@ -11,6 +11,7 @@ import ch.tutteli.atrium.creating.Assert
 import ch.tutteli.atrium.creating.AssertionPlant
 
 fun Assert<Command>.isStateReady() = property(subject::state).toBe(CommandState.Ready)
+fun Assert<Command>.isStateSucceeded() = property(subject::state).toBe(CommandState.Succeeded)
 
 fun Assert<Command>.withStateWaitingWithDependencies(dependency: ProjectId, vararg otherDependencies: ProjectId) =
     property(subject::state).isA<CommandState.Waiting> {

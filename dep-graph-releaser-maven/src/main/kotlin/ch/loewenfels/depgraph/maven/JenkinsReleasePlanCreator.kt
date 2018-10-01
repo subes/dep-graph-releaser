@@ -4,8 +4,8 @@ import ch.loewenfels.depgraph.ConfigKey
 import ch.loewenfels.depgraph.LevelIterator
 import ch.loewenfels.depgraph.data.*
 import ch.loewenfels.depgraph.data.maven.MavenProjectId
-import ch.loewenfels.depgraph.data.maven.jenkins.JenkinsSingleMavenReleaseCommand
 import ch.loewenfels.depgraph.data.maven.jenkins.JenkinsMultiMavenReleasePlugin
+import ch.loewenfels.depgraph.data.maven.jenkins.JenkinsSingleMavenReleaseCommand
 import ch.loewenfels.depgraph.data.maven.jenkins.JenkinsUpdateDependency
 import ch.loewenfels.depgraph.manipulation.ReleasePlanManipulator
 import ch.tutteli.kbox.appendToStringBuilder
@@ -16,23 +16,27 @@ class JenkinsReleasePlanCreator(
     private val versionDeterminer: VersionDeterminer,
     private val options: Options
 ) {
-    fun create(projectToRelease: MavenProjectId, analyser: Analyser): ReleasePlan {
-        val currentVersion = analyser.getCurrentVersion(projectToRelease)
-        require(currentVersion != null) {
-            """Can only release a project which is part of the analysis.
+    fun create(projectsToRelease: List<MavenProjectId>, analyser: Analyser): ReleasePlan {
+        require(projectsToRelease.isNotEmpty()) {
+            "No project given which should be released, aborting now."
+        }
+
+        projectsToRelease.forEach { projectToRelease ->
+            require(analyser.getCurrentVersion(projectToRelease) != null) {
+                """Can only release a project which is part of the analysis.
                 |Given: ${projectToRelease.identifier}
                 |Analysed projects: ${analyser.getAnalysedProjectsAsString()}
             """.trimMargin()
-        }
-
-        require(!analyser.isSubmodule(projectToRelease)) {
-            """Cannot release a submodule, the given project is part of a multi-module hierarchy
-                |Given: $projectToRelease
+            }
+            require(!analyser.isSubmodule(projectToRelease)) {
+                """Cannot release a submodule, the given project is part of a multi-module hierarchy
+                |Given: $projectsToRelease
                 |Multi modules: ${analyser.getMultiModules(projectToRelease).joinToString(",")}
             """.trimMargin()
+            }
         }
 
-        val rootProject = createRootProject(analyser, projectToRelease, currentVersion)
+        val rootProject = createRootProject(analyser, projectsToRelease)
         val paramObject = createDependents(analyser, rootProject)
 
         val warnings = mutableListOf<String>()
@@ -59,18 +63,45 @@ class JenkinsReleasePlanCreator(
         return disableProjectsAsDefinedInOptions(releasePlan)
     }
 
+    private fun createRootProject(analyser: Analyser, projectsToRelease: List<MavenProjectId>): Project {
+        return if (projectsToRelease.size == 1) {
+            createRootProject(analyser, projectsToRelease[0], CommandState.Ready)
+        } else {
+            val syntheticRoot = analyser.createSyntheticRoot(projectsToRelease)
+            createRootProject(analyser, syntheticRoot, listOf())
+        }
+    }
+
     private fun createRootProject(
         analyser: Analyser,
-        projectToRelease: MavenProjectId,
-        currentVersion: String?
+        rootProjectId: MavenProjectId,
+        commandState: CommandState
     ): Project {
+        val currentVersion = analyser.getCurrentVersion(rootProjectId)
         val commands = mutableListOf(
-            createJenkinsReleasePlugin(
-                analyser, projectToRelease, currentVersion!!, CommandState.Ready
-            )
+            createJenkinsReleasePlugin(analyser, rootProjectId, currentVersion!!, commandState)
         )
-        val relativePath = analyser.getRelativePath(projectToRelease)
-        return createInitialProject(projectToRelease, false, currentVersion, 0, commands, relativePath)
+        return createRootProject(analyser, rootProjectId, commands)
+    }
+
+    private fun createRootProject(analyser: Analyser, rootProjectId: MavenProjectId, commands: List<Command>): Project {
+        val currentVersion = analyser.getCurrentVersion(rootProjectId)
+        val relativePath = analyser.getRelativePath(rootProjectId)
+        return createInitialProject(rootProjectId, false, currentVersion!!, 0, commands, relativePath)
+    }
+
+    private fun createJenkinsReleasePlugin(
+        analyser: Analyser,
+        projectId: MavenProjectId,
+        currentVersion: String,
+        state: CommandState
+    ): Command {
+        val nextDevVersion = versionDeterminer.nextDevVersion(currentVersion)
+        return if (analyser.hasSubmodules(projectId)) {
+            JenkinsMultiMavenReleasePlugin(state, nextDevVersion)
+        } else {
+            JenkinsSingleMavenReleaseCommand(state, nextDevVersion)
+        }
     }
 
     private fun createInitialProject(
@@ -89,20 +120,6 @@ class JenkinsReleasePlanCreator(
         commands,
         relativePath
     )
-
-    private fun createJenkinsReleasePlugin(
-        analyser: Analyser,
-        projectId: MavenProjectId,
-        currentVersion: String,
-        state: CommandState
-    ): Command {
-        val nextDevVersion = versionDeterminer.nextDevVersion(currentVersion)
-        return if (analyser.hasSubmodules(projectId)) {
-            JenkinsMultiMavenReleasePlugin(state, nextDevVersion)
-        } else {
-            JenkinsSingleMavenReleaseCommand(state, nextDevVersion)
-        }
-    }
 
     private fun createDependents(analyser: Analyser, rootProject: Project): ParamObject {
         val paramObject = ParamObject(analyser, rootProject)
@@ -204,7 +221,8 @@ class JenkinsReleasePlanCreator(
                 // It might be that the multi module is not part of the dependents graph, in such a case we have to add
                 // it to the analysis nonetheless, because we have a release dependency to track.
                 val tmpRelation = paramObject.relation
-                paramObject.relation = Relation(topMultiModuleId, paramObject.analyser.getCurrentVersion(topMultiModuleId)!!, false)
+                paramObject.relation =
+                    Relation(topMultiModuleId, paramObject.analyser.getCurrentVersion(topMultiModuleId)!!, false)
                 val newDependent = initDependent(paramObject)
                 addDependentAddToProjects(paramObject, newDependent)
                 paramObject.relation = tmpRelation
@@ -234,6 +252,9 @@ class JenkinsReleasePlanCreator(
 
         // we do not have to update the commands because we already have the dependency (only the level changed)
         if (paramObject.isRelationAlreadyDependentOfDependencyAndWaitsInCommand()) return
+
+        // if the dependency is the synthetic root, then we do not need an update command
+        if(paramObject.isDependencySyntheticRoot()) return
 
         val dependencyId = paramObject.dependencyId
         val list = dependent.commands as MutableList
@@ -311,13 +332,13 @@ class JenkinsReleasePlanCreator(
             paramObject.getDependents(dependentId).forEach {
                 if (it == dependencyId) {
                     if (paramObject.isRelationNotInSameMultiModuleCircleAsDependency()) {
-                        val map = paramObject.cyclicDependents.getOrPut(existingDependent.id, { linkedMapOf() })
+                        val map = paramObject.cyclicDependents.getOrPut(existingDependent.id) { linkedMapOf() }
                         map[dependencyId] = dependentBranch
                         return
                     } else {
-                        val map = paramObject.interModuleCyclicDependents.getOrPut(
-                            existingDependent.id, { linkedMapOf() }
-                        )
+                        val map = paramObject.interModuleCyclicDependents.getOrPut(existingDependent.id) {
+                            linkedMapOf()
+                        }
                         map[dependencyId] = dependentBranch
                         //we cannot stop here because cyclic inter module dependencies can be dealt with others not (yet)
                     }
@@ -390,7 +411,7 @@ class JenkinsReleasePlanCreator(
                 "Deactivated release commands of the following projects " +
                     "due to the specified disableReleaseFor regex." +
                     "\nRegex: ${options.disableReleaseFor.pattern}" +
-                    "\nProjects:\n" + deactivatedProjects.sorted().joinToString("\n")
+                    "\nProjects:\n" + deactivatedProjects.asSequence().sorted().joinToString("\n")
             )
         }
         return transformedReleasePlan
@@ -451,6 +472,7 @@ class JenkinsReleasePlanCreator(
         fun isRelationNotSubmodule() = !analyser.isSubmodule(relation.id)
         fun isRelationNotSubmoduleOfDependency() = !analyser.isSubmoduleOf(relation.id, dependencyId)
         fun isDependencyNotSubmoduleOfRelation() = !analyser.isSubmoduleOf(dependencyId, relation.id)
+        fun isDependencySyntheticRoot() = analyser.isSyntheticRoot(dependencyId)
 
         private fun relationAndDependencyHaveNotCommonMultiModule(): Boolean {
             val multiModulesOfDependency = analyser.getMultiModules(dependencyId)
@@ -479,11 +501,11 @@ class JenkinsReleasePlanCreator(
             }
         }
 
-        fun getProject(projectId: ProjectId)
-            = projects[projectId] ?: throw IllegalStateException("$projectId was not found in projects")
+        fun getProject(projectId: ProjectId) =
+            projects[projectId] ?: throw IllegalStateException("$projectId was not found in projects")
 
-        fun getDependents(projectId: ProjectId)
-            = dependents[projectId] ?: throw IllegalStateException("$projectId was not found in dependents")
+        fun getDependents(projectId: ProjectId) =
+            dependents[projectId] ?: throw IllegalStateException("$projectId was not found in dependents")
 
         fun getDependentsOfDependency() = getDependents(dependencyId)
     }

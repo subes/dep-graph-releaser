@@ -35,7 +35,14 @@ object VersionDeterminerSpec : Spek({
             "2.0.3.9-a1" to "2.0.3.9-a2",
             "2.0.3-RC-1" to "2.0.3-RC-2",
             "2.0.rc1" to "2.0.rc2",
-            "2_RC1" to "2_RC2"
+            "2_RC1" to "2_RC2",
+            "0.0.0-SNAPSHOT" to "0.0.0",
+            "0.0-SNAPSHOT" to "0.0",
+            "0-SNAPSHOT" to "0",
+            "0.0.0.0" to "0.0.1.0",
+            "0.0.0" to "0.1.0",
+            "0.0" to "1.0",
+            "0" to "1"
         ).forEach { version, expected ->
             test("$version turns into $expected") {
                 val result = testee.releaseVersion(version)
@@ -86,7 +93,14 @@ object VersionDeterminerSpec : Spek({
             "2.0.3.9-a1" to "2.0.3.9-a3-SNAPSHOT",
             "2.0.3-RC-1" to "2.0.3-RC-3-SNAPSHOT",
             "2.0.rc1" to "2.0.rc3-SNAPSHOT",
-            "2_RC1" to "2_RC3-SNAPSHOT"
+            "2_RC1" to "2_RC3-SNAPSHOT",
+            "0.0.0-SNAPSHOT" to "0.1.0-SNAPSHOT",
+            "0.0-SNAPSHOT" to "1.0-SNAPSHOT",
+            "0-SNAPSHOT" to "1-SNAPSHOT",
+            "0.0.0.0" to "0.0.2.0-SNAPSHOT",
+            "0.0.0" to "0.2.0-SNAPSHOT",
+            "0.0" to "2.0-SNAPSHOT",
+            "0" to "2-SNAPSHOT"
         ).forEach { version, expected ->
             test("$version turns into $expected") {
                 val result = testee.nextDevVersion(version)

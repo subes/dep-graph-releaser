@@ -2,6 +2,7 @@ package ch.loewenfels.depgraph.maven
 
 import ch.loewenfels.depgraph.data.Relation
 import ch.loewenfels.depgraph.data.maven.MavenProjectId
+import ch.loewenfels.depgraph.data.maven.syntheticRoot
 import ch.tutteli.kbox.appendToStringBuilder
 import ch.tutteli.kbox.mapParents
 import fr.lteconsulting.pomexplorer.*
@@ -97,7 +98,7 @@ class Analyser internal constructor(
                 .asSequence()
                 .filter { analysedProjects.contains(it.targetToMapKey()) }
                 .forEach { relation ->
-                    val set = dependents.getOrPut(relation.targetToMapKey(), { mutableSetOf() })
+                    val set = dependents.getOrPut(relation.targetToMapKey()) { mutableSetOf() }
                     when (relation) {
                         is DependencyLikeRelation ->
                             set.add(gav.toRelation(relation.dependency.isVersionSelfManaged.orElse(false)))
@@ -105,7 +106,7 @@ class Analyser internal constructor(
                         is ParentRelation ->
                             set.add(gav.toRelation(true))
 
-                    //we ignore other relations at the moment (such as BuildDependencyRelation)
+                        //we ignore other relations at the moment (such as BuildDependencyRelation)
                     }
                 }
         }
@@ -209,10 +210,12 @@ class Analyser internal constructor(
     }
 
     fun getUnresolvedProperties(): List<String> = pomAnalysis.unresolvedProperties
-        .filter{ dependents.containsKey(it.project.gav.toMapKey()) }
+        .asSequence()
+        .filter { dependents.containsKey(it.project.gav.toMapKey()) }
         .map {
             "Property ${it.propertyName} could not be resolved.\nProject ${it.project.gav} \nPom-file: ${it.project.pomFile.absolutePath}"
         }
+        .toList()
 
 
     fun hasSubmodules(projectId: MavenProjectId) = getSubmodules(projectId).isNotEmpty()
@@ -280,6 +283,19 @@ class Analyser internal constructor(
         return emptySet()
     }
 
+    fun createSyntheticRoot(projectsToRelease: List<MavenProjectId>): MavenProjectId {
+        projectsData.registerSyntheticRoot()
+        val mutableDependents = dependents as MutableMap<String, Set<Relation<MavenProjectId>>>
+        mutableDependents[syntheticRoot.identifier] = projectsToRelease.asSequence().map {
+            val currentVersion = getCurrentVersion(it) ?: throwProjectNotPartOfAnalysis(it)
+            Relation(it, currentVersion, isDependencyVersionSelfManaged = true)
+        }.toSet()
+
+        return syntheticRoot
+    }
+
+    fun isSyntheticRoot(id: MavenProjectId): Boolean = id == syntheticRoot
+
     companion object {
         private val Project.isNotExternal get() = !isExternal
 
@@ -328,7 +344,7 @@ class Analyser internal constructor(
 
                     session.projects().getSubmodulesAsStream(multiModuleGav).forEach { submoduleGav ->
                         val submoduleProjectId = submoduleGav.toMavenProjectId()
-                        val submodules = submodulesOfProjectId.getOrPut(multiModuleProjectId, { hashSetOf() })
+                        val submodules = submodulesOfProjectId.getOrPut(multiModuleProjectId) { hashSetOf() }
                         val notAlreadyContained = submodules.add(submoduleProjectId)
                         //just to prevent from maniac projects which have cyclic modules defined :)
                         if (notAlreadyContained && !gavsToVisit.contains(submoduleGav)) {
@@ -376,6 +392,10 @@ class Analyser internal constructor(
             return projects.entries.joinToString("\n") { (mavenProjectId, project) ->
                 "${mavenProjectId.identifier}:${project.version}"
             }
+        }
+
+        fun registerSyntheticRoot() {
+            projects[syntheticRoot] = ProjectData("0.0.0-SNAPSHOT", setOf(), linkedSetOf(), "::nonExistingPath::")
         }
     }
 

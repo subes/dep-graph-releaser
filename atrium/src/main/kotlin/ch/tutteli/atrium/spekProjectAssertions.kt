@@ -8,6 +8,7 @@ import ch.loewenfels.depgraph.data.maven.jenkins.JenkinsMultiMavenReleasePlugin
 import ch.tutteli.atrium.api.cc.en_GB.*
 import org.jetbrains.spek.api.dsl.TestContainer
 
+val syntheticRoot = IdAndVersions(MavenProjectId("ch.loewenfels", "synthetic-root"), "0.0.0-SNAPSHOT", "0.0.0", "0.1.0-SNAPSHOT")
 val exampleA = IdAndVersions(MavenProjectId("com.example", "a"), "1.1.1-SNAPSHOT", "1.1.1", "1.1.2-SNAPSHOT")
 val exampleB = IdAndVersions(MavenProjectId("com.example", "b"), "1.0.1-SNAPSHOT", "1.0.1", "1.0.2-SNAPSHOT")
 val exampleC = IdAndVersions(MavenProjectId("com.example", "c"), "3.0.0-SNAPSHOT", "3.0.0", "3.1.0-SNAPSHOT")
@@ -168,6 +169,12 @@ fun TestContainer.assertRootProjectOnlyReleaseCommand(
 }
 
 
+fun TestContainer.assertSyntheticRootProject(releasePlan: ReleasePlan){
+    assertRootProject(releasePlan, syntheticRoot)
+    assertHasNoCommands(releasePlan, "synthetic root", syntheticRoot)
+    assertHasRelativePath(releasePlan, "synthetic root", syntheticRoot, "::nonExistingPath::")
+}
+
 fun TestContainer.assertRootProject(releasePlan: ReleasePlan, rootProjectIdAndVersions: IdAndVersions): Project {
     test("${ReleasePlan::rootProjectId.name} is expected rootProject") {
         assert(releasePlan.rootProjectId).toBe(rootProjectIdAndVersions.id)
@@ -308,6 +315,22 @@ fun TestContainer.assertOneUpdateAndOneReleaseCommand(
             property(subject::commands).containsStrictly(
                 { isJenkinsUpdateDependencyWaiting(dependency) },
                 { isJenkinsMavenReleaseWaiting(project.nextDevVersion, dependency) }
+            )
+        }
+    }
+}
+
+
+fun TestContainer.assertOneReleaseCommandWaitingForSyntheticRoot(
+    releasePlan: ReleasePlan,
+    name: String,
+    project: IdAndVersions
+) {
+    test("$name project has only one waiting Release command") {
+        assert(releasePlan.getProject(project.id)) {
+            idAndVersions(project)
+            property(subject::commands).containsStrictly(
+                { isJenkinsMavenReleaseWaiting(project.nextDevVersion, syntheticRoot) }
             )
         }
     }

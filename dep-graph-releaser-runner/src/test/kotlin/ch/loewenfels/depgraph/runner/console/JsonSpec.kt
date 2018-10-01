@@ -9,15 +9,15 @@ import ch.tutteli.atrium.expect
 import ch.tutteli.spek.extensions.TempFolder
 import org.jetbrains.spek.api.Spek
 import org.jetbrains.spek.api.dsl.describe
+import org.jetbrains.spek.api.dsl.it
 import org.jetbrains.spek.api.include
 import java.io.File
+import java.lang.IllegalStateException
 import java.util.regex.PatternSyntaxException
 
 class JsonSpec : Spek({
     include(JsonCommandSpec)
 
-    //TODO write spec for wrong regex, non-existing directory etc.
-    //given("non-existing directory") {}
 
     val tempFolder = TempFolder.perTest()
     registerListener(tempFolder)
@@ -26,32 +26,77 @@ class JsonSpec : Spek({
         override fun file(path: String, fileDescription: String) = File(path)
     }
 
-    describe(Json.BUILD_WITH_PARAM_JOBS_ARG) {
+    fun createArgs(tempFolder: TempFolder, mvnIds: String, regex: String): Array<String> {
+        val jsonFile = File(tempFolder.tmpDir, "test.json")
+        return arrayOf(
+            Json.name, mvnIds,
+            getTestDirectory("managingVersions/inDependency").absolutePath,
+            jsonFile.absolutePath,
+            "dgr-updater",
+            "dgr-dry-run",
+            "^$#https://none.com",
+            "[^/]+/[^/]+/.+",
+            "^(.*)/\$",
+            "https://github.com/$1",
+            "${Json.REGEX_PARAMS_ARG}.*#branch.name=master",
+            "${Json.DISABLE_RELEASE_FOR}ch.loewenfels.*",
+            "${Json.JOB_MAPPING_ARG}com.example:project=ownJobName\ncom.example:anotherProject=another-project",
+            "${Json.COMMIT_PREFIX_ARG}[TEST]",
+            "${Json.BUILD_WITH_PARAM_JOBS_ARG}$regex"
+        )
+    }
 
-        fun createArgs(tempFolder: TempFolder, regex: String): Array<String> {
-            val jsonFile = File(tempFolder.tmpDir, "test.json")
-            return arrayOf(
-                Json.name, "com.example", "a",
-                getTestDirectory("managingVersions/inDependency").absolutePath,
-                jsonFile.absolutePath,
-                "dgr-updater",
-                "dgr-dry-run",
-                "^$#https://none.com",
-                "[^/]+/[^/]+/.+",
-                "^(.*)/\$",
-                "https://github.com/$1",
-                "${Json.REGEX_PARAMS_ARG}.*#branch.name=master",
-                "${Json.DISABLE_RELEASE_FOR}ch.loewenfels.*",
-                "${Json.JOB_MAPPING_ARG}com.example:project=ownJobName\ncom.example:anotherProject=another-project",
-                "${Json.COMMIT_PREFIX_ARG}[TEST]",
-                "${Json.BUILD_WITH_PARAM_JOBS_ARG}$regex"
-            )
+    fun createArgs(tempFolder: TempFolder, regex: String): Array<String> =
+        createArgs(tempFolder, "com.example:a;com.example:b", regex)
+
+    describe("general validation errors"){
+
+        describe("empty mvnIds") {
+            it("throws IllegalStateException mentioning at least one id required") {
+                val args = createArgs(tempFolder, "", ".#http://")
+                expect {
+                    dispatch(args, errorHandler, listOf(Json))
+                }.toThrow<IllegalStateException> { messageContains("You need to specify at least one mvn project") }
+            }
         }
+
+        describe("blank mvnIds") {
+            it("throws IllegalStateException mentioning at least one id required") {
+                val args = createArgs(tempFolder, " ", ".#http://")
+                expect {
+                    dispatch(args, errorHandler, listOf(Json))
+                }.toThrow<IllegalStateException> { messageContains("You need to specify at least one mvn project") }
+            }
+        }
+
+        describe("one mvnId without groupId") {
+            it("throws IllegalStateException mentioning at least one id required") {
+                val args = createArgs(tempFolder, "com:a;com-b", ".#http://")
+                expect {
+                    dispatch(args, errorHandler, listOf(Json))
+                }.toThrow<IllegalStateException> { messageContains("At least one maven project did not have a groupId") }
+            }
+        }
+
+
+        describe("one mvnId with two colon") {
+            it("throws IllegalStateException mentioning at least one id required") {
+                val args = createArgs(tempFolder, "com:a;com:b;com:c:d", ".#http://")
+                expect {
+                    dispatch(args, errorHandler, listOf(Json))
+                }.toThrow<IllegalStateException> { messageContains("At least one maven project was invalid, had more than one : in its identifier") }
+            }
+        }
+        //TODO write spec for non-existing directory etc.
+        //given("non-existing directory") {}
+    }
+
+    describe(Json.BUILD_WITH_PARAM_JOBS_ARG) {
 
         describe("validation errors") {
 
             describe("invalid regex") {
-                test("throws PatternSyntaxException") {
+                it("throws PatternSyntaxException") {
                     val args = createArgs(tempFolder, "(shouldCloseParenthesis#query#rel;next")
                     expect {
                         dispatch(args, errorHandler, listOf(Json))
@@ -60,7 +105,7 @@ class JsonSpec : Spek({
             }
 
             describe("invalid format") {
-                test("throws IllegalArgumentException mentioning allowed formats") {
+                it("throws IllegalArgumentException mentioning allowed formats") {
                     val args = createArgs(tempFolder, ".*#noFormat#rel;next")
                     expect {
                         dispatch(args, errorHandler, listOf(Json))
@@ -71,7 +116,7 @@ class JsonSpec : Spek({
             }
 
             describe("nextDev param name not provided") {
-                test("throws IllegalArgumentException mentioning not enough names") {
+                it("throws IllegalArgumentException mentioning not enough names") {
                     val args = createArgs(tempFolder, ".*#query#rel")
                     expect {
                         dispatch(args, errorHandler, listOf(Json))
@@ -82,7 +127,7 @@ class JsonSpec : Spek({
             }
 
             describe("too many params provided for format query") {
-                test("throws IllegalArgumentException mentioning not enough names") {
+                it("throws IllegalArgumentException mentioning not enough names") {
                     val args = createArgs(tempFolder, ".*#query#rel;nextDev;")
                     expect {
                         dispatch(args, errorHandler, listOf(Json))
@@ -93,7 +138,7 @@ class JsonSpec : Spek({
             }
 
             describe("additional param name not provided for format maven") {
-                test("throws IllegalArgumentException mentioning not enough names") {
+                it("throws IllegalArgumentException mentioning not enough names") {
                     val args = createArgs(tempFolder, ".*#maven#rel;nextDev")
                     expect {
                         dispatch(args, errorHandler, listOf(Json))
@@ -104,7 +149,7 @@ class JsonSpec : Spek({
             }
 
             describe("too many params provided for format maven") {
-                test("throws IllegalArgumentException mentioning not enough names") {
+                it("throws IllegalArgumentException mentioning not enough names") {
                     val args = createArgs(tempFolder, ".*#maven#rel;nextDev;add;somethingElse")
                     expect {
                         dispatch(args, errorHandler, listOf(Json))
@@ -120,14 +165,14 @@ class JsonSpec : Spek({
         Json,
         ::getNotEnoughArgs,
         ::getTooManyArgs,
-        11..16
+        10..15
     )
 
     companion object {
         fun getNotEnoughArgs(tempFolder: TempFolder): Array<out String> {
             val jsonFile = File(tempFolder.tmpDir, "test.json")
             return arrayOf(
-                Json.name, "com.example", "a",
+                Json.name, "com.example:a;com:b;com:c;com:d",
                 getTestDirectory("managingVersions/inDependency").absolutePath,
                 jsonFile.absolutePath,
                 "dgr-updater",
@@ -143,7 +188,7 @@ class JsonSpec : Spek({
         fun getTooManyArgs(tempFolder: TempFolder): Array<out String> {
             val jsonFile = File(tempFolder.tmpDir, "test.json")
             return arrayOf(
-                Json.name, "com.example", "a",
+                Json.name, "com.example:a;com:b;com:c",
                 getTestDirectory("managingVersions/inDependency").absolutePath,
                 jsonFile.absolutePath,
                 "dgr-updater",

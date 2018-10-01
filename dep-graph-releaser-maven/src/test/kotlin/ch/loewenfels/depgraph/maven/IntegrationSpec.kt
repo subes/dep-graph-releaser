@@ -28,7 +28,7 @@ object IntegrationSpec : Spek({
                 val testDirectory = File("nonExistingProject/")
                 expect {
                     analyseAndCreateReleasePlan(singleProjectIdAndVersions.id, testDirectory)
-                }.toThrow<IllegalArgumentException> { message { contains(errMsg, testDirectory.absolutePath) } }
+                }.toThrow<IllegalArgumentException> { messageContains(errMsg, testDirectory.absolutePath) }
             }
         }
 
@@ -38,7 +38,18 @@ object IntegrationSpec : Spek({
                 val testDirectory = getTestDirectory("errorCases/emptyDirectory")
                 expect {
                     analyseAndCreateReleasePlan(singleProjectIdAndVersions.id, testDirectory)
-                }.toThrow<IllegalArgumentException> { message { contains(errMsg, testDirectory.absolutePath) } }
+                }.toThrow<IllegalArgumentException> { messageContains(errMsg, testDirectory.absolutePath) }
+            }
+        }
+
+        given("no projects given") {
+            val errMsg = "No project given which should be released, aborting now"
+            it("throws an IllegalArgumentException, mentioning `$errMsg`") {
+                expect {
+                    analyseAndCreateReleasePlan(listOf(), "singleProject")
+                }.toThrow<IllegalArgumentException> {
+                    messageContains(errMsg)
+                }
             }
         }
 
@@ -49,9 +60,19 @@ object IntegrationSpec : Spek({
                 expect {
                     analyseAndCreateReleasePlan(wrongProject, "singleProject")
                 }.toThrow<IllegalArgumentException> {
-                    message {
-                        contains(errMsg, wrongProject.identifier, singleProjectIdAndVersions.id.identifier)
-                    }
+                    messageContains(errMsg, wrongProject.identifier, singleProjectIdAndVersions.id.identifier)
+                }
+            }
+        }
+
+        given("one of the projects to release not in directory") {
+            val errMsg = "Can only release a project which is part of the analysis"
+            it("throws an IllegalArgumentException, mentioning `$errMsg`") {
+                val wrongProject = MavenProjectId("com.other", "notThatOne")
+                expect {
+                    analyseAndCreateReleasePlan(listOf(singleProjectIdAndVersions.id, wrongProject), "singleProject")
+                }.toThrow<IllegalArgumentException> {
+                    messageContains(errMsg, wrongProject.identifier, singleProjectIdAndVersions.id.identifier)
                 }
             }
         }
@@ -61,13 +82,25 @@ object IntegrationSpec : Spek({
                 expect {
                     analyseAndCreateReleasePlan(exampleA.id, "errorCases/rootIsSubmodule")
                 }.toThrow<IllegalArgumentException> {
-                    message {
-                        contains(
-                            "Cannot release a submodule",
-                            exampleA.id.toString(),
-                            exampleB.id.toString()
-                        )
-                    }
+                    messageContains(
+                        "Cannot release a submodule",
+                        exampleA.id.toString(),
+                        exampleB.id.toString()
+                    )
+                }
+            }
+        }
+
+        given("one of the projects to release is a submodule") {
+            it("throws an IllegalStateException, containing versions of project and multi module project") {
+                expect {
+                    analyseAndCreateReleasePlan(listOf(exampleB.id, exampleA.id), "errorCases/rootIsSubmodule")
+                }.toThrow<IllegalArgumentException> {
+                    messageContains(
+                        "Cannot release a submodule",
+                        exampleA.id.toString(),
+                        exampleB.id.toString()
+                    )
                 }
             }
         }
@@ -104,12 +137,10 @@ object IntegrationSpec : Spek({
                 expect {
                     analyseAndCreateReleasePlan(exampleB.id, testDirectory)
                 }.toThrow<IllegalStateException> {
-                    message {
-                        contains(
-                            "${exampleB.id.identifier}:${exampleB.currentVersion} (${b.absolutePath})",
-                            "${exampleA.id.identifier}:1.0.0"
-                        )
-                    }
+                    messageContains(
+                        "${exampleB.id.identifier}:${exampleB.currentVersion} (${b.absolutePath})",
+                        "${exampleA.id.identifier}:1.0.0"
+                    )
                 }
             }
         }
@@ -123,12 +154,10 @@ object IntegrationSpec : Spek({
                         JenkinsReleasePlanCreator.Options("releaseId", ".*:example")
                     )
                 }.toThrow<IllegalArgumentException> {
-                    message {
-                        contains(
-                            "Disabling a command of the root project does not make sense",
-                            singleProjectIdAndVersions.id.identifier
-                        )
-                    }
+                    messageContains(
+                        "Disabling a command of the root project does not make sense",
+                        singleProjectIdAndVersions.id.identifier
+                    )
                 }
             }
         }
@@ -305,6 +334,27 @@ object IntegrationSpec : Spek({
                 testReleaseSingleProject(exampleA, "unrelatedProjects")
             }
             testReleaseBWithNoDependent("unrelatedProjects")
+
+            action("we release both project A and project B") {
+                val releasePlan = analyseAndCreateReleasePlan(listOf(exampleA.id, exampleB.id), "unrelatedProjects")
+                assertSyntheticRootProject(releasePlan)
+
+                assertHasTwoDependentsAndIsOnLevel(releasePlan, "synthetic root", syntheticRoot, exampleA, exampleB, 0)
+
+                assertOneReleaseCommandWaitingForSyntheticRoot(releasePlan, "project A", exampleA)
+                assertHasNoDependentsAndIsOnLevel(releasePlan, "project A", exampleA, 1)
+                assertHasRelativePath(releasePlan,  "project A", exampleA, "./")
+
+                assertOneReleaseCommandWaitingForSyntheticRoot(releasePlan, "project B", exampleB)
+                assertHasNoDependentsAndIsOnLevel(releasePlan, "project B", exampleB, 1)
+                assertHasRelativePath(releasePlan,  "project B", exampleB, "./")
+
+                assertReleasePlanHasNumOfProjectsAndDependents(releasePlan, 3)
+                assertReleasePlanHasNoWarningsAndNoInfos(releasePlan)
+                test("ReleasePlan.iterator() returns the root Project followed by the unrelated projects in any order") {
+                    assert(releasePlan).iteratorReturnsRootAndInOrderGrouped(listOf(exampleA.id, exampleB.id))
+                }
+            }
         }
     }
 
@@ -1094,6 +1144,11 @@ private fun analyseAndCreateReleasePlan(projectToRelease: ProjectId, testDirecto
     return analyseAndCreateReleasePlan(projectToRelease, analyser)
 }
 
+private fun analyseAndCreateReleasePlan(projectsToRelease: List<MavenProjectId>, testDirectory: String): ReleasePlan {
+    val analyser = createAnalyserWhichDoesNotResolve(getTestDirectory(testDirectory))
+    return analyseAndCreateReleasePlan(projectsToRelease, analyser, JenkinsReleasePlanCreator.Options("id", "^$"))
+}
+
 private fun createAnalyserWhichDoesNotResolve(testDirectory: File): Analyser =
     Analyser(testDirectory, Session(), mock())
 
@@ -1144,13 +1199,19 @@ private fun analyseAndCreateReleasePlan(
     projectToRelease: ProjectId,
     analyser: Analyser,
     options: JenkinsReleasePlanCreator.Options
+): ReleasePlan = analyseAndCreateReleasePlan(listOf(projectToRelease as MavenProjectId), analyser, options)
+
+private fun analyseAndCreateReleasePlan(
+    projectsToRelease: List<MavenProjectId>,
+    analyser: Analyser,
+    options: JenkinsReleasePlanCreator.Options
 ): ReleasePlan {
     val jenkinsReleasePlanCreator = JenkinsReleasePlanCreator(VersionDeterminer(), options)
-    return jenkinsReleasePlanCreator.create(projectToRelease as MavenProjectId, analyser)
+    return jenkinsReleasePlanCreator.create(projectsToRelease, analyser)
 }
 
 private fun ActionBody.testReleaseSingleProject(idAndVersions: IdAndVersions, directory: String) {
-    val releasePlan = analyseAndCreateReleasePlan(idAndVersions.id, getTestDirectory(directory))
+    val releasePlan = analyseAndCreateReleasePlan(idAndVersions.id, directory)
     assertSingleProject(releasePlan, idAndVersions)
 }
 
