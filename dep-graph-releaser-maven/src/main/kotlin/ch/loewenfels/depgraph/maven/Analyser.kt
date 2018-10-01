@@ -2,6 +2,7 @@ package ch.loewenfels.depgraph.maven
 
 import ch.loewenfels.depgraph.data.Relation
 import ch.loewenfels.depgraph.data.maven.MavenProjectId
+import ch.loewenfels.depgraph.data.maven.syntheticRoot
 import ch.tutteli.kbox.appendToStringBuilder
 import ch.tutteli.kbox.mapParents
 import fr.lteconsulting.pomexplorer.*
@@ -296,7 +297,6 @@ class Analyser internal constructor(
     fun isSyntheticRoot(id: MavenProjectId): Boolean = id == syntheticRoot
 
     companion object {
-        private val syntheticRoot = MavenProjectId("ch.loewenfels", "synthetic-root")
         private val Project.isNotExternal get() = !isExternal
 
         private fun Gav.toRelation(isVersionSelfManaged: Boolean): Relation<MavenProjectId> =

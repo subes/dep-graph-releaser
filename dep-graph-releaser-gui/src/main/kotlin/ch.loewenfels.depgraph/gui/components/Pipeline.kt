@@ -6,6 +6,7 @@ import ch.loewenfels.depgraph.data.maven.jenkins.JenkinsCommand
 import ch.loewenfels.depgraph.data.maven.jenkins.JenkinsMultiMavenReleasePlugin
 import ch.loewenfels.depgraph.data.maven.jenkins.JenkinsSingleMavenReleaseCommand
 import ch.loewenfels.depgraph.data.maven.jenkins.JenkinsUpdateDependency
+import ch.loewenfels.depgraph.data.maven.syntheticRoot
 import ch.loewenfels.depgraph.gui.components.Messages.Companion.showError
 import ch.loewenfels.depgraph.gui.elementById
 import ch.loewenfels.depgraph.gui.getCheckbox
@@ -41,6 +42,10 @@ class Pipeline(private val modifiableState: ModifiableState, private val menu: M
         pipeline.append {
             val itr = releasePlan.iterator().toPeekingIterator()
             var level: Int
+            // skip synthetic root
+            if(itr.hasNext() && itr.peek().id == syntheticRoot){
+                set.add(itr.next().id) // still count it though
+            }
             while (itr.hasNext()) {
                 val project = itr.next()
                 level = project.level
@@ -63,10 +68,7 @@ class Pipeline(private val modifiableState: ModifiableState, private val menu: M
         updateStatus(releasePlan, set)
     }
 
-    private fun updateStatus(
-        releasePlan: ReleasePlan,
-        set: HashSet<ProjectId>
-    ) {
+    private fun updateStatus(releasePlan: ReleasePlan, set: HashSet<ProjectId>) {
         val involvedProjects = set.size
         val status = elementById("status")
         status.innerText = "Projects involved: $involvedProjects"
