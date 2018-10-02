@@ -329,8 +329,9 @@ object IntegrationSpec : Spek({
                         "" to "",
                         predefinedRegex to predefinedJobMapping
                     ), listOf(
-                        "ciManagement was invalid for project ${singleProjectIdAndVersions.id.identifier}, cannot use it for remoteRegex nor for jobMapping." +
-                            "\nWe look for /job/ in the given <url>. Please define the url in the following format: https://server.com/jenkins/job/jobName"
+                        "ciManagement url was invalid, cannot use it for ${ConfigKey.REMOTE_REGEX.asString()} nor for ${ConfigKey.JOB_MAPPING.asString()}, please adjust manually if necessary." +
+                            "\nProject: ${singleProjectIdAndVersions.id.identifier}\nciManagement-url: https://example.com" +
+                            "\n\nWe look for /job/ in the given <url>. Please define the url in the following format: https://server.com/jenkins/job/jobName"
                     )
                 ),
                 Triple(
@@ -349,7 +350,9 @@ object IntegrationSpec : Spek({
                     "withWrongSystem", listOf(
                         "" to "",
                         predefinedRegex to predefinedJobMapping
-                    ), listOf()
+                    ), listOf("ciManagement defined with an unsupported ci-system, please verify if you really want to release with jenkins." +
+                        "\nProject: ${singleProjectIdAndVersions.id.identifier}\nSystem: gocd\nUrl: https://example.com/jenkins"
+                    )
                 )
             ).forEach { (folder, list, warnings) ->
                 context(folder) {

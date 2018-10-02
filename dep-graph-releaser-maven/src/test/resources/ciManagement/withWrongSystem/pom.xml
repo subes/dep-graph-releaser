@@ -9,6 +9,6 @@
 
     <ciManagement>
         <system>gocd</system>
-        <url>https://example.com</url>
+        <url>https://example.com/jenkins</url>
     </ciManagement>
 </project>

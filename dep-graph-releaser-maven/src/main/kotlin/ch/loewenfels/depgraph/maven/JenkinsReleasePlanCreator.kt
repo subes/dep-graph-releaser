@@ -40,6 +40,7 @@ class JenkinsReleasePlanCreator(
         val paramObject = createDependents(analyser, rootProject)
 
         val warnings = mutableListOf<String>()
+        warnings.addAll(analyser.getWarnings())
         reportCyclicDependencies(paramObject, warnings)
         warnings.addAll(analyser.getErroneousPomFiles())
         warnings.addAll(analyser.getErroneousProjects())
@@ -82,8 +83,9 @@ class JenkinsReleasePlanCreator(
             val jenkinsUrl = (projectId as? MavenProjectId)?.let { analyser.getJenkinsUrl(it) } ?: return@forEach
             if (!jenkinsUrl.contains("/job/")) {
                 warnings.add(
-                    "ciManagement was invalid for project ${projectId.identifier}, cannot use it for ${ConfigKey.REMOTE_REGEX.asString()} nor for ${ConfigKey.JOB_MAPPING.asString()}." +
-                        "\nWe look for /job/ in the given <url>. Please define the url in the following format: https://server.com/jenkins/job/jobName"
+                    "ciManagement url was invalid, cannot use it for ${ConfigKey.REMOTE_REGEX.asString()} nor for ${ConfigKey.JOB_MAPPING.asString()}, please adjust manually if necessary." +
+                       "\nProject: ${projectId.identifier}\nciManagement-url: $jenkinsUrl" +
+                        "\n\nWe look for /job/ in the given <url>. Please define the url in the following format: https://server.com/jenkins/job/jobName"
                 )
                 return@forEach
             }
