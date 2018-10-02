@@ -57,9 +57,9 @@ buildscript {
     dependencies {
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
         classpath "ch.tutteli:tutteli-gradle-project-utils:${gradle.ext.tutteli_plugins_version}"
+        classpath "ch.tutteli:tutteli-gradle-dokka:${gradle.ext.tutteli_plugins_version}"
         classpath "ch.tutteli:tutteli-gradle-kotlin-utils:${gradle.ext.tutteli_plugins_version}"
         classpath "ch.tutteli:tutteli-gradle-spek:${gradle.ext.tutteli_plugins_version}"
-        classpath "org.jetbrains.dokka:dokka-gradle-plugin:$dokka_version"
     }
 }
 
@@ -112,28 +112,12 @@ configure(publishedProjects - jvmPublishedProjects) {
 
 def projectsWithSources = jvmPublishedProjects - projectsWithoutSources
 configure(projectsWithSources) {
-    apply plugin: 'org.jetbrains.dokka'
-
-    dokka {
-        outputFormat = 'html'
-        outputDirectory = "$buildDir/kdoc"
-        linkMapping {
-            dir = rootProject.projectDir.absolutePath
-            url = "$github_url/${dokka_sourceMapping}/"
-            suffix = '#L'
-        }
-
-        sourceDirs = files(srcKotlin)
-    }
+    apply plugin: 'ch.tutteli.dokka'
+    tutteliDokka.githubUser = 'loewenfels'
 
     task sourceJar(type: Jar) {
         from project.sourceSets.main.allSource
         classifier 'sources'
-    }
-
-    task javadocJar(type: Jar, dependsOn: dokka) {
-        from dokka.outputDirectory
-        classifier = 'javadoc'
     }
 
     it.ext.publish_artifacts += [sourceJar, javadocJar]
