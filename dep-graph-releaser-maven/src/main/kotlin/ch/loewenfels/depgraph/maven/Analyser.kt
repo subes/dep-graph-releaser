@@ -275,7 +275,7 @@ class Analyser internal constructor(
     }
 
     fun getRelativePath(projectId: MavenProjectId): String = projectsData.getProject(projectId).relativePath
-
+    fun getJenkinsUrl(projectId: MavenProjectId): String? = projectsData.getProject(projectId).jenkinsUrl
 
     private fun <T> emptySetIfPartOfAnalysisOrThrow(projectId: MavenProjectId): Set<T> {
         //throws if project does not exist
@@ -327,8 +327,9 @@ class Analyser internal constructor(
                 val submodules = submodulesOfProjectId[mavenProjectId] ?: emptySet()
                 val multiModules = allMultiModules[mavenProjectId] ?: LinkedHashSet(0)
                 val relativePath = calculateRelativePath(gav)
+                val jenkinsUrl = determineJenkinsUrl(gav)
 
-                projects[mavenProjectId] = ProjectData(gav.version, submodules, multiModules, relativePath)
+                projects[mavenProjectId] = ProjectData(gav.version, submodules, multiModules, relativePath, jenkinsUrl)
             }
         }
 
@@ -379,6 +380,15 @@ class Analyser internal constructor(
             return if (path.isNotEmpty()) path else "./"
         }
 
+        private fun determineJenkinsUrl(gav: Gav): String? {
+            val ciManagement = session.projects().forGav(gav).mavenProject?.ciManagement
+            return if (ciManagement?.system?.toLowerCase() == "jenkins") {
+                ciManagement.url
+            } else {
+                null
+            }
+        }
+
         fun getProjectIfPresent(projectId: MavenProjectId): ProjectData? = projects[projectId]
         fun getProject(projectId: MavenProjectId): ProjectData {
             return projects[projectId] ?: throwProjectNotPartOfAnalysis(projectId)
@@ -395,7 +405,7 @@ class Analyser internal constructor(
         }
 
         fun registerSyntheticRoot() {
-            projects[syntheticRoot] = ProjectData("0.0.0-SNAPSHOT", setOf(), linkedSetOf(), "::nonExistingPath::")
+            projects[syntheticRoot] = ProjectData("0.0.0-SNAPSHOT", setOf(), linkedSetOf(), "::nonExistingPath::", null)
         }
     }
 
@@ -403,7 +413,8 @@ class Analyser internal constructor(
         val version: String,
         val submodules: Set<MavenProjectId>,
         val multiModules: LinkedHashSet<MavenProjectId>,
-        val relativePath: String
+        val relativePath: String,
+        val jenkinsUrl: String?
     )
 
     /**

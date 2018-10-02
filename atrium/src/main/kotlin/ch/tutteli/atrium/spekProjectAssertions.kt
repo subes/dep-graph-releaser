@@ -1,14 +1,18 @@
 package ch.tutteli.atrium
 
+import ch.loewenfels.depgraph.ConfigKey
 import ch.loewenfels.depgraph.data.Project
 import ch.loewenfels.depgraph.data.ReleasePlan
 import ch.loewenfels.depgraph.data.maven.MavenProjectId
-import ch.loewenfels.depgraph.data.maven.jenkins.JenkinsSingleMavenReleaseCommand
 import ch.loewenfels.depgraph.data.maven.jenkins.JenkinsMultiMavenReleasePlugin
+import ch.loewenfels.depgraph.data.maven.jenkins.JenkinsSingleMavenReleaseCommand
 import ch.tutteli.atrium.api.cc.en_GB.*
 import org.jetbrains.spek.api.dsl.TestContainer
 
-val syntheticRoot = IdAndVersions(MavenProjectId("ch.loewenfels", "synthetic-root"), "0.0.0-SNAPSHOT", "0.0.0", "0.1.0-SNAPSHOT")
+val syntheticRoot =
+    IdAndVersions(MavenProjectId("ch.loewenfels", "synthetic-root"), "0.0.0-SNAPSHOT", "0.0.0", "0.1.0-SNAPSHOT")
+val singleProjectIdAndVersions =
+    IdAndVersions(MavenProjectId("com.example", "example"), "1.0-SNAPSHOT", "1.0", "2.0-SNAPSHOT")
 val exampleA = IdAndVersions(MavenProjectId("com.example", "a"), "1.1.1-SNAPSHOT", "1.1.1", "1.1.2-SNAPSHOT")
 val exampleB = IdAndVersions(MavenProjectId("com.example", "b"), "1.0.1-SNAPSHOT", "1.0.1", "1.0.2-SNAPSHOT")
 val exampleC = IdAndVersions(MavenProjectId("com.example", "c"), "3.0.0-SNAPSHOT", "3.0.0", "3.1.0-SNAPSHOT")
@@ -53,6 +57,16 @@ fun TestContainer.assertHasRelativePath(
 ) {
     test("$name has relative path $relativePath") {
         assert(releasePlan.getProject(project.id).relativePath).toBe(relativePath)
+    }
+}
+
+fun TestContainer.assertHasConfig(
+    releasePlan: ReleasePlan,
+    configKey: ConfigKey,
+    expected: String
+) {
+    test("has config for key $configKey which is $expected") {
+        assert(releasePlan.getConfig(configKey)).toBe(expected)
     }
 }
 
@@ -169,7 +183,7 @@ fun TestContainer.assertRootProjectOnlyReleaseCommand(
 }
 
 
-fun TestContainer.assertSyntheticRootProject(releasePlan: ReleasePlan){
+fun TestContainer.assertSyntheticRootProject(releasePlan: ReleasePlan) {
     assertRootProject(releasePlan, syntheticRoot)
     assertHasNoCommands(releasePlan, "synthetic root", syntheticRoot)
     assertHasRelativePath(releasePlan, "synthetic root", syntheticRoot, "::nonExistingPath::")
@@ -499,6 +513,15 @@ fun TestContainer.assertReleasePlanHasNoWarnings(releasePlan: ReleasePlan) {
 fun TestContainer.assertReleasePlanHasNoInfos(releasePlan: ReleasePlan) {
     test("it does not have infos") {
         assert(releasePlan.infos).isEmpty()
+    }
+}
+
+fun TestContainer.assertReleasePlanHasWarningsAboutCiManagement(
+    releasePlan: ReleasePlan,
+    warnings: List<String>
+) {
+    test("warnings contains only warning about ciManagement") {
+        assert(releasePlan.warnings).containsStrictly(warnings.first(), *warnings.drop(1).toTypedArray())
     }
 }
 

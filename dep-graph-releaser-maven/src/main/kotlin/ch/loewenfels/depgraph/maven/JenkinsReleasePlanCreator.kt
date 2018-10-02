@@ -48,6 +48,9 @@ class JenkinsReleasePlanCreator(
         val infos = mutableListOf<String>()
         reportInterModuleCyclicDependencies(paramObject, infos)
 
+        val config = options.config.toMutableMap()
+        updateConfigToProjectSpecificJenkinsUrl(paramObject, analyser, config, warnings)
+
         val releasePlan = ReleasePlan(
             options.publishId,
             ReleaseState.READY,
@@ -58,9 +61,36 @@ class JenkinsReleasePlanCreator(
             paramObject.dependents,
             warnings,
             infos,
-            options.config
+            config
         )
+
         return disableProjectsAsDefinedInOptions(releasePlan)
+    }
+
+    private fun updateConfigToProjectSpecificJenkinsUrl(
+        paramObject: ParamObject,
+        analyser: Analyser,
+        config: MutableMap<ConfigKey, String>,
+        warnings: MutableList<String>
+    ) {
+        paramObject.projects.keys.forEach { projectId ->
+            val jenkinsUrl = (projectId as? MavenProjectId)?.let { analyser.getJenkinsUrl(it) } ?: return@forEach
+            if (!jenkinsUrl.contains("/job/")) {
+                warnings.add(
+                    "ciManagement was invalid for project ${projectId.identifier}, cannot use it for ${ConfigKey.REMOTE_REGEX.asString()} nor for ${ConfigKey.JOB_MAPPING.asString()}." +
+                        "\nWe look for /job/ in the given <url>. Please define the url in the following format: https://server.com/jenkins/job/jobName"
+                )
+                return@forEach
+            }
+
+            val (url, jobName) = jenkinsUrl.split("/job/")
+            val regexParams = config[ConfigKey.REMOTE_REGEX] ?: ""
+            config[ConfigKey.REMOTE_REGEX] = projectId.identifier + "#" + url + "\n" + regexParams
+            if (jobName != projectId.artifactId) {
+                val jobMapping = config[ConfigKey.JOB_MAPPING] ?: ""
+                config[ConfigKey.JOB_MAPPING] = jobMapping + "\n" + projectId.identifier + "=" + jobName
+            }
+        }
     }
 
     private fun createRootProject(analyser: Analyser, projectsToRelease: List<MavenProjectId>): Project {
@@ -254,7 +284,7 @@ class JenkinsReleasePlanCreator(
         if (paramObject.isRelationAlreadyDependentOfDependencyAndWaitsInCommand()) return
 
         // if the dependency is the synthetic root, then we do not need an update command
-        if(paramObject.isDependencySyntheticRoot()) return
+        if (paramObject.isDependencySyntheticRoot()) return
 
         val dependencyId = paramObject.dependencyId
         val list = dependent.commands as MutableList
