@@ -73,6 +73,11 @@ class JenkinsReleasePlanCreator(
         config: MutableMap<ConfigKey, String>,
         warnings: MutableList<String>
     ) {
+        val currentRemoteRegex = config[ConfigKey.REMOTE_REGEX]
+        val currentJobMapping = config[ConfigKey.JOB_MAPPING]
+        val remoteRegex = StringBuilder(currentRemoteRegex?.trim() ?: "")
+        val jobMapping = StringBuilder(currentJobMapping?.trim() ?: "")
+
         paramObject.projects.keys.forEach { projectId ->
             val jenkinsUrl = (projectId as? MavenProjectId)?.let { analyser.getJenkinsUrl(it) } ?: return@forEach
             if (!jenkinsUrl.contains("/job/")) {
@@ -84,13 +89,14 @@ class JenkinsReleasePlanCreator(
             }
 
             val (url, jobName) = jenkinsUrl.split("/job/")
-            val regexParams = config[ConfigKey.REMOTE_REGEX] ?: ""
-            config[ConfigKey.REMOTE_REGEX] = projectId.identifier + "#" + url + "\n" + regexParams
+            remoteRegex.insert(0, "\n").insert(0, url).insert(0, '#').insert(0, projectId.identifier)
             if (jobName != projectId.artifactId) {
-                val jobMapping = config[ConfigKey.JOB_MAPPING] ?: ""
-                config[ConfigKey.JOB_MAPPING] = jobMapping + "\n" + projectId.identifier + "=" + jobName
+                jobMapping.append("\n").append( projectId.identifier).append('=').append(jobName)
             }
         }
+        config[ConfigKey.REMOTE_REGEX] = remoteRegex.toString()
+        config[ConfigKey.JOB_MAPPING] = jobMapping.toString()
+
     }
 
     private fun createRootProject(analyser: Analyser, projectsToRelease: List<MavenProjectId>): Project {

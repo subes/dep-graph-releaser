@@ -270,38 +270,39 @@ object IntegrationSpec : Spek({
     }
 
     describe("config") {
-        given("no configuration") {
-            action("it has an empty config list") {
-                val releasePlan = analyseAndCreateReleasePlan(
-                    singleProjectIdAndVersions.id,
-                    getTestDirectory("singleProject"),
-                    JenkinsReleasePlanCreator.Options("releaseId", Regex(".*notTheProject"), mapOf())
+        action("no configuration") {
+            val releasePlan = analyseAndCreateReleasePlan(
+                singleProjectIdAndVersions.id,
+                getTestDirectory("singleProject"),
+                JenkinsReleasePlanCreator.Options("releaseId", Regex(".*notTheProject"), mapOf())
+            )
+            assertSingleProject(releasePlan, singleProjectIdAndVersions)
+            test("config contains only empty ${ConfigKey.REMOTE_REGEX.asString()} and ${ConfigKey.JOB_MAPPING.asString()}") {
+                assert(releasePlan.config.entries).containsStrictly(
+                    { keyValue(ConfigKey.REMOTE_REGEX, "") },
+                    { keyValue(ConfigKey.JOB_MAPPING, "") }
                 )
-                assertSingleProject(releasePlan, singleProjectIdAndVersions)
-                assert(releasePlan.config).isEmpty()
             }
         }
 
-        given("two configurations") {
-            action("it contains both") {
-                val releasePlan = analyseSingleProjectInDirectory(
-                    "singleProject",
-                    mapOf(ConfigKey.REMOTE_REGEX to "b", ConfigKey.COMMIT_PREFIX to "d")
-                )
-                assertSingleProject(releasePlan, singleProjectIdAndVersions)
+        action("two configurations") {
+            val releasePlan = analyseSingleProjectInDirectory(
+                "singleProject",
+                mapOf(ConfigKey.REMOTE_REGEX to "b", ConfigKey.COMMIT_PREFIX to "d")
+            )
+            assertSingleProject(releasePlan, singleProjectIdAndVersions)
+            test("it contains both + empty ${ConfigKey.JOB_MAPPING.asString()} (one is ${ConfigKey.REMOTE_REGEX.asString()}  thus not empty)") {
                 assert(releasePlan.config.entries).containsStrictly(
                     { keyValue(ConfigKey.REMOTE_REGEX, "b") },
-                    { this.keyValue(ConfigKey.COMMIT_PREFIX, "d") })
+                    { keyValue(ConfigKey.COMMIT_PREFIX, "d") },
+                    { keyValue(ConfigKey.JOB_MAPPING, "") }
+                )
             }
         }
 
         describe("project with ciManagement") {
             val predefinedRegex = "regex"
             val predefinedJobMapping = "test:project=project1"
-            val predefinedConfig = mapOf(
-                ConfigKey.REMOTE_REGEX to predefinedRegex,
-                ConfigKey.JOB_MAPPING to predefinedJobMapping
-            )
             listOf(
                 Triple(
                     "jenkinsInLower", listOf(
@@ -313,38 +314,40 @@ object IntegrationSpec : Spek({
                 ),
                 Triple(
                     "jenkinsInUpper", listOf(
-                        "$groupIdAndArtifactId#https://example.com\n" to null,
+                        "$groupIdAndArtifactId#https://example.com\n" to "",
                         "$groupIdAndArtifactId#https://example.com\n$predefinedRegex" to predefinedJobMapping
                     ), listOf()
                 ),
                 Triple(
                     "multiBranchWithTwiceJob", listOf(
-                        "$groupIdAndArtifactId#https://example.com\n" to null,
+                        "$groupIdAndArtifactId#https://example.com\n" to "",
                         "$groupIdAndArtifactId#https://example.com\n$predefinedRegex" to predefinedJobMapping
                     ), listOf()
                 ),
                 Triple(
                     "urlWithoutJob", listOf(
-                        null to null,
+                        "" to "",
                         predefinedRegex to predefinedJobMapping
-                    ), listOf("ciManagement was invalid for project ${singleProjectIdAndVersions.id.identifier}, cannot use it for remoteRegex nor for jobMapping." +
-                        "\nWe look for /job/ in the given <url>. Please define the url in the following format: https://server.com/jenkins/job/jobName")
+                    ), listOf(
+                        "ciManagement was invalid for project ${singleProjectIdAndVersions.id.identifier}, cannot use it for remoteRegex nor for jobMapping." +
+                            "\nWe look for /job/ in the given <url>. Please define the url in the following format: https://server.com/jenkins/job/jobName"
+                    )
                 ),
                 Triple(
                     "withoutSystem", listOf(
-                        null to null,
+                        "" to "",
                         predefinedRegex to predefinedJobMapping
                     ), listOf()
                 ),
                 Triple(
                     "withoutUrl", listOf(
-                        null to null,
+                        "" to "",
                         predefinedRegex to predefinedJobMapping
                     ), listOf()
                 ),
                 Triple(
                     "withWrongSystem", listOf(
-                        null to null,
+                        "" to "",
                         predefinedRegex to predefinedJobMapping
                     ), listOf()
                 )
@@ -358,20 +361,8 @@ object IntegrationSpec : Spek({
                             val releasePlan = analyseSingleProjectInDirectory(
                                 "ciManagement/$folder", mapOf()
                             )
-                            if (regex1 != null) {
-                                assertHasConfig(releasePlan, ConfigKey.REMOTE_REGEX, regex1)
-                            } else {
-                                test("${ConfigKey.JOB_MAPPING.asString()} is empty") {
-                                    assert(releasePlan.config[ConfigKey.JOB_MAPPING]).toBe(null)
-                                }
-                            }
-                            if (jobMapping1 != null) {
-                                assertHasConfig(releasePlan, ConfigKey.JOB_MAPPING, jobMapping1)
-                            } else {
-                                test("${ConfigKey.JOB_MAPPING.asString()} is empty") {
-                                    assert(releasePlan.config[ConfigKey.JOB_MAPPING]).toBe(null)
-                                }
-                            }
+                            assertHasConfig(releasePlan, ConfigKey.REMOTE_REGEX, regex1)
+                            assertHasConfig(releasePlan, ConfigKey.JOB_MAPPING, jobMapping1)
                             if (warnings.isEmpty()) {
                                 assertReleasePlanHasNoWarnings(releasePlan)
                             } else {
@@ -383,7 +374,28 @@ object IntegrationSpec : Spek({
                     context("other remoteRegex and other jobMappings") {
                         action("context Analyser which does not resolve poms") {
                             val releasePlan = analyseSingleProjectInDirectory(
-                                "ciManagement/$folder", predefinedConfig
+                                "ciManagement/$folder", mapOf(
+                                    ConfigKey.REMOTE_REGEX to predefinedRegex,
+                                    ConfigKey.JOB_MAPPING to predefinedJobMapping
+                                )
+                            )
+                            assertHasConfig(releasePlan, ConfigKey.REMOTE_REGEX, regex2)
+                            assertHasConfig(releasePlan, ConfigKey.JOB_MAPPING, jobMapping2)
+                            if (warnings.isEmpty()) {
+                                assertReleasePlanHasNoWarnings(releasePlan)
+                            } else {
+                                assertReleasePlanHasWarningsAboutCiManagement(releasePlan, warnings)
+                            }
+                            assertReleasePlanHasNoInfos(releasePlan)
+                        }
+                    }
+                    context("other remoteRegex and other jobMappings both starting and ending with \n") {
+                        action("context Analyser which does not resolve poms") {
+                            val releasePlan = analyseSingleProjectInDirectory(
+                                "ciManagement/$folder", mapOf(
+                                    ConfigKey.REMOTE_REGEX to "\n" + predefinedRegex + "\n",
+                                    ConfigKey.JOB_MAPPING to "\n" + predefinedJobMapping + "\n"
+                                )
                             )
                             assertHasConfig(releasePlan, ConfigKey.REMOTE_REGEX, regex2!!)
                             assertHasConfig(releasePlan, ConfigKey.JOB_MAPPING, jobMapping2!!)
