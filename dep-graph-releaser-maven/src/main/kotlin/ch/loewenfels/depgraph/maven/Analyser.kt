@@ -275,7 +275,7 @@ class Analyser internal constructor(
     }
 
     fun getRelativePath(projectId: MavenProjectId): String = projectsData.getProject(projectId).relativePath
-
+    fun getJenkinsUrl(projectId: MavenProjectId): String? = projectsData.getProject(projectId).jenkinsUrl
 
     private fun <T> emptySetIfPartOfAnalysisOrThrow(projectId: MavenProjectId): Set<T> {
         //throws if project does not exist
@@ -295,6 +295,7 @@ class Analyser internal constructor(
     }
 
     fun isSyntheticRoot(id: MavenProjectId): Boolean = id == syntheticRoot
+    fun getWarnings(): List<String> = projectsData.getWarnings()
 
     companion object {
         private val Project.isNotExternal get() = !isExternal
@@ -317,6 +318,8 @@ class Analyser internal constructor(
         private val internalAnalysedGavs: Sequence<Gav>
     ) {
         private val projects = HashMap<MavenProjectId, ProjectData>()
+        private val warnings = mutableListOf<String>()
+
         val size get() = projects.size
 
         init {
@@ -327,8 +330,9 @@ class Analyser internal constructor(
                 val submodules = submodulesOfProjectId[mavenProjectId] ?: emptySet()
                 val multiModules = allMultiModules[mavenProjectId] ?: LinkedHashSet(0)
                 val relativePath = calculateRelativePath(gav)
+                val jenkinsUrl = determineJenkinsUrlWarnIfOtherSystem(gav)
 
-                projects[mavenProjectId] = ProjectData(gav.version, submodules, multiModules, relativePath)
+                projects[mavenProjectId] = ProjectData(gav.version, submodules, multiModules, relativePath, jenkinsUrl)
             }
         }
 
@@ -379,6 +383,26 @@ class Analyser internal constructor(
             return if (path.isNotEmpty()) path else "./"
         }
 
+        private fun determineJenkinsUrlWarnIfOtherSystem(gav: Gav): String? {
+            val ciManagement = session.projects().forGav(gav).mavenProject?.ciManagement
+            val system = ciManagement?.system
+            return when {
+                system == null -> null
+                system.toLowerCase() == "jenkins" -> ciManagement.url
+                else -> {
+                    warnings.add(
+                        "ciManagement defined with an unsupported ci-system, please verify if you really want to release with jenkins." +
+                            "\nProject: ${gav.toMapKey()}\nSystem: $system\nUrl: ${ciManagement.url}"
+                    )
+                    null
+                }
+            }
+        }
+
+        fun registerSyntheticRoot() {
+            projects[syntheticRoot] = ProjectData("0.0.0-SNAPSHOT", setOf(), linkedSetOf(), "::nonExistingPath::", null)
+        }
+
         fun getProjectIfPresent(projectId: MavenProjectId): ProjectData? = projects[projectId]
         fun getProject(projectId: MavenProjectId): ProjectData {
             return projects[projectId] ?: throwProjectNotPartOfAnalysis(projectId)
@@ -394,16 +418,16 @@ class Analyser internal constructor(
             }
         }
 
-        fun registerSyntheticRoot() {
-            projects[syntheticRoot] = ProjectData("0.0.0-SNAPSHOT", setOf(), linkedSetOf(), "::nonExistingPath::")
-        }
+        fun getWarnings(): List<String> = warnings
+
     }
 
     private class ProjectData(
         val version: String,
         val submodules: Set<MavenProjectId>,
         val multiModules: LinkedHashSet<MavenProjectId>,
-        val relativePath: String
+        val relativePath: String,
+        val jenkinsUrl: String?
     )
 
     /**

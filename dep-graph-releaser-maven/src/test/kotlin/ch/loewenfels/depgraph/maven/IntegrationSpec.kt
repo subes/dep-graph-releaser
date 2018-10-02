@@ -17,8 +17,8 @@ import org.jetbrains.spek.api.dsl.*
 import java.io.File
 
 object IntegrationSpec : Spek({
-    val singleProjectIdAndVersions =
-        IdAndVersions(MavenProjectId("com.example", "example"), "1.0-SNAPSHOT", "1.0", "2.0-SNAPSHOT")
+
+    val groupIdAndArtifactId = singleProjectIdAndVersions.id.identifier
 
     describe("validation errors") {
 
@@ -60,7 +60,7 @@ object IntegrationSpec : Spek({
                 expect {
                     analyseAndCreateReleasePlan(wrongProject, "singleProject")
                 }.toThrow<IllegalArgumentException> {
-                    messageContains(errMsg, wrongProject.identifier, singleProjectIdAndVersions.id.identifier)
+                    messageContains(errMsg, wrongProject.identifier, groupIdAndArtifactId)
                 }
             }
         }
@@ -72,7 +72,7 @@ object IntegrationSpec : Spek({
                 expect {
                     analyseAndCreateReleasePlan(listOf(singleProjectIdAndVersions.id, wrongProject), "singleProject")
                 }.toThrow<IllegalArgumentException> {
-                    messageContains(errMsg, wrongProject.identifier, singleProjectIdAndVersions.id.identifier)
+                    messageContains(errMsg, wrongProject.identifier, groupIdAndArtifactId)
                 }
             }
         }
@@ -156,7 +156,7 @@ object IntegrationSpec : Spek({
                 }.toThrow<IllegalArgumentException> {
                     messageContains(
                         "Disabling a command of the root project does not make sense",
-                        singleProjectIdAndVersions.id.identifier
+                        groupIdAndArtifactId
                     )
                 }
             }
@@ -270,32 +270,147 @@ object IntegrationSpec : Spek({
     }
 
     describe("config") {
-        given("no configuration") {
-            action("it has an empty config list") {
-                val releasePlan = analyseAndCreateReleasePlan(
-                    singleProjectIdAndVersions.id,
-                    getTestDirectory("singleProject"),
-                    JenkinsReleasePlanCreator.Options("releaseId", Regex(".*notTheProject"), mapOf())
+        action("no configuration") {
+            val releasePlan = analyseAndCreateReleasePlan(
+                singleProjectIdAndVersions.id,
+                getTestDirectory("singleProject"),
+                JenkinsReleasePlanCreator.Options("releaseId", Regex(".*notTheProject"), mapOf())
+            )
+            assertSingleProject(releasePlan, singleProjectIdAndVersions)
+            test("config contains only empty ${ConfigKey.REMOTE_REGEX.asString()} and ${ConfigKey.JOB_MAPPING.asString()}") {
+                assert(releasePlan.config.entries).containsStrictly(
+                    { keyValue(ConfigKey.REMOTE_REGEX, "") },
+                    { keyValue(ConfigKey.JOB_MAPPING, "") }
                 )
-                assertSingleProject(releasePlan, singleProjectIdAndVersions)
-                assert(releasePlan.config).isEmpty()
             }
         }
-        given("two configurations") {
-            action("it contains both") {
-                val releasePlan = analyseAndCreateReleasePlan(
-                    singleProjectIdAndVersions.id,
-                    getTestDirectory("singleProject"),
-                    JenkinsReleasePlanCreator.Options(
-                        "releaseId",
-                        Regex(".*notTheProject"),
-                        mapOf(ConfigKey.REMOTE_REGEX to "b", ConfigKey.COMMIT_PREFIX to "d")
-                    )
-                )
-                assertSingleProject(releasePlan, singleProjectIdAndVersions)
+
+        action("two configurations") {
+            val releasePlan = analyseSingleProjectInDirectory(
+                "singleProject",
+                mapOf(ConfigKey.REMOTE_REGEX to "b", ConfigKey.COMMIT_PREFIX to "d")
+            )
+            assertSingleProject(releasePlan, singleProjectIdAndVersions)
+            test("it contains both + empty ${ConfigKey.JOB_MAPPING.asString()} (one is ${ConfigKey.REMOTE_REGEX.asString()}  thus not empty)") {
                 assert(releasePlan.config.entries).containsStrictly(
                     { keyValue(ConfigKey.REMOTE_REGEX, "b") },
-                    { this.keyValue(ConfigKey.COMMIT_PREFIX, "d") })
+                    { keyValue(ConfigKey.COMMIT_PREFIX, "d") },
+                    { keyValue(ConfigKey.JOB_MAPPING, "") }
+                )
+            }
+        }
+
+        describe("project with ciManagement") {
+            val predefinedRegex = "regex"
+            val predefinedJobMapping = "test:project=project1"
+            listOf(
+                Triple(
+                    "jenkinsInLower", listOf(
+                        "$groupIdAndArtifactId#https://example.com\n" to
+                            "\n$groupIdAndArtifactId=lib-example",
+                        "$groupIdAndArtifactId#https://example.com\n$predefinedRegex" to
+                            "$predefinedJobMapping\n$groupIdAndArtifactId=lib-example"
+                    ), listOf()
+                ),
+                Triple(
+                    "jenkinsInUpper", listOf(
+                        "$groupIdAndArtifactId#https://example.com\n" to "",
+                        "$groupIdAndArtifactId#https://example.com\n$predefinedRegex" to predefinedJobMapping
+                    ), listOf()
+                ),
+                Triple(
+                    "multiBranchWithTwiceJob", listOf(
+                        "$groupIdAndArtifactId#https://example.com\n" to "",
+                        "$groupIdAndArtifactId#https://example.com\n$predefinedRegex" to predefinedJobMapping
+                    ), listOf()
+                ),
+                Triple(
+                    "urlWithoutJob", listOf(
+                        "" to "",
+                        predefinedRegex to predefinedJobMapping
+                    ), listOf(
+                        "ciManagement url was invalid, cannot use it for ${ConfigKey.REMOTE_REGEX.asString()} nor for ${ConfigKey.JOB_MAPPING.asString()}, please adjust manually if necessary." +
+                            "\nProject: ${singleProjectIdAndVersions.id.identifier}\nciManagement-url: https://example.com" +
+                            "\n\nWe look for /job/ in the given <url>. Please define the url in the following format: https://server.com/jenkins/job/jobName"
+                    )
+                ),
+                Triple(
+                    "withoutSystem", listOf(
+                        "" to "",
+                        predefinedRegex to predefinedJobMapping
+                    ), listOf()
+                ),
+                Triple(
+                    "withoutUrl", listOf(
+                        "" to "",
+                        predefinedRegex to predefinedJobMapping
+                    ), listOf()
+                ),
+                Triple(
+                    "withWrongSystem", listOf(
+                        "" to "",
+                        predefinedRegex to predefinedJobMapping
+                    ), listOf("ciManagement defined with an unsupported ci-system, please verify if you really want to release with jenkins." +
+                        "\nProject: ${singleProjectIdAndVersions.id.identifier}\nSystem: gocd\nUrl: https://example.com/jenkins"
+                    )
+                )
+            ).forEach { (folder, list, warnings) ->
+                context(folder) {
+                    val (p1, p2) = list
+                    val (regex1, jobMapping1) = p1
+                    val (regex2, jobMapping2) = p2
+                    context("no other remoteRegex and jobMappings") {
+                        action("context Analyser which does not resolve poms") {
+                            val releasePlan = analyseSingleProjectInDirectory(
+                                "ciManagement/$folder", mapOf()
+                            )
+                            assertHasConfig(releasePlan, ConfigKey.REMOTE_REGEX, regex1)
+                            assertHasConfig(releasePlan, ConfigKey.JOB_MAPPING, jobMapping1)
+                            if (warnings.isEmpty()) {
+                                assertReleasePlanHasNoWarnings(releasePlan)
+                            } else {
+                                assertReleasePlanHasWarningsAboutCiManagement(releasePlan, warnings)
+                            }
+                            assertReleasePlanHasNoInfos(releasePlan)
+                        }
+                    }
+                    context("other remoteRegex and other jobMappings") {
+                        action("context Analyser which does not resolve poms") {
+                            val releasePlan = analyseSingleProjectInDirectory(
+                                "ciManagement/$folder", mapOf(
+                                    ConfigKey.REMOTE_REGEX to predefinedRegex,
+                                    ConfigKey.JOB_MAPPING to predefinedJobMapping
+                                )
+                            )
+                            assertHasConfig(releasePlan, ConfigKey.REMOTE_REGEX, regex2)
+                            assertHasConfig(releasePlan, ConfigKey.JOB_MAPPING, jobMapping2)
+                            if (warnings.isEmpty()) {
+                                assertReleasePlanHasNoWarnings(releasePlan)
+                            } else {
+                                assertReleasePlanHasWarningsAboutCiManagement(releasePlan, warnings)
+                            }
+                            assertReleasePlanHasNoInfos(releasePlan)
+                        }
+                    }
+                    context("other remoteRegex and other jobMappings both starting and ending with \n") {
+                        action("context Analyser which does not resolve poms") {
+                            val releasePlan = analyseSingleProjectInDirectory(
+                                "ciManagement/$folder", mapOf(
+                                    ConfigKey.REMOTE_REGEX to "\n" + predefinedRegex + "\n",
+                                    ConfigKey.JOB_MAPPING to "\n" + predefinedJobMapping + "\n"
+                                )
+                            )
+                            assertHasConfig(releasePlan, ConfigKey.REMOTE_REGEX, regex2!!)
+                            assertHasConfig(releasePlan, ConfigKey.JOB_MAPPING, jobMapping2!!)
+                            if (warnings.isEmpty()) {
+                                assertReleasePlanHasNoWarnings(releasePlan)
+                            } else {
+                                assertReleasePlanHasWarningsAboutCiManagement(releasePlan, warnings)
+                            }
+                            assertReleasePlanHasNoInfos(releasePlan)
+                        }
+                    }
+                }
             }
         }
     }
@@ -304,19 +419,14 @@ object IntegrationSpec : Spek({
 
         context("in root folder") {
             action("context Analyser which does not resolve poms") {
-                val releasePlan =
-                    analyseAndCreateReleasePlan(singleProjectIdAndVersions.id, getTestDirectory("singleProject"))
+                val releasePlan = analyseAndCreateReleasePlan(singleProjectIdAndVersions.id, "singleProject")
                 assertSingleProject(releasePlan, singleProjectIdAndVersions)
                 assertHasRelativePath(releasePlan, "root", singleProjectIdAndVersions, "./")
             }
         }
-        context("in subfolder") {
+        context("in sub folder") {
             action("context Analyser which does not resolve poms") {
-                val releasePlan =
-                    analyseAndCreateReleasePlan(
-                        singleProjectIdAndVersions.id,
-                        getTestDirectory("singleProjectInSubfolder")
-                    )
+                val releasePlan = analyseAndCreateReleasePlan(singleProjectIdAndVersions.id, "singleProjectInSubfolder")
                 assertSingleProject(releasePlan, singleProjectIdAndVersions)
                 assertHasRelativePath(releasePlan, "root", singleProjectIdAndVersions, "subfolder/")
             }
@@ -343,11 +453,11 @@ object IntegrationSpec : Spek({
 
                 assertOneReleaseCommandWaitingForSyntheticRoot(releasePlan, "project A", exampleA)
                 assertHasNoDependentsAndIsOnLevel(releasePlan, "project A", exampleA, 1)
-                assertHasRelativePath(releasePlan,  "project A", exampleA, "./")
+                assertHasRelativePath(releasePlan, "project A", exampleA, "./")
 
                 assertOneReleaseCommandWaitingForSyntheticRoot(releasePlan, "project B", exampleB)
                 assertHasNoDependentsAndIsOnLevel(releasePlan, "project B", exampleB, 1)
-                assertHasRelativePath(releasePlan,  "project B", exampleB, "./")
+                assertHasRelativePath(releasePlan, "project B", exampleB, "./")
 
                 assertReleasePlanHasNumOfProjectsAndDependents(releasePlan, 3)
                 assertReleasePlanHasNoWarningsAndNoInfos(releasePlan)
@@ -1151,6 +1261,13 @@ private fun analyseAndCreateReleasePlan(projectsToRelease: List<MavenProjectId>,
 
 private fun createAnalyserWhichDoesNotResolve(testDirectory: File): Analyser =
     Analyser(testDirectory, Session(), mock())
+
+fun analyseSingleProjectInDirectory(dir: String, config: Map<ConfigKey, String>) =
+    analyseAndCreateReleasePlan(
+        singleProjectIdAndVersions.id,
+        getTestDirectory(dir),
+        JenkinsReleasePlanCreator.Options("releaseId", Regex(".*#notTheProject"), config)
+    )
 
 private fun analyseAndCreateReleasePlan(
     projectToRelease: ProjectId,

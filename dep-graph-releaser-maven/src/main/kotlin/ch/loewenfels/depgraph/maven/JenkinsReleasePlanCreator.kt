@@ -40,6 +40,7 @@ class JenkinsReleasePlanCreator(
         val paramObject = createDependents(analyser, rootProject)
 
         val warnings = mutableListOf<String>()
+        warnings.addAll(analyser.getWarnings())
         reportCyclicDependencies(paramObject, warnings)
         warnings.addAll(analyser.getErroneousPomFiles())
         warnings.addAll(analyser.getErroneousProjects())
@@ -47,6 +48,9 @@ class JenkinsReleasePlanCreator(
 
         val infos = mutableListOf<String>()
         reportInterModuleCyclicDependencies(paramObject, infos)
+
+        val config = options.config.toMutableMap()
+        updateConfigToProjectSpecificJenkinsUrl(paramObject, analyser, config, warnings)
 
         val releasePlan = ReleasePlan(
             options.publishId,
@@ -58,9 +62,43 @@ class JenkinsReleasePlanCreator(
             paramObject.dependents,
             warnings,
             infos,
-            options.config
+            config
         )
+
         return disableProjectsAsDefinedInOptions(releasePlan)
+    }
+
+    private fun updateConfigToProjectSpecificJenkinsUrl(
+        paramObject: ParamObject,
+        analyser: Analyser,
+        config: MutableMap<ConfigKey, String>,
+        warnings: MutableList<String>
+    ) {
+        val currentRemoteRegex = config[ConfigKey.REMOTE_REGEX]
+        val currentJobMapping = config[ConfigKey.JOB_MAPPING]
+        val remoteRegex = StringBuilder(currentRemoteRegex?.trim() ?: "")
+        val jobMapping = StringBuilder(currentJobMapping?.trim() ?: "")
+
+        paramObject.projects.keys.forEach { projectId ->
+            val jenkinsUrl = (projectId as? MavenProjectId)?.let { analyser.getJenkinsUrl(it) } ?: return@forEach
+            if (!jenkinsUrl.contains("/job/")) {
+                warnings.add(
+                    "ciManagement url was invalid, cannot use it for ${ConfigKey.REMOTE_REGEX.asString()} nor for ${ConfigKey.JOB_MAPPING.asString()}, please adjust manually if necessary." +
+                       "\nProject: ${projectId.identifier}\nciManagement-url: $jenkinsUrl" +
+                        "\n\nWe look for /job/ in the given <url>. Please define the url in the following format: https://server.com/jenkins/job/jobName"
+                )
+                return@forEach
+            }
+
+            val (url, jobName) = jenkinsUrl.split("/job/")
+            remoteRegex.insert(0, "\n").insert(0, url).insert(0, '#').insert(0, projectId.identifier)
+            if (jobName != projectId.artifactId) {
+                jobMapping.append("\n").append( projectId.identifier).append('=').append(jobName)
+            }
+        }
+        config[ConfigKey.REMOTE_REGEX] = remoteRegex.toString()
+        config[ConfigKey.JOB_MAPPING] = jobMapping.toString()
+
     }
 
     private fun createRootProject(analyser: Analyser, projectsToRelease: List<MavenProjectId>): Project {
@@ -254,7 +292,7 @@ class JenkinsReleasePlanCreator(
         if (paramObject.isRelationAlreadyDependentOfDependencyAndWaitsInCommand()) return
 
         // if the dependency is the synthetic root, then we do not need an update command
-        if(paramObject.isDependencySyntheticRoot()) return
+        if (paramObject.isDependencySyntheticRoot()) return
 
         val dependencyId = paramObject.dependencyId
         val list = dependent.commands as MutableList
