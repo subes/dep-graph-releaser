@@ -1,8 +1,4 @@
-buildscript {
-    ext.publish_description = 'Provides the javascript for the HTML-Pipeline.'
-}
-
-apply plugin: "kotlin2js"
+project.description= 'Provides the javascript for the HTML-Pipeline.'
 
 dependencies {
     compile prefixedProject('api-js')
@@ -10,10 +6,4 @@ dependencies {
     compile kotlinStdlibJs(), withoutKotlin
     compile "org.jetbrains.kotlinx:kotlinx-html-js:$kotlin_html_version", withoutKotlin
     compile "ch.tutteli.kbox:kbox-js:$kbox_version", withoutKotlin
-}
-
-compileKotlin2Js {
-    kotlinOptions.moduleKind = "umd"
-    kotlinOptions.sourceMap = true
-    kotlinOptions.sourceMapEmbedSources = "always"
 }

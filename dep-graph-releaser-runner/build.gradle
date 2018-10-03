@@ -1,6 +1,4 @@
-buildscript {
-    ext.publish_description = 'Contains different runners, they are the entry point for users.'
-}
+project.description = 'Contains different runners, they are the entry point for users.'
 
 dependencies {
     compile prefixedProject('maven')
@@ -230,4 +228,7 @@ task resourcesJar(type: Jar) {
     classifier 'resources'
 }
 
-ext.publish_artifacts += [resourcesJar, distZip]
+publish {
+    artifacts.add(resourcesJar)
+    artifacts.add(distZip)
+}

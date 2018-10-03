@@ -1,6 +1,4 @@
-buildscript {
-    ext.publish_description = 'Contains classes to manipulate a release plan.'
-}
+project.description = 'Contains classes to manipulate a release plan.'
 
 dependencies {
     compile prefixedProject('api-jvm'), withoutKotlin

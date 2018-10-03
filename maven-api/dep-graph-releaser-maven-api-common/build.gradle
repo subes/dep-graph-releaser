@@ -1,6 +1,4 @@
-buildscript {
-    ext.publish_description = 'Contains the maven related API of the dep-graph-analyser, e.g. data structures.'
-}
+project.description = 'Contains the maven related API of the dep-graph-analyser, e.g. data structures.'
 
 dependencies {
     compile prefixedProject('api-common')

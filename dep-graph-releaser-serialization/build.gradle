@@ -1,6 +1,4 @@
-buildscript {
-    ext.publish_description = 'Contains the serialization logic.'
-}
+project.description = 'Contains the serialization logic.'
 
 dependencies {
     compile prefixedProject('api-jvm')
