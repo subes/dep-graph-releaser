@@ -17,7 +17,8 @@ buildscript {
         mockito_kotlin_version = '1.5.0'
         mockito_version = '2.18.3'
         spek_version = '1.1.5'
-        tutteli_spek_extensions = '0.2.0'
+        tutteli_spek_extensions = '0.3.0'
+        niok_version = '0.2.0'
 
         //publish.gradle
         bintray_version = '1.7.3'

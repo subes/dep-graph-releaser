@@ -2,7 +2,11 @@ package ch.loewenfels.depgraph.manipulation
 
 import ch.loewenfels.depgraph.regex.noneOrSomeChars
 import ch.loewenfels.depgraph.regex.someChars
-import java.io.File
+import ch.tutteli.niok.absolutePathAsString
+import ch.tutteli.niok.exists
+import ch.tutteli.niok.readText
+import ch.tutteli.niok.writeText
+import java.nio.file.Path
 
 object RegexBasedVersionUpdater {
 
@@ -20,10 +24,10 @@ object RegexBasedVersionUpdater {
     private val exclusionRegex = Regex("<$EXCLUSIONS>$someChars</$EXCLUSIONS>")
     private const val ERROR_MESSAGE = "Version is already up-to-date; did you pass wrong argument for newVersion?"
 
-    fun updateDependency(pom: File, groupId: String, artifactId: String, newVersion: String) {
-        require(pom.exists()) {
+    fun updateDependency(pom: Path, groupId: String, artifactId: String, newVersion: String) {
+        require(pom.exists) {
             "pom file does not exist, cannot update dependency." +
-                "\npom: ${pom.absolutePath}" +
+                "\npom: ${pom.absolutePathAsString}" +
                 "\ndependency: $groupId:$artifactId:$newVersion"
         }
 
@@ -55,13 +59,13 @@ object RegexBasedVersionUpdater {
         return Regex("(?:$groupIdPattern$noneOrSomeChars$artifactIdPattern)|(?:$artifactIdPattern$noneOrSomeChars$groupIdPattern)")
     }
 
-    private fun updateParentRelation(parentParamObject: ParamObject, groupIdArtifactIdRegex: Regex, pom: File) {
+    private fun updateParentRelation(parentParamObject: ParamObject, groupIdArtifactIdRegex: Regex, pom: Path) {
         val matchResult = parentParamObject.nullableMatchResult
         if (matchResult != null && groupIdArtifactIdRegex.containsMatchIn(matchResult.value)) {
             parentParamObject.appendBeforeMatchAndUpdateStartIndex()
             appendDependency(parentParamObject)
             check(matchResult.next() == null) {
-                "pom has two <$PARENT> -- file: ${pom.absolutePath}"
+                "pom has two <$PARENT> -- file: ${pom.absolutePathAsString}"
             }
         }
         parentParamObject.appendRestIfUpdated()
@@ -201,7 +205,7 @@ object RegexBasedVersionUpdater {
         dependenciesParamObject: ParamObject,
         parentParamObject: ParamObject,
         propertiesParamObject: ParamObject,
-        pom: File
+        pom: Path
     ) {
         val wasModified = dependenciesParamObject.updated || parentParamObject.updated || propertiesParamObject.updated
         when {
@@ -213,7 +217,7 @@ object RegexBasedVersionUpdater {
                     "Cannot update (parent) dependency: The dependency's version is managed via one or more properties" +
                         " but they are not present in the pom." +
                         "\ndependency: ${propertiesParamObject.groupId}:${propertiesParamObject.artifactId}" +
-                        "\npom: ${pom.absolutePath}" +
+                        "\npom: ${pom.absolutePathAsString}" +
                         "\nproperties:${propertiesParamObject.properties.joinToString()}"
                 )
 
@@ -221,7 +225,7 @@ object RegexBasedVersionUpdater {
                 throw IllegalStateException(
                     "Cannot update (parent) dependency: the dependency was not found." +
                         "\ndependency: ${propertiesParamObject.groupId}:${propertiesParamObject.artifactId}" +
-                        "\npom: ${pom.absolutePath}"
+                        "\npom: ${pom.absolutePathAsString}"
                 )
         }
     }

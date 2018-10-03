@@ -1,9 +1,7 @@
 package ch.loewenfels.depgraph.runner
 
-import ch.loewenfels.depgraph.runner.Main.fileVerifier
 import ch.loewenfels.depgraph.runner.commands.*
 import ch.loewenfels.depgraph.runner.console.*
-import java.io.File
 
 object Main {
     @JvmStatic
@@ -19,6 +17,6 @@ object Main {
     }
 
     internal var errorHandler: ErrorHandler = SystemExitErrorHandler
-    internal var fileVerifier: FileVerifier = OnlyFolderAndSubFolderFileVerifier
+    internal var pathVerifier: PathVerifier = OnlyFolderAndSubFolderPathVerifier
 
 }

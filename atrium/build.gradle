@@ -13,4 +13,5 @@ dependencies {
     }
     compile "org.jetbrains.spek:spek-api:$spek_version", withoutKotlin
     compile "ch.tutteli:tutteli-spek-extensions:$tutteli_spek_extensions", withoutKotlin
+    compile "ch.tutteli.niok:niok:$niok_version", withoutKotlin
 }

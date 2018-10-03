@@ -3,10 +3,11 @@ package ch.loewenfels.depgraph.runner.console
 import ch.loewenfels.depgraph.maven.getTestDirectory
 import ch.loewenfels.depgraph.runner.commands.UpdateDependency
 import ch.tutteli.atrium.copyPom
+import ch.tutteli.niok.absolutePathAsString
 import ch.tutteli.spek.extensions.TempFolder
 import org.jetbrains.spek.api.Spek
 import org.jetbrains.spek.api.include
-import java.io.File
+
 
 class UpdateDependencySpec : Spek({
     include(UpdateDependencyCommandSpec)
@@ -24,11 +25,11 @@ class UpdateDependencySpec : Spek({
 
     companion object {
         fun getNotEnoughArgs(tempFolder: TempFolder): Array<out String> {
-            val pom = File(getTestDirectory("singleProject"), "pom.xml")
+            val pom = getTestDirectory("singleProject").resolve("pom.xml")
             val tmpPom = copyPom(tempFolder, pom)
             return arrayOf(
                 UpdateDependency.name,
-                tmpPom.absolutePath,
+                tmpPom.absolutePathAsString,
                 "junit",
                 "junit"
                 //version is required as well
@@ -37,11 +38,11 @@ class UpdateDependencySpec : Spek({
         }
 
         fun getTooManyArgs(tempFolder: TempFolder): Array<out String> {
-            val pom = File(getTestDirectory("singleProject"), "pom.xml")
+            val pom = getTestDirectory("singleProject").resolve("pom.xml")
             val tmpPom = copyPom(tempFolder, pom)
             return arrayOf(
                 UpdateDependency.name,
-                tmpPom.absolutePath,
+                tmpPom.absolutePathAsString,
                 "junit",
                 "junit",
                 "4.12",

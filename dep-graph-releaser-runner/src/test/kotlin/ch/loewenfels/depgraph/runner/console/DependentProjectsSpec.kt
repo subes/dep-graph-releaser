@@ -2,6 +2,7 @@ package ch.loewenfels.depgraph.runner.console
 
 import ch.loewenfels.depgraph.maven.getTestDirectory
 import ch.loewenfels.depgraph.runner.commands.DependentProjects
+import ch.tutteli.niok.absolutePathAsString
 import ch.tutteli.spek.extensions.TempFolder
 import org.jetbrains.spek.api.Spek
 import org.jetbrains.spek.api.include
@@ -24,7 +25,7 @@ class DependentProjectsSpec : Spek({
         fun getNotEnoughArgs(@Suppress("UNUSED_PARAMETER") tempFolder: TempFolder): Array<out String> {
             return arrayOf(
                 DependentProjects.name, "com.example", "project",
-                getTestDirectory("managingVersions/inDependency").absolutePath
+                getTestDirectory("managingVersions/inDependency").absolutePathAsString
                 //excludeRegex is required as well
                 //"^(.*)$ "
             )
@@ -33,7 +34,7 @@ class DependentProjectsSpec : Spek({
         fun getTooManyArgs(@Suppress("UNUSED_PARAMETER") tempFolder: TempFolder): Array<out String> {
             return arrayOf(
                 DependentProjects.name, "com.example", "project",
-                getTestDirectory("managingVersions/inDependency").absolutePath,
+                getTestDirectory("managingVersions/inDependency").absolutePathAsString,
                 "^$",
                 "${DependentProjects.FORMAT_ARG}list",
                 "${DependentProjects.RELATIVE_PATH_TO_GIT_REPO_REGEX_ARG}^(.*)/$",

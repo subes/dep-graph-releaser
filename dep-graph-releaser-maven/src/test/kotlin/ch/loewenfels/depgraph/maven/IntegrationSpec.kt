@@ -6,6 +6,7 @@ import ch.loewenfels.depgraph.data.ReleasePlan
 import ch.loewenfels.depgraph.data.maven.MavenProjectId
 import ch.tutteli.atrium.*
 import ch.tutteli.atrium.api.cc.en_GB.*
+import ch.tutteli.niok.absolutePathAsString
 import com.nhaarman.mockito_kotlin.any
 import com.nhaarman.mockito_kotlin.eq
 import com.nhaarman.mockito_kotlin.mock
@@ -14,7 +15,8 @@ import fr.lteconsulting.pomexplorer.Session
 import fr.lteconsulting.pomexplorer.model.Gav
 import org.jetbrains.spek.api.Spek
 import org.jetbrains.spek.api.dsl.*
-import java.io.File
+import java.nio.file.Path
+import java.nio.file.Paths
 
 object IntegrationSpec : Spek({
 
@@ -25,10 +27,10 @@ object IntegrationSpec : Spek({
         given("non existing directory") {
             val errMsg = "directory does not exists"
             it("throws an IllegalArgumentException, mentioning `$errMsg`") {
-                val testDirectory = File("nonExistingProject/")
+                val testDirectory = Paths.get("nonExistingProject/")
                 expect {
                     analyseAndCreateReleasePlan(singleProjectIdAndVersions.id, testDirectory)
-                }.toThrow<IllegalArgumentException> { messageContains(errMsg, testDirectory.absolutePath) }
+                }.toThrow<IllegalArgumentException> { messageContains(errMsg, testDirectory.absolutePathAsString) }
             }
         }
 
@@ -38,7 +40,7 @@ object IntegrationSpec : Spek({
                 val testDirectory = getTestDirectory("errorCases/emptyDirectory")
                 expect {
                     analyseAndCreateReleasePlan(singleProjectIdAndVersions.id, testDirectory)
-                }.toThrow<IllegalArgumentException> { messageContains(errMsg, testDirectory.absolutePath) }
+                }.toThrow<IllegalArgumentException> { messageContains(errMsg, testDirectory.absolutePathAsString) }
             }
         }
 
@@ -133,12 +135,12 @@ object IntegrationSpec : Spek({
         given("parent not in analysis") {
             it("throws an IllegalStateException, containing versions of project and parent and path of project") {
                 val testDirectory = getTestDirectory("errorCases/parentNotInAnalysis")
-                val b = File(testDirectory, "b.pom")
+                val b = testDirectory.resolve("b.pom")
                 expect {
                     analyseAndCreateReleasePlan(exampleB.id, testDirectory)
                 }.toThrow<IllegalStateException> {
                     messageContains(
-                        "${exampleB.id.identifier}:${exampleB.currentVersion} (${b.absolutePath})",
+                        "${exampleB.id.identifier}:${exampleB.currentVersion} (${b.absolutePathAsString})",
                         "${exampleA.id.identifier}:1.0.0"
                     )
                 }
@@ -167,20 +169,20 @@ object IntegrationSpec : Spek({
         given("a project without group id") {
             test("release plan contains warning which includes file path") {
                 val testDir = getTestDirectory("warnings/projectWithoutGroupId")
-                val pom = File(testDir, "b.pom")
+                val pom = testDir.resolve("b.pom")
                 val releasePlan = analyseAndCreateReleasePlan(exampleA.id, testDir)
                 assert(releasePlan.warnings).containsStrictly({
-                    contains(pom.absolutePath)
+                    contains(pom.absolutePathAsString)
                 })
             }
         }
         given("a project without version") {
             test("release plan contains warning which includes file path") {
                 val testDir = getTestDirectory("warnings/projectWithoutVersion")
-                val pom = File(testDir, "b.pom")
+                val pom = testDir.resolve("b.pom")
                 val releasePlan = analyseAndCreateReleasePlan(exampleA.id, testDir)
                 assert(releasePlan.warnings).containsStrictly({
-                    contains(pom.absolutePath)
+                    contains(pom.absolutePathAsString)
                 })
             }
         }
@@ -400,8 +402,8 @@ object IntegrationSpec : Spek({
                                     ConfigKey.JOB_MAPPING to "\n" + predefinedJobMapping + "\n"
                                 )
                             )
-                            assertHasConfig(releasePlan, ConfigKey.REMOTE_REGEX, regex2!!)
-                            assertHasConfig(releasePlan, ConfigKey.JOB_MAPPING, jobMapping2!!)
+                            assertHasConfig(releasePlan, ConfigKey.REMOTE_REGEX, regex2)
+                            assertHasConfig(releasePlan, ConfigKey.JOB_MAPPING, jobMapping2)
                             if (warnings.isEmpty()) {
                                 assertReleasePlanHasNoWarnings(releasePlan)
                             } else {
@@ -1249,7 +1251,7 @@ private fun SpecBody.testMultiModuleAWithSubmoduleBWithDependentSubmoduleC(testD
 private fun analyseAndCreateReleasePlan(projectToRelease: ProjectId, testDirectory: String) =
     analyseAndCreateReleasePlan(projectToRelease, getTestDirectory(testDirectory))
 
-private fun analyseAndCreateReleasePlan(projectToRelease: ProjectId, testDirectory: File): ReleasePlan {
+private fun analyseAndCreateReleasePlan(projectToRelease: ProjectId, testDirectory: Path): ReleasePlan {
     val analyser = createAnalyserWhichDoesNotResolve(testDirectory)
     return analyseAndCreateReleasePlan(projectToRelease, analyser)
 }
@@ -1259,7 +1261,7 @@ private fun analyseAndCreateReleasePlan(projectsToRelease: List<MavenProjectId>,
     return analyseAndCreateReleasePlan(projectsToRelease, analyser, JenkinsReleasePlanCreator.Options("id", "^$"))
 }
 
-private fun createAnalyserWhichDoesNotResolve(testDirectory: File): Analyser =
+private fun createAnalyserWhichDoesNotResolve(testDirectory: Path): Analyser =
     Analyser(testDirectory, Session(), mock())
 
 fun analyseSingleProjectInDirectory(dir: String, config: Map<ConfigKey, String>) =
@@ -1271,7 +1273,7 @@ fun analyseSingleProjectInDirectory(dir: String, config: Map<ConfigKey, String>)
 
 private fun analyseAndCreateReleasePlan(
     projectToRelease: ProjectId,
-    testDirectory: File,
+    testDirectory: Path,
     options: JenkinsReleasePlanCreator.Options
 ): ReleasePlan {
     val analyser = createAnalyserWhichDoesNotResolve(testDirectory)
@@ -1287,22 +1289,22 @@ private fun analyseAndCreateReleasePlanWithPomResolverOldVersions(
     val pomFileLoader = mock<PomFileLoader> {
         on {
             it.loadPomFileForGav(eq(Gav(exampleA.id.groupId, exampleA.id.artifactId, "1.0.0")), eq(null), any())
-        }.thenReturn(File(oldPomsDir, "a-1.0.0.pom"))
+        }.thenReturn(oldPomsDir.resolve("a-1.0.0.pom").toFile())
         on {
             it.loadPomFileForGav(eq(Gav(exampleA.id.groupId, exampleA.id.artifactId, "0.9.0")), eq(null), any())
-        }.thenReturn(File(oldPomsDir, "a-0.9.0.pom"))
+        }.thenReturn(oldPomsDir.resolve("a-0.9.0.pom").toFile())
         on {
             it.loadPomFileForGav(eq(Gav(exampleB.id.groupId, exampleB.id.artifactId, "1.0.0")), eq(null), any())
-        }.thenReturn(File(oldPomsDir, "b-1.0.0.pom"))
+        }.thenReturn(oldPomsDir.resolve("b-1.0.0.pom").toFile())
         on {
             it.loadPomFileForGav(eq(Gav(exampleC.id.groupId, exampleC.id.artifactId, "2.0.0")), eq(null), any())
-        }.thenReturn(File(oldPomsDir, "c-2.0.0.pom"))
+        }.thenReturn(oldPomsDir.resolve("c-2.0.0.pom").toFile())
         on {
             it.loadPomFileForGav(eq(Gav(exampleC.id.groupId, exampleC.id.artifactId, "1.0.0")), eq(null), any())
-        }.thenReturn(File(oldPomsDir, "c-1.0.0.pom"))
+        }.thenReturn(oldPomsDir.resolve("c-1.0.0.pom").toFile())
         on {
             it.loadPomFileForGav(eq(Gav(exampleDeps.id.groupId, exampleDeps.id.artifactId, "8")), eq(null), any())
-        }.thenReturn(File(oldPomsDir, "deps-8.pom"))
+        }.thenReturn(oldPomsDir.resolve("deps-8.pom").toFile())
     }
     val analyser = Analyser(getTestDirectory(testDirectory), Session(), pomFileLoader)
     return analyseAndCreateReleasePlan(projectToRelease, analyser)
@@ -1392,9 +1394,9 @@ private fun SpecBody.testDuplicateProject(directory: String, vararg poms: Pair<S
         }.toThrow<IllegalStateException> {
             message {
                 contains(
-                    "directory: ${testDirectory.absolutePath}",
+                    "directory: ${testDirectory.absolutePathAsString}",
                     *poms.map {
-                        "${exampleA.id.identifier}:${it.second} (${File(testDirectory, it.first).absolutePath})"
+                        "${exampleA.id.identifier}:${it.second} (${testDirectory.resolve(it.first).absolutePathAsString})"
                     }.toTypedArray()
                 )
             }

@@ -6,32 +6,33 @@ import ch.loewenfels.depgraph.runner.commands.Json
 import ch.tutteli.atrium.api.cc.en_GB.messageContains
 import ch.tutteli.atrium.api.cc.en_GB.toThrow
 import ch.tutteli.atrium.expect
+import ch.tutteli.niok.absolutePathAsString
 import ch.tutteli.spek.extensions.TempFolder
 import org.jetbrains.spek.api.Spek
 import org.jetbrains.spek.api.dsl.describe
 import org.jetbrains.spek.api.dsl.it
 import org.jetbrains.spek.api.include
-import java.io.File
+
 import java.lang.IllegalStateException
+import java.nio.file.Paths
 import java.util.regex.PatternSyntaxException
 
 class JsonSpec : Spek({
     include(JsonCommandSpec)
 
-
     val tempFolder = TempFolder.perTest()
     registerListener(tempFolder)
 
-    Main.fileVerifier = object : FileVerifier {
-        override fun file(path: String, fileDescription: String) = File(path)
+    Main.pathVerifier = object : PathVerifier {
+        override fun path(path: String, fileDescription: String) = Paths.get(path)
     }
 
     fun createArgs(tempFolder: TempFolder, mvnIds: String, regex: String): Array<String> {
-        val jsonFile = File(tempFolder.tmpDir, "test.json")
+        val jsonFile = tempFolder.tmpDir.resolve("test.json")
         return arrayOf(
             Json.name, mvnIds,
-            getTestDirectory("managingVersions/inDependency").absolutePath,
-            jsonFile.absolutePath,
+            getTestDirectory("managingVersions/inDependency").absolutePathAsString,
+            jsonFile.absolutePathAsString,
             "dgr-updater",
             "dgr-dry-run",
             "^$#https://none.com",
@@ -170,11 +171,11 @@ class JsonSpec : Spek({
 
     companion object {
         fun getNotEnoughArgs(tempFolder: TempFolder): Array<out String> {
-            val jsonFile = File(tempFolder.tmpDir, "test.json")
+            val jsonFile = tempFolder.tmpDir.resolve("test.json")
             return arrayOf(
                 Json.name, "com.example:a;com:b;com:c;com:d",
-                getTestDirectory("managingVersions/inDependency").absolutePath,
-                jsonFile.absolutePath,
+                getTestDirectory("managingVersions/inDependency").absolutePathAsString,
+                jsonFile.absolutePathAsString,
                 "dgr-updater",
                 "dgr-dry-run",
                 "^$#none",
@@ -186,11 +187,11 @@ class JsonSpec : Spek({
         }
 
         fun getTooManyArgs(tempFolder: TempFolder): Array<out String> {
-            val jsonFile = File(tempFolder.tmpDir, "test.json")
+            val jsonFile = tempFolder.tmpDir.resolve("test.json")
             return arrayOf(
                 Json.name, "com.example:a;com:b;com:c",
-                getTestDirectory("managingVersions/inDependency").absolutePath,
-                jsonFile.absolutePath,
+                getTestDirectory("managingVersions/inDependency").absolutePathAsString,
+                jsonFile.absolutePathAsString,
                 "dgr-updater",
                 "dgr-dry-run",
                 "^$#none",

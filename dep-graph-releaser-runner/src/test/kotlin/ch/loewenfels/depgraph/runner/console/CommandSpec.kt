@@ -9,7 +9,8 @@ import ch.tutteli.spek.extensions.TempFolder
 import org.jetbrains.spek.api.Spek
 import org.jetbrains.spek.api.dsl.describe
 import org.jetbrains.spek.api.dsl.it
-import java.io.File
+import java.nio.file.Paths
+
 
 abstract class CommandSpec(
     testee: ConsoleCommand,
@@ -20,8 +21,8 @@ abstract class CommandSpec(
     val tempFolder = TempFolder.perTest()
     registerListener(tempFolder)
 
-    Main.fileVerifier = object : FileVerifier {
-        override fun file(path: String, fileDescription: String) = File(path)
+    Main.pathVerifier = object : PathVerifier {
+        override fun path(path: String, fileDescription: String) = Paths.get(path)
     }
 
     describe("[CommandSpec] validation errors") {

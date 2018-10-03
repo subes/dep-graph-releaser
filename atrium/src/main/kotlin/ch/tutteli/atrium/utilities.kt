@@ -1,18 +1,19 @@
 package ch.tutteli.atrium
 
 import ch.tutteli.atrium.api.cc.en_GB.toBe
+import ch.tutteli.niok.readAllBytes
+import ch.tutteli.niok.readText
+import ch.tutteli.niok.writeBytes
 import ch.tutteli.spek.extensions.TempFolder
-import org.jetbrains.spek.api.dsl.TestContainer
-import org.jetbrains.spek.api.dsl.it
-import java.io.File
+import java.nio.file.Path
 
-fun copyPom(tempFolder: TempFolder, pom: File): File {
+fun copyPom(tempFolder: TempFolder, pom: Path): Path {
     val tmpPom = tempFolder.newFile("pom.xml")
-    tmpPom.writeBytes(pom.readBytes())
+    tmpPom.writeBytes(pom.readAllBytes())
     return tmpPom
 }
 
-fun assertSameAsBeforeAfterReplace(tmpPom: File, pom: File, versionToReplace: String, newVersion: String) {
+fun assertSameAsBeforeAfterReplace(tmpPom: Path, pom: Path, versionToReplace: String, newVersion: String) {
     val content = pom.readText()
     assert(tmpPom.readText()).toBe(content.replace(versionToReplace, newVersion))
 }

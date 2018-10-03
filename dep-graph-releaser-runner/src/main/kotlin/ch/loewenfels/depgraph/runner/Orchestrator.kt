@@ -10,7 +10,11 @@ import ch.loewenfels.depgraph.maven.Analyser
 import ch.loewenfels.depgraph.maven.JenkinsReleasePlanCreator
 import ch.loewenfels.depgraph.maven.VersionDeterminer
 import ch.loewenfels.depgraph.serialization.Serializer
-import java.io.File
+import ch.tutteli.niok.absolutePathAsString
+import ch.tutteli.niok.exists
+import ch.tutteli.niok.newOutputStream
+import ch.tutteli.niok.writeText
+import java.nio.file.Path
 import java.util.logging.Logger
 
 object Orchestrator {
@@ -22,8 +26,8 @@ object Orchestrator {
 
 
     fun analyseAndCreateJson(
-        directoryToAnalyse: File,
-        outputFile: File,
+        directoryToAnalyse: Path,
+        outputFile: Path,
         projectsToRelease: List<MavenProjectId>,
         releasePlanCreatorOptions: JenkinsReleasePlanCreator.Options
     ) {
@@ -33,16 +37,16 @@ object Orchestrator {
         logIfFileExists(outputFile, "resulting json file")
         val json = serializer.serialize(releasePlan)
         outputFile.writeText(json)
-        logger.info { "Created json file at: ${outputFile.absolutePath}" }
+        logger.info { "Created json file at: ${outputFile.absolutePathAsString}" }
     }
 
 
     private fun createReleasePlan(
-        directoryToAnalyse: File,
+        directoryToAnalyse: Path,
         rootProjects: List<MavenProjectId>,
         releasePlanCreatorOptions: JenkinsReleasePlanCreator.Options
     ): ReleasePlan {
-        logger.info { "Going to analyse: ${directoryToAnalyse.absolutePath}" }
+        logger.info { "Going to analyse: ${directoryToAnalyse.absolutePathAsString}" }
         val analyser = Analyser(directoryToAnalyse, Analyser.Options())
         logger.info { "Analysed ${analyser.getNumberOfProjects()} projects." }
 
@@ -54,8 +58,8 @@ object Orchestrator {
     }
 
 
-    fun printReleasableProjects(directoryToAnalyse: File) {
-        logger.info { "Going to analyse: ${directoryToAnalyse.absolutePath}" }
+    fun printReleasableProjects(directoryToAnalyse: Path) {
+        logger.info { "Going to analyse: ${directoryToAnalyse.absolutePathAsString}" }
         val analyser = Analyser(directoryToAnalyse, Analyser.Options(false))
         logger.info { "Analysed ${analyser.getNumberOfProjects()} projects." }
         val list = analyser.getAllReleasableProjects().asSequence().sortedBy { it.artifactId }.joinToString("\n") {
@@ -75,7 +79,7 @@ object Orchestrator {
         return sb.toString()
     }
 
-    fun copyResources(outputDir: File) {
+    fun copyResources(outputDir: Path) {
         logger.info("Going to copy resource files")
         copyResourceToFile(outputDir, "kotlin.js")
         copyResourceToFile(outputDir, "kotlin.js.map")
@@ -99,34 +103,34 @@ object Orchestrator {
         logger.info("Everything done :)")
     }
 
-    private fun copyResourceToFile(outputDir: File, input: String) {
-        val outputFile = File(outputDir, input)
+    private fun copyResourceToFile(outputDir: Path, input: String) {
+        val outputFile = outputDir.resolve(input)
         logIfFileExists(outputFile, "file $input")
         val stream = this::class.java.getResourceAsStream("/$input")
         check(stream != null) {
             "Could not find /$input, please verify it is part of the classpath"
         }
         stream.use { inputStream ->
-            outputFile.outputStream().use { fileOut ->
+            outputFile.newOutputStream().use { fileOut ->
                 inputStream.copyTo(fileOut)
             }
         }
-        logger.fine { "Created ${outputFile.absolutePath}" }
+        logger.fine { "Created ${outputFile.absolutePathAsString}" }
     }
 
-    private fun logIfFileExists(file: File, fileDescription: String) {
-        if (file.exists()) {
+    private fun logIfFileExists(file: Path, fileDescription: String) {
+        if (file.exists) {
             logger.info("The $fileDescription already exists, going to overwrite it.")
         }
     }
 
-    fun updateDependency(pom: File, groupId: String, artifactId: String, newVersion: String) {
+    fun updateDependency(pom: Path, groupId: String, artifactId: String, newVersion: String) {
         RegexBasedVersionUpdater.updateDependency(pom, groupId, artifactId, newVersion)
         logger.info("updated dependency $groupId:$artifactId to new version $newVersion")
     }
 
     fun printDependents(
-        directoryToAnalyse: File,
+        directoryToAnalyse: Path,
         projectToAnalyse: MavenProjectId,
         excludeRegex: Regex
     ) {
@@ -140,7 +144,7 @@ object Orchestrator {
     }
 
     fun printGitCloneForDependents(
-        directoryToAnalyse: File,
+        directoryToAnalyse: Path,
         projectToAnalyse: MavenProjectId,
         excludeRegex: Regex,
         transformerRegex: Regex,
@@ -157,22 +161,22 @@ object Orchestrator {
     }
 
     fun createPsfFileForDependents(
-        directoryToAnalyse: File,
+        directoryToAnalyse: Path,
         projectToAnalyse: MavenProjectId,
         excludeRegex: Regex,
         transformerRegex: Regex,
         transformerReplacement: String,
-        outputFile: File
+        outputFile: Path
     ) {
         val releasePlan = createReleasePlanForAnalysisOnly(directoryToAnalyse, listOf(projectToAnalyse))
         logger.info("Going to create the psf file.")
         val psfContent = generateEclipsePsf(releasePlan, excludeRegex, transformerRegex, transformerReplacement)
         outputFile.writeText(psfContent)
-        logger.info { "Created psf file at: ${outputFile.absolutePath}" }
+        logger.info { "Created psf file at: ${outputFile.absolutePathAsString}" }
     }
 
     private fun createReleasePlanForAnalysisOnly(
-        directoryToAnalyse: File,
+        directoryToAnalyse: Path,
         projectToAnalyse: List<MavenProjectId>
     ) = createReleasePlan(directoryToAnalyse, projectToAnalyse, JenkinsReleasePlanCreator.Options("list", "^$"))
 }

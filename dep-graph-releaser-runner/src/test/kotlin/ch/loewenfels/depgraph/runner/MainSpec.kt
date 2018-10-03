@@ -4,17 +4,19 @@ import ch.loewenfels.depgraph.ConfigKey
 import ch.loewenfels.depgraph.data.ReleasePlan
 import ch.loewenfels.depgraph.maven.getTestDirectory
 import ch.loewenfels.depgraph.runner.Main.errorHandler
-import ch.loewenfels.depgraph.runner.Main.fileVerifier
+import ch.loewenfels.depgraph.runner.Main.pathVerifier
 import ch.loewenfels.depgraph.runner.commands.Json
 import ch.loewenfels.depgraph.runner.console.ErrorHandler
-import ch.loewenfels.depgraph.runner.console.FileVerifier
+import ch.loewenfels.depgraph.runner.console.PathVerifier
 import ch.loewenfels.depgraph.serialization.Serializer
 import ch.tutteli.atrium.*
 import ch.tutteli.atrium.api.cc.en_GB.*
+import ch.tutteli.niok.absolutePathAsString
+import ch.tutteli.niok.exists
 import ch.tutteli.spek.extensions.TempFolder
 import org.jetbrains.spek.api.Spek
 import org.jetbrains.spek.api.dsl.*
-import java.io.File
+import java.nio.file.Paths
 import java.util.*
 
 
@@ -24,14 +26,14 @@ object MainSpec : Spek({
     errorHandler = object : ErrorHandler {
         override fun error(msg: String) = throw AssertionError(msg)
     }
-    fileVerifier = object : FileVerifier {
-        override fun file(path: String, fileDescription: String) = File(path)
+    pathVerifier = object : PathVerifier {
+        override fun path(path: String, fileDescription: String) = Paths.get(path)
     }
 
     describe("json") {
         given("project A with dependent project B (happy case)") {
             on("calling main") {
-                val jsonFile = File(tempFolder.tmpDir, "test.json")
+                val jsonFile = tempFolder.tmpDir.resolve("test.json")
                 val dryRunJob = "dgr-dry-run"
                 val updateJob = "dgr-updater"
                 val remoteRegex = "^$#https://none.com\n(a\n\tcomplicated|regex)(?!\n\ta|\n\tb).*#https://somewhere.else.com/\nb#https://test"
@@ -44,8 +46,8 @@ object MainSpec : Spek({
                 val buildWithParamsJob = "^$#maven#r;n;a\n.*#query#releaseVersion;nextDevVersion"
                 Main.main(
                     "json", "com.example:a;com.example:b",
-                    getTestDirectory("managingVersions/inDependency").absolutePath,
-                    jsonFile.absolutePath,
+                    getTestDirectory("managingVersions/inDependency").absolutePathAsString,
+                    jsonFile.toAbsolutePath().toString(),
                     updateJob,
                     dryRunJob,
                     remoteRegex,
@@ -58,7 +60,7 @@ object MainSpec : Spek({
                     "${Json.BUILD_WITH_PARAM_JOBS_ARG}$buildWithParamsJob"
                 )
                 it("creates a corresponding json file") {
-                    assert(jsonFile).returnValueOf(jsonFile::exists).toBe(true)
+                    assert(jsonFile).property(jsonFile::exists).toBe(true)
                 }
 
                 test("the json file can be de-serialized and is expected project A with dependent B") {
@@ -86,7 +88,7 @@ object MainSpec : Spek({
 
     describe("update") {
         given("single project with third party dependency") {
-            val pom = File(getTestDirectory("singleProject"), "pom.xml")
+            val pom = getTestDirectory("singleProject").resolve("pom.xml")
 
             context("dependency shall be updated, same version") {
                 on("calling main") {
@@ -94,7 +96,7 @@ object MainSpec : Spek({
                     val errMessage = "Version is already up-to-date; did you pass wrong argument for newVersion"
                     it("throws an IllegalArgumentException, mentioning `$errMessage`") {
                         expect {
-                            Main.main("update", tmpPom.absolutePath, "junit", "junit", "4.12")
+                            Main.main("update", tmpPom.absolutePathAsString, "junit", "junit", "4.12")
                         }.toThrow<IllegalArgumentException> { message { contains(errMessage, "4.12") } }
                     }
                 }
@@ -105,7 +107,7 @@ object MainSpec : Spek({
                     val tmpPom = copyPom(tempFolder, pom)
 
                     it("updates the dependency") {
-                        Main.main("update", tmpPom.absolutePath, "junit", "junit", "4.4")
+                        Main.main("update", tmpPom.absolutePathAsString, "junit", "junit", "4.4")
                         assertSameAsBeforeAfterReplace(tmpPom, pom, "4.12", "4.4")
                     }
                 }

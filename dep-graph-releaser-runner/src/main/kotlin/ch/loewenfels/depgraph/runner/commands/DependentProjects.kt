@@ -6,7 +6,8 @@ import ch.loewenfels.depgraph.runner.Orchestrator
 import ch.loewenfels.depgraph.runner.console.ErrorHandler
 import ch.loewenfels.depgraph.runner.console.expectedArgsAndGiven
 import ch.loewenfels.depgraph.runner.console.toOptionalArgs
-import java.io.File
+import java.nio.file.Path
+
 
 object DependentProjects : ConsoleCommand {
 
@@ -120,13 +121,13 @@ object DependentProjects : ConsoleCommand {
     }
 
     private fun list(
-        directoryToAnalyse: File,
+        directoryToAnalyse: Path,
         mavenProjectId: MavenProjectId,
         excludeRegex: Regex
     ) = Orchestrator.printDependents(directoryToAnalyse, mavenProjectId, excludeRegex)
 
     private fun clone(
-        directoryToAnalyse: File,
+        directoryToAnalyse: Path,
         mavenProjectId: MavenProjectId,
         excludeRegex: Regex,
         nullableTransformRegex: String?,
@@ -152,7 +153,7 @@ object DependentProjects : ConsoleCommand {
     }
 
     private fun eclipsePsf(
-        directoryToAnalyse: File,
+        directoryToAnalyse: Path,
         mavenProjectId: MavenProjectId,
         excludeRegex: Regex,
         nullableTransformRegex: String?,

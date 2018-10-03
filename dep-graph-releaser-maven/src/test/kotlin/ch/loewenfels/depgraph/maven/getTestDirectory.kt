@@ -1,5 +1,6 @@
 package ch.loewenfels.depgraph.maven
 
-import java.io.File
+import java.nio.file.Path
+import java.nio.file.Paths
 
-fun getTestDirectory(name: String) = File(IntegrationSpec.javaClass.getResource("/$name/").path)
+fun getTestDirectory(name: String): Path = Paths.get(IntegrationSpec.javaClass.getResource("/$name/").toURI())

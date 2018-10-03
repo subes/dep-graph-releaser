@@ -16,7 +16,7 @@ object OnlyFolderAndSubFolderFileVerifierSpec : Spek({
             val errMsg = "Using `..` in the path of the $fileDescription is prohibited"
             it("throws an IllegalArgumentException, mentioning $errMsg") {
                 expect {
-                    OnlyFolderAndSubFolderFileVerifier.file("../test", fileDescription)
+                    OnlyFolderAndSubFolderPathVerifier.path("../test", fileDescription)
                 }.toThrow<IllegalArgumentException> { message { contains(errMsg) } }
             }
         }
@@ -26,7 +26,7 @@ object OnlyFolderAndSubFolderFileVerifierSpec : Spek({
             val errMsg = "$fileDescription is neither a relative path nor an absolute path"
             it("throws an IllegalArgumentException, mentioning $errMsg") {
                 expect {
-                    OnlyFolderAndSubFolderFileVerifier.file("/Windows", fileDescription)
+                    OnlyFolderAndSubFolderPathVerifier.path("/Windows", fileDescription)
                 }.toThrow<IllegalArgumentException> { message { contains(errMsg) } }
             }
         }

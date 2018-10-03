@@ -5,23 +5,25 @@ import ch.loewenfels.depgraph.data.maven.MavenProjectId
 import ch.loewenfels.depgraph.data.maven.syntheticRoot
 import ch.tutteli.kbox.appendToStringBuilder
 import ch.tutteli.kbox.mapParents
+import ch.tutteli.niok.absolutePathAsString
+import ch.tutteli.niok.exists
 import fr.lteconsulting.pomexplorer.*
 import fr.lteconsulting.pomexplorer.graph.relation.DependencyLikeRelation
 import fr.lteconsulting.pomexplorer.graph.relation.ParentRelation
 import fr.lteconsulting.pomexplorer.model.Gav
-import java.io.File
+import java.nio.file.Path
 import java.util.logging.Logger
 
 class Analyser internal constructor(
-    directoryWithProjects: File,
+    directoryWithProjects: Path,
     private val session: Session,
     pomFileLoader: PomFileLoader,
     options: Options = Options()
 ) {
-    constructor(directoryWithProjects: File, options: Options)
+    constructor(directoryWithProjects: Path, options: Options)
         : this(directoryWithProjects, Session(), options)
 
-    private constructor(directoryWithProjects: File, session: Session, options: Options)
+    private constructor(directoryWithProjects: Path, session: Session, options: Options)
         : this(directoryWithProjects, session, DefaultPomFileLoader(session, true), options)
 
     private val logger = Logger.getLogger(Analyser::class.qualifiedName)
@@ -30,13 +32,13 @@ class Analyser internal constructor(
     private val pomAnalysis: PomAnalysis
 
     init {
-        require(directoryWithProjects.exists()) {
-            "Cannot analyse because the given directory does not exists: ${directoryWithProjects.absolutePath}"
+        require(directoryWithProjects.exists) {
+            "Cannot analyse because the given directory does not exists: ${directoryWithProjects.absolutePathAsString}"
         }
         pomAnalysis = analyseDirectory(directoryWithProjects, pomFileLoader)
         val analysedProjects = getInternalAnalysedProjects()
         require(analysedProjects.isNotEmpty()) {
-            "No pom files found in the given directory (which exists): ${directoryWithProjects.absolutePath}"
+            "No pom files found in the given directory (which exists): ${directoryWithProjects.absolutePathAsString}"
         }
 
         projectsData = ProjectDataCollection(session, directoryWithProjects, getInternalAnalysedGavsAsSequence())
@@ -52,10 +54,10 @@ class Analyser internal constructor(
         dependents = analyseDependents(analysedProjects)
     }
 
-    private fun analyseDirectory(directoryWithProjects: File, pomFileLoader: PomFileLoader): PomAnalysis {
+    private fun analyseDirectory(directoryWithProjects: Path, pomFileLoader: PomFileLoader): PomAnalysis {
         val nullLogger = Log { }
         return PomAnalysis.runFullRecursiveAnalysis(
-            directoryWithProjects.absolutePath,
+            directoryWithProjects.absolutePathAsString,
             session,
             pomFileLoader,
             null,
@@ -128,7 +130,7 @@ class Analyser internal constructor(
 
 
     private fun reportDuplicatesAndMissingParentsIfNecessary(
-        directoryWithProjects: File,
+        directoryWithProjects: Path,
         duplicates: Map<String, List<Project>>,
         parentsNotInAnalysis: Map<Project, Gav>
     ) {
@@ -136,7 +138,7 @@ class Analyser internal constructor(
 
         if (duplicates.isNotEmpty()) {
             sb.append("Found duplicated projects in the given `directoryWithProjects`.\n")
-                .append("directory: ${directoryWithProjects.absolutePath}\n")
+                .append("directory: ${directoryWithProjects.absolutePathAsString}\n")
                 .append("duplicates:\n\n")
             duplicates.values.appendToStringBuilder(sb, "\n\n") { projects ->
                 projects.appendToStringBuilder(sb, "\n") { project ->
@@ -314,7 +316,7 @@ class Analyser internal constructor(
 
     private class ProjectDataCollection(
         private val session: Session,
-        private val directoryWithProjects: File,
+        private val directoryWithProjects: Path,
         private val internalAnalysedGavs: Sequence<Gav>
     ) {
         private val projects = HashMap<MavenProjectId, ProjectData>()
@@ -378,8 +380,8 @@ class Analyser internal constructor(
         }
 
         private fun calculateRelativePath(gav: Gav): String {
-            val projectDir = session.projects().forGav(gav).pomFile.parentFile
-            val path = directoryWithProjects.toURI().relativize(projectDir.toURI()).path
+            val projectDir = session.projects().forGav(gav).pomFile.parentFile.toPath()
+            val path = directoryWithProjects.toUri().relativize(projectDir.toUri()).path
             return if (path.isNotEmpty()) path else "./"
         }
 

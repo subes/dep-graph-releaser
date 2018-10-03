@@ -5,6 +5,7 @@ import ch.tutteli.atrium.api.cc.en_GB.contains
 import ch.tutteli.atrium.api.cc.en_GB.message
 import ch.tutteli.atrium.api.cc.en_GB.toThrow
 import ch.tutteli.atrium.expect
+import ch.tutteli.niok.absolutePathAsString
 import ch.tutteli.spek.extensions.TempFolder
 import org.jetbrains.spek.api.Spek
 import org.jetbrains.spek.api.dsl.given
@@ -45,7 +46,7 @@ class HtmlSpec : Spek({
         fun getTooManyArgs(tempFolder: TempFolder): Array<out String> {
             return arrayOf(
                 Html.name,
-                tempFolder.tmpDir.absolutePath,
+                tempFolder.tmpDir.absolutePathAsString,
                 "unexpectedAdditionalArg"
             )
         }

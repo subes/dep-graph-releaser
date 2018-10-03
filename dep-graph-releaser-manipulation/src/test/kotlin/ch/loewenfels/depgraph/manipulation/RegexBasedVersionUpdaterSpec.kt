@@ -5,10 +5,12 @@ import ch.tutteli.atrium.*
 import ch.tutteli.atrium.api.cc.en_GB.contains
 import ch.tutteli.atrium.api.cc.en_GB.message
 import ch.tutteli.atrium.api.cc.en_GB.toThrow
+import ch.tutteli.niok.absolutePathAsString
 import ch.tutteli.spek.extensions.TempFolder
 import org.jetbrains.spek.api.Spek
 import org.jetbrains.spek.api.dsl.*
-import java.io.File
+import java.nio.file.Path
+import java.nio.file.Paths
 
 object RegexBasedVersionUpdaterSpec : Spek({
     val tempFolder = TempFolder.perTest()
@@ -20,12 +22,12 @@ object RegexBasedVersionUpdaterSpec : Spek({
         given("pom file which does not exist") {
             val errMessage = "pom file does not exist"
             it("throws an IllegalArgumentException, mentioning `$errMessage`") {
-                val pom = File("nonExisting")
+                val pom = Paths.get("nonExisting")
                 expect {
                     testee.updateDependency(pom, "com.google.code.gson", "gson", "4.4")
                 }.toThrow<IllegalArgumentException> {
                     message {
-                        contains(errMessage, pom.absolutePath, "com.google.code.gson", "gson", "4.4")
+                        contains(errMessage, pom.absolutePathAsString, "com.google.code.gson", "gson", "4.4")
                     }
                 }
             }
@@ -34,7 +36,7 @@ object RegexBasedVersionUpdaterSpec : Spek({
         given("single project with third party dependency without version") {
             val errMessage = "the dependency was not found"
             it("throws an IllegalStateException, mentioning `$errMessage`") {
-                val pom = File(getTestDirectory("singleProject"), "pom.xml")
+                val pom = getTestDirectory("singleProject").resolve("pom.xml")
                 val tmpPom = copyPom(tempFolder, pom)
                 expect {
                     testee.updateDependency(tmpPom, "com.google.code.gson", "gson", "4.4")
@@ -92,7 +94,9 @@ object RegexBasedVersionUpdaterSpec : Spek({
         }
 
         given("new version = old version in dependency management") {
-            testSameVersionThrowsIllegalArgumentException("errorCases/sameVersionDependencyManagement.pom", tempFolder, testee)
+            testSameVersionThrowsIllegalArgumentException(
+                "errorCases/sameVersionDependencyManagement.pom", tempFolder, testee
+            )
         }
 
         given("new version = old version in property") {
@@ -101,7 +105,7 @@ object RegexBasedVersionUpdaterSpec : Spek({
     }
 
     given("single project with third party dependency") {
-        val pom = File(getTestDirectory("singleProject"), "pom.xml")
+        val pom = getTestDirectory("singleProject").resolve("pom.xml")
 
         context("dependency shall be updated, new version") {
             it("updates the dependency") {
@@ -129,7 +133,7 @@ object RegexBasedVersionUpdaterSpec : Spek({
     }
 
     given("project with dependency and version in dependency management") {
-        val pom = File(getTestDirectory("managingVersions/viaDependencyManagement"), "b.pom")
+        val pom = getTestDirectory("managingVersions/viaDependencyManagement").resolve("b.pom")
         testWithExampleA(testee, tempFolder, pom)
     }
 
@@ -139,12 +143,12 @@ object RegexBasedVersionUpdaterSpec : Spek({
     }
 
     given("project with parent dependency") {
-        val pom = File(getTestDirectory("parentRelations/parent"), "b.pom")
+        val pom = getTestDirectory("parentRelations/parent").resolve("b.pom")
         testWithExampleA(testee, tempFolder, pom)
     }
 
     given("project with dependency and version in property") {
-        val pom = File(getTestDirectory("managingVersions/viaProperty"), "b.pom")
+        val pom = getTestDirectory("managingVersions/viaProperty").resolve("b.pom")
         testWithExampleA(testee, tempFolder, pom)
     }
 
@@ -196,7 +200,7 @@ private fun SpecBody.testSameVersionThrowsIllegalArgumentException(
 
 private fun SpecBody.testProjectVersionWithExampleA(
     tempFolder: TempFolder,
-    pom: File,
+    pom: Path,
     testee: RegexBasedVersionUpdater
 ) {
     context("dependency shall be updated, same version") {
@@ -219,7 +223,7 @@ private fun SpecBody.testProjectVersionWithExampleA(
 private fun SpecBody.testWithExampleA(
     testee: RegexBasedVersionUpdater,
     tempFolder: TempFolder,
-    pom: File
+    pom: Path
 ) {
     context("dependency shall be updated, new version") {
         it("updates the property") {
@@ -230,15 +234,16 @@ private fun SpecBody.testWithExampleA(
     }
 }
 
-private fun getPom(pomName: String): File = File(RegexBasedVersionUpdaterSpec.javaClass.getResource("/$pomName").path)
+private fun getPom(pomName: String): Path =
+    Paths.get(RegexBasedVersionUpdaterSpec.javaClass.getResource("/$pomName").toURI())
 
-private fun updateDependency(testee: RegexBasedVersionUpdater, tmpPom: File, project: IdAndVersions) {
+private fun updateDependency(testee: RegexBasedVersionUpdater, tmpPom: Path, project: IdAndVersions) {
     updateDependency(testee, tmpPom, project, project.releaseVersion)
 }
 
 private fun updateDependency(
     testee: RegexBasedVersionUpdater,
-    tmpPom: File,
+    tmpPom: Path,
     project: IdAndVersions,
     oldVersion: String
 ) {
