@@ -114,7 +114,7 @@ configure(prefixedProject('gui')) {
 
 configure(publishedProjects) { subproject ->
     apply plugin: 'ch.tutteli.publish'
-    publish {
+    tutteliPublish {
         githubUser = 'loewenfels'
         bintrayRepo = 'oss'
         manifestVendor = 'Loewenfels Partner AG'

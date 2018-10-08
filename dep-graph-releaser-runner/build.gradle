@@ -228,7 +228,7 @@ task resourcesJar(type: Jar) {
     classifier 'resources'
 }
 
-publish {
+tutteliPublish {
     artifacts.add(resourcesJar)
     artifacts.add(distZip)
 }
