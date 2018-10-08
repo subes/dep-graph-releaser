@@ -2,6 +2,6 @@ project.description = 'Contains the serialization logic.'
 
 dependencies {
     compile prefixedProject('api-jvm')
-    compile "com.squareup.moshi:moshi:$moshi_version", withoutKotlin
-    compile "com.squareup.moshi:moshi-kotlin:$moshi_version", withoutKotlin
+    compile "com.squareup.moshi:moshi:$moshi_version", excludeKotlin
+    compile "com.squareup.moshi:moshi-kotlin:$moshi_version", excludeKotlin
 }

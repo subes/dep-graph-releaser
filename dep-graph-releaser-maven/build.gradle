@@ -1,16 +1,14 @@
 project.description = 'Contains the analyser which creates the release data-structure.'
 
 dependencies {
-    compile(prefixedProject('maven-api-jvm')) {
-        exclude group: 'org.jetbrains.kotlin'
-        exclude group: 'ch.tutteli.kbox'
+    compile prefixedProject('maven-api-jvm'), excluding {
+        kotlin()
+        kbox()
     }
-    compile(prefixedProject('manipulation')) {
-        exclude group: 'org.jetbrains.kotlin'
-        exclude group: 'ch.tutteli.kbox'
+    compile prefixedProject('manipulation'), excluding {
+        kotlin()
+        kbox()
     }
     compile "ch.tutteli.copies:pom-explorer-core:$pom_explorer_version"
-    compile("ch.tutteli.kbox:kbox:$kbox_version") {
-        exclude group: 'ch.tutteli.kbox'
-    }
+    compile "ch.tutteli.kbox:kbox:$kbox_version", excludeKbox
 }

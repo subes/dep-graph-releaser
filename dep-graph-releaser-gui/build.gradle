@@ -3,7 +3,7 @@ project.description= 'Provides the javascript for the HTML-Pipeline.'
 dependencies {
     compile prefixedProject('api-js')
     compile prefixedProject('maven-api-js')
-    compile kotlinStdlibJs(), withoutKotlin
-    compile "org.jetbrains.kotlinx:kotlinx-html-js:$kotlin_html_version", withoutKotlin
-    compile "ch.tutteli.kbox:kbox-js:$kbox_version", withoutKotlin
+    compile kotlinStdlibJs(), excludeKotlin
+    compile "org.jetbrains.kotlinx:kotlinx-html-js:$kotlin_html_version", excludeKotlin
+    compile "ch.tutteli.kbox:kbox-js:$kbox_version", excludeKotlin
 }

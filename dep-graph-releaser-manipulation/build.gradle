@@ -1,8 +1,8 @@
 project.description = 'Contains classes to manipulate a release plan.'
 
 dependencies {
-    compile prefixedProject('api-jvm'), withoutKotlin
-    compile "ch.tutteli.niok:niok:$niok_version", withoutKotlin
+    compile prefixedProject('api-jvm'), excludeKotlin
+    compile "ch.tutteli.niok:niok:$niok_version", excludeKotlin
 
     testCompile prefixedProject('maven').sourceSets.test.output
 }

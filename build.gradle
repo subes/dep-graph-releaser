@@ -20,17 +20,12 @@ buildscript {
         tutteli_spek_extensions = '0.3.0'
         niok_version = '0.2.0'
 
-        //publish.gradle
-        bintray_version = '1.7.3'
-        publish_pkg_name = rootProject.name
-        github_url = "https://github.com/loewenfels/${rootProject.name}"
-        publish_vcsUrl = "${github_url}.git"
-
         //gh-pages.gradle
         ghPages_version = version
         dokka_sourceMapping = 'tree/master'
         docProjects = subprojects
         srcKotlin = 'src/main/kotlin'
+        github_url = "https://github.com/loewenfels/${rootProject.name}"
 
         //jacoco-multi-project.gradle
         jacoco_tool_version = '0.8.1'
@@ -123,6 +118,8 @@ configure(publishedProjects) { subproject ->
     publish {
         githubUser = 'loewenfels'
         bintrayRepo = 'oss'
+        manifestVendor = 'Loewenfels Partner AG'
+        resetLicenses 'EUPL-1.2'
     }
 }
 
