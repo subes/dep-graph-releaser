@@ -79,45 +79,6 @@ object Orchestrator {
         return sb.toString()
     }
 
-    fun copyResources(outputDir: Path) {
-        logger.info("Going to copy resource files")
-        copyResourceToFile(outputDir, "kotlin.js")
-        copyResourceToFile(outputDir, "kotlin.js.map")
-        copyResourceToFile(outputDir, "kotlinx-html-js.js")
-        copyResourceToFile(outputDir, "kotlinx-html-js.js.map")
-        copyResourceToFile(outputDir, "kbox-js.js")
-        copyResourceToFile(outputDir, "kbox-js.js.map")
-        copyResourceToFile(outputDir, "dep-graph-releaser-api-js.js")
-        copyResourceToFile(outputDir, "dep-graph-releaser-api-js.js.map")
-        copyResourceToFile(outputDir, "dep-graph-releaser-maven-api-js.js")
-        copyResourceToFile(outputDir, "dep-graph-releaser-maven-api-js.js.map")
-        copyResourceToFile(outputDir, "dep-graph-releaser-gui.js")
-        copyResourceToFile(outputDir, "dep-graph-releaser-gui.js.map")
-        copyResourceToFile(outputDir, "style.css")
-        copyResourceToFile(outputDir, "index.html")
-        copyResourceToFile(outputDir, "material-icons.css")
-        copyResourceToFile(outputDir, "MaterialIcons-Regular.ttf")
-        copyResourceToFile(outputDir, "MaterialIcons-Regular.woff")
-        copyResourceToFile(outputDir, "MaterialIcons-Regular.woff2")
-        logger.info("copied resources files")
-        logger.info("Everything done :)")
-    }
-
-    private fun copyResourceToFile(outputDir: Path, input: String) {
-        val outputFile = outputDir.resolve(input)
-        logIfFileExists(outputFile, "file $input")
-        val stream = this::class.java.getResourceAsStream("/$input")
-        check(stream != null) {
-            "Could not find /$input, please verify it is part of the classpath"
-        }
-        stream.use { inputStream ->
-            outputFile.newOutputStream().use { fileOut ->
-                inputStream.copyTo(fileOut)
-            }
-        }
-        logger.fine { "Created ${outputFile.absolutePathAsString}" }
-    }
-
     private fun logIfFileExists(file: Path, fileDescription: String) {
         if (file.exists) {
             logger.info("The $fileDescription already exists, going to overwrite it.")

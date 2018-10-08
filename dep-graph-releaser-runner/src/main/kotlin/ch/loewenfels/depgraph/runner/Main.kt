@@ -9,7 +9,6 @@ object Main {
         val commands = listOf(
             DependentProjects,
             Json,
-            Html,
             PrintReleasableProjects,
             UpdateDependency
         )
@@ -18,5 +17,4 @@ object Main {
 
     internal var errorHandler: ErrorHandler = SystemExitErrorHandler
     internal var pathVerifier: PathVerifier = OnlyFolderAndSubFolderPathVerifier
-
 }

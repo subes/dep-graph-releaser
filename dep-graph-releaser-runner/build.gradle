@@ -3,7 +3,6 @@ project.description = 'Contains different runners, they are the entry point for 
 dependencies {
     compile prefixedProject('maven')
     compile prefixedProject('serialization')
-    compile prefixedProject('gui')
     compile prefixedProject('manipulation')
 
     runtimeOnly "org.jetbrains.kotlin:kotlin-runtime:$kotlin_version"
@@ -147,23 +146,13 @@ task json {
     }
 }
 
-task copyResources {
-    inputs.files dist
-    outputs.dir htmlDir
-    doLast {
-        mkdir(htmlDir)
-        execMain(['html', htmlDir.absolutePath])
-    }
-}
-
 task cleanHtmlDir(type: Delete){
     delete htmlDir
 }
 
 task html {
     dependsOn json
-    dependsOn copyResources
-    copyResources.mustRunAfter(json)
+    dependsOn prefixedProject('gui').tasks.htmlResources
 }
 
 task releasable {
@@ -213,16 +202,14 @@ task dependents {
 task server {
     doLast {
         SimpleHttpFileServerFactory factory = new SimpleHttpFileServerFactory()
-        factory.start(file("$rootProject.buildDir/html"), 8085)
+        factory.start(htmlDir, 8085)
         println("Server Started on 8085 CTRL+C to kill it")
         java.lang.Thread.sleep(Long.MAX_VALUE)
     }
 }
 
 task resourcesJar(type: Jar) {
-    dependsOn cleanHtmlDir
-    dependsOn copyResources
-    copyResources.mustRunAfter(cleanHtmlDir)
+    dependsOn prefixedProject('gui').tasks.htmlResources
     from htmlDir
     from "$projectDir/src/jenkins.pom"
     classifier 'resources'

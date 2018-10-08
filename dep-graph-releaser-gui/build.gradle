@@ -1,4 +1,4 @@
-project.description= 'Provides the javascript for the HTML-Pipeline.'
+project.description = 'Provides the javascript for the HTML-Pipeline.'
 
 dependencies {
     compile prefixedProject('api-js')
@@ -7,3 +7,20 @@ dependencies {
     compile "org.jetbrains.kotlinx:kotlinx-html-js:$kotlin_html_version", excludeKotlin
     compile "ch.tutteli.kbox:kbox-js:$kbox_version", excludeKotlin
 }
+
+task htmlResources(type: Sync) {
+    dependsOn classes
+    def fromClause = {
+        includeEmptyDirs = false
+        include { fileTreeElement ->
+            fileTreeElement.path.endsWith(".js") || fileTreeElement.path.endsWith(".js.map")
+        }
+    }
+    configurations.compile.each { File file ->
+        from(zipTree(file.absolutePath), fromClause)
+    }
+    from (compileKotlin2Js.destinationDir, fromClause)
+    from "$project.buildDir/resources/main/"
+    into "$rootProject.buildDir/html"
+}
+assemble.dependsOn htmlResources
