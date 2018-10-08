@@ -2,6 +2,9 @@ package ch.loewenfels.depgraph.gui.components
 
 import ch.loewenfels.depgraph.ConfigKey
 import ch.loewenfels.depgraph.data.*
+import ch.loewenfels.depgraph.data.maven.MavenProjectId
+import ch.loewenfels.depgraph.data.maven.jenkins.JenkinsNextDevReleaseCommand
+import ch.loewenfels.depgraph.data.maven.jenkins.JenkinsUpdateDependency
 import ch.loewenfels.depgraph.generateEclipsePsf
 import ch.loewenfels.depgraph.generateGitCloneCommands
 import ch.loewenfels.depgraph.generateListOfDependentsWithoutSubmoduleAndExcluded
@@ -392,14 +395,20 @@ class Menu(
     }
 
     private fun initReportButtons(modifiableState: ModifiableState) {
-        activateButton(changelogButton, "See changelog in CSV format")
+        activateButton(changelogButton, "Download changelog in CSV format")
         changelogButton.addClickEventListenerIfNotDeactivatedNorDisabled {
-            showOutput("Changelog Release ${modifiableState.releasePlan.rootProjectId.identifier}", generateChangelog(modifiableState.releasePlan))
+            Downloader.download(
+                "changelog.csv",
+                generateChangelog(modifiableState.releasePlan, ::appendProjectToCsvWithoutWrapper)
+            )
         }
-    }
-
-    private fun generateChangelog(releasePlan: ReleasePlan): String {
-        return "TODO CSV"
+        activateButton(changelogButtonExcel, "Download changelog in CSV format for Excel")
+        changelogButtonExcel.addClickEventListenerIfNotDeactivatedNorDisabled {
+            Downloader.download(
+                "changelog-excel.csv",
+                generateChangelog(modifiableState.releasePlan, ::appendProjectToCsvExcel)
+            )
+        }
     }
 
     private fun HTMLElement.addClickEventListenerIfNotDeactivatedNorDisabled(action: () -> Any) {
@@ -525,6 +534,7 @@ class Menu(
         private val gitCloneCommandsButton get() = elementById("gitCloneCommands")
         private val listDependentsButton get() = elementById("listDependents")
         private val changelogButton get() = elementById("changelog")
+        private val changelogButtonExcel get() = elementById("changelogExcel")
 
         private lateinit var _modifiableState: ModifiableState
         var modifiableState: ModifiableState

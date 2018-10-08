@@ -8,6 +8,7 @@ import ch.loewenfels.depgraph.data.maven.jenkins.JenkinsSingleMavenReleaseComman
 import ch.loewenfels.depgraph.data.maven.jenkins.JenkinsUpdateDependency
 import ch.loewenfels.depgraph.data.maven.syntheticRoot
 import ch.loewenfels.depgraph.gui.components.Messages.Companion.showError
+import ch.loewenfels.depgraph.gui.components.Messages.Companion.showThrowableAndThrow
 import ch.loewenfels.depgraph.gui.elementById
 import ch.loewenfels.depgraph.gui.getCheckbox
 import ch.loewenfels.depgraph.gui.getUnderlyingHtmlElement
@@ -43,7 +44,7 @@ class Pipeline(private val modifiableState: ModifiableState, private val menu: M
             val itr = releasePlan.iterator().toPeekingIterator()
             var level: Int
             // skip synthetic root
-            if(itr.hasNext() && itr.peek().id == syntheticRoot){
+            if (itr.hasNext() && itr.peek().id == syntheticRoot) {
                 set.add(itr.next().id) // still count it though
             }
             while (itr.hasNext()) {
@@ -196,7 +197,9 @@ class Pipeline(private val modifiableState: ModifiableState, private val menu: M
             is JenkinsUpdateDependency ->
                 appendJenkinsUpdateDependencyField(idPrefix, command)
             else ->
-                showError("Unknown command found, cannot display its fields.\n$command")
+                showThrowableAndThrow(
+                    IllegalStateException("Unknown command found, cannot display its fields.\n$command")
+                )
         }
     }
 
@@ -272,8 +275,10 @@ class Pipeline(private val modifiableState: ModifiableState, private val menu: M
         private const val STATE_RE_POLLING = "Command is being re-polled."
         private const val STATE_IN_PROGRESS = "Command is running."
         private const val STATE_SUCCEEDED = "Command completed successfully."
-        private const val STATE_FAILED = "Command failed - click to navigate to the console or the queue item of the job."
-        private const val STATE_TIMEOUT = "Command run into a timeout - click to navigate to the console or the queue item of the job."
+        private const val STATE_FAILED =
+            "Command failed - click to navigate to the console or the queue item of the job."
+        private const val STATE_TIMEOUT =
+            "Command run into a timeout - click to navigate to the console or the queue item of the job."
         private const val STATE_DEACTIVATED = "Currently deactivated, click to activate."
         private const val STATE_DISABLED = "Command disabled, cannot be reactivated."
 
