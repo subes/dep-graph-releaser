@@ -133,6 +133,7 @@ class Menu(
         activateSettingsButton()
         initStartOverButton(processStarter)
         initExportButtons(modifiableState)
+        initReportButtons(modifiableState)
 
         val releasePlan = modifiableState.releasePlan
         return when (releasePlan.state) {
@@ -390,6 +391,17 @@ class Menu(
         }
     }
 
+    private fun initReportButtons(modifiableState: ModifiableState) {
+        activateButton(changelogButton, "See changelog in CSV format")
+        changelogButton.addClickEventListenerIfNotDeactivatedNorDisabled {
+            showOutput("Changelog Release ${modifiableState.releasePlan.rootProjectId.identifier}", generateChangelog(modifiableState.releasePlan))
+        }
+    }
+
+    private fun generateChangelog(releasePlan: ReleasePlan): String {
+        return "TODO CSV"
+    }
+
     private fun HTMLElement.addClickEventListenerIfNotDeactivatedNorDisabled(action: () -> Any) {
         addClickEventListener {
             @Suppress("RedundantUnitExpression")
@@ -512,6 +524,7 @@ class Menu(
         private val eclipsePsfButton get() = elementById("eclipsePsf")
         private val gitCloneCommandsButton get() = elementById("gitCloneCommands")
         private val listDependentsButton get() = elementById("listDependents")
+        private val changelogButton get() = elementById("changelog")
 
         private lateinit var _modifiableState: ModifiableState
         var modifiableState: ModifiableState
