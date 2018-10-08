@@ -2,11 +2,7 @@ dependencies {
     compile prefixedProject('api-jvm')
     compile prefixedProject('maven')
     compile "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
-    compile "com.nhaarman:mockito-kotlin:$mockito_kotlin_version", excluding {
-        kotlin()
-        exclude group: "org.mockito" // is added below with a higher version
-    }
-    compile "org.mockito:mockito-core:$mockito_version"
+    compile "com.nhaarman:mockito-kotlin:$mockito_kotlin_version", excludeKotlin
     compile "ch.tutteli.atrium:atrium-cc-en_GB-robstoll:$atrium_version", excluding {
         kotlin()
         atriumVerbs()
