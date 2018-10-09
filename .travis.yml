@@ -24,7 +24,7 @@ install: true
 
 
 script:
-- ./gr -i build CodeCoverageReport detektCheck
+- ./gr -i build CodeCoverageReport
 - |
     if [ $TRAVIS_JDK_VERSION == oraclejdk8 ]; then
         sonar-scanner -X \
@@ -47,20 +47,7 @@ script:
                 dep-graph-releaser-manipulation/src/test/kotlin,\
                 dep-graph-releaser-maven/src/test/kotlin,\
                 dep-graph-releaser-runner/src/test/kotlin,\
-                dep-graph-releaser-serialization/src/test/kotlin" \
-            -Dsonar.java.binaries="\
-                   api/dep-graph-releaser-api-common/build/classes/kotlin/main,\
-                   api/dep-graph-releaser-api-js/build/classes/kotlin/main,\
-                   api/dep-graph-releaser-api-jvm/build/classes/kotlin/main,\
-                   atrium/build/classes/kotlin/main,\
-                   dep-graph-releaser-gui/build/classes/kotlin/main,\
-                   dep-graph-releaser-manipulation/build/classes/kotlin/main,\
-                   dep-graph-releaser-maven/build/classes/kotlin/main,\
-                   dep-graph-releaser-runner/build/classes/kotlin/main,\
-                   dep-graph-releaser-serialization/build/classes/kotlin/main,\
-                   maven-api/dep-graph-releaser-maven-api-common/build/classes/kotlin/main,\
-                   maven-api/dep-graph-releaser-maven-api-js/build/classes/kotlin/main,\
-                   maven-api/dep-graph-releaser-maven-api-jvm/build/classes/kotlin/main"
+                dep-graph-releaser-serialization/src/test/kotlin"
     fi
 
 after_success:
