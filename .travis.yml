@@ -27,7 +27,7 @@ script:
 - ./gr -i build CodeCoverageReport detektCheck
 - |
     if [ $TRAVIS_JDK_VERSION == oraclejdk8 ]; then
-        sonar-scanner -X \
+        sonar-scanner \
             -Dsonar.projectKey=depgraph \
             -Dsonar.projectVersion=1.2.0-SNAPSHOT \
             -Dsonar.java.coveragePlugin=jacoco \
