@@ -62,7 +62,7 @@ class ReleasePlanManipulator(private val releasePlan: ReleasePlan) {
             val projectId = projectsToVisit.iterator().next()
             projectsToVisit.remove(projectId)
             releasePlan.getDependents(projectId).forEach { dependentId ->
-                val set = projectIds.computeIfAbsent(dependentId, { hashSetOf() })
+                val set = projectIds.computeIfAbsent(dependentId) { hashSetOf() }
                 set.add(projectId)
                 projectsToVisit.add(dependentId)
             }
@@ -84,7 +84,14 @@ class ReleasePlanManipulator(private val releasePlan: ReleasePlan) {
             val projectId = project.id
             projectId to when {
                 newProject != null && newProject.id == projectId -> newProject
-                projectsToTransform.contains(projectId) -> transform(project, projectsToTransform[projectId]!!)
+                projectsToTransform.contains(projectId) -> {
+                    val dependencies = projectsToTransform[projectId] ?: throw IllegalStateException(
+                        "ProjectId not found in projectsToTransform." +
+                            "\nProjectId: $projectId" +
+                            "\nprojectsToTransform: $projectsToTransform"
+                    )
+                    transform(project, dependencies)
+                }
                 else -> project
             }
         }

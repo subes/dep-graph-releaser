@@ -15,11 +15,11 @@ inline fun <T> Promise<Promise<Promise<T>>>.unwrap2Promise(): Promise<T> = this.
 inline fun <T> Promise<Promise<Promise<Promise<T>>>>.unwrap3Promise(): Promise<T> = this.unsafeCast<Promise<T>>()
 
 fun changeCursorToProgress() {
-    document.body!!.style.cursor = "progress"
+    document.bodyNonNull.style.cursor = "progress"
 }
 
 fun changeCursorBackToNormal() {
-    document.body!!.style.cursor = "default"
+    document.bodyNonNull.style.cursor = "default"
 }
 
 fun <T, S> Promise<T>.finally(action: (T?) -> S): Promise<S> {

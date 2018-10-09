@@ -538,7 +538,7 @@ class Menu(
         private val changelogButton get() = elementById("changelog")
         private val changelogButtonExcel get() = elementById("changelogExcel")
 
-        @Suppress("ObjectPropertyName")
+        @Suppress("ObjectPropertyName", "ObjectPropertyNaming", "LateinitUsage")
         private lateinit var _modifiableState: ModifiableState
         var modifiableState: ModifiableState
             get() = _modifiableState

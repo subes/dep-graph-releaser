@@ -179,6 +179,8 @@ class Analyser internal constructor(
      * @return The current version or `null` if [projectId] was not part of the analysis.
      */
     fun getCurrentVersion(projectId: MavenProjectId): String? = projectsData.getProjectIfPresent(projectId)?.version
+    fun getCurrentVersionOrThrow(projectId: MavenProjectId): String =
+        getCurrentVersion(projectId) ?: throwProjectNotPartOfAnalysis(projectId)
 
 
     /**
@@ -204,14 +206,14 @@ class Analyser internal constructor(
     fun getErroneousPomFiles(): List<String> = pomAnalysis.erroneousPomFiles.map {
         "Error reading pom file." +
             "\nFile: ${it.pomFile.absolutePath}" +
-            "\nMessage: ${it.cause!!.message}"
+            "\nMessage: ${it.cause?.message}"
     }
 
     fun getErroneousProjects(): List<String> = pomAnalysis.erroneousProjects.map {
         "Project is erroneous and could not be analysed entirely." +
             "\nProject ${it.project.gav}" +
             "\nPom-file: ${it.project.pomFile.absolutePath}" +
-            "\nMessage: ${it.cause!!.message}"
+            "\nMessage: ${it.cause?.message}"
     }
 
     fun getUnresolvedProperties(): List<String> =
@@ -291,7 +293,7 @@ class Analyser internal constructor(
         projectsData.registerSyntheticRoot()
         val mutableDependents = dependents as MutableMap<String, Set<Relation<MavenProjectId>>>
         mutableDependents[syntheticRoot.identifier] = projectsToRelease.asSequence().map {
-            val currentVersion = getCurrentVersion(it) ?: throwProjectNotPartOfAnalysis(it)
+            val currentVersion = getCurrentVersionOrThrow(it)
             Relation(it, currentVersion, isDependencyVersionSelfManaged = true)
         }.toSet()
 

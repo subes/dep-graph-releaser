@@ -75,12 +75,13 @@ object Loader {
 
     private fun updateLoader(newItem: String, divContent: DIV.() -> Unit) {
         val loader = elementById("loader")
-        loader.removeChild(loader.lastChild!!)
-        val lastItem = loader.lastChild!!
-        val icon = lastItem.firstChild as HTMLElement
+        val currentLastChild = loader.lastChild ?: throw IllegalStateException("loader does not have a child")
+        loader.removeChild(currentLastChild)
+        val newLastChild = loader.lastChild ?: throw IllegalStateException("loader does not have two children")
+        val icon = newLastChild.firstChild as HTMLElement
         icon.removeClass("waiting")
         icon.innerText = "check_box"
-        val text = lastItem.lastChild as HTMLElement
+        val text = newLastChild.lastChild as HTMLElement
         text.innerText = text.innerText.substringBefore("...") + " successful"
         loader.append {
             p {

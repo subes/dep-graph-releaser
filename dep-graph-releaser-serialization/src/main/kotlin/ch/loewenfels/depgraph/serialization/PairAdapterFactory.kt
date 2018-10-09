@@ -1,6 +1,7 @@
 package ch.loewenfels.depgraph.serialization
 
 import com.squareup.moshi.*
+import java.lang.IllegalStateException
 import java.lang.reflect.ParameterizedType
 import java.lang.reflect.Type
 
@@ -38,8 +39,8 @@ object PairAdapterFactory : JsonAdapter.Factory {
             require(list.size == 2) {
                 "pair with more or less than two elements: $list"
             }
-            val first = firstAdapter.fromJsonValue(list[0])!!
-            val second = secondAdapter.fromJsonValue(list[1])!!
+            val first = firstAdapter.fromJsonValue(list[0]) ?: throw IllegalStateException("pair without first")
+            val second = secondAdapter.fromJsonValue(list[1])?: throw IllegalStateException("pair without second")
             return first to second
         }
     }

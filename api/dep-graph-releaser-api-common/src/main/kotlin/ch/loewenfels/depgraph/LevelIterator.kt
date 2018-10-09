@@ -25,7 +25,8 @@ class LevelIterator<in K, V>(
         }
         cleanupCurrentLevel()
         val itemsOnTheSameLevel = itemsToVisit[0]
-        return itemsOnTheSameLevel.remove(itemsOnTheSameLevel.iterator().next().key)!!
+        return itemsOnTheSameLevel.remove(itemsOnTheSameLevel.iterator().next().key)
+            ?: throw IllegalStateException("Could not remove the next item, this class is not thread safe.")
     }
 
     fun addToCurrentLevel(pair: Pair<K, V>) {

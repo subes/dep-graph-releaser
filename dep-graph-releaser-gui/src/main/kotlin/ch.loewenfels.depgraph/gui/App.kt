@@ -228,7 +228,7 @@ class App {
                 fakeJenkinsBaseUrl,
                 "${fakeJenkinsBaseUrl}dgr-publisher/",
                 modifiableState
-            )!!
+            ) ?: throw IllegalStateException("faking ProcessStarter failed, was null")
         }
     }
 }

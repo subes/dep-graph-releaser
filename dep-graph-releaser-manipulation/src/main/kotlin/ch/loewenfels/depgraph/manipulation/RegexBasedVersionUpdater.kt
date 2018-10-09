@@ -261,7 +261,7 @@ object RegexBasedVersionUpdater {
         var nullableMatchResult = regex.find(content, 0)
         var startIndex: Int = 0
         var updated = false
-        val nonNullMatchResult get() = nullableMatchResult!!
+        val nonNullMatchResult get() = nullableMatchResult ?: throw NullPointerException("match result was null")
 
         fun appendBeforeMatchAndUpdateStartIndex() {
             appendSubstring(startIndex, nonNullMatchResult.range.start)

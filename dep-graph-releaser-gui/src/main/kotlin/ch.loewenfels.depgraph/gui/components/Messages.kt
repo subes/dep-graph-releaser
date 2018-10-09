@@ -210,7 +210,9 @@ class Messages(releasePlan: ReleasePlan) {
             if (matchResult != null) {
                 var index = 0
                 do {
-                    val match = matchResult!!
+                    val match = matchResult ?: throw ConcurrentModificationException(
+                        "matchResult was suddenly null, this class is not thread-safe"
+                    )
                     convertTabToTwoSpaces(message.substring(index, match.range.start))
                     val (url, nextIndex) = determineUrlAndNextIndex(match)
                     a(href = url) {

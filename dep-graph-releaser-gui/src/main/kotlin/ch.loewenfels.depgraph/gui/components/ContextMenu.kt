@@ -368,12 +368,12 @@ class ContextMenu(
         val mouseX = event.pageX
         val mouseY = event.pageY
 
-        val x = if (mouseX + menuWidth > document.body!!.clientWidth + window.scrollX) {
+        val x = if (mouseX + menuWidth > document.bodyNonNull.clientWidth + window.scrollX) {
             mouseX - menuWidth
         } else {
             mouseX
         }
-        val y = if (mouseY + menuHeight > document.body!!.clientHeight + window.scrollY) {
+        val y = if (mouseY + menuHeight > document.bodyNonNull.clientHeight + window.scrollY) {
             mouseY - menuHeight
         } else {
             mouseY

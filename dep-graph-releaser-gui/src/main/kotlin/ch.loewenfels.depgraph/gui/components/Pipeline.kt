@@ -151,7 +151,7 @@ class Pipeline(private val modifiableState: ModifiableState, private val menu: M
                 classes = setOf("command", stateToCssClass(command.state))
                 div("commandTitle") {
                     id = "$commandId$TITLE_SUFFIX"
-                    +command::class.simpleName!!
+                    +command::class.simpleNameNonNull
                 }
                 div("fields") {
                     fieldsForCommand(commandId, project, index, command)
@@ -288,7 +288,6 @@ class Pipeline(private val modifiableState: ModifiableState, private val menu: M
         const val NEXT_DEV_VERSION_SUFFIX = ":nextDevVersion"
         const val STATE_SUFFIX = ":state"
         const val TITLE_SUFFIX = ":title"
-
 
 
         fun getCommandId(project: Project, index: Int) = getCommandId(project.id, index)

@@ -115,17 +115,17 @@ class JenkinsReleasePlanCreator(
         rootProjectId: MavenProjectId,
         commandState: CommandState
     ): Project {
-        val currentVersion = analyser.getCurrentVersion(rootProjectId)
+        val currentVersion = analyser.getCurrentVersionOrThrow(rootProjectId)
         val commands = mutableListOf(
-            createJenkinsReleasePlugin(analyser, rootProjectId, currentVersion!!, commandState)
+            createJenkinsReleasePlugin(analyser, rootProjectId, currentVersion, commandState)
         )
         return createRootProject(analyser, rootProjectId, commands)
     }
 
     private fun createRootProject(analyser: Analyser, rootProjectId: MavenProjectId, commands: List<Command>): Project {
-        val currentVersion = analyser.getCurrentVersion(rootProjectId)
+        val currentVersion = analyser.getCurrentVersionOrThrow(rootProjectId)
         val relativePath = analyser.getRelativePath(rootProjectId)
-        return createInitialProject(rootProjectId, false, currentVersion!!, 0, commands, relativePath)
+        return createInitialProject(rootProjectId, false, currentVersion, 0, commands, relativePath)
     }
 
     private fun createJenkinsReleasePlugin(
@@ -260,7 +260,7 @@ class JenkinsReleasePlanCreator(
                 // it to the analysis nonetheless, because we have a release dependency to track.
                 val tmpRelation = paramObject.relation
                 paramObject.relation =
-                    Relation(topMultiModuleId, paramObject.analyser.getCurrentVersion(topMultiModuleId)!!, false)
+                    Relation(topMultiModuleId, paramObject.analyser.getCurrentVersionOrThrow(topMultiModuleId), false)
                 val newDependent = initDependent(paramObject)
                 addDependentAddToProjects(paramObject, newDependent)
                 paramObject.relation = tmpRelation

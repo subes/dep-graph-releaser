@@ -1,5 +1,6 @@
 package ch.loewenfels.depgraph.gui
 
+import org.w3c.dom.Document
 import org.w3c.dom.HTMLElement
 import org.w3c.dom.HTMLInputElement
 import kotlin.browser.document
@@ -38,3 +39,6 @@ fun getInputElementOrNull(id: String, type: String): HTMLInputElement? {
     }
     return element
 }
+
+@Suppress("unused")
+val Document.bodyNonNull get() = document.body ?: throw IllegalStateException("document without body")
