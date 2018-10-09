@@ -266,9 +266,6 @@ class Analyser internal constructor(
         return isNestedSubmodule(submodulesToVisit, submoduleId)
     }
 
-    /**
-     * Returns all identifier
-     */
     fun getAllReleasableProjects(): Set<MavenProjectId> {
         return getInternalAnalysedGavsAsSequence()
             .map { it.toMavenProjectId() }

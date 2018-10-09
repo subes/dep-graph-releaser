@@ -29,7 +29,7 @@ object UsernameTokenRegistry {
 
     /**
      * Retrieves the API token of the logged in user at [jenkinsBaseUrl] and registers it, moreover it returns the name
-     * of the user in the same request (the name is not stored though)
+     * of the user in the same request (the name is not stored though).
      *
      * @return A pair consisting of the name and the [UsernameAndApiToken] of the logged in user.
      */

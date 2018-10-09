@@ -23,7 +23,7 @@ data class MavenProjectId(
     override val typeId = TYPE_ID
 
     /**
-     * Returns [groupId]:[artifactId]
+     * Returns [groupId]:[artifactId].
      * @return The identifier of the maven artifact.
      */
     override val identifier = "$groupId:$artifactId"

@@ -12,7 +12,7 @@ interface Command: PolymorphSerializable {
     fun asNewState(newState: CommandState): Command
 
     /**
-     * Makes a copy of this command but with [CommandState.Deactivated] as [state]
+     * Makes a copy of this command but with [CommandState.Deactivated] as [state].
      *
      * @throws IllegalStateException in case the state was already [CommandState.Deactivated]
      */
@@ -24,7 +24,7 @@ interface Command: PolymorphSerializable {
     }
 
     /**
-     * Makes a copy of this command but with [CommandState.Disabled] as [state]
+     * Makes a copy of this command but with [CommandState.Disabled] as [state].
      *
      * @throws IllegalStateException in case the state was already [CommandState.Disabled]
      */

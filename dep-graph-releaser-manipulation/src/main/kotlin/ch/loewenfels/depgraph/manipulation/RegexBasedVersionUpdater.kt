@@ -240,7 +240,7 @@ object RegexBasedVersionUpdater {
     ) {
 
         /**
-         * Copy constructor where [getModifiedContent] is used as new [content] and [newRegex] as [newRegex]
+         * Copy constructor where [getModifiedContent] is used as new [content] and [newRegex] as [newRegex].
          */
         constructor(paramObject: ParamObject, newRegex: Regex) : this(
             paramObject.groupId,

@@ -6,7 +6,7 @@ enum class ReleaseState {
     SUCCEEDED,
     FAILED,
     /**
-     * State indicating that a user only observes the process (we could disable all toggles etc.)
+     * State indicating that a user only observes the process (we could disable all toggles etc.).
      */
     WATCHING,
     ;

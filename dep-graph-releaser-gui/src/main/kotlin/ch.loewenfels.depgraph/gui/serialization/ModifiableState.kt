@@ -37,7 +37,7 @@ class ModifiableState(defaultJenkinsBaseUrl: String?, json: String) {
         }
 
     /**
-     * Copy constructor, takes over the [defaultJenkinsBaseUrl] from the given [modifiableState]
+     * Copy constructor, takes over the [defaultJenkinsBaseUrl] from the given [modifiableState].
      */
     constructor(modifiableState: ModifiableState, json: String): this(modifiableState.defaultJenkinsBaseUrl, json)
 

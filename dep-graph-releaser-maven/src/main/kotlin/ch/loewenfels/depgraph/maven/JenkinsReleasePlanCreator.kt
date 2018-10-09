@@ -234,7 +234,7 @@ class JenkinsReleasePlanCreator(
 
     /**
      * It actually adds the given [dependent] to [ParamObject.projects] or *updates* the entry if already exists
-     * => not only Add as indicated in the method name
+     * => not only Add as indicated in the method name.
      */
     private fun updateCommandsAddDependentAddToProjectsAndUpdateMultiModuleIfNecessary(
         paramObject: ParamObject,

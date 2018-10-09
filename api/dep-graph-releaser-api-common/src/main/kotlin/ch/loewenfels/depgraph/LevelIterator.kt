@@ -1,7 +1,7 @@
 package ch.loewenfels.depgraph
 
 /**
- * Not thread safe
+ * Not thread safe.
  */
 class LevelIterator<in K, V>(
     private val startingPoint: Pair<K, V>
