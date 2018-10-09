@@ -72,7 +72,7 @@ detekt {
     version = detekt_version
      defaultProfile {
          output = "$rootProject.buildDir/detekt"
-         //config = file("$rootProject.projectDir/gradle/scripts/detekt.yml")
+         config = file("$rootProject.projectDir/gradle/scripts/detekt.yml")
      }
 }
 
