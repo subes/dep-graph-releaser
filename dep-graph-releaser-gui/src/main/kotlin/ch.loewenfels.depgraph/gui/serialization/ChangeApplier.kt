@@ -83,7 +83,10 @@ object ChangeApplier {
     private fun replaceConfigEntriesIfChanged(releasePlanJson: ReleasePlanJson): Boolean {
         var changed = false
         releasePlanJson.config.forEach { arr ->
-            if (arr.size != 2) return@forEach
+            check(arr.size != 2) {
+                "config entry corrupt, does not have two entries:\n" +
+                    if (arr.isNotEmpty()) arr[0] else releasePlanJson.config.joinToString { it.joinToString() }
+            }
 
             val input = elementById("config-${arr[0]}")
             val value = getConfigValue(arr, input)
@@ -162,7 +165,10 @@ object ChangeApplier {
             }
             return true
         }
-        if (previousState is CommandState.Waiting && newState is CommandState.Waiting && previousState.dependencies.size != newState.dependencies.size) {
+        if (previousState is CommandState.Waiting &&
+            newState is CommandState.Waiting &&
+            previousState.dependencies.size != newState.dependencies.size
+        ) {
             serializeWaitingDependencies(newState, command)
         }
         return false

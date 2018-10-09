@@ -36,7 +36,9 @@ object UsernameTokenRegistry {
     fun register(jenkinsBaseUrl: String): Promise<Pair<String, UsernameAndApiToken>?> =
         retrieveUserAndApiTokenAndSaveToken(jenkinsBaseUrl)
 
-    private fun retrieveUserAndApiTokenAndSaveToken(jenkinsBaseUrl: String): Promise<Pair<String, UsernameAndApiToken>?> {
+    private fun retrieveUserAndApiTokenAndSaveToken(
+        jenkinsBaseUrl: String
+    ): Promise<Pair<String, UsernameAndApiToken>?> {
         val urlWithoutSlash = urlWithoutEndingSlash(jenkinsBaseUrl)
         return window.fetch("$urlWithoutSlash/me/configure", createFetchInitWithCredentials())
             .then(::checkStatusOkOr403)

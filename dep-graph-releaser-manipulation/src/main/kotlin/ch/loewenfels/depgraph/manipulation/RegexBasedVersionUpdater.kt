@@ -1,7 +1,7 @@
 package ch.loewenfels.depgraph.manipulation
 
-import ch.loewenfels.depgraph.regex.noneOrSomeChars
-import ch.loewenfels.depgraph.regex.someChars
+import ch.loewenfels.depgraph.regex.NONE_OR_SOME_CHARS
+import ch.loewenfels.depgraph.regex.SOME_CHARS
 import ch.tutteli.niok.absolutePathAsString
 import ch.tutteli.niok.exists
 import ch.tutteli.niok.readText
@@ -11,24 +11,25 @@ import java.nio.file.Path
 object RegexBasedVersionUpdater {
 
     private const val DEPENDENCY = "dependency"
-    private val dependencyRegex = Regex("<$DEPENDENCY>$someChars</$DEPENDENCY>")
+    private val dependencyRegex = Regex("<$DEPENDENCY>$SOME_CHARS</$DEPENDENCY>")
     private const val PARENT = "parent"
-    private val parentRegex = Regex("<$PARENT>$someChars</$PARENT>")
+    private val parentRegex = Regex("<$PARENT>$SOME_CHARS</$PARENT>")
     private const val PROPERTIES = "properties"
-    private val propertiesRegex = Regex("<$PROPERTIES>$someChars</$PROPERTIES>")
+    private val propertiesRegex = Regex("<$PROPERTIES>$SOME_CHARS</$PROPERTIES>")
     private const val VERSION = "version"
     private val versionRegex = Regex("<$VERSION>([^<]+)</$VERSION>")
     private val mavenPropertyRegex = Regex("\\$\\{([^}]+)}")
     private val tagRegex = Regex("<([a-zA-Z0-9_.-]+)>([^<]+)</([a-zA-Z0-9_.-]+)>")
     private const val EXCLUSIONS = "exclusions"
-    private val exclusionRegex = Regex("<$EXCLUSIONS>$someChars</$EXCLUSIONS>")
+    private val exclusionRegex = Regex("<$EXCLUSIONS>$SOME_CHARS</$EXCLUSIONS>")
     private const val ERROR_MESSAGE = "Version is already up-to-date; did you pass wrong argument for newVersion?"
 
     fun updateDependency(pom: Path, groupId: String, artifactId: String, newVersion: String) {
         require(pom.exists) {
             "pom file does not exist, cannot update dependency." +
-                "\npom: ${pom.absolutePathAsString}" +
-                "\ndependency: $groupId:$artifactId:$newVersion"
+                dependencyAndPomDiagnostic(
+                    ParamObject(groupId, artifactId, newVersion, hashSetOf(), "", Regex("undefined")), pom
+                )
         }
 
         val groupIdArtifactIdRegex = createGroupIdArtifactIdRegex(groupId, artifactId)
@@ -56,7 +57,7 @@ object RegexBasedVersionUpdater {
     private fun createGroupIdArtifactIdRegex(groupId: String, artifactId: String): Regex {
         val groupIdPattern = "<groupId>$groupId</groupId>"
         val artifactIdPattern = "<artifactId>$artifactId</artifactId>"
-        return Regex("(?:$groupIdPattern$noneOrSomeChars$artifactIdPattern)|(?:$artifactIdPattern$noneOrSomeChars$groupIdPattern)")
+        return Regex("(?:$groupIdPattern$NONE_OR_SOME_CHARS$artifactIdPattern)|(?:$artifactIdPattern$NONE_OR_SOME_CHARS$groupIdPattern)")
     }
 
     private fun updateParentRelation(parentParamObject: ParamObject, groupIdArtifactIdRegex: Regex, pom: Path) {
@@ -113,7 +114,10 @@ object RegexBasedVersionUpdater {
     private fun getTagNameAndVersion(tagMatchResult: MatchResult): Pair<String, String> {
         val (start, version, end) = tagMatchResult.destructured
         check(start == end) {
-            "Property seems to be malformed, start and end tag were different.\nStart: $start\nEnd: $end\nValue: $version"
+            "Property seems to be malformed, start and end tag were different." +
+                "\nStart: $start" +
+                "\nEnd: $end" +
+                "\nValue: $version"
         }
         return start to version
     }
@@ -216,19 +220,21 @@ object RegexBasedVersionUpdater {
                 throw IllegalStateException(
                     "Cannot update (parent) dependency: The dependency's version is managed via one or more properties" +
                         " but they are not present in the pom." +
-                        "\ndependency: ${propertiesParamObject.groupId}:${propertiesParamObject.artifactId}" +
-                        "\npom: ${pom.absolutePathAsString}" +
+                        dependencyAndPomDiagnostic(propertiesParamObject, pom) +
                         "\nproperties:${propertiesParamObject.properties.joinToString()}"
                 )
 
             else ->
                 throw IllegalStateException(
                     "Cannot update (parent) dependency: the dependency was not found." +
-                        "\ndependency: ${propertiesParamObject.groupId}:${propertiesParamObject.artifactId}" +
-                        "\npom: ${pom.absolutePathAsString}"
+                        dependencyAndPomDiagnostic(propertiesParamObject, pom)
                 )
         }
     }
+
+    private fun dependencyAndPomDiagnostic(paramObject: ParamObject, pom: Path) =
+        "\ndependency: ${paramObject.groupId}:${paramObject.artifactId}:${paramObject.newVersion}" +
+            "\npom: ${pom.absolutePathAsString}"
 
     class ParamObject(
         val groupId: String,

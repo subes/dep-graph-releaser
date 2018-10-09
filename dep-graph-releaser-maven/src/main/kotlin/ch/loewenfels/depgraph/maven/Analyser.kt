@@ -66,18 +66,15 @@ class Analyser internal constructor(
         )
     }
 
-    private fun getInternalAnalysedProjects(): Set<String> {
-        return getInternalAnalysedGavsAsSequence()
+    private fun getInternalAnalysedProjects(): Set<String> =
+        getInternalAnalysedGavsAsSequence()
             .map { it.toMapKey() }
             .toHashSet()
-    }
 
-    private fun collectDuplicates(pomAnalysis: PomAnalysis): Map<String, List<Project>> {
-        val sequence = pomAnalysis.duplicatedProjects.asSequence() + getInternalAnalysedProjectsAsSequence()
-        return sequence
+    private fun collectDuplicates(pomAnalysis: PomAnalysis): Map<String, List<Project>> =
+        (pomAnalysis.duplicatedProjects.asSequence() + getInternalAnalysedProjectsAsSequence())
             .groupBy { it.gav.toMapKey() }
             .filterValues { it.size > 1 }
-    }
 
 
     private fun collectParentsNotInAnalysis(options: Options, analysedProjects: Set<String>): Map<Project, Gav> {
@@ -115,16 +112,18 @@ class Analyser internal constructor(
         return dependents
     }
 
-    private fun getInternalAnalysedGavsAsSequence() = session.projects()
-        .keySet()
-        .asSequence()
-        .filter { it.toProject().isNotExternal }
+    private fun getInternalAnalysedGavsAsSequence() =
+        session.projects()
+            .keySet()
+            .asSequence()
+            .filter { it.toProject().isNotExternal }
 
-    private fun getInternalAnalysedProjectsAsSequence() = session.projects()
-        .keySet()
-        .asSequence()
-        .map { it.toProject() }
-        .filter { it.isNotExternal }
+    private fun getInternalAnalysedProjectsAsSequence() =
+        session.projects()
+            .keySet()
+            .asSequence()
+            .map { it.toProject() }
+            .filter { it.isNotExternal }
 
     private fun Gav.toProject() = session.projects().forGav(this)
 
@@ -194,9 +193,8 @@ class Analyser internal constructor(
      * Meaning, if a project ch.loewenfels:A has a dependency on Project ch.loewenfels:B:1.0 and
      * the analysed project B is in version 2.0-SNAPSHOT then project A is still dependent of project B.
      */
-    fun getDependentsOf(projectId: MavenProjectId): Set<Relation<MavenProjectId>> {
-        return dependents[projectId.identifier] ?: emptySetIfPartOfAnalysisOrThrow(projectId)
-    }
+    fun getDependentsOf(projectId: MavenProjectId): Set<Relation<MavenProjectId>> =
+        dependents[projectId.identifier] ?: emptySetIfPartOfAnalysisOrThrow(projectId)
 
     /**
      * Returns the number of analysed projects.
@@ -204,20 +202,28 @@ class Analyser internal constructor(
     fun getNumberOfProjects(): Int = projectsData.size
 
     fun getErroneousPomFiles(): List<String> = pomAnalysis.erroneousPomFiles.map {
-        "Error reading pom file.\nFile: ${it.pomFile.absolutePath}\nMessage: ${it.cause!!.message}"
+        "Error reading pom file." +
+            "\nFile: ${it.pomFile.absolutePath}" +
+            "\nMessage: ${it.cause!!.message}"
     }
 
     fun getErroneousProjects(): List<String> = pomAnalysis.erroneousProjects.map {
-        "Project is erroneous and could not be analysed entirely.\nProject ${it.project.gav} \nPom-file: ${it.project.pomFile.absolutePath}\nMessage: ${it.cause!!.message}"
+        "Project is erroneous and could not be analysed entirely." +
+            "\nProject ${it.project.gav}" +
+            "\nPom-file: ${it.project.pomFile.absolutePath}" +
+            "\nMessage: ${it.cause!!.message}"
     }
 
-    fun getUnresolvedProperties(): List<String> = pomAnalysis.unresolvedProperties
-        .asSequence()
-        .filter { dependents.containsKey(it.project.gav.toMapKey()) }
-        .map {
-            "Property ${it.propertyName} could not be resolved.\nProject ${it.project.gav} \nPom-file: ${it.project.pomFile.absolutePath}"
-        }
-        .toList()
+    fun getUnresolvedProperties(): List<String> =
+        pomAnalysis.unresolvedProperties
+            .asSequence()
+            .filter { dependents.containsKey(it.project.gav.toMapKey()) }
+            .map {
+                "Property ${it.propertyName} could not be resolved." +
+                    "\nProject ${it.project.gav}" +
+                    "\nPom-file: ${it.project.pomFile.absolutePath}"
+            }
+            .toList()
 
 
     fun hasSubmodules(projectId: MavenProjectId) = getSubmodules(projectId).isNotEmpty()
@@ -229,12 +235,11 @@ class Analyser internal constructor(
     fun getSubmodules(projectId: MavenProjectId): Set<MavenProjectId> = projectsData.getSubmodules(projectId)
 
     /**
-     * Returns all multi modules of the given submodule project including super multi modules (multi module of multi module)
-     * or an empty set if the project is not a submodule.
+     * Returns all multi modules of the given submodule project including super multi modules
+     * (multi module of multi module) or an empty set if the project is not a submodule.
      */
-    fun getMultiModules(projectId: MavenProjectId): LinkedHashSet<MavenProjectId> {
-        return projectsData.getProject(projectId).multiModules
-    }
+    fun getMultiModules(projectId: MavenProjectId): LinkedHashSet<MavenProjectId> =
+        projectsData.getProject(projectId).multiModules
 
     /**
      * Indicates whether the given [projectId] is a submodule of a multi module project or not.
@@ -368,7 +373,8 @@ class Analyser internal constructor(
             submodulesOfProjectId.forEach { multiModuleId, submodules ->
                 submodules.forEach { submoduleId ->
                     val set = linkedSetOf(multiModuleId)
-                    //TODO would go forever if there are multi modules which have one another as modules, should we add a check?
+                    //Notice, this could end in an endless loop if there are multi modules which have one another
+                    // as modules. We ignore this here and assume that such use cases are only theoretical.
                     set.addAll(multiModuleOfSubmodule.mapParents(multiModuleId))
                     map[submoduleId] = set
                 }
@@ -403,25 +409,21 @@ class Analyser internal constructor(
         }
 
         fun getProjectIfPresent(projectId: MavenProjectId): ProjectData? = projects[projectId]
-        fun getProject(projectId: MavenProjectId): ProjectData {
-            return projects[projectId] ?: throwProjectNotPartOfAnalysis(projectId)
-        }
+        fun getProject(projectId: MavenProjectId): ProjectData =
+            projects[projectId] ?: throwProjectNotPartOfAnalysis(projectId)
 
-        fun getSubmodules(projectId: MavenProjectId): Set<MavenProjectId> {
-            return getProject(projectId).submodules
-        }
+        fun getSubmodules(projectId: MavenProjectId): Set<MavenProjectId> = getProject(projectId).submodules
 
-        fun getIdentifiersWithVersion(): String {
-            return projects.entries.joinToString("\n") { (mavenProjectId, project) ->
+        fun getIdentifiersWithVersion(): String =
+            projects.entries.joinToString("\n") { (mavenProjectId, project) ->
                 "${mavenProjectId.identifier}:${project.version}"
             }
-        }
 
         fun getWarnings(): List<String> = warnings
 
     }
 
-    private class ProjectData(
+    private data class ProjectData(
         val version: String,
         val submodules: Set<MavenProjectId>,
         val multiModules: LinkedHashSet<MavenProjectId>,

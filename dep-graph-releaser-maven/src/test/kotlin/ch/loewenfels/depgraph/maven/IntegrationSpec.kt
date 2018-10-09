@@ -1310,9 +1310,8 @@ private fun analyseAndCreateReleasePlanWithPomResolverOldVersions(
     return analyseAndCreateReleasePlan(projectToRelease, analyser)
 }
 
-private fun analyseAndCreateReleasePlan(projectToRelease: ProjectId, analyser: Analyser): ReleasePlan {
-    return analyseAndCreateReleasePlan(projectToRelease, analyser, JenkinsReleasePlanCreator.Options("releaseId", "^$"))
-}
+private fun analyseAndCreateReleasePlan(projectToRelease: ProjectId, analyser: Analyser): ReleasePlan =
+    analyseAndCreateReleasePlan(projectToRelease, analyser, JenkinsReleasePlanCreator.Options("releaseId", "^$"))
 
 private fun analyseAndCreateReleasePlan(
     projectToRelease: ProjectId,

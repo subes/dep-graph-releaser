@@ -94,7 +94,7 @@ class Pipeline(private val modifiableState: ModifiableState, private val menu: M
             getUnderlyingHtmlElement().asDynamic().project = project
             val hasCommands = project.commands.isNotEmpty()
             classes = setOf(
-                "project",
+                PROJECT_CSS_CLASS,
                 if (project.isSubmodule) "submodule" else "",
                 if (!hasCommands) "withoutCommands" else "",
                 if (modifiableState.releasePlan.hasSubmodules(project.id)) "withSubmodules" else ""
@@ -266,6 +266,7 @@ class Pipeline(private val modifiableState: ModifiableState, private val menu: M
 
     companion object {
         private const val PIPELINE_HTML_ID = "pipeline"
+        private const val PROJECT_CSS_CLASS = "project"
 
         private const val STATE_WAITING = "Wait for dependent projects to complete."
         private const val STATE_READY = "Ready to be queued for execution."
@@ -287,6 +288,7 @@ class Pipeline(private val modifiableState: ModifiableState, private val menu: M
         const val NEXT_DEV_VERSION_SUFFIX = ":nextDevVersion"
         const val STATE_SUFFIX = ":state"
         const val TITLE_SUFFIX = ":title"
+
 
 
         fun getCommandId(project: Project, index: Int) = getCommandId(project.id, index)
@@ -330,7 +332,8 @@ class Pipeline(private val modifiableState: ModifiableState, private val menu: M
                 try {
                     previousState.checkTransitionAllowed(newState)
                 } catch (e: IllegalStateException) {
-                    //TODO use $this instead of $getToStringRepresentation(...) once https://youtrack.jetbrains.com/issue/KT-23970 is fixed
+                    //TODO use $this instead of $getToStringRepresentation(...) once
+                    // https://youtrack.jetbrains.com/issue/KT-23970 is fixed
                     throw IllegalStateException(
                         "Cannot change the state of the command to ${newState.getToStringRepresentation()}." +
                             failureDiagnosticsStateTransition(project, index, previousState, commandId),
@@ -346,7 +349,8 @@ class Pipeline(private val modifiableState: ModifiableState, private val menu: M
             previousState: CommandState,
             commandId: String
         ): String {
-            //TODO use $this instead of $getToStringRepresentation(...) once https://youtrack.jetbrains.com/issue/KT-23970 is fixed
+            //TODO use $this instead of $getToStringRepresentation(...) once
+            // https://youtrack.jetbrains.com/issue/KT-23970 is fixed
             val commandTitle = elementById(commandId + TITLE_SUFFIX)
             return "\nProject: ${project.id.identifier}" +
                 "\nCommand: ${commandTitle.innerText} (${index + 1}. command)" +
@@ -416,10 +420,10 @@ class Pipeline(private val modifiableState: ModifiableState, private val menu: M
 
         fun getSurroundingProject(id: String): Project {
             var node = elementById(id).parentNode
-            while (node is HTMLElement && !node.hasClass("project")) {
+            while (node is HTMLElement && !node.hasClass(PROJECT_CSS_CLASS)) {
                 node = node.parentNode
             }
-            check(node is HTMLElement && node.hasClass("project")) {
+            check(node is HTMLElement && node.hasClass(PROJECT_CSS_CLASS)) {
                 "Cannot determine whether input field should be re-activated or not, could not get surrounding project"
             }
             return node.asDynamic().project as Project

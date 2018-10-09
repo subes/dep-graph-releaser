@@ -21,9 +21,7 @@ class SimulatingJobExecutor : JobExecutor {
         pollEverySecond: Int,
         maxWaitingTimeInSeconds: Int,
         errorHandler: (PollTimeoutException) -> Nothing
-    ): Promise<String> {
-        return Promise.resolve("simulation-only.json")
-    }
+    ): Promise<String> = Promise.resolve("simulation-only.json")
 
     override fun trigger(
         jobExecutionData: JobExecutionData,
@@ -37,7 +35,7 @@ class SimulatingJobExecutor : JobExecutor {
         return sleep(100) {
             jobQueuedHook("${jobExecutionData.jobBaseUrl}queuingUrl")
             informIfStepWiseAndNotPublish("job $jobName queued", jobName)
-            if (!jobExecutionData.jobName.startsWith("publish")) {
+            if (isNotPublishJob(jobExecutionData)) {
                 ++count
             }
             if (failDuringQueueing) {
@@ -64,13 +62,9 @@ class SimulatingJobExecutor : JobExecutor {
         return informIfStepWiseAndNotPublish("job $jobName started", jobName)
     }
 
-    private fun informIfStepWiseAndNotPublish(msg: String, jobName: String): Promise<Unit> {
-        return if (!jobName.startsWith("publish")) {
-            informIfStepWise(msg)
-        } else {
-            Promise.resolve(Unit)
-        }
-    }
+    private fun informIfStepWiseAndNotPublish(msg: String, jobName: String): Promise<Unit> =
+        if (!jobName.startsWith("publish")) informIfStepWise(msg)
+        else Promise.resolve(Unit)
 
     override fun rePollQueueing(
         jobExecutionData: JobExecutionData,
@@ -106,7 +100,7 @@ class SimulatingJobExecutor : JobExecutor {
     }
 
     private fun checkIfNeedsToFail(jobExecutionData: JobExecutionData) {
-        if (!jobExecutionData.jobName.startsWith("publish") && count >= failAfterSteps) {
+        if (isNotPublishJob(jobExecutionData) && count >= failAfterSteps) {
             count = 0
             if (failWithTimeout) {
                 throw PollTimeoutException("simulated timeout for ${jobExecutionData.jobName}", "no body")
@@ -116,18 +110,16 @@ class SimulatingJobExecutor : JobExecutor {
         }
     }
 
-    private fun informIfStepWise(msg: String): Promise<Unit> {
-        return if (stepWise) {
-            showAlert(msg)
-        } else {
-            Promise.resolve(Unit)
-        }
-    }
+    private fun isNotPublishJob(jobExecutionData: JobExecutionData) =
+        !jobExecutionData.jobName.startsWith("publish")
 
-    private fun getFakeAuthDataAndBuildNumber(): Pair<AuthData, Int> {
-        return AuthData(
+    private fun informIfStepWise(msg: String): Promise<Unit> =
+        if (stepWise) showAlert(msg)
+        else Promise.resolve(Unit)
+
+    private fun getFakeAuthDataAndBuildNumber() =
+        AuthData(
             UsernameAndApiToken("simulating-user", "random-api-token"),
             CrumbWithId("Jenkins-Crumb", "onlySimulation")
         ) to 100
-    }
 }

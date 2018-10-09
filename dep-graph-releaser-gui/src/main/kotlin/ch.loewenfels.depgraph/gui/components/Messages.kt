@@ -40,6 +40,7 @@ class Messages(releasePlan: ReleasePlan) {
 
     companion object {
         private const val MESSAGES_ID = "messages"
+        private const val HOLDER_CSS_CLASS = "holder"
 
         fun putMessagesInHolder(lastProcess: TypeOfRun) {
             val messagesDiv = elementById(MESSAGES_ID)
@@ -49,7 +50,7 @@ class Messages(releasePlan: ReleasePlan) {
                 val timestamp = (messages[0].childNodes.asList()
                     .find { it is HTMLDivElement && it.className == "timestamp" } as HTMLDivElement).innerText
 
-                val holder = document.create.div("holder") {
+                val holder = document.create.div(HOLDER_CSS_CLASS) {
                     id = holderId
                     appendClose(holderId)
                     +"Click here to see messages of a previous '${lastProcess.toProcessName()}' process - last message with timestamp $timestamp"
@@ -60,14 +61,14 @@ class Messages(releasePlan: ReleasePlan) {
                         messagesDiv.removeChild(holder)
                     }
                 }
-                holder.className = "holder"
+                holder.className = HOLDER_CSS_CLASS
                 messagesDiv.insertBefore(holder, messages[0])
                 messages.forEach { holder.appendChild(it) }
             }
         }
 
         private fun getMessages(node: HTMLElement) =
-            node.childNodes.asList().filter { it is HTMLDivElement && it.className != "holder" }
+            node.childNodes.asList().filter { it is HTMLDivElement && it.className != HOLDER_CSS_CLASS }
 
         fun showSuccess(message: String, autoCloseAfterMs: Int? = null) =
             showMessageOfType("success", "check_circle", message, autoCloseAfterMs)
@@ -94,8 +95,13 @@ class Messages(releasePlan: ReleasePlan) {
                 appendClose(msgId)
                 div("timestamp") {
                     val now = Date()
-                    +"${now.getFullYear().toString().substring(2)}-${padWithZero(now.getMonth() + 1)}-${padWithZero(now.getDay())} "
-                    +"${now.getHours()}:${padWithZero(now.getMinutes())}:${padWithZero(now.getSeconds())}"
+                    val year = now.getFullYear().toString().substring(2)
+                    val month = padWithZero(now.getMonth() + 1)
+                    val day = padWithZero(now.getDay())
+                    val hours = now.getHours()
+                    val minutes = padWithZero(now.getMinutes())
+                    val seconds = padWithZero(now.getSeconds())
+                    +"$year-$month-$day $hours:$minutes:$seconds"
                 }
                 i("material-icons") {
                     +icon

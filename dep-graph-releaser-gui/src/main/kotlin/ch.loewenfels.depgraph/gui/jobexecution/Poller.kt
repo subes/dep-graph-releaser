@@ -34,7 +34,7 @@ object Poller {
         val headers = createHeaderWithAuthAndCrumb(pollData.authData)
         val init = createGetRequest(headers)
 
-        val rePoll: (String) -> T = { body ->
+        fun rePoll(body: String): T {
             if (pollData.numberOfTries * pollData.pollEverySecond >= pollData.maxWaitingTimeInSeconds) {
                 throw PollTimeoutException(
                     "Waited at least ${pollData.maxWaitingTimeInSeconds} seconds",
@@ -46,7 +46,7 @@ object Poller {
             }
             // unsafeCast is used because javascript resolves the result automatically on return
             // will not result in Promise<Promise<T>> but T
-            p.unsafeCast<T>()
+            return p.unsafeCast<T>()
         }
 
         return window.fetch(pollData.pollUrl, init)
@@ -55,8 +55,10 @@ object Poller {
                 val (success, result) = pollData.action(body)
                 if (success) {
                     if (result == null) {
-                        throw Error("Result was null even though success flag during polling was true." +
-                            "\nPlease report a bug: $GITHUB_NEW_ISSUE")
+                        throw IllegalStateException(
+                            "Result was null even though success flag during polling was true." +
+                                "\nPlease report a bug: $GITHUB_NEW_ISSUE"
+                        )
                     }
                     result
                 } else {

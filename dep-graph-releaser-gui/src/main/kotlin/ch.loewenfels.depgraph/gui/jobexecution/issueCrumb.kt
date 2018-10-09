@@ -14,7 +14,7 @@ fun issueCrumb(
     return window.fetch(url, init)
         .then(::checkStatusOkOr404)
         .catch<Pair<Response, String?>> {
-            throw Error("Cannot issue a crumb", it)
+            throw IllegalStateException("Cannot issue a crumb", it)
         }.then { (_, crumbWithIdString) ->
             val crumbWithId = if (crumbWithIdString != null) {
                 val (id, crumb) = crumbWithIdString.split(':')

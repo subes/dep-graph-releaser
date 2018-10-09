@@ -1,6 +1,5 @@
 package ch.loewenfels.depgraph.runner.console
 
-
 import java.nio.file.Path
 import java.nio.file.Paths
 

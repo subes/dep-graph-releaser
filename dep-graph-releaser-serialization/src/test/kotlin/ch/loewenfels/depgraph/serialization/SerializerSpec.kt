@@ -16,9 +16,8 @@ import org.jetbrains.spek.api.dsl.it
 object SerializerSpec : Spek({
     val testee = Serializer()
 
-    fun createReleasePlan(project: Project): ReleasePlan {
-        return createReleasePlanWithDefaults("releaseId", project.id, mapOf(project.id to project), mapOf(), mapOf())
-    }
+    fun createReleasePlan(project: Project): ReleasePlan =
+        createReleasePlanWithDefaults("releaseId", project.id, mapOf(project.id to project), mapOf(), mapOf())
 
     fun createReleasePlan(state: CommandState): ReleasePlan {
         val rootProjectId = DummyProjectId("x")

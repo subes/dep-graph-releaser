@@ -11,7 +11,6 @@ import org.jetbrains.spek.api.dsl.describe
 import org.jetbrains.spek.api.dsl.it
 import java.nio.file.Paths
 
-
 abstract class CommandSpec(
     testee: ConsoleCommand,
     notEnoughArgs: (TempFolder) -> Array<out String>,

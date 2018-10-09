@@ -16,7 +16,10 @@ import java.lang.reflect.Type
  * This factory does not support processing of concrete classes with subtypes (introduce an interface,
  * that is better anyway).
  */
-class PolymorphicAdapterFactory<T : PolymorphSerializable>(private val polymorphicType: Class<T>, private val typeIdMappers: List<TypeIdMapper<T>>) : JsonAdapter.Factory {
+class PolymorphicAdapterFactory<T : PolymorphSerializable>(
+    private val polymorphicType: Class<T>,
+    private val typeIdMappers: List<TypeIdMapper<T>>
+) : JsonAdapter.Factory {
     init {
         require(polymorphicType.isInterface || Modifier.isAbstract(polymorphicType.modifiers)) {
             "Do not use ${PolymorphicAdapterFactory::class.simpleName} for non abstract types (neither an interface nor an abstract class).\n" +
@@ -24,15 +27,14 @@ class PolymorphicAdapterFactory<T : PolymorphSerializable>(private val polymorph
         }
     }
 
-    override fun create(type: Type, annotations: MutableSet<out Annotation>, moshi: Moshi): JsonAdapter<*>? {
-        // we only deal with the polymorphic type here
-        if (polymorphicType != type) {
-            return null
-        }
-        return PolymorphicAdapter(moshi, typeIdMappers)
-    }
+    override fun create(type: Type, annotations: MutableSet<out Annotation>, moshi: Moshi): JsonAdapter<*>? =
+        if (polymorphicType == type) PolymorphicAdapter(moshi, typeIdMappers)
+        else null
 
-    private class PolymorphicAdapter<T : PolymorphSerializable>(private val moshi: Moshi, private val typeIdMappers: List<TypeIdMapper<T>>) : NonNullJsonAdapter<T>() {
+    private class PolymorphicAdapter<T : PolymorphSerializable>(
+        private val moshi: Moshi,
+        private val typeIdMappers: List<TypeIdMapper<T>>
+    ) : NonNullJsonAdapter<T>() {
 
         override fun toJsonNonNull(writer: JsonWriter, value: T) {
             val runtimeClass = value::class.java

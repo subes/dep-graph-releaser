@@ -7,6 +7,7 @@ import ch.loewenfels.depgraph.data.ReleasePlan
 import ch.loewenfels.depgraph.data.maven.MavenProjectId
 import ch.loewenfels.depgraph.data.maven.jenkins.JenkinsNextDevReleaseCommand
 import ch.loewenfels.depgraph.data.maven.jenkins.JenkinsUpdateDependency
+import ch.loewenfels.depgraph.gui.components.Messages.Companion.showThrowableAndThrow
 
 
 internal fun generateChangelog(
@@ -80,7 +81,9 @@ private fun appendCommandToCsv(sb: StringBuilder, command: Command) {
     sb.append(command::class.simpleName)
     when (command) {
         is JenkinsUpdateDependency -> sb.append(" ${command.projectId.identifierForCsv}")
-        else -> Messages.showThrowableAndThrow(IllegalStateException("Unknown command found, cannot transform it to CSV.\n$command"))
+        else -> showThrowableAndThrow(
+            IllegalStateException("Unknown command found, cannot transform it to CSV.\n$command")
+        )
     }
     sb.append(';')
 }

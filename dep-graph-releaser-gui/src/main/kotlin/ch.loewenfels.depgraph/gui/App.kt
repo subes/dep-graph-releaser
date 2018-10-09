@@ -181,7 +181,7 @@ class App {
             return loadJson(jsonUrl, usernameAndApiToken)
                 .then(::checkStatusOk)
                 .catch<Pair<Response, String>> {
-                    throw Error("Could not load json from url $jsonUrl.", it)
+                    throw IllegalStateException("Could not load json from url $jsonUrl.", it)
                 }
         }
 

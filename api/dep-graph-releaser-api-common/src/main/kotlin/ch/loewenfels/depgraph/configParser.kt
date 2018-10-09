@@ -30,25 +30,22 @@ fun parseJobMapping(mapping: String): Map<String, String> {
 fun parseRemoteRegex(releasePlan: ReleasePlan) =
     parseRemoteRegex(releasePlan.getConfig(ConfigKey.REMOTE_REGEX))
 
-fun parseRemoteRegex(regex: String): List<Pair<Regex, String>> {
-    return parseRegex(regex, "remoteRegex", ::requireHttpsDefined) { it }
-}
+fun parseRemoteRegex(regex: String): List<Pair<Regex, String>> =
+    parseRegex(regex, "remoteRegex", ::requireHttpsDefined) { it }
 
 fun parseRegexParams(releasePlan: ReleasePlan) =
     parseRegexParams(releasePlan.getConfig(ConfigKey.REGEX_PARAMS))
 
-fun parseRegexParams(regex: String): List<Pair<Regex, List<String>>> {
-    return parseRegex(regex, "regexParams", ::requireAtLeastOneParameter) { params ->
+fun parseRegexParams(regex: String): List<Pair<Regex, List<String>>> =
+    parseRegex(regex, "regexParams", ::requireAtLeastOneParameter) { params ->
         params.split(';')
     }
-}
 
 fun parseBuildWithParamJobs(releasePlan: ReleasePlan) =
     parseBuildWithParamJobs(releasePlan.getConfig(ConfigKey.BUILD_WITH_PARAM_JOBS))
 
-fun parseBuildWithParamJobs(regex: String): List<Pair<Regex, BuildWithParamFormat>> {
-    return parseRegex(regex, "buildWithParamJobs", ::requireFormatAndNames, ::createBuildWithParamFormat)
-}
+fun parseBuildWithParamJobs(regex: String): List<Pair<Regex, BuildWithParamFormat>> =
+    parseRegex(regex, "buildWithParamJobs", ::requireFormatAndNames, ::createBuildWithParamFormat)
 
 private fun <T> parseRegex(
     configValue: String,
@@ -96,17 +93,15 @@ private fun getRightSide(value: String, endRegex: Int): Pair<Int, String> {
     return Pair(endRightSide, rightSide)
 }
 
-private fun checkRegexNotEmpty(index: Int, name: String, input: String) {
+private fun checkRegexNotEmpty(index: Int, name: String, input: String) =
     require(index > 0) {
         "regex requires at least one character.\n$name: $input"
     }
-}
 
-private fun requireHttpsDefined(jenkinsBaseUrl: String, remoteRegex: String) {
+private fun requireHttpsDefined(jenkinsBaseUrl: String, remoteRegex: String) =
     require(jenkinsBaseUrl.startsWith("https")) {
         "A remoteRegex requires a related jenkins base url which starts with https.\nremoteRegex: $remoteRegex"
     }
-}
 
 private fun requireAtLeastOneParameter(pair: String, regexParams: String) {
     require(pair.isNotEmpty()) {
@@ -131,7 +126,10 @@ private fun requireFormatAndNames(formatAndNames: String, buildWithParamJobs: St
     val numOfNames = when (format) {
         "query" -> 2
         "maven" -> 3
-        else -> throw IllegalArgumentException("Illegal format `$format` provided, only `query` and `maven` supported.\nbuildWithParamJobs: $buildWithParamJobs")
+        else -> throw IllegalArgumentException(
+            "Illegal format `$format` provided, only `query` and `maven` supported." +
+                "\nbuildWithParamJobs: $buildWithParamJobs"
+        )
     }
     val names = namesAsString.split(';')
     require(names.size == numOfNames) {
