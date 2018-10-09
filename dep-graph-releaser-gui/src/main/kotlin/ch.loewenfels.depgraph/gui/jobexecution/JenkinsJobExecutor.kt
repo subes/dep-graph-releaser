@@ -1,6 +1,7 @@
 package ch.loewenfels.depgraph.gui.jobexecution
 
 import ch.loewenfels.depgraph.gui.components.Messages.Companion.showInfo
+import ch.loewenfels.depgraph.gui.jobexecution.exceptions.JobNotTriggeredException
 import ch.loewenfels.depgraph.gui.sleep
 import ch.loewenfels.depgraph.gui.unwrap2Promise
 import ch.loewenfels.depgraph.gui.unwrap3Promise
@@ -26,7 +27,7 @@ class JenkinsJobExecutor(
             triggerJob(authData, jobExecutionData)
                 .then(::checkStatusIgnoreOpaqueRedirect)
                 .catch<Pair<Response, String>> {
-                    throw Error(
+                    throw JobNotTriggeredException(
                         "Could not trigger the job $jobName." +
                             "\nPlease visit ${jobExecutionData.jobBaseUrl} to see if it was triggered nonetheless." +
                             "\nYou can manually set the command to Succeeded if the job was triggered/executed and ended successfully."

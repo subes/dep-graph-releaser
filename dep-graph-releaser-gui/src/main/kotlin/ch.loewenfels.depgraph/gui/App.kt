@@ -31,7 +31,7 @@ class App {
             defaultJenkinsBaseUrl = publishJobUrl?.substringBefore("/job/")
             menu = Menu(UsernameTokenRegistry, defaultJenkinsBaseUrl)
             start(jsonUrl)
-        } catch (t: Throwable) {
+        } catch (@Suppress("TooGenericExceptionCaught") t: Throwable) {
             showThrowableAndThrow(t)
         }
     }
