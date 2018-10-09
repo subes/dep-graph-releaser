@@ -1,0 +1,64 @@
+autoCorrect: false
+failFast: true
+
+build:
+    maxIssues: 200
+    weights:
+        complexity: 2
+        style: 0.5
+
+test-pattern: # Configure exclusions for test sources
+    active: true
+    patterns: # Test file regexes
+    - '.*atrium.*'
+    - '.*/test/.*'
+    - '.*Test.kt'
+    - '.*Spec.kt'
+    exclude-rule-sets:
+    - 'comments'
+    exclude-rules:
+    - 'NamingRules'
+    - 'WildcardImport'
+    - 'MagicNumber'
+    - 'MaxLineLength'
+    - 'LateinitUsage'
+    - 'StringLiteralDuplication'
+    - 'SpreadOperator'
+    - 'TooManyFunctions'
+    - 'ForEachOnRange'
+    - 'LongParameterList'
+    - 'LargeClass'
+
+comments:
+    UndocumentedPublicClass:
+        active: false
+    UndocumentedPublicFunction:
+        active: false
+    CommentOverPrivateFunction:
+            active: false
+
+complexity:
+    ComplexMethod:
+        ignoreSingleWhenExpression: true
+        ignoreSimpleWhenEntries: true
+    LongParameterList:
+        threshold: 7
+    TooManyFunctions:
+        ignorePrivate: true
+
+naming:
+    FunctionMaxLength:
+        active: false
+    MatchingDeclarationName:
+        active: false
+
+style:
+    MandatoryBracesIfStatements:
+        active: false
+    OptionalWhenBraces:
+        active: false
+    SpacingBetweenPackageAndImports:
+        active: false
+    WildcardImport:
+        active: false
+

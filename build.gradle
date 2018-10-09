@@ -29,6 +29,9 @@ buildscript {
         jacoco_tool_version = '0.8.1'
         projectsWithoutSources = [] //currently all have sources
 
+        // detekt/sonarcloud
+        detekt_version = '1.0.0.RC8'
+
         apiProjects = subprojects.findAll { it.name.contains('api') }
         apiJvmProjects = ext.apiProjects.findAll { it.name.endsWith('-jvm') }
         apiJsProjects = ext.apiProjects.findAll { it.name.endsWith('-js') }
@@ -56,12 +59,23 @@ buildscript {
         classpath "ch.tutteli:tutteli-gradle-kotlin-utils:${gradle.ext.tutteli_plugins_version}"
         classpath "ch.tutteli:tutteli-gradle-publish:${gradle.ext.tutteli_plugins_version}"
         classpath "ch.tutteli:tutteli-gradle-spek:${gradle.ext.tutteli_plugins_version}"
+        classpath "gradle.plugin.io.gitlab.arturbosch.detekt:detekt-gradle-plugin:$detekt_version"
     }
 }
 
 apply plugin: 'ch.tutteli.project.utils'
 apply plugin: 'ch.tutteli.kotlin.utils'
 kotlinutils.kotlinVersion = kotlin_version
+apply plugin: "io.gitlab.arturbosch.detekt"
+
+detekt {
+    version = detekt_version
+     defaultProfile {
+         filters = ".*/resources/.*,.dep-graph-releaser/.*/build/.*"
+         output = "$rootProject.buildDir/detekt"
+         config = file("$rootProject.projectDir/gradle/scripts/detekt.yml")
+     }
+}
 
 repositories {
     mavenCentral()
