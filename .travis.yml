@@ -1,24 +1,74 @@
 language: java
 jdk:
-  # junit5 requires java 8
-  - oraclejdk8
-  - oraclejdk9
+# junit5 requires java 8
+- oraclejdk8
+- oraclejdk9
+
+addons:
+    sonarcloud:
+        organization: "loewenfels"
+        token:
+            secure: $SONAR_TOKEN
 
 before_install:
- - chmod +x gr
+- chmod +x gr
 install: true
 
 script:
-  - ./gr -i build CodeCoverageReport
+- ./gr -i build CodeCoverageReport
+- |
+    if [ $TRAVIS_JDK_VERSION == oraclejdk8 ]; then
+        sonar-scanner \
+            -Dsonar.projectKey=depgraph \
+            -Dsonar.projectVersion=0.2.0 \
+            -Dsonar.java.coveragePlugin=jacoco \
+            -Dsonar.jacoco.reportPaths="\
+                api/dep-graph-releaser-api-jvm/build/jacoco/junitPlatformTest.exec,\
+                dep-graph-releaser-manipulation/build/jacoco/junitPlatformTest.exec,\
+                dep-graph-releaser-maven/build/jacoco/junitPlatformTest.exec,\
+                dep-graph-releaser-runner/build/jacoco/junitPlatformTest.exec,\
+                dep-graph-releaser-serialization/build/jacoco/junitPlatformTest.exec,\
+                maven-api/dep-graph-releaser-maven-api-jvm/build/jacoco/junitPlatformTest.exec \
+            -Ddetekt.sonar.kotlin.config.path=gradle/scripts/detekt.yml" \
+            -Dsonar.sources="\
+                api/dep-graph-releaser-api-common/src/main/kotlin,\
+                atrium/src/main/kotlin,\
+                dep-graph-releaser-gui/src/main/kotlin,\
+                dep-graph-releaser-manipulation/src/main/kotlin,\
+                dep-graph-releaser-maven/src/main/kotlin,\
+                dep-graph-releaser-runner/src/main/kotlin,\
+                dep-graph-releaser-serialization/src/main/kotlin,\
+                maven-api/dep-graph-releaser-maven-api-common/src/main/kotlin,\
+                maven-api/dep-graph-releaser-maven-api-jvm/src/main/kotlin" \
+            -Dsonar.tests="\
+                api/dep-graph-releaser-api-jvm/src/test/kotlin,\
+                dep-graph-releaser-manipulation/src/test/kotlin,\
+                dep-graph-releaser-maven/src/test/kotlin,\
+                dep-graph-releaser-runner/src/test/kotlin,\
+                dep-graph-releaser-serialization/src/test/kotlin" \
+            -Dsonar.java.binaries="\
+                   api/dep-graph-releaser-api-common/build/classes/kotlin/main,\
+                   api/dep-graph-releaser-api-js/build/classes/kotlin/main,\
+                   api/dep-graph-releaser-api-jvm/build/classes/kotlin/main,\
+                   atrium/build/classes/kotlin/main,\
+                   dep-graph-releaser-gui/build/classes/kotlin/main,\
+                   dep-graph-releaser-manipulation/build/classes/kotlin/main,\
+                   dep-graph-releaser-maven/build/classes/kotlin/main,\
+                   dep-graph-releaser-runner/build/classes/kotlin/main,\
+                   dep-graph-releaser-serialization/build/classes/kotlin/main,\
+                   maven-api/dep-graph-releaser-maven-api-common/build/classes/kotlin/main,\
+                   maven-api/dep-graph-releaser-maven-api-js/build/classes/kotlin/main,\
+                   maven-api/dep-graph-releaser-maven-api-jvm/build/classes/kotlin/main"
+    fi
 
 after_success:
-  - bash <(curl -s https://codecov.io/bash)
+- bash <(curl -s https://codecov.io/bash)
 
 before_cache:
-    - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
-    - rm -fr $HOME/.gradle/caches/*/plugin-resolution/
+- rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
+- rm -fr $HOME/.gradle/caches/*/plugin-resolution/
 
 cache:
-  directories:
+    directories:
     - $HOME/.gradle/wrapper/
     - $HOME/.gradle/caches/
