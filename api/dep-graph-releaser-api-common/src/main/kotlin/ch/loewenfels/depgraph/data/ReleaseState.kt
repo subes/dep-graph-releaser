@@ -6,7 +6,7 @@ enum class ReleaseState {
     SUCCEEDED,
     FAILED,
     /**
-     * State indicating that a user only observes the process (we could disable all toggles etc.)
+     * State indicating that a user only observes the process (we could disable all toggles etc.).
      */
     WATCHING,
     ;
@@ -37,7 +37,8 @@ enum class ReleaseState {
 
     private fun getErrorMessage(newState: ReleaseState, reason: String) {
         "Cannot transition to ${newState::class.simpleName} because $reason." +
-            //TODO use $this instead of $getToStringRepresentation(...) once https://youtrack.jetbrains.com/issue/KT-23970 is fixed
+            //TODO use $this instead of $getToStringRepresentation(...) once
+            // https://youtrack.jetbrains.com/issue/KT-23970 is fixed
             "\nState was: ${this.getToStringRepresentation()}"
     }
 }

@@ -105,9 +105,7 @@ class Publisher(
         }
     }
 
-    fun applyChanges(): Boolean {
-        return modifiableState.applyChanges()
-    }
+    fun applyChanges(): Boolean = modifiableState.applyChanges()
 
     companion object {
         private val resultRegex = Regex("<fileName>([^<]+)</fileName>")

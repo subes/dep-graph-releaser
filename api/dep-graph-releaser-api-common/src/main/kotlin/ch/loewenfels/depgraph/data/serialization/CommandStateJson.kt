@@ -62,4 +62,5 @@ fun fromJson(json: CommandStateJson): CommandState = when (json.state) {
     DISABLED -> CommandState.Disabled
 }
 
-private fun throwIllegal(fieldName: String, stateName: String): Nothing = throw IllegalArgumentException("$fieldName must be defined for state $stateName")
+private fun throwIllegal(fieldName: String, stateName: String): Nothing =
+    throw IllegalArgumentException("$fieldName must be defined for state $stateName")

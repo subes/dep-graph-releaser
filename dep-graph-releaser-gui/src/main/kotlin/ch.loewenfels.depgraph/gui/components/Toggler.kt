@@ -82,23 +82,20 @@ class Toggler(private val modifiableState: ModifiableState, private val menu: Me
         }
     }
 
-    private fun notAllCommandsOrSubmodulesActive(project: Project, toggle: HTMLInputElement): Boolean {
-        return notAllCommandsOrSubmodulesActive(project) { it.id != toggle.id }
-    }
+    private fun notAllCommandsOrSubmodulesActive(project: Project, toggle: HTMLInputElement): Boolean =
+        notAllCommandsOrSubmodulesActive(project) { it.id != toggle.id }
 
-    private fun notAllCommandsOrSubmodulesActive(project: Project, predicate: (HTMLInputElement) -> Boolean): Boolean {
-        return notAllCommandsActive(project, predicate) || notAllSubmodulesActive(project)
-    }
+    private fun notAllCommandsOrSubmodulesActive(project: Project, predicate: (HTMLInputElement) -> Boolean): Boolean =
+        notAllCommandsActive(project, predicate) || notAllSubmodulesActive(project)
 
-    private fun notAllCommandsActive(project: Project, predicate: (HTMLInputElement) -> Boolean): Boolean {
-        return project.commands.asSequence()
+    private fun notAllCommandsActive(project: Project, predicate: (HTMLInputElement) -> Boolean): Boolean =
+        project.commands.asSequence()
             .mapIndexed { index, _ -> Pipeline.getToggle(project, index) }
             .filter(predicate)
             .any { checkbox -> !checkbox.checked }
-    }
 
-    private fun notAllSubmodulesActive(project: Project): Boolean {
-        return modifiableState.releasePlan.getSubmodules(project.id).any { submoduleId ->
+    private fun notAllSubmodulesActive(project: Project): Boolean =
+        modifiableState.releasePlan.getSubmodules(project.id).any { submoduleId ->
             val submodulesHasCommands = !elementById(project.id.identifier).hasClass("withoutCommands")
             submodulesHasCommands &&
                 notAllCommandsOrSubmodulesActive(
@@ -107,7 +104,6 @@ class Toggler(private val modifiableState: ModifiableState, private val menu: Me
                     predicate = { true }
                 )
         }
-    }
 
     private fun registerReleaseUncheckEventForDependentsAndSubmodules(project: Project) {
         if (!project.isSubmodule) {

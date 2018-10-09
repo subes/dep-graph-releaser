@@ -31,7 +31,7 @@ class ContextMenu(
     fun createProjectContextMenu(div: DIV, project: Project) {
         div.div("contextMenu") {
             val idPrefix = project.id.identifier
-            id = "$idPrefix$CONTEXT_MENU_SUFFIX"
+            id = getContextMenuId(idPrefix)
             contextMenuEntry(idPrefix, "gitClone", "Git clone", "Show the git clone command for this project",
                 iconCreator = { i("material-icons char") { +"G" } }
             ) {
@@ -49,7 +49,7 @@ class ContextMenu(
 
     fun createCommandContextMenu(div: DIV, idPrefix: String, project: Project, index: Int) {
         div.div("contextMenu") {
-            id = "$idPrefix$CONTEXT_MENU_SUFFIX"
+            id = getContextMenuId(idPrefix)
             commandContextMenuEntry(idPrefix, CONTEXT_MENU_COMMAND_DEACTIVATED, CommandState.Deactivated::class) {
                 transitionToDeactivatedIfOk(project, index)
             }
@@ -139,21 +139,19 @@ class ContextMenu(
     }
 
     private fun transitionToSucceededIfOk(project: Project, index: Int) {
-        if (project.commands[index] is ReleaseCommand) {
-            if (notAllOtherCommandsSucceeded(project, index)) {
-                val succeeded = CommandState.Succeeded::class.simpleName
-                showDialog(
-                    "You cannot set this command to the state $succeeded because not all other commands of this project have $succeeded yet." +
-                        "\n\n" +
-                        "Do you want to set all other commands forcibly to $succeeded as well?"
-                ).then { setAllToSucceeded ->
-                    if (setAllToSucceeded) {
-                        transitionAllCommandsToSucceeded(project)
-                        menu.activateSaveButtonAndDeactivateOthers()
-                    }
+        if (project.commands[index] is ReleaseCommand && notAllOtherCommandsSucceeded(project, index)) {
+            val succeeded = CommandState.Succeeded::class.simpleName
+            showDialog(
+                "You cannot set this command to the state $succeeded because not all other commands of this project have $succeeded yet." +
+                    "\n\n" +
+                    "Do you want to set all other commands forcibly to $succeeded as well?"
+            ).then { setAllToSucceeded ->
+                if (setAllToSucceeded) {
+                    transitionAllCommandsToSucceeded(project)
+                    menu.activateSaveButtonAndDeactivateOthers()
                 }
-                return
             }
+            return
         }
         transitionToSucceededWithoutCheck(project, index)
         menu.activateSaveButtonAndDeactivateOthers()
@@ -245,9 +243,9 @@ class ContextMenu(
 
     private fun reProcessProject(project: Project, index: Int, stateTransition: (Project, index: Int) -> Unit) {
         val processStarter = if (Pipeline.getTypeOfRun() == TypeOfRun.EXPLORE) {
-            App.givenOrFakeProcessStarter(this@ContextMenu.processStarter, modifiableState)
+            App.givenOrFakeProcessStarter(processStarter, modifiableState)
         } else {
-            this@ContextMenu.processStarter
+            processStarter
         }
         if (processStarter != null) {
             stateTransition(project, index)
@@ -280,7 +278,7 @@ class ContextMenu(
             element.addEventListener("contextmenu", { event ->
                 hideAllContextMenus()
                 disableContextEntriesIfNecessary(idPrefix)
-                val contextMenu = elementById("$idPrefix$CONTEXT_MENU_SUFFIX")
+                val contextMenu = elementById(getContextMenuId(idPrefix))
                 moveContextMenuPosition(event as MouseEvent, contextMenu)
                 contextMenu.style.visibility = "visible"
                 window.addEventListener("click", { hideAllContextMenus() }, js("({once: true})"))
@@ -290,6 +288,8 @@ class ContextMenu(
         }
         window.addEventListener("contextmenu", { hideAllContextMenus() })
     }
+
+    private fun getContextMenuId(idPrefix: String) = "$idPrefix$CONTEXT_MENU_SUFFIX"
 
     private fun disableCommandContextEntriesIfNecessary(idPrefix: String) {
         val state = Pipeline.getReleaseState()

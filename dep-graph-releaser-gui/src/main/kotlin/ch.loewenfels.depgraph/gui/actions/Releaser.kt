@@ -2,13 +2,14 @@ package ch.loewenfels.depgraph.gui.actions
 
 import ch.loewenfels.depgraph.data.*
 import ch.loewenfels.depgraph.data.maven.jenkins.JenkinsCommand
-import ch.loewenfels.depgraph.gui.*
 import ch.loewenfels.depgraph.gui.components.Messages.Companion.showError
 import ch.loewenfels.depgraph.gui.components.Messages.Companion.showThrowable
 import ch.loewenfels.depgraph.gui.components.Messages.Companion.showWarning
 import ch.loewenfels.depgraph.gui.components.Pipeline
+import ch.loewenfels.depgraph.gui.elementById
 import ch.loewenfels.depgraph.gui.jobexecution.*
 import ch.loewenfels.depgraph.gui.serialization.ModifiableState
+import ch.loewenfels.depgraph.gui.unwrapPromise
 import ch.tutteli.kbox.mapWithIndex
 import org.w3c.dom.HTMLAnchorElement
 import kotlin.browser.window
@@ -265,11 +266,15 @@ class Releaser(
 
 
     private fun rePollQueueing(paramObject: ParamObject, command: Command, index: Int): Promise<CommandState> {
+        //TODO switch to check(...) when using kotlin 1.3
         if (command !is JenkinsCommand) {
             throw IllegalStateException("We do not know how to re-poll a non Jenkins command.\nGiven Command: $command")
         }
         val queuedItemUrl = command.buildUrl
-            ?: throw IllegalStateException("We do not know how to re-poll a queued Jenkins job if it does not have a specified build url.\nGiven Command: $command")
+            ?: throw IllegalStateException(
+                "We do not know how to re-poll a queued Jenkins job if it does not have a specified build url." +
+                    "\nGiven Command: $command"
+            )
 
         val jobExecutionData = paramObject.jobExecutionDataFactory.create(paramObject.project, command)
         return paramObject.jobExecutor.rePollQueueing(
@@ -282,11 +287,15 @@ class Releaser(
     }
 
     private fun rePollCommand(paramObject: ParamObject, command: Command, index: Int): Promise<CommandState> {
+        //TODO switch to check(...) when using kotlin 1.3
         if (command !is JenkinsCommand) {
             throw IllegalStateException("We do not know how to re-poll a non Jenkins command.\nGiven Command: $command")
         }
         val buildUrl = command.buildUrl
-            ?: throw IllegalStateException("We do not know how to re-poll a Jenkins command if it does not have a specified build url.\nGiven Command: $command")
+            ?: throw IllegalStateException(
+                "We do not know how to re-poll a Jenkins command if it does not have a specified build url." +
+                    "\nGiven Command: $command"
+            )
 
         Pipeline.changeStateOfCommandAndAddBuildUrlIfSet(paramObject.project, index, CommandState.RePolling, buildUrl)
         val jobExecutionData = paramObject.jobExecutionDataFactory.create(paramObject.project, command)
@@ -396,8 +405,8 @@ class Releaser(
         } else {
             CommandState.Failed
         }
-        val href = if (!state.href.endsWith(endOfConsoleUrlSuffix)) {
-            state.href + "/" + endOfConsoleUrlSuffix
+        val href = if (!state.href.endsWith(END_OF_CONSOLE_URL_SUFFIX)) {
+            state.href + "/" + END_OF_CONSOLE_URL_SUFFIX
         } else {
             state.href
         }

@@ -30,7 +30,9 @@ fun generateGitCloneCommands(
     excludeRegex: Regex,
     relativePathTransformerRegex: Regex,
     relativePathTransformerReplacement: String
-) = generateGitCloneCommands(releasePlan.iterator().asSequence(), excludeRegex, relativePathTransformerRegex, relativePathTransformerReplacement)
+) = generateGitCloneCommands(
+    releasePlan.iterator().asSequence(), excludeRegex, relativePathTransformerRegex, relativePathTransformerReplacement
+)
 
 /**
  * Generates a list of git clone commands based on the given [projectsAsSequence] but
@@ -45,8 +47,9 @@ fun generateGitCloneCommands(
     excludeRegex: Regex,
     relativePathTransformerRegex: Regex,
     relativePathTransformerReplacement: String
-)= gitRepoUrlsOfProjects(projectsAsSequence, excludeRegex, relativePathTransformerRegex, relativePathTransformerReplacement)
-    .joinToString("\n") { "git clone $it" }
+) = gitRepoUrlsOfProjects(
+    projectsAsSequence, excludeRegex, relativePathTransformerRegex, relativePathTransformerReplacement
+).joinToString("\n") { "git clone $it" }
 
 /**
  * Generates an eclipse compatible psf-file including projects which are part of the given [releasePlan] but
@@ -68,10 +71,14 @@ fun generateEclipsePsf(
         |
         """.trimMargin()
     )
-    gitRepoUrlsOfProjects(releasePlan.iterator().asSequence(), excludeRegex, relativePathTransformerRegex, relativePathTransformerReplacement)
-        .appendToStringBuilder(sb, "\n") { gitRepoUrl ->
-            sb.append("    <project reference=\"1.0,").append(gitRepoUrl).append(",master,.\"/>")
-        }
+    gitRepoUrlsOfProjects(
+        releasePlan.iterator().asSequence(),
+        excludeRegex,
+        relativePathTransformerRegex,
+        relativePathTransformerReplacement
+    ).appendToStringBuilder(sb, "\n") { gitRepoUrl ->
+        sb.append("    <project reference=\"1.0,").append(gitRepoUrl).append(",master,.\"/>")
+    }
     sb.append("\n  </provider>\n</psf>")
     return sb.toString()
 }

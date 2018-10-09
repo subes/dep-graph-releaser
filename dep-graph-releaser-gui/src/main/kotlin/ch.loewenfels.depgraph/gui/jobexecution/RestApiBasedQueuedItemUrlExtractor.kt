@@ -1,6 +1,6 @@
 package ch.loewenfels.depgraph.gui.jobexecution
 
-import ch.loewenfels.depgraph.regex.noneOrSomeChars
+import ch.loewenfels.depgraph.regex.NONE_OR_SOME_CHARS
 import org.w3c.fetch.Response
 import kotlin.browser.window
 import kotlin.js.Promise
@@ -27,10 +27,10 @@ class RestApiBasedQueuedItemUrlExtractor(private val identifyingParams: Map<Stri
             .then(::checkStatusOk)
             .then { (_, body) ->
                 val queuedItemRegex = Regex(
-                    "<item>$noneOrSomeChars" +
+                    "<item>$NONE_OR_SOME_CHARS" +
                         paramsIdentification +
-                        "<task>$noneOrSomeChars<name>$jobName</name>$noneOrSomeChars</task>$noneOrSomeChars" +
-                        "<url>([^<]+)</url>$noneOrSomeChars" +
+                        "<task>$NONE_OR_SOME_CHARS<name>$jobName</name>$NONE_OR_SOME_CHARS</task>$NONE_OR_SOME_CHARS" +
+                        "<url>([^<]+)</url>$NONE_OR_SOME_CHARS" +
                     "</item>"
                 )
                 val matchResult = queuedItemRegex.find(body)

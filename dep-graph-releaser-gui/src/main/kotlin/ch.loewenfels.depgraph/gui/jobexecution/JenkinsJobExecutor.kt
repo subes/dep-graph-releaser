@@ -1,7 +1,10 @@
 package ch.loewenfels.depgraph.gui.jobexecution
 
-import ch.loewenfels.depgraph.gui.*
 import ch.loewenfels.depgraph.gui.components.Messages.Companion.showInfo
+import ch.loewenfels.depgraph.gui.sleep
+import ch.loewenfels.depgraph.gui.unwrap2Promise
+import ch.loewenfels.depgraph.gui.unwrap3Promise
+import ch.loewenfels.depgraph.gui.unwrapPromise
 import org.w3c.fetch.Response
 import kotlin.browser.window
 import kotlin.js.Promise
@@ -93,11 +96,7 @@ class JenkinsJobExecutor(
         return window.fetch(jobExecutionData.jobTriggerUrl, init)
     }
 
-    private fun showInfoQueuedItemIfVerbose(
-        verbose: Boolean,
-        nullableQueuedItemUrl: String?,
-        jobName: String
-    ) {
+    private fun showInfoQueuedItemIfVerbose(verbose: Boolean, nullableQueuedItemUrl: String?, jobName: String) {
         if (verbose) {
             if (nullableQueuedItemUrl != null) {
                 showInfo(
@@ -117,13 +116,12 @@ class JenkinsJobExecutor(
         nullableQueuedItemUrl: String?,
         authData: AuthData,
         jobExecutionData: JobExecutionData
-    ): Promise<Int> {
-        return if (nullableQueuedItemUrl != null) {
+    ): Promise<Int> =
+        if (nullableQueuedItemUrl != null) {
             QueuedItemBasedBuildNumberExtractor(authData, nullableQueuedItemUrl).extract()
         } else {
             BuildHistoryBasedBuildNumberExtractor(authData, jobExecutionData).extract()
         }
-    }
 
     override fun rePollQueueing(
         jobExecutionData: JobExecutionData,
@@ -185,7 +183,7 @@ class JenkinsJobExecutor(
                 .then { (buildNumber, result) ->
                     check(result == SUCCESS) {
                         "${jobExecutionData.jobName} failed, job did not end with status $SUCCESS but $result." +
-                            "\nVisit ${jobExecutionData.jobBaseUrl}$buildNumber/$endOfConsoleUrlSuffix for further information"
+                            "\nVisit ${jobExecutionData.jobBaseUrl}$buildNumber/$END_OF_CONSOLE_URL_SUFFIX for further information"
                     }
                     authData to buildNumber
                 }
@@ -199,9 +197,8 @@ class JenkinsJobExecutor(
         pollEverySecond: Int,
         maxWaitingTimeInSeconds: Int,
         errorHandler: (PollTimeoutException) -> Nothing
-    ): Promise<String> {
-        return Poller.pollAndExtract(authData, url, regex, pollEverySecond, maxWaitingTimeInSeconds, errorHandler)
-    }
+    ): Promise<String> =
+        Poller.pollAndExtract(authData, url, regex, pollEverySecond, maxWaitingTimeInSeconds, errorHandler)
 
     companion object {
         private val resultRegex = Regex("<result>([A-Z]+)</result>")

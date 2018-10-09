@@ -21,8 +21,9 @@ class BuildHistoryBasedBuildNumberExtractor(
     }
 
     private fun searchBuildNumber(body: String, init: RequestInit): Promise<Int> {
-        val matchResult = numberRegex.find(body)
-            ?: throw IllegalStateException("no job run at ${jobExecutionData.jobBaseUrl} so far, as consequence we cannot extract a build number.")
+        val matchResult = numberRegex.find(body) ?: throw IllegalStateException(
+            "no job run at ${jobExecutionData.jobBaseUrl} so far, as consequence we cannot extract a build number."
+        )
         val parametersRegex = Regex(createParameterRegexPattern(jobExecutionData.identifyingParams))
         return searchBuildNumber(matchResult, parametersRegex, init)
     }
@@ -35,8 +36,10 @@ class BuildHistoryBasedBuildNumberExtractor(
                 if (parametersRegex.containsMatchIn(body)) {
                     Promise.resolve(buildNumber)
                 } else {
-                    val newMatchResult = matchResult.next()
-                        ?: throw IllegalStateException("No job matches the given identifying parameters at ${jobExecutionData.jobBaseUrl}.\nRegex used: ${parametersRegex.pattern}")
+                    val newMatchResult = matchResult.next() ?: throw IllegalStateException(
+                        "No job matches the given identifying parameters at ${jobExecutionData.jobBaseUrl}." +
+                            "\nRegex used: ${parametersRegex.pattern}"
+                    )
                     searchBuildNumber(newMatchResult, parametersRegex, init)
                 }
             }.unwrapPromise()

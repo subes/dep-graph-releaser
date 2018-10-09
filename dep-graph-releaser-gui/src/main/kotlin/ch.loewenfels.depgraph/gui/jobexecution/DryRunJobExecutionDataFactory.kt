@@ -57,7 +57,9 @@ class DryRunJobExecutionDataFactory(
         )
     }
 
-    private fun determineGroupIdArtifactIdAndNewVersion(command: JenkinsUpdateDependency): GroupIdArtifactIdAndNewVersion {
+    private fun determineGroupIdArtifactIdAndNewVersion(
+        command: JenkinsUpdateDependency
+    ): GroupIdArtifactIdAndNewVersion {
         val dependency = releasePlan.getProject(command.projectId)
         val dependencyMavenProjectId = dependency.id as MavenProjectId
         val groupId = dependencyMavenProjectId.groupId
@@ -105,7 +107,7 @@ class DryRunJobExecutionDataFactory(
             .let { if (it != null) searchTopMultiModule(it.key) else releasePlan.getProject(projectId) }
 
     private fun commandRanOnProjectOrSubmodules(project: Project): Boolean {
-        val projectHasCompletedCommands = project.commands.withIndex().any { (index, command) ->
+        val projectHasCompletedCommands = project.commands.asSequence().withIndex().any { (index, command) ->
             val state = getState(project, index, command)
             CommandState.isEndState(state)
         }

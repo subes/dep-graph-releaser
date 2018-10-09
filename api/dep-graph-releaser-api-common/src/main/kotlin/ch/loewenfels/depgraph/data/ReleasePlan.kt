@@ -40,24 +40,20 @@ data class ReleasePlan(
     )
 
     fun getRootProject() = getProject(rootProjectId)
-    fun getProject(projectId: ProjectId): Project {
-        return projects[projectId] ?: throw IllegalArgumentException("Could not find the project with id $projectId")
-    }
+    fun getProject(projectId: ProjectId): Project =
+        projects[projectId] ?: throw IllegalArgumentException("Could not find the project with id $projectId")
 
     fun hasSubmodules(projectId: ProjectId) = getSubmodules(projectId).isNotEmpty()
-    fun getSubmodules(projectId: ProjectId): Set<ProjectId> {
-        return submodules[projectId]
-            ?: throw IllegalArgumentException("Could not find submodules for project with id $projectId")
-    }
+    fun getSubmodules(projectId: ProjectId): Set<ProjectId> =
+        submodules[projectId]
+        ?: throw IllegalArgumentException("Could not find submodules for project with id $projectId")
 
-    fun getDependents(projectId: ProjectId): Set<ProjectId> {
-        return dependents[projectId]
-            ?: throw IllegalArgumentException("Could not find dependents for project with id $projectId")
-    }
+    fun getDependents(projectId: ProjectId): Set<ProjectId> =
+        dependents[projectId]
+        ?: throw IllegalArgumentException("Could not find dependents for project with id $projectId")
 
-    fun getConfig(configKey: ConfigKey): String {
-        return config[configKey] ?: throw IllegalArgumentException("Unknown config key: $configKey")
-    }
+    fun getConfig(configKey: ConfigKey): String =
+        config[configKey] ?: throw IllegalArgumentException("Unknown config key: $configKey")
 
     /**
      * Returns the dependents of the given [multiModuleId] as well as the dependents of submodules and

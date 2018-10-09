@@ -10,18 +10,9 @@ fun <T> sleep(ms: Int, action: () -> T): Promise<T> {
 }
 
 // It's workaround for KT-19672 since we can fix it properly until KT-11265 isn't fixed.
-inline fun <T> Promise<Promise<T>>.unwrapPromise(): Promise<T> {
-    return this.unsafeCast<Promise<T>>()
-}
-inline fun <T> Promise<Promise<Promise<T>>>.unwrap2Promise(): Promise<T> {
-    return this.unsafeCast<Promise<T>>()
-}
-inline fun <T> Promise<Promise<Promise<Promise<T>>>>.unwrap3Promise(): Promise<T> {
-    return this.unsafeCast<Promise<T>>()
-}
-inline fun <T> Promise<Promise<Promise<Promise<Promise<T>>>>>.unwrap4Promise(): Promise<T> {
-    return this.unsafeCast<Promise<T>>()
-}
+inline fun <T> Promise<Promise<T>>.unwrapPromise(): Promise<T> = this.unsafeCast<Promise<T>>()
+inline fun <T> Promise<Promise<Promise<T>>>.unwrap2Promise(): Promise<T> = this.unsafeCast<Promise<T>>()
+inline fun <T> Promise<Promise<Promise<Promise<T>>>>.unwrap3Promise(): Promise<T> = this.unsafeCast<Promise<T>>()
 
 fun changeCursorToProgress() {
     document.body!!.style.cursor = "progress"
@@ -37,9 +28,7 @@ fun <T, S> Promise<T>.finally(action: (T?) -> S): Promise<S> {
         .catch { t -> action(null); throw t }
 }
 
-fun randomPublishId(): String {
-    return uuidv4().replace("-", "").take(15)
-}
+fun randomPublishId(): String = uuidv4().replace("-", "").take(15)
 
 //copied from https://stackoverflow.com/questions/105034/create-guid-uuid-in-javascript
 private fun uuidv4(): String {

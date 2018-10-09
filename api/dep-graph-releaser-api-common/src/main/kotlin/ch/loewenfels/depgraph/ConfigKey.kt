@@ -17,8 +17,6 @@ enum class ConfigKey(private val key: kotlin.String) {
     fun asString(): String = key
 
     companion object {
-        fun fromString(key: String): ConfigKey {
-            return values().first { it.asString() == key  }
-        }
+        fun fromString(key: String): ConfigKey = values().first { it.asString() == key  }
     }
 }

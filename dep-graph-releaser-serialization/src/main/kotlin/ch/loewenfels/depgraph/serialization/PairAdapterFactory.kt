@@ -7,17 +7,16 @@ import java.lang.reflect.Type
 object PairAdapterFactory : JsonAdapter.Factory {
 
     override fun create(type: Type, annotations: MutableSet<out Annotation>, moshi: Moshi): JsonAdapter<*>? {
-        if (type !is ParameterizedType) {
-            return null
-        }
-        if (Pair::class.java != type.rawType) {
-            return null
-        }
+        if (type !is ParameterizedType || Pair::class.java != type.rawType) return null
 
         val listType = Types.newParameterizedType(List::class.java, String::class.java)
         val listAdapter = moshi.adapter<List<String>>(listType)
 
-        return PairAdapter(moshi.adapter(type.actualTypeArguments[0]), moshi.adapter(type.actualTypeArguments[1]), listAdapter)
+        return PairAdapter(
+            moshi.adapter(type.actualTypeArguments[0]),
+            moshi.adapter(type.actualTypeArguments[1]),
+            listAdapter
+        )
     }
 
     private class PairAdapter(

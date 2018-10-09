@@ -10,6 +10,7 @@ class Man(private val commands: Map<String, ConsoleCommand>) : ConsoleCommand {
         private const val COMMAND = "-command="
         const val name = "man"
     }
+
     override val name = Companion.name
     override val description = "shows kind of a man page of one or all available commands"
     override val example = "./dgr $name -command=html"
@@ -25,7 +26,7 @@ class Man(private val commands: Map<String, ConsoleCommand>) : ConsoleCommand {
         if (commandName != null) {
             val command = getCommand(commandName, errorHandler)
             println(command.arguments)
-        }else{
+        } else {
             println(showAllCommands())
         }
     }
@@ -36,14 +37,15 @@ class Man(private val commands: Map<String, ConsoleCommand>) : ConsoleCommand {
             sb.append(k.padEnd(15)).append("// ").append(v.description)
         }
         sb.append("\n\n")
-        commands.values.appendToStringBuilder(sb, "\n\n") { it->
+        commands.values.appendToStringBuilder(sb, "\n\n") { it ->
             sb.append(it.arguments)
         }
         return sb.toString()
     }
 
-    fun getCommand(commandName: String, errorHandler: ErrorHandler): ConsoleCommand {
-        return commands[commandName] ?: errorHandler.error("Unknown command supplied.\nCommand name: $commandName\n${showAllCommands()}")
-    }
+    fun getCommand(commandName: String, errorHandler: ErrorHandler): ConsoleCommand =
+        commands[commandName] ?: errorHandler.error(
+            "Unknown command supplied.\nCommand name: $commandName\n${showAllCommands()}"
+        )
 
 }

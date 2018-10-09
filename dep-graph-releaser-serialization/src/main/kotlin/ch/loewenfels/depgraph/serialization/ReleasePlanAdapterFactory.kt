@@ -5,7 +5,6 @@ import ch.loewenfels.depgraph.data.*
 import com.squareup.moshi.*
 import java.lang.reflect.Type
 
-
 object ReleasePlanAdapterFactory : JsonAdapter.Factory {
     override fun create(type: Type, annotations: MutableSet<out Annotation>, moshi: Moshi): JsonAdapter<*>? {
         if (ReleasePlan::class.java != type) {

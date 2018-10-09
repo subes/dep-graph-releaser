@@ -8,7 +8,6 @@ import ch.tutteli.spek.extensions.TempFolder
 import org.jetbrains.spek.api.Spek
 import org.jetbrains.spek.api.include
 
-
 class UpdateDependencySpec : Spek({
     include(UpdateDependencyCommandSpec)
 

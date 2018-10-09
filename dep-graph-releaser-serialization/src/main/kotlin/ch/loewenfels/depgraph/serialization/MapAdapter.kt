@@ -8,17 +8,17 @@ import java.lang.reflect.ParameterizedType
 import java.lang.reflect.Type
 
 class MapAdapterFactory<K : Any>(private val keyType: Class<K>) : JsonAdapter.Factory {
-    override fun create(type: Type, annotations: MutableSet<out Annotation>, moshi: Moshi): JsonAdapter<*>? {
-        if (type !is ParameterizedType) {
-            return null
+    override fun create(type: Type, annotations: MutableSet<out Annotation>, moshi: Moshi): JsonAdapter<*>? =
+        if (type is ParameterizedType && Map::class.java == type.rawType && keyType == type.actualTypeArguments[0]) {
+            MapAdapter(moshi.adapter(keyType), moshi.adapter(type.actualTypeArguments[1]))
+        } else {
+            null
         }
-        if (Map::class.java != type.rawType || keyType != type.actualTypeArguments[0]) {
-            return null
-        }
-        return MapAdapter(moshi.adapter(keyType), moshi.adapter(type.actualTypeArguments[1]))
-    }
 
-    private class MapAdapter<K : Any>(private val keyAdapter: JsonAdapter<K>, private val valueAdapter: JsonAdapter<Any>) : NonNullJsonAdapter<Map<K, Any>>() {
+    private class MapAdapter<K : Any>(
+        private val keyAdapter: JsonAdapter<K>,
+        private val valueAdapter: JsonAdapter<Any>
+    ) : NonNullJsonAdapter<Map<K, Any>>() {
 
         override fun toJsonNonNull(writer: JsonWriter, value: Map<K, Any>) {
             writer.writeArray {
@@ -45,8 +45,8 @@ class MapAdapterFactory<K : Any>(private val keyType: Class<K>) : JsonAdapter.Fa
             return map
         }
 
-        private fun <T> JsonReader.checkNextNameAndGetValue(name: String, adapter: JsonAdapter<T>)
-            = checkNextFieldNameAndGetValue("map with object as key", name, adapter)
+        private fun <T> JsonReader.checkNextNameAndGetValue(name: String, adapter: JsonAdapter<T>) =
+            checkNextFieldNameAndGetValue("map with object as key", name, adapter)
     }
 
     companion object {

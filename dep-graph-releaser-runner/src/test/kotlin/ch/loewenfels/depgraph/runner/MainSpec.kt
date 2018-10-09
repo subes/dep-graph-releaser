@@ -19,7 +19,6 @@ import org.jetbrains.spek.api.dsl.*
 import java.nio.file.Paths
 import java.util.*
 
-
 object MainSpec : Spek({
     val tempFolder = TempFolder.perAction()
     registerListener(tempFolder)

@@ -234,7 +234,7 @@ class JenkinsReleasePlanCreator(
 
     /**
      * It actually adds the given [dependent] to [ParamObject.projects] or *updates* the entry if already exists
-     * => not only Add as indicated in the method name
+     * => not only Add as indicated in the method name.
      */
     private fun updateCommandsAddDependentAddToProjectsAndUpdateMultiModuleIfNecessary(
         paramObject: ParamObject,
@@ -293,6 +293,7 @@ class JenkinsReleasePlanCreator(
 
         // if the dependency is the synthetic root, then we do not need an update command
         if (paramObject.isDependencySyntheticRoot()) return
+
 
         val dependencyId = paramObject.dependencyId
         val list = dependent.commands as MutableList
@@ -378,7 +379,8 @@ class JenkinsReleasePlanCreator(
                             linkedMapOf()
                         }
                         map[dependencyId] = dependentBranch
-                        //we cannot stop here because cyclic inter module dependencies can be dealt with others not (yet)
+                        // we cannot stop here because cyclic inter module dependencies can be dealt with
+                        // but not other cyclic dependencies (at least not yet)
                     }
                 } else if (!visitedProjects.contains(it)) {
                     projectsToVisit[it] = ArrayList<ProjectId>(dependentBranch.size + 1).apply {
@@ -439,7 +441,8 @@ class JenkinsReleasePlanCreator(
                     .forEach inner@{ (index, _) ->
                         val manipulator = ReleasePlanManipulator(transformedReleasePlan)
                         transformedReleasePlan = manipulator.disableCommand(projectId, index)
-                        //we only need to disable the first release-command we find, others will be disabled automatically
+                        // we only need to disable the first release-command we find
+                        // others will be disabled automatically
                         return@inner
                     }
             }

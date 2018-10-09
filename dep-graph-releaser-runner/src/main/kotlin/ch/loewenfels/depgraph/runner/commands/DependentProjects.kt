@@ -8,7 +8,6 @@ import ch.loewenfels.depgraph.runner.console.expectedArgsAndGiven
 import ch.loewenfels.depgraph.runner.console.toOptionalArgs
 import java.nio.file.Path
 
-
 object DependentProjects : ConsoleCommand {
 
     const val FORMAT_ARG = "-format="
@@ -45,7 +44,7 @@ object DependentProjects : ConsoleCommand {
         |                                                    // in case ${FORMAT_ARG}$LIST. Is the replacement pattern
         |                                                    // of the ${ConfigKey.RELATIVE_PATH_EXCLUDE_PROJECT_REGEX.asString()}
         |
-        |(${PSF}file)                       // optionally in the sense that it is only required in case ${FORMAT_ARG}$ECLIPSE_PSF
+        |(${PSF}file)                       // optionally in the sense that it is only required in case $FORMAT_ARG$ECLIPSE_PSF
         |                                  // path + file name for the resulting psf file
         """.trimMargin()
 
