@@ -52,6 +52,10 @@ naming:
     MatchingDeclarationName:
         active: false
 
+potential-bugs:
+    UnsafeCast:
+        active: false
+
 style:
     MandatoryBracesIfStatements:
         active: false
