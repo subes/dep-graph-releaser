@@ -1,5 +1,11 @@
-autoCorrect: true
+autoCorrect: false
 failFast: true
+
+build:
+    maxIssues: 200
+    weights:
+        complexity: 2
+        style: 0.5
 
 test-pattern: # Configure exclusions for test sources
     active: true
