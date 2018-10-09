@@ -28,7 +28,14 @@ script:
                 dep-graph-releaser-maven/build/jacoco/junitPlatformTest.exec,\
                 dep-graph-releaser-runner/build/jacoco/junitPlatformTest.exec,\
                 dep-graph-releaser-serialization/build/jacoco/junitPlatformTest.exec,\
-                maven-api/dep-graph-releaser-maven-api-jvm/build/jacoco/junitPlatformTest.exec \
+                maven-api/dep-graph-releaser-maven-api-jvm/build/jacoco/junitPlatformTest.exec" \
+            -Dsonar.coverage.jacoco.xmlReportPaths="\
+               api/dep-graph-releaser-api-jvm/build/reports/jacoco/report.xml,\
+               dep-graph-releaser-manipulation/build/reports/jacoco/report.xml,\
+               dep-graph-releaser-maven/build/reports/jacoco/report.xml,\
+               dep-graph-releaser-runner/build/reports/jacoco/report.xml,\
+               dep-graph-releaser-serialization/build/reports/jacoco/report.xml,\
+               maven-api/dep-graph-releaser-maven-api-jvm/build/reports/jacoco/report.xml \
             -Ddetekt.sonar.kotlin.config.path=gradle/scripts/detekt.yml" \
             -Dsonar.sources="\
                 api/dep-graph-releaser-api-common/src/main/kotlin,\
