@@ -24,7 +24,7 @@ install: true
 
 
 script:
-- ./gr -i build CodeCoverageReport
+- ./gr -i build CodeCoverageReport detektCheck
 - |
     if [ $TRAVIS_JDK_VERSION == oraclejdk8 ]; then
         sonar-scanner -X \
