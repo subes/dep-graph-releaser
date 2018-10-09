@@ -137,6 +137,7 @@ class Menu(
         initStartOverButton(processStarter)
         initExportButtons(modifiableState)
         initReportButtons(modifiableState)
+        registerForStartAndEndReleaseEvent(processStarter)
 
         val releasePlan = modifiableState.releasePlan
         return when (releasePlan.state) {
@@ -194,75 +195,6 @@ class Menu(
         activateExploreButton()
         exploreButton.addClickEventListenerIfNotDeactivatedNorDisabled {
             startExploration(modifiableState, processStarter)
-        }
-
-        registerForProcessStartEvent {
-            listOf(dryRunButton, releaseButton, exploreButton).forEach {
-                it.addClass(DISABLED)
-                it.title = getDisabledMessage()
-            }
-        }
-        registerForProcessEndEvent { success ->
-            val (processName, button, buttonText) = getCurrentRunData()
-            button.removeClass(DISABLED)
-
-            if (success) {
-                listOf(dryRunButton, releaseButton, exploreButton).forEach {
-                    if (button != releaseButton) {
-                        it.title =
-                            "Current process is '$processName' - click on 'Start Over' to start over with a new process."
-                    } else {
-                        it.title = "Release successful, use a new pipeline for a new release " +
-                            "or make changes and continue with the release process."
-                    }
-                }
-                val hintIfNotRelease = if (processStarter != null && button != releaseButton) {
-                    startOverButton.style.display = "inline-block"
-                    "Click on the 'Start Over' button if you want to start over with a new process.\n"
-                } else {
-                    ""
-                }
-                createNotification("Process $processName succeeded :)")
-                showSuccess(
-                    """
-                    |Process '$processName' ended successfully :) you can now close the window or continue with the process.
-                    |$hintIfNotRelease
-                    |Please report a bug at $GITHUB_NEW_ISSUE in case some job failed without us noticing it.
-                    |Do not forget to star the repository if you like dep-graph-releaser ;-) $GITHUB_REPO
-                    |Last but not least, you might want to visit $LOEWENFELS_URL to get to know the company pushing this project forward.
-                    """.trimMargin()
-                )
-                buttonText.innerText = "Continue: $processName"
-                button.title = "Continue with the process '$processName'."
-                button.addClass(DEACTIVATED)
-            } else {
-                createNotification("Process $processName failed :(")
-                showError(
-                    """
-                    |Process '$processName' ended with failure :(
-                    |At least one job failed. Check errors, fix them and then you can re-trigger the failed jobs, the pipeline respectively, by clicking on the release button (you might have to delete git tags and remove artifacts if they have already been created).
-                    |
-                    |Please report a bug at $GITHUB_NEW_ISSUE in case a job failed due to an error in dep-graph-releaser.
-                    """.trimMargin()
-                )
-                buttonText.innerText = "Re-trigger failed Jobs"
-                button.title = "Continue with the process '$processName' by re-processing previously failed projects."
-            }
-        }
-    }
-
-    private fun createNotification(body: String) {
-        if (Notification.permission == NotificationPermission.GRANTED && !window.document.hasFocus()) {
-            @Suppress("UNCHECKED_CAST_TO_EXTERNAL_INTERFACE")
-            val options = js("{}") as NotificationOptions
-            options.body = body
-            options.requireInteraction = true
-            val notification = Notification("DGR ended", options)
-            notification.onclick = {
-                js("parent.focus()")
-                window.focus()
-                notification.close()
-            }
         }
     }
 
@@ -408,6 +340,78 @@ class Menu(
                 "changelog-excel.csv",
                 generateChangelog(modifiableState.releasePlan, ::appendProjectToCsvExcel)
             )
+        }
+    }
+
+
+    private fun registerForStartAndEndReleaseEvent(processStarter: ProcessStarter?) {
+        registerForProcessStartEvent {
+            listOf(dryRunButton, releaseButton, exploreButton).forEach {
+                it.addClass(DISABLED)
+                it.title = getDisabledMessage()
+            }
+        }
+        registerForProcessEndEvent { success ->
+            val (processName, button, buttonText) = getCurrentRunData()
+            button.removeClass(DISABLED)
+
+            if (success) {
+                listOf(dryRunButton, releaseButton, exploreButton).forEach {
+                    if (button != releaseButton) {
+                        it.title =
+                            "Current process is '$processName' - click on 'Start Over' to start over with a new process."
+                    } else {
+                        it.title = "Release successful, use a new pipeline for a new release " +
+                            "or make changes and continue with the release process."
+                    }
+                }
+                val hintIfNotRelease = if (processStarter != null && button != releaseButton) {
+                    startOverButton.style.display = "inline-block"
+                    "Click on the 'Start Over' button if you want to start over with a new process.\n"
+                } else {
+                    ""
+                }
+                createNotification("Process $processName succeeded :)")
+                showSuccess(
+                    """
+                    |Process '$processName' ended successfully :) you can now close the window or continue with the process.
+                    |$hintIfNotRelease
+                    |Please report a bug at $GITHUB_NEW_ISSUE in case some job failed without us noticing it.
+                    |Do not forget to star the repository if you like dep-graph-releaser ;-) $GITHUB_REPO
+                    |Last but not least, you might want to visit $LOEWENFELS_URL to get to know the company pushing this project forward.
+                    """.trimMargin()
+                )
+                buttonText.innerText = "Continue: $processName"
+                button.title = "Continue with the process '$processName'."
+                button.addClass(DEACTIVATED)
+            } else {
+                createNotification("Process $processName failed :(")
+                showError(
+                    """
+                    |Process '$processName' ended with failure :(
+                    |At least one job failed. Check errors, fix them and then you can re-trigger the failed jobs, the pipeline respectively, by clicking on the release button (you might have to delete git tags and remove artifacts if they have already been created).
+                    |
+                    |Please report a bug at $GITHUB_NEW_ISSUE in case a job failed due to an error in dep-graph-releaser.
+                    """.trimMargin()
+                )
+                buttonText.innerText = "Re-trigger failed Jobs"
+                button.title = "Continue with the process '$processName' by re-processing previously failed projects."
+            }
+        }
+    }
+
+    private fun createNotification(body: String) {
+        if (Notification.permission == NotificationPermission.GRANTED && !window.document.hasFocus()) {
+            @Suppress("UNCHECKED_CAST_TO_EXTERNAL_INTERFACE")
+            val options = js("{}") as NotificationOptions
+            options.body = body
+            options.requireInteraction = true
+            val notification = Notification("DGR ended", options)
+            notification.onclick = {
+                js("parent.focus()")
+                window.focus()
+                notification.close()
+            }
         }
     }
 
