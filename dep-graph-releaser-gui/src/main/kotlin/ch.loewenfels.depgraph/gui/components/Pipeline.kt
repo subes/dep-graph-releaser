@@ -114,7 +114,10 @@ class Pipeline(private val modifiableState: ModifiableState, private val menu: M
                     )
                     textFieldWithLabel("$identifier:releaseVersion", "Release Version", project.releaseVersion, menu)
                 }
-                @Suppress("LabeledExpression")
+                @Suppress(
+                    "LabeledExpression"
+                    //TODO remove if https://github.com/arturbosch/detekt/issues/1226 is fixed
+                )
                 this@Pipeline.contextMenu.createProjectContextMenu(this, project)
             }
             commands(project)
@@ -169,7 +172,10 @@ class Pipeline(private val modifiableState: ModifiableState, private val menu: M
     private fun DIV.fieldsForCommand(idPrefix: String, project: Project, index: Int, command: Command) {
         commandToggle(command, idPrefix)
         commandState(idPrefix, command)
-        @Suppress("LabeledExpression")
+        @Suppress(
+            "LabeledExpression"
+            //TODO remove if https://github.com/arturbosch/detekt/issues/1226 is fixed
+        )
         this@Pipeline.contextMenu.createCommandContextMenu(this, idPrefix, project, index)
 
         when (command) {

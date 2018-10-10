@@ -73,8 +73,9 @@ object Orchestrator {
 
         val sb = StringBuilder(length)
         sb.append(this)
-        for (i in 1..(length - this.length) step padString.length)
+        (1..(length - this.length) step padString.length).forEach { _ ->
             sb.append(padString)
+        }
         return sb.toString()
     }
 

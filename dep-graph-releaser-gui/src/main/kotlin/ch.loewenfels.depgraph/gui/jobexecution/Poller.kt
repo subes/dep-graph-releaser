@@ -30,6 +30,7 @@ object Poller {
         }
     }
 
+    @Suppress("ThrowsCount")
     private fun <T : Any> poll(pollData: PollData<T>): Promise<T> {
         val headers = createHeaderWithCrumb(pollData.crumbWithId)
         val init = createGetRequest(headers)
@@ -54,13 +55,10 @@ object Poller {
             .then { (_, body) ->
                 val (success, result) = pollData.action(body)
                 if (success) {
-                    if (result == null) {
-                        throw IllegalStateException(
-                            "Result was null even though success flag during polling was true." +
-                                "\nPlease report a bug: $GITHUB_NEW_ISSUE"
-                        )
-                    }
-                    result
+                    result ?: throw IllegalStateException(
+                        "Result was null even though success flag during polling was true." +
+                            "\nPlease report a bug: $GITHUB_NEW_ISSUE"
+                    )
                 } else {
                     rePoll(body)
                 }

@@ -90,7 +90,7 @@ private fun getRightSide(value: String, endRegex: Int): Pair<Int, String> {
     val indexOf = value.indexOf("\n", endRegex)
     val endRightSide = if (indexOf < 0) value.length else indexOf
     val rightSide = value.substring(endRegex + 1, endRightSide)
-    return Pair(endRightSide, rightSide)
+    return endRightSide to rightSide
 }
 
 private fun checkRegexNotEmpty(index: Int, name: String, input: String) =

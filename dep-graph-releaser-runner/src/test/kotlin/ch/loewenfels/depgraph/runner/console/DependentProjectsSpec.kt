@@ -22,7 +22,7 @@ class DependentProjectsSpec : Spek({
     )
 
     companion object {
-        fun getNotEnoughArgs(@Suppress("UNUSED_PARAMETER") tempFolder: TempFolder): Array<out String> {
+        fun getNotEnoughArgs(@Suppress("UNUSED_PARAMETER") ignored: TempFolder): Array<out String> {
             return arrayOf(
                 DependentProjects.name, "com.example", "project",
                 getTestDirectory("managingVersions/inDependency").absolutePathAsString
@@ -31,7 +31,7 @@ class DependentProjectsSpec : Spek({
             )
         }
 
-        fun getTooManyArgs(@Suppress("UNUSED_PARAMETER") tempFolder: TempFolder): Array<out String> {
+        fun getTooManyArgs(@Suppress("UNUSED_PARAMETER") ignored: TempFolder): Array<out String> {
             return arrayOf(
                 DependentProjects.name, "com.example", "project",
                 getTestDirectory("managingVersions/inDependency").absolutePathAsString,

@@ -42,6 +42,10 @@ sealed class CommandState {
     object Disabled : CommandState()
 
 
+    @Suppress("ComplexMethod"
+        //TODO should not be complex if ignoreSimpleWhenEntries applies, I guess is not yet available in RC8
+        // check again if detekt is updated
+    )
     fun checkTransitionAllowed(newState: CommandState): CommandState {
         check(this !== Disabled) { "Cannot transition to any state if current state is ${Disabled::class.simpleName}." }
         check(this::class != newState::class) {
