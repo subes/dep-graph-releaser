@@ -57,6 +57,8 @@ potential-bugs:
         active: false
 
 style:
+    DataClassContainsFunctions:
+        active: false
     MandatoryBracesIfStatements:
         active: false
     MaxLineLength:
@@ -66,6 +68,8 @@ style:
     OptionalUnit:
         active: false
     SpacingBetweenPackageAndImports:
+        active: false
+    UnnecessaryParentheses:
         active: false
     WildcardImport:
         active: false
