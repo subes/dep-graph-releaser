@@ -2,8 +2,10 @@ package ch.loewenfels.depgraph.gui.components
 
 import ch.loewenfels.depgraph.data.ReleasePlan
 import ch.loewenfels.depgraph.gui.elementById
-import ch.loewenfels.depgraph.gui.jobexecution.UsernameTokenRegistry
+import ch.loewenfels.depgraph.gui.jobexecution.checkStatusOkOr403
+import ch.loewenfels.depgraph.gui.jobexecution.createFetchInitWithCredentials
 import ch.loewenfels.depgraph.parseRemoteRegex
+import org.w3c.fetch.Response
 import kotlin.browser.window
 import kotlin.dom.addClass
 import kotlin.dom.hasClass
@@ -17,7 +19,7 @@ class Login(private val defaultJenkinsBaseUrl: String?) {
             disableButtonsDueToNoPublishUrl()
             Promise.resolve(null as String?)
         } else {
-            UsernameTokenRegistry.register(defaultJenkinsBaseUrl).then { pair ->
+            register(defaultJenkinsBaseUrl).then { pair ->
                 if (pair == null) {
                     disableButtonsDueToNoAuth(
                         "You need to log in if you want to use this functionality.",
@@ -36,13 +38,60 @@ class Login(private val defaultJenkinsBaseUrl: String?) {
     }
 
 
+    /**
+     * Retrieves the API token of the logged in user at [jenkinsBaseUrl] and registers it, moreover it returns the name
+     * of the user in the same request (the name is not stored though).
+     *
+     * @return A pair consisting of the name and the username of the logged in user.
+     */
+    private fun register(jenkinsBaseUrl: String): Promise<Pair<String, String>?> =
+        retrieveUserAndApiTokenAndSaveToken(jenkinsBaseUrl)
+
+    private fun retrieveUserAndApiTokenAndSaveToken(
+        jenkinsBaseUrl: String
+    ): Promise<Pair<String, String>?> {
+        val urlWithoutSlash = urlWithoutEndingSlash(jenkinsBaseUrl)
+        return window.fetch("$urlWithoutSlash/me/configure", createFetchInitWithCredentials())
+            .then(::checkStatusOkOr403)
+            .catch<Pair<Response, String?>?> { t ->
+                errorHandling(urlWithoutSlash, t)
+            }
+            .then { pair ->
+                val body = pair?.second
+                if (body == null) {
+                    null
+                } else {
+                    val (username, name) = extractNameAndApiToken(body)
+                    usernameTokens[urlWithoutSlash] = username
+                    name to username
+                }
+            }.catch { t ->
+                errorHandling(urlWithoutSlash, t)
+            }
+    }
+
+    private fun errorHandling(urlWithoutSlash: String, t: Throwable): Nothing? {
+        Messages.showThrowable(Error("Could not verify login (and retrieve user) for $urlWithoutSlash", t))
+        return null
+    }
+
+
+    private fun extractNameAndApiToken(body: String): Pair<String, String> {
+        val usernameMatch = usernameRegex.find(body) ?: throwCouldNotFind("username", body)
+        val fullNameMatch = fullNameRegex.find(body) ?: throwCouldNotFind("user's name", body)
+        return usernameMatch.groupValues[1] to fullNameMatch.groupValues[1]
+    }
+
+    private fun throwCouldNotFind(what: String, body: String): Nothing =
+        throw IllegalStateException("Could not find $what in response.\n$body")
+
     fun loadOtherApiTokens(releasePlan: ReleasePlan): Promise<*> {
         val remoteRegex = parseRemoteRegex(releasePlan)
         val mutableList = ArrayList<Promise<*>>(remoteRegex.size)
 
         remoteRegex.forEach { (_, remoteJenkinsBaseUrl) ->
             val promise = if (isUrlAndNotYetRegistered(remoteJenkinsBaseUrl)) {
-                UsernameTokenRegistry.register(remoteJenkinsBaseUrl).then { pair ->
+                register(remoteJenkinsBaseUrl).then { pair ->
                     updateUserToolTip(remoteJenkinsBaseUrl, pair)
                     if (pair == null) {
                         setHalfVerified(defaultJenkinsBaseUrl, remoteJenkinsBaseUrl)
@@ -57,8 +106,17 @@ class Login(private val defaultJenkinsBaseUrl: String?) {
     }
 
     private fun isUrlAndNotYetRegistered(remoteJenkinsBaseUrl: String) =
-        remoteJenkinsBaseUrl.startsWith("http") && UsernameTokenRegistry.forHost(remoteJenkinsBaseUrl) == null
+        remoteJenkinsBaseUrl.startsWith("http") && forHost(remoteJenkinsBaseUrl) == null
 
+    private fun forHost(jenkinsBaseUrl: String): String? = usernameTokens[urlWithoutEndingSlash(jenkinsBaseUrl)]
+
+    private fun urlWithoutEndingSlash(jenkinsBaseUrl: String): String {
+        return if (jenkinsBaseUrl.endsWith("/")) {
+            jenkinsBaseUrl.substring(0, jenkinsBaseUrl.length - 1)
+        } else {
+            jenkinsBaseUrl
+        }
+    }
 
     private fun updateUserToolTip(url: String, pair: Pair<String, String>?) {
         appendToUserButtonToolTip(url, pair?.second ?: "Anonymous", pair?.first)
@@ -110,5 +168,10 @@ class Login(private val defaultJenkinsBaseUrl: String?) {
         private val userButton get() = elementById("user")
         private val userIcon get() = elementById("user.icon")
         private val userName get() = elementById("user.name")
+
+        private val fullNameRegex = Regex("<input[^>]+name=\"_\\.fullName\"[^>]+value=\"([^\"]+)\"")
+        private val usernameRegex = Regex("<a[^>]+href=\"[^\"]*/user/([^\"]+)\"")
+
+        private val usernameTokens = hashMapOf<String, String>()
     }
 }
