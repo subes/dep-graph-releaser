@@ -1,12 +1,13 @@
 package ch.loewenfels.depgraph.gui.components
 
 import ch.loewenfels.depgraph.ConfigKey
-import ch.loewenfels.depgraph.data.*
+import ch.loewenfels.depgraph.data.ReleaseState
+import ch.loewenfels.depgraph.data.TypeOfRun
+import ch.loewenfels.depgraph.data.toProcessName
 import ch.loewenfels.depgraph.generateEclipsePsf
 import ch.loewenfels.depgraph.generateGitCloneCommands
 import ch.loewenfels.depgraph.generateListOfDependentsWithoutSubmoduleAndExcluded
 import ch.loewenfels.depgraph.gui.*
-import ch.loewenfels.depgraph.gui.ContentContainer.Companion.RELEASE_ID_HTML_ID
 import ch.loewenfels.depgraph.gui.actions.Downloader
 import ch.loewenfels.depgraph.gui.components.Messages.Companion.showError
 import ch.loewenfels.depgraph.gui.components.Messages.Companion.showInfo
@@ -15,12 +16,7 @@ import ch.loewenfels.depgraph.gui.components.Messages.Companion.showThrowableAnd
 import ch.loewenfels.depgraph.gui.components.Messages.Companion.showWarning
 import ch.loewenfels.depgraph.gui.jobexecution.*
 import ch.loewenfels.depgraph.gui.serialization.ModifiableState
-import ch.loewenfels.depgraph.gui.serialization.deserialize
-import org.w3c.dom.CustomEvent
-import org.w3c.dom.CustomEventInit
 import org.w3c.dom.HTMLElement
-import org.w3c.dom.HTMLInputElement
-import org.w3c.dom.events.Event
 import org.w3c.notifications.GRANTED
 import org.w3c.notifications.Notification
 import org.w3c.notifications.NotificationOptions
@@ -33,10 +29,7 @@ import kotlin.js.Promise
 
 external fun encodeURIComponent(encodedURI: String): String
 
-class Menu(
-    private val usernameTokenRegistry: UsernameTokenRegistry,
-    private val defaultJenkinsBaseUrl: String?
-) {
+class Menu(private val eventManager: EventManager) {
     init {
         setUpMenuLayers(
             Triple(toolsButton, "toolbox", TOOLS_INACTIVE_TITLE to "Close the toolbox."),
@@ -82,7 +75,7 @@ class Menu(
     fun disableButtonsDueToNoAuth(titleButtons: String, info: String) {
         showInfo(info)
         userButton.title = titleButtons
-        userButton.addClass(DEACTIVATED)
+        userButton.addClass(DEACTIVATED_CSS_CLASS)
         userName.innerText = "Anonymous"
         userIcon.innerText = "error"
         listOf(saveButton, dryRunButton, releaseButton).forEach { it.disable(titleButtons) }
@@ -91,11 +84,11 @@ class Menu(
     fun setVerifiedUser(name: String) {
         userName.innerText = name
         userIcon.innerText = "verified_user"
-        userButton.removeClass(DEACTIVATED)
+        userButton.removeClass(DEACTIVATED_CSS_CLASS)
     }
 
     fun setHalfVerified(defaultJenkinsBaseUrl: String?, remoteJenkinsBaseUrl: String) {
-        if (!userButton.hasClass(DEACTIVATED)) {
+        if (!userButton.hasClass(DEACTIVATED_CSS_CLASS)) {
             userIcon.innerText = "error"
             userButton.addClass("warning")
             showWarning(
@@ -119,7 +112,7 @@ class Menu(
         Companion.modifiableState = modifiableState
 
         window.onbeforeunload = {
-            if (!saveButton.hasClass(DEACTIVATED)) {
+            if (!saveButton.hasClass(DEACTIVATED_CSS_CLASS)) {
                 "Your changes will be lost, sure you want to leave the page?"
             } else if (Pipeline.getReleaseState() === ReleaseState.IN_PROGRESS) {
                 "You might lose state changes if you navigate away from this page, sure you want to proceed?"
@@ -136,32 +129,8 @@ class Menu(
         initExportButtons(modifiableState)
         initReportButtons(modifiableState)
         registerForStartAndEndReleaseEvent(processStarter)
-
-        val releasePlan = modifiableState.releasePlan
-        return when (releasePlan.state) {
-            ReleaseState.READY -> Unit /* nothing to do */
-            ReleaseState.IN_PROGRESS -> restartProcess(modifiableState, processStarter)
-            ReleaseState.FAILED, ReleaseState.SUCCEEDED -> {
-                dispatchProcessStart()
-                dispatchProcessEnd(success = releasePlan.state == ReleaseState.SUCCEEDED)
-            }
-            ReleaseState.WATCHING -> dispatchProcessStart()
-        }
     }
 
-    private fun restartProcess(modifiableState: ModifiableState, processStarter: ProcessStarter?) {
-        //TODO change to nicer code in case https://youtrack.jetbrains.com/issue/KT-12380 is implemented
-        @Suppress("UNUSED_VARIABLE" /* used to check that we have covered all TypeOfRun */)
-        val checkWhenExhaustiveness: Any? = when {
-            processStarter != null -> when (modifiableState.releasePlan.typeOfRun) {
-                TypeOfRun.EXPLORE -> startExploration(modifiableState, processStarter)
-                TypeOfRun.DRY_RUN -> startDryRun(modifiableState, processStarter)
-                TypeOfRun.RELEASE -> startRelease(modifiableState, processStarter)
-            }
-            modifiableState.releasePlan.typeOfRun == TypeOfRun.EXPLORE -> startExploration(modifiableState, null)
-            else -> null //only necessary to be when exhaustive
-        }
-    }
 
     private fun initSaveAndDownloadButton(downloader: Downloader, processStarter: ProcessStarter?) {
         deactivateSaveButtonAndReactivateOthers()
@@ -171,7 +140,7 @@ class Menu(
             }
         }
         downloadButton.title = "Download the release.json"
-        downloadButton.removeClass(DEACTIVATED)
+        downloadButton.removeClass(DEACTIVATED_CSS_CLASS)
         downloadButton.addClickEventListenerIfNotDeactivatedNorDisabled {
             downloader.download()
         }
@@ -182,91 +151,37 @@ class Menu(
         if (processStarter != null) {
             activateDryRunButton()
             dryRunButton.addClickEventListenerIfNotDeactivatedNorDisabled {
-                startDryRun(modifiableState, processStarter)
+                eventManager.startDryRun(modifiableState, processStarter)
             }
             activateReleaseButton()
             releaseButton.addClickEventListenerIfNotDeactivatedNorDisabled {
-                startRelease(modifiableState, processStarter)
+                eventManager.startRelease(modifiableState, processStarter)
             }
         }
 
         activateExploreButton()
         exploreButton.addClickEventListenerIfNotDeactivatedNorDisabled {
-            startExploration(modifiableState, processStarter)
+            eventManager.startExploration(modifiableState, processStarter)
         }
-    }
-
-    private fun startDryRun(modifiableState: ModifiableState, processStarter: ProcessStarter): Promise<*> =
-        triggerProcess { processStarter.dryRun(modifiableState) }
-
-    private fun startRelease(modifiableState: ModifiableState, processStarter: ProcessStarter): Promise<*> =
-        triggerProcess { processStarter.release(modifiableState) }
-
-    private fun startExploration(modifiableState: ModifiableState, processStarter: ProcessStarter?): Promise<*> {
-        val nonNullProcessStarter = App.givenOrFakeProcessStarter(processStarter, modifiableState)
-        return triggerProcess { nonNullProcessStarter.explore(modifiableState) }
-    }
-
-    private fun triggerProcess(action: () -> Promise<Boolean>): Promise<*> {
-        Messages.putMessagesInHolder(Pipeline.getTypeOfRun())
-
-        dispatchProcessStart()
-        if (Pipeline.getReleaseState() === ReleaseState.SUCCEEDED) {
-            dispatchProcessContinue()
-        }
-        return action().then(
-            { result ->
-                dispatchProcessEnd(success = result)
-            },
-            { t ->
-                dispatchProcessEnd(success = false)
-                // the user should see this, otherwise we only display it in the dev-console.
-                showThrowableAndThrow(t)
-            }
-        )
     }
 
     private fun initStartOverButton(processStarter: ProcessStarter?) {
         if (processStarter != null) {
             activateStartOverButton()
-            startOverButton.addClickEventListener { resetForNewProcess(processStarter) }
-        }
-    }
-
-    private fun resetForNewProcess(processStarter: ProcessStarter) {
-        val currentReleasePlan = modifiableState.releasePlan
-        val initialJson = currentReleasePlan.config[ConfigKey.INITIAL_RELEASE_JSON]
-            ?: App.determineJsonUrlOrThrow()
-        val usernameAndApiToken = if (defaultJenkinsBaseUrl != null) {
-            usernameTokenRegistry.forHost(defaultJenkinsBaseUrl)
-        } else {
-            null
-        }
-        App.loadJsonAndCheckStatus(initialJson, usernameAndApiToken).then { (_, body) ->
-            val initialReleasePlan = deserialize(body)
-            initialReleasePlan.getProjects().forEach { project ->
-                project.commands.forEachIndexed { index, command ->
-                    val newState = determineNewState(project, index, command)
-                    Pipeline.changeBuildUrlOfCommand(project, index, "")
-                    Pipeline.changeStateOfCommand(project, index, newState) { _, _ ->
-                        // we do not check if the transition is allowed since we reset the command
-                        newState
-                    }
+            startOverButton.addClickEventListener {
+                eventManager.resetForNewProcess().then {
+                    resetButtons()
+                    startOverButton.style.display = "none"
+                    save(processStarter)
                 }
             }
-            Pipeline.changeReleaseState(ReleaseState.READY)
-            dispatchProcessReset()
-            elementById<HTMLInputElement>(ContentContainer.RELEASE_ID_HTML_ID).value = randomPublishId()
-            resetButtons()
-            startOverButton.style.display = "none"
-            save(processStarter)
         }
     }
 
     private fun resetButtons() {
         val (processName, _, buttonText) = getCurrentRunData()
         listOf(dryRunButton, releaseButton, exploreButton).forEach {
-            it.removeClass(DISABLED)
+            it.removeClass(DISABLED_CSS_CLASS)
         }
         buttonText.innerText = processName //currently it is 'Continue:...'
         activateDryRunButton()
@@ -274,14 +189,6 @@ class Menu(
         activateExploreButton()
     }
 
-    private fun determineNewState(project: Project, index: Int, command: Command): CommandState {
-        val currentState = Pipeline.getCommandState(project.id, index)
-        return if (currentState is CommandState.Deactivated && command.state !is CommandState.Deactivated) {
-            CommandState.Deactivated(command.state)
-        } else {
-            command.state
-        }
-    }
 
     private fun initExportButtons(modifiableState: ModifiableState) {
         activateButton(eclipsePsfButton, "Download an eclipse psf-file to import all projects into eclipse.")
@@ -343,15 +250,15 @@ class Menu(
 
 
     private fun registerForStartAndEndReleaseEvent(processStarter: ProcessStarter?) {
-        registerForProcessStartEvent {
+        EventManager.registerForProcessStartEvent {
             listOf(dryRunButton, releaseButton, exploreButton).forEach {
-                it.addClass(DISABLED)
-                it.title = getDisabledMessage()
+                it.addClass(DISABLED_CSS_CLASS)
+                it.title = EventManager.getDisabledMessage()
             }
         }
-        registerForProcessEndEvent { success ->
+        EventManager.registerForProcessEndEvent { success ->
             val (processName, button, buttonText) = getCurrentRunData()
-            button.removeClass(DISABLED)
+            button.removeClass(DISABLED_CSS_CLASS)
 
             if (success) {
                 listOf(dryRunButton, releaseButton, exploreButton).forEach {
@@ -381,7 +288,7 @@ class Menu(
                 )
                 buttonText.innerText = "Continue: $processName"
                 button.title = "Continue with the process '$processName'."
-                button.addClass(DEACTIVATED)
+                button.addClass(DEACTIVATED_CSS_CLASS)
             } else {
                 createNotification("Process $processName failed :(")
                 showError(
@@ -416,22 +323,22 @@ class Menu(
     private fun HTMLElement.addClickEventListenerIfNotDeactivatedNorDisabled(action: () -> Any) {
         addClickEventListener {
             @Suppress("RedundantUnitExpression")
-            if (hasClass(DEACTIVATED) || hasClass(DISABLED)) return@addClickEventListener Unit
+            if (hasClass(DEACTIVATED_CSS_CLASS) || hasClass(DISABLED_CSS_CLASS)) return@addClickEventListener Unit
             action()
         }
     }
 
     private fun HTMLElement.disable(reason: String) {
-        this.addClass(DISABLED)
+        this.addClass(DISABLED_CSS_CLASS)
         this.title = reason
     }
 
-    private fun HTMLElement.isDisabled() = hasClass(DISABLED)
+    private fun HTMLElement.isDisabled() = hasClass(DISABLED_CSS_CLASS)
 
     private fun HTMLElement.deactivate(reason: String) {
         if (saveButton.isDisabled()) return
 
-        this.addClass(DEACTIVATED)
+        this.addClass(DEACTIVATED_CSS_CLASS)
         this.setTitleSaveOld(reason)
     }
 
@@ -441,7 +348,7 @@ class Menu(
             val oldTitle = it.getOldTitleOrNull()
             if (oldTitle != null) {
                 it.title = oldTitle
-                it.removeClass(DEACTIVATED)
+                it.removeClass(DEACTIVATED_CSS_CLASS)
             }
         }
     }
@@ -449,7 +356,7 @@ class Menu(
     fun activateSaveButtonAndDeactivateOthers() {
         if (saveButton.isDisabled()) return
 
-        saveButton.removeClass(DEACTIVATED)
+        saveButton.removeClass(DEACTIVATED_CSS_CLASS)
         saveButton.title = "Publish changed json file and change location"
         val saveFirst = "You need to save your changes first."
         listOf(dryRunButton, releaseButton, exploreButton).forEach {
@@ -484,7 +391,7 @@ class Menu(
     private fun activateButton(button: HTMLElement, newTitle: String) {
         if (button.isDisabled()) return
 
-        button.removeClass(DEACTIVATED)
+        button.removeClass(DEACTIVATED_CSS_CLASS)
         button.title = newTitle
     }
 
@@ -509,13 +416,8 @@ class Menu(
     }
 
     companion object {
-        private const val DEACTIVATED = "deactivated"
-        private const val DISABLED = "disabled"
-
-        private const val EVENT_PROCESS_START = "process.start"
-        private const val EVENT_PROCESS_END = "process.end"
-        private const val EVENT_PROCESS_CONTINUE = "process.continue"
-        private const val EVENT_PROCESS_RESET = "process.reset"
+        private const val DEACTIVATED_CSS_CLASS = "deactivated"
+        private const val DISABLED_CSS_CLASS = "disabled"
 
         private const val TOOLS_INACTIVE_TITLE = "Open the toolbox to see further available features."
         private const val SETTINGS_INACTIVE_TITLE = "Open Settings."
@@ -546,72 +448,6 @@ class Menu(
                 _modifiableState = value
             }
 
-        fun registerForProcessStartEvent(callback: (Event) -> Unit) {
-            elementById("menu").addEventListener(EVENT_PROCESS_START, callback)
-        }
-
-        fun registerForProcessEndEvent(callback: (Boolean) -> Unit) {
-            elementById("menu").addEventListener(EVENT_PROCESS_END, { e ->
-                val customEvent = e as CustomEvent
-                val success = customEvent.detail as Boolean
-                callback(success)
-            })
-        }
-
-        private fun registerForProcessContinueEvent(callback: (Event) -> Unit) {
-            elementById("menu").addEventListener(EVENT_PROCESS_CONTINUE, callback)
-        }
-
-        private fun registerForProcessResetEvent(callback: (Event) -> Unit) {
-            elementById("menu").addEventListener(EVENT_PROCESS_RESET, callback)
-        }
-
-        private fun dispatchProcessStart() {
-            elementById("menu").dispatchEvent(Event(EVENT_PROCESS_START))
-        }
-
-        private fun dispatchProcessEnd(success: Boolean) {
-            elementById("menu").dispatchEvent(CustomEvent(EVENT_PROCESS_END, CustomEventInit(detail = success)))
-        }
-
-        private fun dispatchProcessContinue() {
-            elementById("menu").dispatchEvent(Event(EVENT_PROCESS_CONTINUE))
-        }
-
-        private fun dispatchProcessReset() {
-            elementById("menu").dispatchEvent(Event(EVENT_PROCESS_RESET))
-        }
-
-
-        fun disableUnDisableForProcessStartAndEnd(input: HTMLInputElement, titleElement: HTMLElement) {
-            registerForProcessStartEvent {
-                input.asDynamic().oldDisabled = input.disabled
-                input.disabled = true
-                titleElement.setTitleSaveOld(getDisabledMessage())
-            }
-            registerForProcessEndEvent { _ ->
-                if (input.id.startsWith("config-") || isInputFieldOfNonSuccessfulCommand(input.id)) {
-                    unDisableInputField(input, titleElement)
-                }
-            }
-        }
-
-        fun unDisableForProcessContinueAndReset(input: HTMLInputElement, titleElement: HTMLElement) {
-            registerForProcessContinueEvent { unDisableInputField(input, titleElement) }
-            registerForProcessResetEvent { unDisableInputField(input, titleElement) }
-        }
-
-        private fun unDisableInputField(input: HTMLInputElement, titleElement: HTMLElement) {
-            input.disabled = input.asDynamic().oldDisabled as Boolean
-            titleElement.title = titleElement.getOldTitle()
-        }
-
-        private fun getDisabledMessage(): String {
-            val (processName, _, _) = getCurrentRunData()
-            return "disabled due to process '$processName' which is in progress."
-        }
-
-
         fun getCurrentRunData(): Triple<String, HTMLElement, HTMLElement> {
             val typeOfRun = modifiableState.releasePlan.typeOfRun
             val buttonPair = when (typeOfRun) {
@@ -622,14 +458,5 @@ class Menu(
             return Triple(typeOfRun.toProcessName(), buttonPair.first, buttonPair.second)
         }
 
-        private fun isInputFieldOfNonSuccessfulCommand(id: String): Boolean {
-            if (id == RELEASE_ID_HTML_ID) return false
-
-            val project = Pipeline.getSurroundingProject(id)
-            val releasePlan = modifiableState.releasePlan
-            return releasePlan.getProject(project.id).commands.any {
-                it.state !== CommandState.Succeeded && it.state !== CommandState.Disabled
-            }
-        }
     }
 }

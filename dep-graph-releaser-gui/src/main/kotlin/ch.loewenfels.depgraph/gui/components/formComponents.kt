@@ -1,6 +1,7 @@
 package ch.loewenfels.depgraph.gui.components
 
 import ch.loewenfels.depgraph.gui.getUnderlyingHtmlElement
+import ch.loewenfels.depgraph.gui.jobexecution.EventManager
 import kotlinx.html.*
 import kotlinx.html.js.onKeyUpFunction
 import org.w3c.dom.HTMLInputElement
@@ -32,8 +33,8 @@ fun DIV.textFieldWithLabel(id: String, label: String, value: String, menu: Menu,
             inputAct()
             onKeyUpFunction = { menu.activateSaveButtonAndDeactivateOthers() }
             val input = getUnderlyingHtmlElement() as HTMLInputElement
-            Menu.disableUnDisableForProcessStartAndEnd(input, input)
-            Menu.unDisableForProcessContinueAndReset(input, input)
+            EventManager.disableUnDisableForProcessStartAndEnd(input, input)
+            EventManager.unDisableForProcessContinueAndReset(input, input)
         }
     }
 }
@@ -53,8 +54,8 @@ fun DIV.textAreaWithLabel(id: String, label: String, value: String, menu: Menu) 
             //for what disableUnDisableForProcessStartAndEnd needs, title and disabled, it is ok to make the unsafe cast
             //TODO change in case https://github.com/Kotlin/kotlinx.html/issues/87 is implemented
             val input = htmlTextAreaElement.unsafeCast<HTMLInputElement>()
-            Menu.disableUnDisableForProcessStartAndEnd(input, htmlTextAreaElement)
-            Menu.unDisableForProcessContinueAndReset(input, htmlTextAreaElement)
+            EventManager.disableUnDisableForProcessStartAndEnd(input, htmlTextAreaElement)
+            EventManager.unDisableForProcessContinueAndReset(input, htmlTextAreaElement)
         }
     }
 }

@@ -21,6 +21,7 @@ class App {
     private val publishJobUrl: String?
     private val defaultJenkinsBaseUrl: String?
     private val menu: Menu
+    private val eventManager: EventManager
 
     init {
         try {
@@ -29,7 +30,8 @@ class App {
             publishJobUrl = determinePublishJob()
 
             defaultJenkinsBaseUrl = publishJobUrl?.substringBefore("/job/")
-            menu = Menu(UsernameTokenRegistry, defaultJenkinsBaseUrl)
+            eventManager = EventManager(UsernameTokenRegistry, defaultJenkinsBaseUrl)
+            menu = Menu(eventManager)
             start(jsonUrl)
         } catch (@Suppress("TooGenericExceptionCaught") t: Throwable) {
             showThrowableAndThrow(t)
@@ -90,6 +92,7 @@ class App {
                     val processStarter = createProcessStarter(defaultJenkinsBaseUrl, publishJobUrl, modifiableState)
                     ContentContainer(modifiableState, menu, processStarter)
                     menu.initDependencies(Downloader(modifiableState), modifiableState, processStarter)
+                    eventManager.recoverEventState(processStarter)
                     switchLoaderWithPipeline()
                     Notification.requestPermission()
                 }

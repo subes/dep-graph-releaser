@@ -7,12 +7,14 @@ import ch.loewenfels.depgraph.gui.addChangeEventListener
 import ch.loewenfels.depgraph.gui.addClickEventListener
 import ch.loewenfels.depgraph.gui.components.Messages.Companion.showInfo
 import ch.loewenfels.depgraph.gui.elementById
+import ch.loewenfels.depgraph.gui.jobexecution.EventManager
 import ch.loewenfels.depgraph.gui.serialization.ModifiableState
 import ch.tutteli.kbox.mapWithIndex
 import org.w3c.dom.CustomEvent
 import org.w3c.dom.CustomEventInit
 import org.w3c.dom.HTMLInputElement
 import org.w3c.dom.events.Event
+import org.w3c.dom.events.EventModifierInit
 import kotlin.dom.hasClass
 import kotlin.js.Promise
 
@@ -44,8 +46,8 @@ class Toggler(private val modifiableState: ModifiableState, private val menu: Me
             }
 
             val slider = getSlider(toggle)
-            Menu.disableUnDisableForProcessStartAndEnd(toggle, slider)
-            Menu.unDisableForProcessContinueAndReset(toggle, slider)
+            EventManager.disableUnDisableForProcessStartAndEnd(toggle, slider)
+            EventManager.unDisableForProcessContinueAndReset(toggle, slider)
         }
     }
 
