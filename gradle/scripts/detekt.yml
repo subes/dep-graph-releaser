@@ -59,7 +59,11 @@ potential-bugs:
 style:
     MandatoryBracesIfStatements:
         active: false
+    MaxLineLength:
+        active: false
     OptionalWhenBraces:
+        active: false
+    OptionalUnit:
         active: false
     SpacingBetweenPackageAndImports:
         active: false
