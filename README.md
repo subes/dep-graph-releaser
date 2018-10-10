@@ -3,6 +3,8 @@
 [![Build Status Travis](https://travis-ci.org/loewenfels/dep-graph-releaser.svg?branch=master)](https://travis-ci.org/loewenfels/dep-graph-releaser/branches)
 [![Build status AppVeyor](https://ci.appveyor.com/api/projects/status/2cw4dnwkmlpb7fnn/branch/master?svg=true)](https://ci.appveyor.com/project/loewenfels/dep-graph-releaser/branch/master)
 [![Coverage](https://codecov.io/github/loewenfels/dep-graph-releaser/coverage.svg?branch=master)](https://codecov.io/github/loewenfels/dep-graph-releaser?branch=master)
+[![SonarCloud Status](https://sonarcloud.io/api/project_badges/measure?project=depgraph&metric=alert_status)](https://sonarcloud.io/dashboard?id=depgraph)
+
 
 # Dependent Graph Releaser
 Dependent Graph Releaser is a tool which helps you with releasing a project and its dependent projects.
