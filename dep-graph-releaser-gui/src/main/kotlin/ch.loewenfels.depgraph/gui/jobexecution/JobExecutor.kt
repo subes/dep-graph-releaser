@@ -11,7 +11,7 @@ interface JobExecutor {
         pollEverySecond: Int,
         maxWaitingTimeForCompletenessInSeconds: Int,
         verbose: Boolean = true
-    ): Promise<Pair<AuthData, Int>>
+    ): Promise<Pair<CrumbWithId?, Int>>
 
     fun rePollQueueing(
         jobExecutionData: JobExecutionData,
@@ -19,17 +19,17 @@ interface JobExecutor {
         jobStartedHook: (buildNumber: Int) -> Promise<*>,
         pollEverySecond: Int,
         maxWaitingTimeForCompletenessInSeconds: Int
-    ): Promise<Pair<AuthData, Int>>
+    ): Promise<Pair<CrumbWithId?, Int>>
 
     fun rePoll(
         jobExecutionData: JobExecutionData,
         buildNumber: Int,
         pollEverySecond: Int,
         maxWaitingTimeForCompletenessInSeconds: Int
-    ): Promise<Pair<AuthData, Int>>
+    ): Promise<Pair<CrumbWithId?, Int>>
 
     fun pollAndExtract(
-        authData: AuthData,
+        authData: CrumbWithId?,
         url: String,
         regex: Regex,
         pollEverySecond: Int,

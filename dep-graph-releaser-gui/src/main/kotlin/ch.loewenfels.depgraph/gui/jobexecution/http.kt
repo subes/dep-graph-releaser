@@ -39,21 +39,12 @@ fun createFetchInitWithCredentials(): RequestInit {
     return init
 }
 
-
-fun createHeaderWithAuthAndCrumb(authData: AuthData): dynamic {
+fun createHeaderWithCrumb(crumbWithId: CrumbWithId?): dynamic {
     val headers = js("({})")
-    addAuthentication(headers, authData.usernameAndApiToken)
-    if (authData.crumbWithId != null) {
-        headers[authData.crumbWithId.id] = authData.crumbWithId.crumb
+    if (crumbWithId != null) {
+        headers[crumbWithId.id] = crumbWithId.crumb
     }
     return headers
-}
-
-fun addAuthentication(headers: dynamic, usernameAndApiToken: UsernameAndApiToken) {
-    //TODO we disabled the following due to https://github.com/loewenfels/dep-graph-releaser/issues/57
-    // if the cookie only approach was ok, then we could remove this and corresponding calls
-//    val base64UsernameAndToken = window.btoa("${usernameAndApiToken.username}:${usernameAndApiToken.token}")
-//    headers["Authorization"] = "Basic $base64UsernameAndToken"
 }
 
 @Suppress("NESTED_CLASS_IN_EXTERNAL_INTERFACE")

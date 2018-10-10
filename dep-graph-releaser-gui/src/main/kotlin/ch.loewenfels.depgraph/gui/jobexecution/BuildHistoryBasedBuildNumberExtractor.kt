@@ -7,12 +7,12 @@ import kotlin.browser.window
 import kotlin.js.Promise
 
 class BuildHistoryBasedBuildNumberExtractor(
-    private val authData: AuthData,
+    private val crumbWithId: CrumbWithId?,
     private val jobExecutionData: JobExecutionData
 ) : BuilderNumberExtractor {
 
     override fun extract(): Promise<Int> {
-        val headers = createHeaderWithAuthAndCrumb(authData)
+        val headers = createHeaderWithCrumb(crumbWithId)
         val init = createGetRequest(headers)
         return window.fetch("${jobExecutionData.jobBaseUrl}api/xml?xpath=//build/number&wrapper=builds", init)
             .then(::checkStatusOk)

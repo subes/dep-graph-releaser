@@ -5,7 +5,7 @@ import ch.loewenfels.depgraph.gui.sleep
 import kotlin.js.Promise
 
 class QueuedItemBasedBuildNumberExtractor(
-    private val authData: AuthData,
+    private val crumbWithId: CrumbWithId?,
     private val queuedItemUrl: String
 ) : BuilderNumberExtractor {
 
@@ -13,7 +13,7 @@ class QueuedItemBasedBuildNumberExtractor(
         // wait a bit, if we are too fast we run almost certainly into a 404 (job is not even queued)
         return sleep(200) {
             Poller.pollAndExtract(
-                authData,
+                crumbWithId,
                 "${queuedItemUrl}api/xml",
                 numberRegex,
                 pollEverySecond = 2,

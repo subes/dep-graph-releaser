@@ -15,7 +15,7 @@ class SimulatingJobExecutor : JobExecutor {
     private var count = 0
 
     override fun pollAndExtract(
-        authData: AuthData,
+        authData: CrumbWithId?,
         url: String,
         regex: Regex,
         pollEverySecond: Int,
@@ -30,7 +30,7 @@ class SimulatingJobExecutor : JobExecutor {
         pollEverySecond: Int,
         maxWaitingTimeForCompletenessInSeconds: Int,
         verbose: Boolean
-    ): Promise<Pair<AuthData, Int>> {
+    ): Promise<Pair<CrumbWithId?, Int>> {
         val jobName = jobExecutionData.jobName
         return sleep(100) {
             jobQueuedHook("${jobExecutionData.jobBaseUrl}queuingUrl")
@@ -50,7 +50,7 @@ class SimulatingJobExecutor : JobExecutor {
                 simulateJobFinished(jobExecutionData)
             }
         }.then {
-            getFakeAuthDataAndBuildNumber()
+            getFakeCrumbWithIdAndBuildNumber()
         }
     }
 
@@ -72,7 +72,7 @@ class SimulatingJobExecutor : JobExecutor {
         jobStartedHook: (buildNumber: Int) -> Promise<*>,
         pollEverySecond: Int,
         maxWaitingTimeForCompletenessInSeconds: Int
-    ): Promise<Pair<AuthData, Int>> {
+    ): Promise<Pair<CrumbWithId?, Int>> {
         return sleep(waitBetweenSteps) {
             simulateBuildNumberExtracted(jobExecutionData.jobName, jobStartedHook)
         }.then {
@@ -85,11 +85,11 @@ class SimulatingJobExecutor : JobExecutor {
         buildNumber: Int,
         pollEverySecond: Int,
         maxWaitingTimeForCompletenessInSeconds: Int
-    ): Promise<Pair<AuthData, Int>> {
+    ): Promise<Pair<CrumbWithId?, Int>> {
         return sleep(waitBetweenSteps) {
             simulateJobFinished(jobExecutionData)
         }.then {
-            getFakeAuthDataAndBuildNumber()
+            getFakeCrumbWithIdAndBuildNumber()
         }
     }
 
@@ -117,9 +117,5 @@ class SimulatingJobExecutor : JobExecutor {
         if (stepWise) showAlert(msg)
         else Promise.resolve(Unit)
 
-    private fun getFakeAuthDataAndBuildNumber() =
-        AuthData(
-            UsernameAndApiToken("simulating-user", "random-api-token"),
-            CrumbWithId("Jenkins-Crumb", "onlySimulation")
-        ) to 100
+    private fun getFakeCrumbWithIdAndBuildNumber() = CrumbWithId("Jenkins-Crumb", "onlySimulation") to 100
 }

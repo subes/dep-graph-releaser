@@ -2,7 +2,6 @@ package ch.loewenfels.depgraph.gui.components
 
 import ch.loewenfels.depgraph.data.ReleasePlan
 import ch.loewenfels.depgraph.gui.elementById
-import ch.loewenfels.depgraph.gui.jobexecution.UsernameAndApiToken
 import ch.loewenfels.depgraph.gui.jobexecution.UsernameTokenRegistry
 import ch.loewenfels.depgraph.parseRemoteRegex
 import kotlin.browser.window
@@ -13,10 +12,10 @@ import kotlin.js.Promise
 
 class Login(private val defaultJenkinsBaseUrl: String?) {
 
-    fun retrieveUserAndApiToken(): Promise<UsernameAndApiToken?> {
+    fun retrieveUserAndApiToken(): Promise<String?> {
         return if (defaultJenkinsBaseUrl == null) {
             disableButtonsDueToNoPublishUrl()
-            Promise.resolve(null as UsernameAndApiToken?)
+            Promise.resolve(null as String?)
         } else {
             UsernameTokenRegistry.register(defaultJenkinsBaseUrl).then { pair ->
                 if (pair == null) {
@@ -61,8 +60,8 @@ class Login(private val defaultJenkinsBaseUrl: String?) {
         remoteJenkinsBaseUrl.startsWith("http") && UsernameTokenRegistry.forHost(remoteJenkinsBaseUrl) == null
 
 
-    private fun updateUserToolTip(url: String, pair: Pair<String, UsernameAndApiToken>?) {
-        appendToUserButtonToolTip(url, pair?.second?.username ?: "Anonymous", pair?.first)
+    private fun updateUserToolTip(url: String, pair: Pair<String, String>?) {
+        appendToUserButtonToolTip(url, pair?.second ?: "Anonymous", pair?.first)
     }
 
     private fun disableButtonsDueToNoPublishUrl() {

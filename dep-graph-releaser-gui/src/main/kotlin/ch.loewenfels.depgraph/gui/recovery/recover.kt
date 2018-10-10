@@ -120,8 +120,7 @@ private fun recoverStateQueueing(
         )
     }
 
-    val usernameAndApiToken = UsernameTokenRegistry.forHostOrThrow(jenkinsBaseUrl)
-    return issueCrumb(jenkinsBaseUrl, usernameAndApiToken).then { authData ->
+    return issueCrumb(jenkinsBaseUrl).then { authData ->
         val jobExecutionData = recoverJobExecutionData(modifiableState, project, command)
         val nullableQueuedItemUrl = command.buildUrl
         recoverToStillQueueingOrReadyToRePoll(nullableQueuedItemUrl, authData, jobExecutionData, lazyProjectJson, index)
@@ -146,7 +145,7 @@ private fun recoverJobExecutionData(
 
 private fun recoverToStillQueueingOrReadyToRePoll(
     nullableQueuedItemUrl: String?,
-    authData: AuthData,
+    authData: CrumbWithId?,
     jobExecutionData: JobExecutionData,
     lazyProjectJson: ProjectJson,
     index: Int
@@ -183,11 +182,11 @@ private fun updateBuildUrlAndTransitionToRePolling(
 
 private fun recoverBuildNumberFromQueue(
     nullableQueuedItemUrl: String?,
-    authData: AuthData
+    authData: CrumbWithId?
 ): Promise<RecoveredBuildNumber> {
     if (nullableQueuedItemUrl == null) return Promise.resolve(RecoveredBuildNumber.Undetermined)
 
-    val headers = createHeaderWithAuthAndCrumb(authData)
+    val headers = createHeaderWithCrumb(authData)
     val init = createGetRequest(headers)
     return window.fetch(nullableQueuedItemUrl, init)
         .then(::checkStatusOkOr404)

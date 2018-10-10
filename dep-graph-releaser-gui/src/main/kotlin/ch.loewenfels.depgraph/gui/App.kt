@@ -29,7 +29,7 @@ class App {
             publishJobUrl = determinePublishJob()
 
             defaultJenkinsBaseUrl = publishJobUrl?.substringBefore("/job/")
-            eventManager = EventManager(UsernameTokenRegistry, defaultJenkinsBaseUrl)
+            eventManager = EventManager()
             menu = Menu(eventManager)
             start(jsonUrl)
         } catch (@Suppress("TooGenericExceptionCaught") t: Throwable) {
@@ -64,15 +64,15 @@ class App {
 
     private fun start(jsonUrl: String) {
         val login = Login(defaultJenkinsBaseUrl)
-        login.retrieveUserAndApiToken().then { usernameAndApiToken ->
+        login.retrieveUserAndApiToken().then { username ->
             display("gui", "block")
             Loader.updateToLoadingJson()
 
-            loadJsonAndCheckStatus(jsonUrl, usernameAndApiToken)
+            loadJsonAndCheckStatus(jsonUrl)
                 .then { (_, body) ->
                     val modifiableState = ModifiableState(defaultJenkinsBaseUrl, body)
                     val releasePlan = modifiableState.releasePlan
-                    val promise = if (usernameAndApiToken != null) {
+                    val promise = if (username != null) {
                         Loader.updateToLoadOtherTokens()
                         login.loadOtherApiTokens(releasePlan)
                     } else {
@@ -127,26 +127,16 @@ class App {
             }
         }
 
-        fun loadJsonAndCheckStatus(
-            jsonUrl: String,
-            usernameAndApiToken: UsernameAndApiToken?
-        ): Promise<Pair<Response, String>> {
-            return loadJson(jsonUrl, usernameAndApiToken)
+        fun loadJsonAndCheckStatus(jsonUrl: String): Promise<Pair<Response, String>> {
+            return loadJson(jsonUrl)
                 .then(::checkStatusOk)
                 .catch<Pair<Response, String>> {
                     throw IllegalStateException("Could not load json from url $jsonUrl.", it)
                 }
         }
 
-        private fun loadJson(jsonUrl: String, usernameAndApiToken: UsernameAndApiToken?): Promise<Response> {
+        private fun loadJson(jsonUrl: String): Promise<Response> {
             val init = createFetchInitWithCredentials()
-            val headers = js("({})")
-            // if &publishJob is not specified, then we don't have usernameAndApiToken but we can still
-            // load the json and display it as pipeline
-//            if (usernameAndApiToken != null) {
-//                addAuthentication(headers, usernameAndApiToken)
-//            }
-            init.headers = headers
             return window.fetch(jsonUrl, init)
         }
 
@@ -158,7 +148,7 @@ class App {
             return if (publishJobUrl != null && defaultJenkinsBaseUrl != null) {
 
                 val publisher = Publisher(publishJobUrl, modifiableState)
-                val jenkinsJobExecutor = JenkinsJobExecutor(UsernameTokenRegistry)
+                val jenkinsJobExecutor = JenkinsJobExecutor()
                 val simulatingJobExecutor = SimulatingJobExecutor()
                 ProcessStarter(
                     publisher,

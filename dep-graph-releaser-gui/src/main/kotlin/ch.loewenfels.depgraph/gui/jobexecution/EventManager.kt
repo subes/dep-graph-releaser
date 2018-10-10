@@ -16,10 +16,7 @@ import org.w3c.dom.events.Event
 import kotlin.browser.document
 import kotlin.js.Promise
 
-class EventManager(
-    private val usernameTokenRegistry: UsernameTokenRegistry,
-    private val defaultJenkinsBaseUrl: String?
-) {
+class EventManager {
 
     fun recoverEventState(processStarter: ProcessStarter?) {
         val modifiableState = Menu.modifiableState
@@ -54,12 +51,7 @@ class EventManager(
         val currentReleasePlan = Menu.modifiableState.releasePlan
         val initialJson = currentReleasePlan.config[ConfigKey.INITIAL_RELEASE_JSON]
             ?: App.determineJsonUrlOrThrow()
-        val usernameAndApiToken = if (defaultJenkinsBaseUrl != null) {
-            usernameTokenRegistry.forHost(defaultJenkinsBaseUrl)
-        } else {
-            null
-        }
-        return App.loadJsonAndCheckStatus(initialJson, usernameAndApiToken).then { (_, body) ->
+        return App.loadJsonAndCheckStatus(initialJson).then { (_, body) ->
             val initialReleasePlan = deserialize(body)
             initialReleasePlan.getProjects().forEach { project ->
                 project.commands.forEachIndexed { index, command ->

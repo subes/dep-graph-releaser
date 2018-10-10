@@ -7,14 +7,14 @@ import kotlin.js.Promise
 object Poller {
 
     fun pollAndExtract(
-        authData: AuthData,
+        crumbWithId: CrumbWithId?,
         url: String,
         regex: Regex,
         pollEverySecond: Int,
         maxWaitingTimeInSeconds: Int,
         errorHandler: (PollTimeoutException) -> Nothing
     ): Promise<String> {
-        return poll(PollData(authData, url, pollEverySecond, maxWaitingTimeInSeconds) { body ->
+        return poll(PollData(crumbWithId, url, pollEverySecond, maxWaitingTimeInSeconds) { body ->
             val matchResult = regex.find(body)
             if (matchResult != null) {
                 true to matchResult.groupValues[1]
@@ -31,7 +31,7 @@ object Poller {
     }
 
     private fun <T : Any> poll(pollData: PollData<T>): Promise<T> {
-        val headers = createHeaderWithAuthAndCrumb(pollData.authData)
+        val headers = createHeaderWithCrumb(pollData.crumbWithId)
         val init = createGetRequest(headers)
 
         fun rePoll(body: String): T {
@@ -78,7 +78,7 @@ object Poller {
 
     @Suppress("DataClassPrivateConstructor")
     data class PollData<T> private constructor(
-        val authData: AuthData,
+        val crumbWithId: CrumbWithId?,
         val pollUrl: String,
         val pollEverySecond: Int,
         val maxWaitingTimeInSeconds: Int,
@@ -86,13 +86,13 @@ object Poller {
         val numberOfTries: Int
     ) {
         constructor(
-            authData: AuthData,
+            crumbWithId: CrumbWithId?,
             pollUrl: String,
             pollEverySecond: Int,
             maxWaitingTimeInSeconds: Int,
             action: (String) -> Pair<Boolean, T?>
         ) : this(
-            authData,
+            crumbWithId,
             pollUrl,
             pollEverySecond,
             maxWaitingTimeInSeconds,
@@ -101,7 +101,7 @@ object Poller {
         )
 
         fun newWithIncreasedNumberOfTimes(): PollData<T> = PollData(
-            authData,
+            crumbWithId,
             pollUrl,
             pollEverySecond,
             maxWaitingTimeInSeconds,

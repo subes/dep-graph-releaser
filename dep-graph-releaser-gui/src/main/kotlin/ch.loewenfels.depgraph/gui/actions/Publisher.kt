@@ -46,7 +46,7 @@ class Publisher(
 
     private fun extractResultJsonUrl(
         jobExecutor: JobExecutor,
-        authData: AuthData,
+        authData: CrumbWithId?,
         jobUrl: String,
         buildNumber: Int
     ): Promise<String> {
