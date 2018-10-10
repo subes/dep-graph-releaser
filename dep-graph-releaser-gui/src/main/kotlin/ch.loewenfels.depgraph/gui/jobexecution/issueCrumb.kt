@@ -6,7 +6,7 @@ import kotlin.js.Promise
 
 fun issueCrumb(jenkinsBaseUrl: String): Promise<CrumbWithId?> {
     val url = "$jenkinsBaseUrl/crumbIssuer/api/xml?xpath=concat(//crumbRequestField,\":\",//crumb)"
-    val init = createGetRequest(null)
+    val init = createFetchInitWithCredentials()
     return window.fetch(url, init)
         .then(::checkStatusOkOr404)
         .catch<Pair<Response, String?>> {
