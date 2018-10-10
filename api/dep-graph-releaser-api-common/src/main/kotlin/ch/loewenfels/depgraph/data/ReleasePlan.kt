@@ -84,6 +84,7 @@ data class ReleasePlan(
     fun getAllSubmodules(): Map<ProjectId, Set<ProjectId>> = submodules
 
 
+    @Suppress("IteratorNotThrowingNoSuchElementException")
     private class ReleasePlanIterator(
         private val releasePlan: ReleasePlan
     ) : Iterator<Project> {
