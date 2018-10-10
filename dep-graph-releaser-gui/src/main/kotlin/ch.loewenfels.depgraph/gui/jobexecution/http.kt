@@ -1,7 +1,6 @@
 package ch.loewenfels.depgraph.gui.jobexecution
 
 import org.w3c.fetch.*
-import kotlin.browser.window
 import kotlin.js.Promise
 
 fun checkStatusOk(response: Response): Promise<Pair<Response, String>> {
@@ -12,11 +11,11 @@ fun checkStatusOk(response: Response): Promise<Pair<Response, String>> {
 fun checkStatusOkOr403(response: Response) = checkResponseIgnoreStatus(response, 403)
 fun checkStatusOkOr404(response: Response) = checkResponseIgnoreStatus(response, 404)
 
-private fun checkResponseIgnoreStatus(response: Response, errorStatus: Int)
-    = checkResponseIgnore(response) { errorStatus.toShort() == response.status }
+private fun checkResponseIgnoreStatus(response: Response, errorStatus: Int) =
+    checkResponseIgnore(response) { errorStatus.toShort() == response.status }
 
-fun checkStatusIgnoreOpaqueRedirect(response: Response)
-    = checkResponseIgnore(response) { response.type == ResponseType.OPAQUEREDIRECT }
+fun checkStatusIgnoreOpaqueRedirect(response: Response) =
+    checkResponseIgnore(response) { response.type == ResponseType.OPAQUEREDIRECT }
 
 private fun checkResponseIgnore(
     response: Response,

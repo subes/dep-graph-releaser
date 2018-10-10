@@ -2,7 +2,6 @@ package ch.loewenfels.depgraph
 
 import ch.loewenfels.depgraph.data.Project
 import ch.loewenfels.depgraph.data.ProjectId
-import ch.loewenfels.depgraph.data.ReleasePlan
 import ch.loewenfels.depgraph.data.maven.MavenProjectId
 import ch.tutteli.atrium.api.cc.en_GB.*
 import ch.tutteli.atrium.assert

@@ -4,14 +4,11 @@ import ch.loewenfels.depgraph.ConfigKey
 import ch.loewenfels.depgraph.data.ReleasePlan
 import ch.loewenfels.depgraph.data.maven.MavenProjectId
 import ch.loewenfels.depgraph.gui.components.*
-import ch.loewenfels.depgraph.gui.components.Messages.Companion.showInfo
-import ch.loewenfels.depgraph.gui.components.Messages.Companion.showWarning
 import ch.loewenfels.depgraph.gui.jobexecution.ProcessStarter
 import ch.loewenfels.depgraph.gui.serialization.ModifiableState
 import kotlinx.html.DIV
 import kotlinx.html.div
 import kotlinx.html.dom.append
-import org.w3c.dom.asList
 import kotlin.browser.document
 
 class ContentContainer(modifiableState: ModifiableState, private val menu: Menu, processStarter: ProcessStarter?) {

@@ -12,7 +12,6 @@ import ch.loewenfels.depgraph.maven.VersionDeterminer
 import ch.loewenfels.depgraph.serialization.Serializer
 import ch.tutteli.niok.absolutePathAsString
 import ch.tutteli.niok.exists
-import ch.tutteli.niok.newOutputStream
 import ch.tutteli.niok.writeText
 import java.nio.file.Path
 import java.util.logging.Logger

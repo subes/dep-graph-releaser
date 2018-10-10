@@ -2,7 +2,6 @@ package ch.loewenfels.depgraph.serialization
 
 import ch.loewenfels.depgraph.data.ProjectId
 import ch.loewenfels.depgraph.data.serialization.PolymorphSerializable
-import ch.loewenfels.depgraph.data.serialization.ProjectIdTypeIdMapper
 import ch.loewenfels.depgraph.serialization.PolymorphicAdapterFactory.Companion.PAYLOAD
 import ch.loewenfels.depgraph.serialization.PolymorphicAdapterFactory.Companion.TYPE
 import ch.tutteli.atrium.api.cc.en_GB.*
@@ -18,7 +17,6 @@ import org.jetbrains.spek.api.dsl.given
 import org.jetbrains.spek.api.dsl.it
 import org.jetbrains.spek.api.dsl.on
 import java.io.EOFException
-import kotlin.reflect.KClass
 
 object PolymorphicAdapterFactorySpec : Spek({
 
