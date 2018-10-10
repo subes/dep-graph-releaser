@@ -13,7 +13,6 @@ import ch.loewenfels.depgraph.gui.components.Messages.Companion.showError
 import ch.loewenfels.depgraph.gui.components.Messages.Companion.showInfo
 import ch.loewenfels.depgraph.gui.components.Messages.Companion.showSuccess
 import ch.loewenfels.depgraph.gui.components.Messages.Companion.showThrowableAndThrow
-import ch.loewenfels.depgraph.gui.components.Messages.Companion.showWarning
 import ch.loewenfels.depgraph.gui.jobexecution.*
 import ch.loewenfels.depgraph.gui.serialization.ModifiableState
 import org.w3c.dom.HTMLElement
@@ -62,48 +61,6 @@ class Menu(private val eventManager: EventManager) {
         }
     }
 
-    fun disableButtonsDueToNoPublishUrl() {
-        val titleButtons =
-            "You need to specify &publishJob if you want to use other functionality than Download and Explore Release Order."
-        disableButtonsDueToNoAuth(
-            titleButtons, titleButtons +
-                "\nAn example: ${window.location}&publishJob=jobUrl" +
-                "\nwhere you need to replace jobUrl accordingly."
-        )
-    }
-
-    fun disableButtonsDueToNoAuth(titleButtons: String, info: String) {
-        showInfo(info)
-        userButton.title = titleButtons
-        userButton.addClass(DEACTIVATED_CSS_CLASS)
-        userName.innerText = "Anonymous"
-        userIcon.innerText = "error"
-        listOf(saveButton, dryRunButton, releaseButton).forEach { it.disable(titleButtons) }
-    }
-
-    fun setVerifiedUser(name: String) {
-        userName.innerText = name
-        userIcon.innerText = "verified_user"
-        userButton.removeClass(DEACTIVATED_CSS_CLASS)
-    }
-
-    fun setHalfVerified(defaultJenkinsBaseUrl: String?, remoteJenkinsBaseUrl: String) {
-        if (!userButton.hasClass(DEACTIVATED_CSS_CLASS)) {
-            userIcon.innerText = "error"
-            userButton.addClass("warning")
-            showWarning(
-                "You are not logged in at $remoteJenkinsBaseUrl.\n" +
-                    "You can perform a Dry Run (runs on $defaultJenkinsBaseUrl) but a release involving the remote jenkins will most likely fail.\n\n" +
-                    "Go to the log in: $remoteJenkinsBaseUrl/login?from=" + window.location
-            )
-        }
-    }
-
-    fun appendToUserButtonToolTip(url: String, username: String, name: String?) {
-        val nameSuffix = if (name != null) " ($name)" else ""
-        userButton.title += "\nLogged in as $username$nameSuffix @ $url"
-    }
-
     internal fun initDependencies(
         downloader: Downloader,
         modifiableState: ModifiableState,
@@ -112,12 +69,12 @@ class Menu(private val eventManager: EventManager) {
         Companion.modifiableState = modifiableState
 
         window.onbeforeunload = {
-            if (!saveButton.hasClass(DEACTIVATED_CSS_CLASS)) {
-                "Your changes will be lost, sure you want to leave the page?"
-            } else if (Pipeline.getReleaseState() === ReleaseState.IN_PROGRESS) {
-                "You might lose state changes if you navigate away from this page, sure you want to proceed?"
-            } else {
-                null
+            when {
+                saveButton.isNotDeactivated() ->
+                    "Your changes will be lost, sure you want to leave the page?"
+                Pipeline.getReleaseState() === ReleaseState.IN_PROGRESS ->
+                    "You might lose state changes if you navigate away from this page, sure you want to proceed?"
+                else -> null
             }
         }
 
@@ -141,9 +98,7 @@ class Menu(private val eventManager: EventManager) {
         }
         downloadButton.title = "Download the release.json"
         downloadButton.removeClass(DEACTIVATED_CSS_CLASS)
-        downloadButton.addClickEventListenerIfNotDeactivatedNorDisabled {
-            downloader.download()
-        }
+        downloadButton.addClickEventListenerIfNotDeactivatedNorDisabled { downloader.download() }
     }
 
 
@@ -323,17 +278,10 @@ class Menu(private val eventManager: EventManager) {
     private fun HTMLElement.addClickEventListenerIfNotDeactivatedNorDisabled(action: () -> Any) {
         addClickEventListener {
             @Suppress("RedundantUnitExpression")
-            if (hasClass(DEACTIVATED_CSS_CLASS) || hasClass(DISABLED_CSS_CLASS)) return@addClickEventListener Unit
+            if (isDeactivated() || isDisabled()) return@addClickEventListener Unit
             action()
         }
     }
-
-    private fun HTMLElement.disable(reason: String) {
-        this.addClass(DISABLED_CSS_CLASS)
-        this.title = reason
-    }
-
-    private fun HTMLElement.isDisabled() = hasClass(DISABLED_CSS_CLASS)
 
     private fun HTMLElement.deactivate(reason: String) {
         if (saveButton.isDisabled()) return
@@ -416,16 +364,10 @@ class Menu(private val eventManager: EventManager) {
     }
 
     companion object {
-        private const val DEACTIVATED_CSS_CLASS = "deactivated"
-        private const val DISABLED_CSS_CLASS = "disabled"
-
         private const val TOOLS_INACTIVE_TITLE = "Open the toolbox to see further available features."
         private const val SETTINGS_INACTIVE_TITLE = "Open Settings."
         private const val START_OVER_INACTIVE_TITLE = "Start over with a new process."
 
-        private val userButton get() = elementById("user")
-        private val userIcon get() = elementById("user.icon")
-        private val userName get() = elementById("user.name")
         private val saveButton get() = elementById("save")
         private val downloadButton get() = elementById("download")
         private val dryRunButton get() = elementById("dryRun")
@@ -458,5 +400,11 @@ class Menu(private val eventManager: EventManager) {
             return Triple(typeOfRun.toProcessName(), buttonPair.first, buttonPair.second)
         }
 
+        fun disableButtonsDueToNoAuth(reason: String) {
+            listOf(saveButton, dryRunButton, releaseButton).forEach {
+                it.addClass(DISABLED_CSS_CLASS)
+                it.title = reason
+            }
+        }
     }
 }

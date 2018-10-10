@@ -1,17 +1,16 @@
 package ch.loewenfels.depgraph.gui
 
-import ch.loewenfels.depgraph.data.ReleasePlan
 import ch.loewenfels.depgraph.data.ReleaseState
 import ch.loewenfels.depgraph.gui.actions.Downloader
 import ch.loewenfels.depgraph.gui.actions.Publisher
 import ch.loewenfels.depgraph.gui.actions.Releaser
 import ch.loewenfels.depgraph.gui.components.Loader
+import ch.loewenfels.depgraph.gui.components.Login
 import ch.loewenfels.depgraph.gui.components.Menu
 import ch.loewenfels.depgraph.gui.components.Messages.Companion.showThrowableAndThrow
 import ch.loewenfels.depgraph.gui.jobexecution.*
 import ch.loewenfels.depgraph.gui.recovery.recover
 import ch.loewenfels.depgraph.gui.serialization.ModifiableState
-import ch.loewenfels.depgraph.parseRemoteRegex
 import org.w3c.fetch.Response
 import org.w3c.notifications.Notification
 import kotlin.browser.window
@@ -64,7 +63,8 @@ class App {
     }
 
     private fun start(jsonUrl: String) {
-        retrieveUserAndApiToken().then { usernameAndApiToken ->
+        val login = Login(defaultJenkinsBaseUrl)
+        login.retrieveUserAndApiToken().then { usernameAndApiToken ->
             display("gui", "block")
             Loader.updateToLoadingJson()
 
@@ -74,7 +74,7 @@ class App {
                     val releasePlan = modifiableState.releasePlan
                     val promise = if (usernameAndApiToken != null) {
                         Loader.updateToLoadOtherTokens()
-                        loadOtherApiTokens(releasePlan)
+                        login.loadOtherApiTokens(releasePlan)
                     } else {
                         Promise.resolve(Unit)
                     }
@@ -102,61 +102,11 @@ class App {
         }
     }
 
-    private fun loadOtherApiTokens(releasePlan: ReleasePlan): Promise<*> {
-        val remoteRegex = parseRemoteRegex(releasePlan)
-        val mutableList = ArrayList<Promise<*>>(remoteRegex.size)
-
-        remoteRegex.forEach { (_, remoteJenkinsBaseUrl) ->
-            val promise = if (isUrlAndNotYetRegistered(remoteJenkinsBaseUrl)) {
-                UsernameTokenRegistry.register(remoteJenkinsBaseUrl).then { pair ->
-                    updateUserToolTip(remoteJenkinsBaseUrl, pair)
-                    if (pair == null) {
-                        menu.setHalfVerified(defaultJenkinsBaseUrl, remoteJenkinsBaseUrl)
-                    }
-                }
-            } else {
-                Promise.resolve(Unit)
-            }
-            mutableList.add(promise)
-        }
-        return Promise.all(mutableList.toTypedArray())
-    }
-
-    private fun isUrlAndNotYetRegistered(remoteJenkinsBaseUrl: String) =
-        remoteJenkinsBaseUrl.startsWith("http") && UsernameTokenRegistry.forHost(remoteJenkinsBaseUrl) == null
-
-    private fun retrieveUserAndApiToken(): Promise<UsernameAndApiToken?> {
-        return if (defaultJenkinsBaseUrl == null) {
-            menu.disableButtonsDueToNoPublishUrl()
-            Promise.resolve(null as UsernameAndApiToken?)
-        } else {
-            UsernameTokenRegistry.register(defaultJenkinsBaseUrl).then { pair ->
-                if (pair == null) {
-                    menu.disableButtonsDueToNoAuth(
-                        "You need to log in if you want to use this functionality.",
-                        "You need to log in if you want to use all functionality and not only a limited set." +
-                            "\n$defaultJenkinsBaseUrl/login?from=" + window.location
-                    )
-                    null
-                } else {
-                    val (name, usernameToken) = pair
-                    menu.setVerifiedUser(name)
-                    updateUserToolTip(defaultJenkinsBaseUrl, pair)
-                    usernameToken
-                }
-            }
-        }
-    }
-
-    private fun updateUserToolTip(url: String, pair: Pair<String, UsernameAndApiToken>?) {
-        menu.appendToUserButtonToolTip(url, pair?.second?.username ?: "Anonymous", pair?.first)
-    }
 
     private fun switchLoaderWithPipeline() {
         display("loader", "none")
         display("pipeline", "table")
     }
-
 
     companion object {
         const val PUBLISH_JOB = "&publishJob="
