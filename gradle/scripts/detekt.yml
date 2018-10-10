@@ -28,6 +28,7 @@ test-pattern: # Configure exclusions for test sources
     - 'ForEachOnRange'
     - 'LongParameterList'
     - 'LargeClass'
+    - 'MethodOverloading'
 
 comments:
     UndocumentedPublicClass:
