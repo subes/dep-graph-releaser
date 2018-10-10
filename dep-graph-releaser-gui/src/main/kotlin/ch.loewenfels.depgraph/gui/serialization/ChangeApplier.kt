@@ -83,7 +83,7 @@ object ChangeApplier {
     private fun replaceConfigEntriesIfChanged(releasePlanJson: ReleasePlanJson): Boolean {
         var changed = false
         releasePlanJson.config.forEach { arr ->
-            check(arr.size != 2) {
+            check(arr.size == 2) {
                 "config entry corrupt, does not have two entries:\n" +
                     if (arr.isNotEmpty()) arr[0] else releasePlanJson.config.joinToString { it.joinToString() }
             }
