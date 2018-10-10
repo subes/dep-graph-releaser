@@ -1,5 +1,6 @@
 package ch.loewenfels.depgraph.gui.actions
 
+import ch.loewenfels.depgraph.gui.SECOND
 import ch.loewenfels.depgraph.data.*
 import ch.loewenfels.depgraph.data.maven.jenkins.JenkinsCommand
 import ch.loewenfels.depgraph.gui.components.Messages.Companion.showError
@@ -61,7 +62,7 @@ class Releaser(
             showWarning(
                 "Remote publish server detected. We currently do not support to consume remote release.json." +
                     "\nThis means that we publish changes during the release process but will not change the location. Thus, please do not reload the page during the release process."
-                , 8000
+                , 8 * SECOND
             )
         }
     }

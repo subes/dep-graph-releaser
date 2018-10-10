@@ -24,7 +24,8 @@ class QueuedItemBasedBuildNumberExtractor(
                             "\nJob URL: $queuedItemUrl" +
                             "\nRegex used: ${numberRegex.pattern}" +
                             "\nContent: ${e.body}"
-                    , e.body, e)
+                        , e.body, e
+                    )
                 })
         }.then { it.toInt() }
     }

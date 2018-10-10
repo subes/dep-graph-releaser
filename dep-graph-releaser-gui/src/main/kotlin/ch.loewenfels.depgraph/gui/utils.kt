@@ -4,6 +4,10 @@ import kotlin.browser.document
 import kotlin.browser.window
 import kotlin.js.Promise
 
+const val SECOND = 1000
+const val HALF_A_SECOND = 500
+
+
 fun <T> sleep(ms: Int, action: () -> T): Promise<T> {
     val p: Promise<Any> = Promise { resolve, _ -> window.setTimeout(resolve, ms) }
     return p.then { action() }
@@ -11,6 +15,7 @@ fun <T> sleep(ms: Int, action: () -> T): Promise<T> {
 
 // It's workaround for KT-19672 since we can fix it properly until KT-11265 isn't fixed.
 inline fun <T> Promise<Promise<T>>.unwrapPromise(): Promise<T> = this.unsafeCast<Promise<T>>()
+
 inline fun <T> Promise<Promise<Promise<T>>>.unwrap2Promise(): Promise<T> = this.unsafeCast<Promise<T>>()
 inline fun <T> Promise<Promise<Promise<Promise<T>>>>.unwrap3Promise(): Promise<T> = this.unsafeCast<Promise<T>>()
 

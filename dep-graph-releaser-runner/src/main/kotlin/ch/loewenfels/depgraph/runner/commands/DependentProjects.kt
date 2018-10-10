@@ -24,7 +24,8 @@ object DependentProjects : ConsoleCommand {
     override val description = "Somehow (depending on the format) displays the dependent projects of a given root project."
     override val example = "./dgr $name com.example example-project ./repos \"[^/]+/[^/]+/.+\" " +
         "${FORMAT_ARG}list $RELATIVE_PATH_TO_GIT_REPO_REGEX_ARG^(.*)/\$ ${RELATIVE_PATH_TO_GIT_REPO_REPLACEMENT}https://github.com/\$1 $PSF./import.psf"
-    override val arguments = """
+    override val arguments by lazy {
+        """
         |$name requires the following arguments in the given order:
         |groupId                           // maven groupId of the project for which we search dependent projects
         |artifactId                        // maven artifactId of the project for which we search dependent projects
@@ -47,6 +48,7 @@ object DependentProjects : ConsoleCommand {
         |(${PSF}file)                       // optionally in the sense that it is only required in case $FORMAT_ARG$ECLIPSE_PSF
         |                                  // path + file name for the resulting psf file
         """.trimMargin()
+    }
 
     override fun numOfArgsNotOk(number: Int) = number < 5 || number > 9
 

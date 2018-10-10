@@ -11,6 +11,7 @@ import kotlinx.html.js.p
 import kotlinx.html.js.span
 import kotlinx.html.p
 import org.w3c.dom.HTMLElement
+import org.w3c.dom.Node
 import org.w3c.dom.asList
 import kotlin.dom.removeClass
 
@@ -19,7 +20,7 @@ object Loader {
     init{
         val loader = elementById("loader")
         loader.childNodes.asList().forEach {
-            if (it.nodeType == 3.toShort()) {
+            if (it.nodeType == Node.TEXT_NODE) {
                 loader.removeChild(it)
             }
         }

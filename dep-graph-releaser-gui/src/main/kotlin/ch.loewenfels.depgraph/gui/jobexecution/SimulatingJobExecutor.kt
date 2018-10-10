@@ -76,7 +76,9 @@ class SimulatingJobExecutor : JobExecutor {
         return sleep(waitBetweenSteps) {
             simulateBuildNumberExtracted(jobExecutionData.jobName, jobStartedHook)
         }.then {
-            rePoll(jobExecutionData, 100, pollEverySecond, maxWaitingTimeForCompletenessInSeconds)
+            rePoll(
+                jobExecutionData, 100, pollEverySecond, maxWaitingTimeForCompletenessInSeconds
+            )
         }.unwrapPromise()
     }
 
@@ -117,5 +119,6 @@ class SimulatingJobExecutor : JobExecutor {
         if (stepWise) showAlert(msg)
         else Promise.resolve(Unit)
 
-    private fun getFakeCrumbWithIdAndBuildNumber() = CrumbWithId("Jenkins-Crumb", "onlySimulation") to 100
+    private fun getFakeCrumbWithIdAndBuildNumber() =
+        CrumbWithId("Jenkins-Crumb", "onlySimulation") to 100
 }

@@ -1,5 +1,6 @@
 package ch.loewenfels.depgraph.gui.components
 
+import ch.loewenfels.depgraph.gui.SECOND
 import ch.loewenfels.depgraph.data.CommandState
 import ch.loewenfels.depgraph.data.Project
 import ch.loewenfels.depgraph.data.ReleaseCommand
@@ -77,7 +78,7 @@ class Toggler(private val modifiableState: ModifiableState, private val menu: Me
                 showInfo(
                     "Cannot reactivate the ReleaseCommand for project ${project.id.identifier} " +
                         "because some commands (of submodules) are deactivated.",
-                    4000
+                    4 * SECOND
                 )
             }
         }

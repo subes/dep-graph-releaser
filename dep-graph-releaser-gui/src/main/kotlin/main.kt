@@ -1,4 +1,6 @@
 import ch.loewenfels.depgraph.gui.App
+import ch.loewenfels.depgraph.gui.HALF_A_SECOND
+import ch.loewenfels.depgraph.gui.SECOND
 import kotlin.browser.window
 
 @JsName("main")
@@ -10,7 +12,7 @@ fun main() {
 val onlyUsedToCallMain = main()
 
 @JsName("failAfterSteps")
-var failAfterSteps = 10000
+var failAfterSteps = 10 * SECOND
 
 @JsName("failWithTimeout")
 var failWithTimeout = false
@@ -19,7 +21,8 @@ var failWithTimeout = false
 var failDuringQueueing = false
 
 @JsName("waitBetweenSteps")
-var waitBetweenSteps = 500
+var waitBetweenSteps = HALF_A_SECOND
+
 
 @JsName("stepWise")
 var stepWise = false

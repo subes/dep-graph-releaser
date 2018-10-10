@@ -80,6 +80,7 @@ object Json : ConsoleCommand {
         """.trimMargin()
     }
 
+
     override fun numOfArgsNotOk(number: Int) = number < 10 || number > 15
 
     override fun execute(args: Array<out String>, errorHandler: ErrorHandler) {

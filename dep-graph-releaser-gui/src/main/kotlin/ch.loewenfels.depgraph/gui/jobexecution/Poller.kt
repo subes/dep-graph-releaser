@@ -1,5 +1,6 @@
 package ch.loewenfels.depgraph.gui.jobexecution
 
+import ch.loewenfels.depgraph.gui.SECOND
 import ch.loewenfels.depgraph.gui.sleep
 import kotlin.browser.window
 import kotlin.js.Promise
@@ -42,7 +43,7 @@ object Poller {
                     body
                 )
             }
-            val p = sleep(pollData.pollEverySecond * 1000) {
+            val p = sleep(pollData.pollEverySecond * SECOND) {
                 poll(pollData.newWithIncreasedNumberOfTimes())
             }
             // unsafeCast is used because javascript resolves the result automatically on return

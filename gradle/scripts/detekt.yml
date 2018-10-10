@@ -62,6 +62,8 @@ potential-bugs:
 style:
     DataClassContainsFunctions:
         active: false
+    MagicNumber:
+        active: false
     MandatoryBracesIfStatements:
         active: false
     MaxLineLength:

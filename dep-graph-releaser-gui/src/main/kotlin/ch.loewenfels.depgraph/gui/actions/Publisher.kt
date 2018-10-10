@@ -1,9 +1,13 @@
 package ch.loewenfels.depgraph.gui.actions
 
+import ch.loewenfels.depgraph.gui.SECOND
 import ch.loewenfels.depgraph.gui.*
 import ch.loewenfels.depgraph.gui.components.Messages.Companion.showSuccess
 import ch.loewenfels.depgraph.gui.components.Messages.Companion.showWarning
-import ch.loewenfels.depgraph.gui.jobexecution.*
+import ch.loewenfels.depgraph.gui.jobexecution.CrumbWithId
+import ch.loewenfels.depgraph.gui.jobexecution.JobExecutionData
+import ch.loewenfels.depgraph.gui.jobexecution.JobExecutor
+import ch.loewenfels.depgraph.gui.jobexecution.toQueryParameters
 import ch.loewenfels.depgraph.gui.serialization.ModifiableState
 import kotlin.browser.window
 import kotlin.js.Promise
@@ -58,13 +62,14 @@ class Publisher(
             pollEverySecond = 2,
             maxWaitingTimeInSeconds = 20,
             errorHandler = { e ->
-            throw IllegalStateException(
-                "Could not find the published release.json as artifact of the publish job." +
-                    "\nJob URL: $jobUrl" +
-                    "\nRegex used: ${resultRegex.pattern}" +
-                    "\nContent: ${e.body}"
-            )
-        }).then { fileName ->
+                throw IllegalStateException(
+                    "Could not find the published release.json as artifact of the publish job." +
+                        "\nJob URL: $jobUrl" +
+                        "\nRegex used: ${resultRegex.pattern}" +
+                        "\nContent: ${e.body}"
+                )
+            }
+        ).then { fileName ->
             "$jobUrl$buildNumber/artifact/$fileName"
         }
     }
@@ -89,7 +94,7 @@ class Publisher(
                         "\nIf this message does not disappear, then it means the switch failed. Please visit the following url manually:" +
                         "\n$url"
                 )
-                sleep(2000) {
+                sleep(2 * SECOND) {
                     window.location.href = url
                     successMsg.remove()
                 }

@@ -1,11 +1,8 @@
 package ch.loewenfels.depgraph.gui.jobexecution
 
+import ch.loewenfels.depgraph.gui.*
 import ch.loewenfels.depgraph.gui.components.Messages.Companion.showInfo
 import ch.loewenfels.depgraph.gui.jobexecution.exceptions.JobNotTriggeredException
-import ch.loewenfels.depgraph.gui.sleep
-import ch.loewenfels.depgraph.gui.unwrap2Promise
-import ch.loewenfels.depgraph.gui.unwrap3Promise
-import ch.loewenfels.depgraph.gui.unwrapPromise
 import org.w3c.fetch.Response
 import kotlin.browser.window
 import kotlin.js.Promise
@@ -69,7 +66,7 @@ class JenkinsJobExecutor : JobExecutor {
             if (verbose) {
                 showInfo(
                     "${jobExecutionData.jobName} started with build number $buildNumber, wait for completion...",
-                    2000
+                    2 * SECOND
                 )
             }
             jobStartedHook(buildNumber).then {
@@ -99,12 +96,12 @@ class JenkinsJobExecutor : JobExecutor {
             if (nullableQueuedItemUrl != null) {
                 showInfo(
                     "Queued $jobName successfully, wait for execution...\nQueued item URL: ${nullableQueuedItemUrl}api/xml",
-                    2000
+                    2 * SECOND
                 )
             } else {
                 showInfo(
                     "$jobName is probably already running (queued item could not be found), trying to fetch execution number from Job history.",
-                    2000
+                    2 * SECOND
                 )
             }
         }
@@ -167,7 +164,7 @@ class JenkinsJobExecutor : JobExecutor {
         pollEverySecond: Int,
         maxWaitingTimeForCompletenessInSeconds: Int
     ): Promise<Pair<CrumbWithId?, Int>> {
-        return sleep(pollEverySecond * 500) {
+        return sleep(pollEverySecond * HALF_A_SECOND) {
             pollAndExtract(
                 authData,
                 "${jobExecutionData.jobBaseUrl}$buildNumber/api/xml",
