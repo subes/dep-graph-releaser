@@ -277,9 +277,9 @@ class Menu(private val eventManager: EventManager) {
 
     private fun HTMLElement.addClickEventListenerIfNotDeactivatedNorDisabled(action: () -> Any) {
         addClickEventListener {
-            @Suppress("RedundantUnitExpression")
-            if (isDeactivated() || isDisabled()) return@addClickEventListener Unit
-            action()
+            if (isNotDeactivated() && isNotDisabled()) {
+                action()
+            }
         }
     }
 

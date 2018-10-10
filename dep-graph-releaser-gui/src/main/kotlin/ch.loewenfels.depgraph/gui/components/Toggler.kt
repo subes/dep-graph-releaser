@@ -14,7 +14,6 @@ import org.w3c.dom.CustomEvent
 import org.w3c.dom.CustomEventInit
 import org.w3c.dom.HTMLInputElement
 import org.w3c.dom.events.Event
-import org.w3c.dom.events.EventModifierInit
 import kotlin.dom.hasClass
 import kotlin.js.Promise
 
@@ -115,10 +114,13 @@ class Toggler(private val modifiableState: ModifiableState, private val menu: Me
                 modifiableState.releasePlan.getProject(dependentId).commands
                     .mapWithIndex()
                     .filter { (_, command) ->
-                        // release command will get deactivated automatically via deactivation dependency update
-                        if (command is ReleaseCommand) return@filter false
-                        val state = command.state
-                        state is CommandState.Waiting && state.dependencies.contains(projectId)
+                        if (command is ReleaseCommand) {
+                            // release command will get deactivated automatically via deactivation dependency update
+                            false
+                        } else {
+                            val state = command.state
+                            state is CommandState.Waiting && state.dependencies.contains(projectId)
+                        }
                     }
                     .forEach { (index, _) ->
                         registerForProjectEvent(project, EVENT_RELEASE_TOGGLE_UNCHECKED) {

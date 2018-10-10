@@ -79,26 +79,40 @@ class JenkinsReleasePlanCreator(
         val remoteRegex = StringBuilder(currentRemoteRegex?.trim() ?: "")
         val jobMapping = StringBuilder(currentJobMapping?.trim() ?: "")
 
-        analysisResult.projects.keys.forEach { projectId ->
-            val jenkinsUrl = (projectId as? MavenProjectId)?.let { analyser.getJenkinsUrl(it) } ?: return@forEach
-            if (!jenkinsUrl.contains("/job/")) {
+        analysisResult.projects.keys.asSequence()
+            .filterIsInstance<MavenProjectId>()
+            .map { it to analyser.getJenkinsUrl(it) }
+            .filterWithJenkinsUrlAndWarnIfOtherSystem(warnings)
+            .forEach { (projectId, jenkinsUrl) ->
+                val (url, jobName) = jenkinsUrl.split("/job/")
+                remoteRegex.insert(0, "\n").insert(0, url).insert(0, '#').insert(0, projectId.identifier)
+                if (jobName != projectId.artifactId) {
+                    jobMapping.append("\n").append(projectId.identifier).append('=').append(jobName)
+                }
+            }
+        config[ConfigKey.REMOTE_REGEX] = remoteRegex.toString()
+        config[ConfigKey.JOB_MAPPING] = jobMapping.toString()
+    }
+
+
+    private fun Sequence<Pair<MavenProjectId, String?>>.filterWithJenkinsUrlAndWarnIfOtherSystem(
+        warnings: MutableList<String>
+    ): Sequence<Pair<MavenProjectId, String>> {
+        @Suppress("UNCHECKED_CAST")
+        val sequence: Sequence<Pair<MavenProjectId, String>> = filter { (projectId, jenkinsUrl) ->
+            if (jenkinsUrl == null) false
+            else if (!jenkinsUrl.contains("/job/")) {
                 warnings.add(
                     "ciManagement url was invalid, cannot use it for ${ConfigKey.REMOTE_REGEX.asString()} nor for ${ConfigKey.JOB_MAPPING.asString()}, please adjust manually if necessary." +
                         "\nProject: ${projectId.identifier}\nciManagement-url: $jenkinsUrl" +
                         "\n\nWe look for /job/ in the given <url>. Please define the url in the following format: https://server.com/jenkins/job/jobName"
                 )
-                return@forEach
+                false
+            } else {
+                true
             }
-
-            val (url, jobName) = jenkinsUrl.split("/job/")
-            remoteRegex.insert(0, "\n").insert(0, url).insert(0, '#').insert(0, projectId.identifier)
-            if (jobName != projectId.artifactId) {
-                jobMapping.append("\n").append(projectId.identifier).append('=').append(jobName)
-            }
-        }
-        config[ConfigKey.REMOTE_REGEX] = remoteRegex.toString()
-        config[ConfigKey.JOB_MAPPING] = jobMapping.toString()
-
+        } as Sequence<Pair<MavenProjectId, String>>
+        return sequence
     }
 
     private fun createRootProject(analyser: Analyser, projectsToRelease: List<MavenProjectId>): Project {
@@ -438,6 +452,7 @@ class JenkinsReleasePlanCreator(
             val projectId = project.id
             if (options.disableReleaseFor.matches(projectId.identifier)) {
                 deactivatedProjects.add(projectId.identifier)
+                @Suppress("LabeledExpression")
                 project.commands.asSequence()
                     .mapWithIndex()
                     .filter { (_, command) -> command is ReleaseCommand && command.state !== CommandState.Disabled }

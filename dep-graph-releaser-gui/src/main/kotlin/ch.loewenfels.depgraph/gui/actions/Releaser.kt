@@ -135,17 +135,19 @@ class Releaser(
     private fun releaseProject(paramObject: ParamObject): Promise<*> {
         return withLockForProject(paramObject.project.id) {
             triggerNonReleaseCommandsInclSubmoduleCommands(paramObject).then { jobResult ->
-                if (jobResult !== CommandState.Succeeded) return@then jobResult
-
-                triggerReleaseCommands(paramObject).unsafeCast<CommandState>()
+                if (jobResult !== CommandState.Succeeded) jobResult
+                else triggerReleaseCommands(paramObject).unsafeCast<CommandState>()
             }.then { jobResult ->
                 paramObject.projectResults[paramObject.project.id] = jobResult
-                if (jobResult !== CommandState.Succeeded) return@then jobResult
-
-                val releasePlan = paramObject.releasePlan
-                val allDependents = releasePlan.collectDependentsInclDependentsOfAllSubmodules(paramObject.project.id)
-                updateStateWaiting(releasePlan, allDependents)
-                releaseDependentProjects(allDependents, releasePlan, paramObject)
+                if (jobResult !== CommandState.Succeeded) {
+                    Promise.resolve(jobResult)
+                } else {
+                    val releasePlan = paramObject.releasePlan
+                    val allDependents =
+                        releasePlan.collectDependentsInclDependentsOfAllSubmodules(paramObject.project.id)
+                    updateStateWaiting(releasePlan, allDependents)
+                    releaseDependentProjects(allDependents, releasePlan, paramObject)
+                }
             }.catch { t ->
                 paramObject.projectResults[paramObject.project.id] = CommandState.Failed
                 if (t !== ReleaseFailure) throw t

@@ -42,9 +42,10 @@ fun recover(modifiableState: ModifiableState, defaultJenkinsBaseUrl: String?): P
             )
             val releasePlanJson = JSON.parse<ReleasePlanJson>(modifiableState.json)
             releasePlanJson.state = ReleaseState.WATCHING.name.unsafeCast<ReleaseState>()
-            return@then Promise.resolve(releasePlanJson)
+            Promise.resolve(releasePlanJson)
+        } else {
+            recoverCommandStates(modifiableState, defaultJenkinsBaseUrl)
         }
-        recoverCommandStates(modifiableState, defaultJenkinsBaseUrl)
     }.then { ModifiableState(modifiableState, JSON.stringify(it)) }
 }
 
@@ -191,16 +192,18 @@ private fun recoverBuildNumberFromQueue(
     return window.fetch(nullableQueuedItemUrl, init)
         .then(::checkStatusOkOr404)
         .then { (_, body) ->
-            // might well be that we get a 404 (body is null) because the item is no longer in the queue
-            // (the job is already being executed) => we return RecoverBuildNumber.Undetermined so that we recover
-            // the build number from the job's build history
-            if (body == null) return@then RecoveredBuildNumber.Undetermined
-
-            val match = numberRegex.find(body)
-            if (match != null) {
-                RecoveredBuildNumber.Determined(match.groupValues[1].toInt())
+            if (body == null) {
+                // might well be that we get a 404 (body is null) because the item is no longer in the queue
+                // (the job is already being executed) => we return RecoverBuildNumber.Undetermined so that we recover
+                // the build number from the job's build history
+                RecoveredBuildNumber.Undetermined
             } else {
-                RecoveredBuildNumber.StillQueueing
+                val match = numberRegex.find(body)
+                if (match != null) {
+                    RecoveredBuildNumber.Determined(match.groupValues[1].toInt())
+                } else {
+                    RecoveredBuildNumber.StillQueueing
+                }
             }
         }
 }
