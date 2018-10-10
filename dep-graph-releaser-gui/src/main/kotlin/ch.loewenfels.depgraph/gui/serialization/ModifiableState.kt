@@ -15,6 +15,8 @@ class ModifiableState(defaultJenkinsBaseUrl: String?, json: String) {
             _json = value
         }
 
+    //TODO get rid of lateinit once https://youtrack.jetbrains.com/issue/KT-27480 is implemented
+    @Suppress("LateinitUsage")
     private lateinit var _releaseJobExecutionDataFactory: JobExecutionDataFactory
     var releaseJobExecutionDataFactory: JobExecutionDataFactory
         get() = _releaseJobExecutionDataFactory
@@ -22,6 +24,8 @@ class ModifiableState(defaultJenkinsBaseUrl: String?, json: String) {
             _releaseJobExecutionDataFactory = value
         }
 
+    //TODO get rid of lateinit once https://youtrack.jetbrains.com/issue/KT-27480 is implemented
+    @Suppress("LateinitUsage")
     private lateinit var _dryRunExecutionDataFactory: JobExecutionDataFactory
     var dryRunExecutionDataFactory: JobExecutionDataFactory
         get() = _dryRunExecutionDataFactory
@@ -29,6 +33,8 @@ class ModifiableState(defaultJenkinsBaseUrl: String?, json: String) {
             _dryRunExecutionDataFactory = value
         }
 
+    //TODO get rid of lateinit once https://youtrack.jetbrains.com/issue/KT-27480 is implemented
+    @Suppress("LateinitUsage")
     private lateinit var _releasePlan: ReleasePlan
     var releasePlan: ReleasePlan
         get() = _releasePlan
@@ -39,7 +45,7 @@ class ModifiableState(defaultJenkinsBaseUrl: String?, json: String) {
     /**
      * Copy constructor, takes over the [defaultJenkinsBaseUrl] from the given [modifiableState].
      */
-    constructor(modifiableState: ModifiableState, json: String): this(modifiableState.defaultJenkinsBaseUrl, json)
+    constructor(modifiableState: ModifiableState, json: String) : this(modifiableState.defaultJenkinsBaseUrl, json)
 
     init {
         val fakeJenkinsBaseUrl = "https://github.com/loewenfels/"

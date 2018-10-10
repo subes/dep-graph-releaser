@@ -69,7 +69,7 @@ class JenkinsReleasePlanCreator(
     }
 
     private fun updateConfigToProjectSpecificJenkinsUrl(
-        paramObject: ParamObject,
+        analysisResult: AnalysisResult,
         analyser: Analyser,
         config: MutableMap<ConfigKey, String>,
         warnings: MutableList<String>
@@ -79,12 +79,12 @@ class JenkinsReleasePlanCreator(
         val remoteRegex = StringBuilder(currentRemoteRegex?.trim() ?: "")
         val jobMapping = StringBuilder(currentJobMapping?.trim() ?: "")
 
-        paramObject.projects.keys.forEach { projectId ->
+        analysisResult.projects.keys.forEach { projectId ->
             val jenkinsUrl = (projectId as? MavenProjectId)?.let { analyser.getJenkinsUrl(it) } ?: return@forEach
             if (!jenkinsUrl.contains("/job/")) {
                 warnings.add(
                     "ciManagement url was invalid, cannot use it for ${ConfigKey.REMOTE_REGEX.asString()} nor for ${ConfigKey.JOB_MAPPING.asString()}, please adjust manually if necessary." +
-                       "\nProject: ${projectId.identifier}\nciManagement-url: $jenkinsUrl" +
+                        "\nProject: ${projectId.identifier}\nciManagement-url: $jenkinsUrl" +
                         "\n\nWe look for /job/ in the given <url>. Please define the url in the following format: https://server.com/jenkins/job/jobName"
                 )
                 return@forEach
@@ -93,7 +93,7 @@ class JenkinsReleasePlanCreator(
             val (url, jobName) = jenkinsUrl.split("/job/")
             remoteRegex.insert(0, "\n").insert(0, url).insert(0, '#').insert(0, projectId.identifier)
             if (jobName != projectId.artifactId) {
-                jobMapping.append("\n").append( projectId.identifier).append('=').append(jobName)
+                jobMapping.append("\n").append(projectId.identifier).append('=').append(jobName)
             }
         }
         config[ConfigKey.REMOTE_REGEX] = remoteRegex.toString()
@@ -159,21 +159,21 @@ class JenkinsReleasePlanCreator(
         relativePath
     )
 
-    private fun createDependents(analyser: Analyser, rootProject: Project): ParamObject {
-        val paramObject = ParamObject(analyser, rootProject)
-        while (paramObject.levelIterator.hasNext()) {
-            val dependent = paramObject.levelIterator.next()
-            paramObject.submodules[dependent.id] = analyser.getSubmodules(dependent.id as MavenProjectId)
-            createCommandsForDependents(paramObject, dependent)
+    private fun createDependents(analyser: Analyser, rootProject: Project): AnalysisResult {
+        val analysisResults = ParamObjectAnalysisResult(analyser, rootProject)
+        while (analysisResults.levelIterator.hasNext()) {
+            val dependent = analysisResults.levelIterator.next()
+            analysisResults.submodules[dependent.id] = analyser.getSubmodules(dependent.id as MavenProjectId)
+            createCommandsForDependents(analysisResults, dependent)
         }
-        return paramObject
+        return analysisResults
     }
 
-    private fun createCommandsForDependents(paramObject: ParamObject, dependency: Project) {
-        paramObject.initDependency(dependency)
-
-        paramObject.analyser.getDependentsOf(paramObject.dependencyId).forEach { relation ->
-            paramObject.relation = relation
+    private fun createCommandsForDependents(analysisResult: AnalysisResult, dependency: Project) {
+        val dependencyId = dependency.id as? MavenProjectId
+            ?: throw IllegalStateException("We only support ${MavenProjectId::class.qualifiedName} currently")
+        analysisResult.analyser.getDependentsOf(dependencyId).forEach { relation ->
+            val paramObject = ParamObject(analysisResult, dependency, dependencyId, relation)
             if (paramObject.isDependencyNotSubmoduleOfRelation()) {
                 val existingDependent = paramObject.projects[relation.id]
                 when {
@@ -258,21 +258,24 @@ class JenkinsReleasePlanCreator(
             if (topMultiModule == null && isNotDependentOfDependency(paramObject, topMultiModuleId)) {
                 // It might be that the multi module is not part of the dependents graph, in such a case we have to add
                 // it to the analysis nonetheless, because we have a release dependency to track.
-                val tmpRelation = paramObject.relation
-                paramObject.relation =
+                paramObject.temporarilyOverwriteRelation(
                     Relation(topMultiModuleId, paramObject.analyser.getCurrentVersionOrThrow(topMultiModuleId), false)
-                val newDependent = initDependent(paramObject)
-                addDependentAddToProjects(paramObject, newDependent)
-                paramObject.relation = tmpRelation
+                ) {
+                    val newDependent = initDependent(paramObject)
+                    addDependentAddToProjects(paramObject, newDependent)
+                }
             } else if (topMultiModule != null && topMultiModule.level < dependent.level) {
-                val tmpRelation = paramObject.relation
-                paramObject.relation = Relation(topMultiModuleId, topMultiModule.currentVersion, false)
-                val wouldHaveCycles = !checkForCyclicAndUpdateIfOk(paramObject, topMultiModule)
-                paramObject.relation = tmpRelation
+                val wouldHaveCycles = paramObject.temporarilyOverwriteRelation(
+                    Relation(topMultiModuleId, topMultiModule.currentVersion, false)
+                ) {
+                    !checkForCyclicAndUpdateIfOk(paramObject, topMultiModule)
+                }
                 if (wouldHaveCycles) {
-                    paramObject.initDependency(topMultiModule)
+                    val multiModuleParam = ParamObject(
+                        paramObject.analysisResult, topMultiModule, topMultiModuleId, paramObject.relation
+                    )
                     //updating the multi module would introduce a cycle, thus we need to adjust the submodule instead
-                    updateLevelIfNecessaryAndRevisitInCase(paramObject, dependent)
+                    updateLevelIfNecessaryAndRevisitInCase(multiModuleParam, dependent)
                 }
             }
         }
@@ -392,8 +395,8 @@ class JenkinsReleasePlanCreator(
         }
     }
 
-    private fun reportCyclicDependencies(paramObject: ParamObject, warnings: MutableList<String>) {
-        paramObject.cyclicDependents.mapTo(warnings) { (projectId, dependentEntry) ->
+    private fun reportCyclicDependencies(analysisResult: AnalysisResult, warnings: MutableList<String>) {
+        analysisResult.cyclicDependents.mapTo(warnings) { (projectId, dependentEntry) ->
             val sb = StringBuilder()
             sb.append("Project ").append(projectId.identifier).append(" has one or more cyclic dependencies. ")
                 .append("The corresponding relation (first ->) was ignored, you need to address this circumstance manually:\n")
@@ -402,8 +405,8 @@ class JenkinsReleasePlanCreator(
         }
     }
 
-    private fun reportInterModuleCyclicDependencies(paramObject: ParamObject, infos: MutableList<String>) {
-        paramObject.interModuleCyclicDependents.mapTo(infos) { (projectId, dependentEntry) ->
+    private fun reportInterModuleCyclicDependencies(analysisResult: AnalysisResult, infos: MutableList<String>) {
+        analysisResult.interModuleCyclicDependents.mapTo(infos) { (projectId, dependentEntry) ->
             val sb = StringBuilder()
             sb.append("Project ").append(projectId.identifier)
                 .append(" has one or more inter module cyclic dependencies. ")
@@ -462,34 +465,48 @@ class JenkinsReleasePlanCreator(
         private val logger = Logger.getLogger(JenkinsReleasePlanCreator::class.qualifiedName)
     }
 
-    private class ParamObject(
-        val analyser: Analyser,
+
+    interface AnalysisResult {
+        val analyser: Analyser
+        val projects: HashMap<ProjectId, Project>
+        val submodules: HashMap<ProjectId, Set<ProjectId>>
+        val dependents: HashMap<ProjectId, HashSet<ProjectId>>
+        val cyclicDependents: HashMap<ProjectId, LinkedHashMap<ProjectId, MutableList<ProjectId>>>
+        val interModuleCyclicDependents: HashMap<ProjectId, LinkedHashMap<ProjectId, MutableList<ProjectId>>>
+        val levelIterator: LevelIterator<ProjectId, Project>
+    }
+
+    private class ParamObjectAnalysisResult(
+        override val analyser: Analyser,
         rootProject: Project
-    ) {
-        val projects = hashMapOf(rootProject.id to rootProject)
-        val submodules = hashMapOf<ProjectId, Set<ProjectId>>()
-        val dependents = hashMapOf(rootProject.id to hashSetOf<ProjectId>())
-        val cyclicDependents = hashMapOf<ProjectId, LinkedHashMap<ProjectId, MutableList<ProjectId>>>()
-        val interModuleCyclicDependents = hashMapOf<ProjectId, LinkedHashMap<ProjectId, MutableList<ProjectId>>>()
-        val levelIterator = LevelIterator(rootProject.id to rootProject)
+    ) : AnalysisResult {
+        override val projects = hashMapOf(rootProject.id to rootProject)
+        override val submodules = hashMapOf<ProjectId, Set<ProjectId>>()
+        override val dependents = hashMapOf(rootProject.id to hashSetOf<ProjectId>())
+        override val cyclicDependents = hashMapOf<ProjectId, LinkedHashMap<ProjectId, MutableList<ProjectId>>>()
+        override val interModuleCyclicDependents =
+            hashMapOf<ProjectId, LinkedHashMap<ProjectId, MutableList<ProjectId>>>()
+        override val levelIterator = LevelIterator(rootProject.id to rootProject)
+    }
 
-        private lateinit var _dependency: Project
-        var dependency: Project
-            get() = _dependency
-            private set(value) {
-                _dependency = value
-            }
-        private lateinit var _dependencyId: MavenProjectId
-        var dependencyId: MavenProjectId
-            get() = _dependencyId
-            private set(value) {
-                _dependencyId = value
-            }
-        lateinit var relation: Relation<MavenProjectId>
+    private class ParamObject(
+        val analysisResult: AnalysisResult,
+        val dependency: Project,
+        val dependencyId: MavenProjectId,
+        relation: Relation<MavenProjectId>
+    ) : AnalysisResult by analysisResult {
 
-        fun initDependency(dependency: Project) {
-            this.dependency = dependency
-            this.dependencyId = dependency.id as MavenProjectId
+        private var _relation = relation
+        val relation get() = _relation
+
+        inline fun <R> temporarilyOverwriteRelation(newRelation: Relation<MavenProjectId>, action: () -> R): R {
+            val original = _relation
+            try {
+                _relation = newRelation
+                return action()
+            } finally {
+                _relation = original
+            }
         }
 
         /**
