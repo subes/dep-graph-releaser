@@ -39,6 +39,8 @@ comments:
             active: false
 
 complexity:
+    ComplexInterface:
+        threshold: 15
     ComplexMethod:
         ignoreSingleWhenExpression: true
         ignoreSimpleWhenEntries: true
