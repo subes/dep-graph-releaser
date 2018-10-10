@@ -166,27 +166,8 @@ class Pipeline(private val modifiableState: ModifiableState, private val menu: M
     }
 
     private fun DIV.fieldsForCommand(idPrefix: String, project: Project, index: Int, command: Command) {
-        val cssClass = if (command is ReleaseCommand) "release" else ""
-        val isNotDeactivated = command.state !is CommandState.Deactivated
-
-        toggle(
-            "$idPrefix$DEACTIVATE_SUFFIX",
-            if (isNotDeactivated) "Click to deactivate command" else "Click to activate command",
-            isNotDeactivated,
-            command.state === CommandState.Disabled,
-            cssClass
-        )
-        a(classes = "state") {
-            id = "$idPrefix$STATE_SUFFIX"
-            i("material-icons") {
-                span()
-                id = "$idPrefix:status.icon"
-            }
-            if (command is JenkinsCommand) {
-                href = command.buildUrl ?: ""
-            }
-            title = stateToTitle(command.state)
-        }
+        commandToggle(command, idPrefix)
+        commandState(idPrefix, command)
         this@Pipeline.contextMenu.createCommandContextMenu(this, idPrefix, project, index)
 
         when (command) {
@@ -200,6 +181,32 @@ class Pipeline(private val modifiableState: ModifiableState, private val menu: M
                 showThrowableAndThrow(
                     IllegalStateException("Unknown command found, cannot display its fields.\n$command")
                 )
+        }
+    }
+
+    private fun DIV.commandToggle(command: Command, idPrefix: String) {
+        val cssClass = if (command is ReleaseCommand) "release" else ""
+        val isNotDeactivated = command.state !is CommandState.Deactivated
+        toggle(
+            "$idPrefix$DEACTIVATE_SUFFIX",
+            if (isNotDeactivated) "Click to deactivate command" else "Click to activate command",
+            isNotDeactivated,
+            command.state === CommandState.Disabled,
+            cssClass
+        )
+    }
+
+    private fun DIV.commandState(idPrefix: String, command: Command) {
+        a(classes = "state") {
+            id = "$idPrefix$STATE_SUFFIX"
+            i("material-icons") {
+                span()
+                id = "$idPrefix:status.icon"
+            }
+            if (command is JenkinsCommand) {
+                href = command.buildUrl ?: ""
+            }
+            title = stateToTitle(command.state)
         }
     }
 

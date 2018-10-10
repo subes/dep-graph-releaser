@@ -55,19 +55,7 @@ sealed class CommandState {
         return when (newState) {
             is ReadyToRePoll -> checkNewStateIsAfter(newState, Timeout::class)
             is ReadyToReTrigger -> checkNewStateIsAfter(newState, Failed::class, Timeout::class)
-            is Ready -> {
-                checkNewStateIsAfter(newState, Waiting::class)
-                if (this is Waiting) { //could also be Deactivated with previous Ready
-                    check(this.dependencies.isEmpty()) {
-                        "Can only change from ${Waiting::class.simpleName} to ${Ready::class.simpleName} " +
-                            "if there are not any dependencies left which we need to wait for." +
-                            //TODO use $this instead of $getToStringRepresentation(...) once
-                            // https://youtrack.jetbrains.com/issue/KT-23970 is fixed
-                            "\nState was: ${this.getToStringRepresentation()}"
-                    }
-                }
-                newState
-            }
+            is Ready -> checkNewStateIsAfterWaitingAndNoDependencies(newState)
             is Queueing -> checkNewStateIsAfter(newState, Ready::class, ReadyToReTrigger::class)
             is StillQueueing -> checkNewStateIsAfter(newState, Queueing::class, Timeout::class)
             is InProgress -> checkNewStateIsAfter(newState, Queueing::class, StillQueueing::class)
@@ -99,6 +87,20 @@ sealed class CommandState {
                     "one of: ${requiredState.joinToString { it.simpleNameNonNull }}"
                 }
                 "Cannot transition to ${newState::class.simpleNameNonNull} because state is not $states." +
+                    //TODO use $this instead of $getToStringRepresentation(...) once
+                    // https://youtrack.jetbrains.com/issue/KT-23970 is fixed
+                    "\nState was: ${this.getToStringRepresentation()}"
+            }
+        }
+        return newState
+    }
+
+    private fun checkNewStateIsAfterWaitingAndNoDependencies(newState: CommandState): CommandState {
+        checkNewStateIsAfter(newState, Waiting::class)
+        if (this is Waiting) { //could also be Deactivated with previous Ready
+            check(this.dependencies.isEmpty()) {
+                "Can only change from ${Waiting::class.simpleName} to ${Ready::class.simpleName} " +
+                    "if there are not any dependencies left which we need to wait for." +
                     //TODO use $this instead of $getToStringRepresentation(...) once
                     // https://youtrack.jetbrains.com/issue/KT-23970 is fixed
                     "\nState was: ${this.getToStringRepresentation()}"
