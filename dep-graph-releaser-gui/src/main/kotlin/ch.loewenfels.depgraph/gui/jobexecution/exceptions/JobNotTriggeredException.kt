@@ -1,3 +1,3 @@
 package ch.loewenfels.depgraph.gui.jobexecution.exceptions
 
-class JobNotTriggeredException(message: String, cause: Throwable?) : IllegalStateException(message, cause)
+class JobNotTriggeredException(message: String, cause: Throwable) : IllegalStateException(message, cause)
