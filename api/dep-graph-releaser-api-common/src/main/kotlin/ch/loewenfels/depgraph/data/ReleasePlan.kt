@@ -39,7 +39,7 @@ data class ReleasePlan(
         releasePlan.config
     )
 
-    fun getRootProject() = getProject(rootProjectId)
+    fun getRootProject(): Project = getProject(rootProjectId)
     fun getProject(projectId: ProjectId): Project =
         projects[projectId] ?: throw IllegalArgumentException("Could not find the project with id $projectId")
 
@@ -79,9 +79,9 @@ data class ReleasePlan(
 
     fun getProjectIds(): Set<ProjectId> = projects.keys
     fun getProjects(): Collection<Project> = projects.values
-    fun getNumberOfProjects() = projects.size
+    fun getNumberOfProjects(): Int = projects.size
 
-    fun getNumberOfDependents() = dependents.size
+    fun getNumberOfDependents(): Int = dependents.size
     fun getAllDependents(): Map<ProjectId, Set<ProjectId>> = dependents
     fun getAllSubmodules(): Map<ProjectId, Set<ProjectId>> = submodules
 
