@@ -37,8 +37,8 @@ class Publisher(
             pollEverySecond = 2,
             maxWaitingTimeForCompletenessInSeconds = 60,
             verbose = verbose
-        ).then { (authData, buildNumber) ->
-            extractResultJsonUrl(jobExecutor, authData, publishJobUrl, buildNumber).then {
+        ).then { (crumbWithId, buildNumber) ->
+            extractResultJsonUrl(jobExecutor, crumbWithId, publishJobUrl, buildNumber).then {
                 buildNumber to it
             }
         }.then { (buildNumber, releaseJsonUrl) ->
@@ -50,13 +50,13 @@ class Publisher(
 
     private fun extractResultJsonUrl(
         jobExecutor: JobExecutor,
-        authData: CrumbWithId?,
+        crumbWithId: CrumbWithId?,
         jobUrl: String,
         buildNumber: Int
     ): Promise<String> {
         val xpathUrl = "$jobUrl$buildNumber/api/xml?xpath=//artifact/fileName"
         return jobExecutor.pollAndExtract(
-            authData,
+            crumbWithId,
             xpathUrl,
             resultRegex,
             pollEverySecond = 2,

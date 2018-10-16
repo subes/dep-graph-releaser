@@ -8,7 +8,7 @@ import kotlin.js.Promise
 class RestApiBasedQueuedItemUrlExtractor(private val identifyingParams: Map<String, String>) : QueuedItemUrlExtractor {
 
     override fun extract(
-        authData: CrumbWithId?,
+        crumbWithId: CrumbWithId?,
         response: Response,
         jobExecutionData: JobExecutionData
     ): Promise<String?> {
@@ -19,7 +19,7 @@ class RestApiBasedQueuedItemUrlExtractor(private val identifyingParams: Map<Stri
         val jenkinsBaseUrl = jobExecutionData.jobBaseUrl.substringBefore("/job/")
         val t = jobExecutionData.jobBaseUrl.substringAfter("/job/")
         val jobName = if (t.endsWith("/")) t.substringBeforeLast("/") else t
-        val headers = createHeaderWithCrumb(authData)
+        val headers = createHeaderWithCrumb(crumbWithId)
         val init = createGetRequest(headers)
         val paramsIdentification = createParameterRegexPattern(identifyingParams)
 

@@ -15,7 +15,7 @@ class SimulatingJobExecutor : JobExecutor {
     private var count = 0
 
     override fun pollAndExtract(
-        authData: CrumbWithId?,
+        crumbWithId: CrumbWithId?,
         url: String,
         regex: Regex,
         pollEverySecond: Int,

@@ -121,10 +121,10 @@ private fun recoverStateQueueing(
         )
     }
 
-    return issueCrumb(jenkinsBaseUrl).then { authData ->
+    return issueCrumb(jenkinsBaseUrl).then { crumbWithId ->
         val jobExecutionData = recoverJobExecutionData(modifiableState, project, command)
         val nullableQueuedItemUrl = command.buildUrl
-        recoverToStillQueueingOrReadyToRePoll(nullableQueuedItemUrl, authData, jobExecutionData, lazyProjectJson, index)
+        recoverToStillQueueingOrReadyToRePoll(nullableQueuedItemUrl, crumbWithId, jobExecutionData, lazyProjectJson, index)
             .catch { t ->
                 showThrowable(IllegalStateException("job ${jobExecutionData.jobName} could not be recovered", t))
                 recoverStateTo(lazyProjectJson, index, CommandStateJson.State.FAILED)
@@ -146,12 +146,12 @@ private fun recoverJobExecutionData(
 
 private fun recoverToStillQueueingOrReadyToRePoll(
     nullableQueuedItemUrl: String?,
-    authData: CrumbWithId?,
+    crumbWithId: CrumbWithId?,
     jobExecutionData: JobExecutionData,
     lazyProjectJson: ProjectJson,
     index: Int
 ): Promise<Promise<*>> {
-    return recoverBuildNumberFromQueue(nullableQueuedItemUrl, authData).then { recoveredBuildNumber ->
+    return recoverBuildNumberFromQueue(nullableQueuedItemUrl, crumbWithId).then { recoveredBuildNumber ->
         when (recoveredBuildNumber) {
             is RecoveredBuildNumber.Determined -> updateBuildUrlAndTransitionToRePolling(
                 jobExecutionData, lazyProjectJson, index, recoveredBuildNumber.buildNumber
@@ -160,7 +160,7 @@ private fun recoverToStillQueueingOrReadyToRePoll(
                 lazyProjectJson, index, CommandStateJson.State.STILL_QUEUEING
             )
             is RecoveredBuildNumber.Undetermined -> {
-                BuildHistoryBasedBuildNumberExtractor(authData, jobExecutionData)
+                BuildHistoryBasedBuildNumberExtractor(crumbWithId, jobExecutionData)
                     .extract()
                     .then { buildNumber ->
                         updateBuildUrlAndTransitionToRePolling(jobExecutionData, lazyProjectJson, index, buildNumber)
@@ -183,11 +183,11 @@ private fun updateBuildUrlAndTransitionToRePolling(
 
 private fun recoverBuildNumberFromQueue(
     nullableQueuedItemUrl: String?,
-    authData: CrumbWithId?
+    crumbWithId: CrumbWithId?
 ): Promise<RecoveredBuildNumber> {
     if (nullableQueuedItemUrl == null) return Promise.resolve(RecoveredBuildNumber.Undetermined)
 
-    val headers = createHeaderWithCrumb(authData)
+    val headers = createHeaderWithCrumb(crumbWithId)
     val init = createGetRequest(headers)
     return window.fetch(nullableQueuedItemUrl, init)
         .then(::checkStatusOkOr404)
