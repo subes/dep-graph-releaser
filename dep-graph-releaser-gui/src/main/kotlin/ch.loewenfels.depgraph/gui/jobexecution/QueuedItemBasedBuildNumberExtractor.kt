@@ -1,6 +1,7 @@
 package ch.loewenfels.depgraph.gui.jobexecution
 
 import ch.loewenfels.depgraph.gui.jobexecution.BuilderNumberExtractor.Companion.numberRegex
+import ch.loewenfels.depgraph.gui.jobexecution.exceptions.PollTimeoutException
 import ch.loewenfels.depgraph.gui.sleep
 import kotlin.js.Promise
 

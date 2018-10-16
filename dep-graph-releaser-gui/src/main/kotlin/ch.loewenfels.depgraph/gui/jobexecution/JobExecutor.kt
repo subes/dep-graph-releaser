@@ -1,5 +1,6 @@
 package ch.loewenfels.depgraph.gui.jobexecution
 
+import ch.loewenfels.depgraph.gui.jobexecution.exceptions.PollTimeoutException
 import kotlin.js.Promise
 
 interface JobExecutor {

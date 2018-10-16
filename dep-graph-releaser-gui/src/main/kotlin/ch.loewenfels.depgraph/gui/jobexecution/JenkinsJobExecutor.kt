@@ -3,6 +3,7 @@ package ch.loewenfels.depgraph.gui.jobexecution
 import ch.loewenfels.depgraph.gui.*
 import ch.loewenfels.depgraph.gui.components.Messages.Companion.showInfo
 import ch.loewenfels.depgraph.gui.jobexecution.exceptions.JobNotTriggeredException
+import ch.loewenfels.depgraph.gui.jobexecution.exceptions.PollTimeoutException
 import org.w3c.fetch.Response
 import kotlin.browser.window
 import kotlin.js.Promise
