@@ -9,6 +9,7 @@ import ch.loewenfels.depgraph.gui.components.Messages.Companion.showWarning
 import ch.loewenfels.depgraph.gui.components.Pipeline
 import ch.loewenfels.depgraph.gui.elementById
 import ch.loewenfels.depgraph.gui.jobexecution.*
+import ch.loewenfels.depgraph.gui.jobexecution.exceptions.PollTimeoutException
 import ch.loewenfels.depgraph.gui.serialization.ModifiableState
 import ch.loewenfels.depgraph.gui.unwrapPromise
 import ch.tutteli.kbox.mapWithIndex
