@@ -1,4 +1,4 @@
-version = "1.2.0"
+version = "1.3.0-SNAPSHOT"
 group = 'ch.loewenfels.depgraph'
 
 buildscript {
@@ -20,7 +20,7 @@ buildscript {
 
         //gh-pages.gradle
         ghPages_version = version
-        dokka_sourceMapping = 'tree/v1.2.0'
+        dokka_sourceMapping = 'tree/master'
         docProjects = subprojects
         srcKotlin = 'src/main/kotlin'
         github_url = "https://github.com/loewenfels/${rootProject.name}"
@@ -129,6 +129,7 @@ configure(publishedProjects) { subproject ->
     apply plugin: 'ch.tutteli.publish'
     tutteliPublish {
         githubUser = 'loewenfels'
+        bintrayOrganisation = 'loewenfels'
         bintrayRepo = 'oss'
         manifestVendor = 'Loewenfels Partner AG'
         resetLicenses 'EUPL-1.2'
@@ -164,7 +165,7 @@ Release & deploy
     b) Log in to bintray, navigate to https://bintray.com/loewenfels/oss -> check and publish new jars
 4. create release on github
 5. update example gh-pages
-    a) gr html -PgId=ch.loewenfels.depgraph -PaId=dgr-4
+    a) gr html -PmvnIds=ch.loewenfels.depgraph:dgr-4
     b) skip if already done:
         1) clone the project into a separate folder dep-graph-releaser-gh-pages (outside of the project)
         2) change to branch gh-pages
