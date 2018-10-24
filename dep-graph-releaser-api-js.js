@@ -30,10 +30,8 @@
   var emptyList = Kotlin.kotlin.collections.emptyList_287e2$;
   var Regex_init = Kotlin.kotlin.text.Regex_init_61zpoe$;
   var indexOf_0 = Kotlin.kotlin.text.indexOf_l5u8uk$;
-  var Pair = Kotlin.kotlin.Pair;
   var startsWith = Kotlin.kotlin.text.startsWith_7epoxm$;
   var IllegalArgumentException_init = Kotlin.kotlin.IllegalArgumentException_init_pdl1vj$;
-  var ensureNotNull = Kotlin.ensureNotNull;
   var Kind_INTERFACE = Kotlin.Kind.INTERFACE;
   var getKClass = Kotlin.getKClass;
   var toString = Kotlin.toString;
@@ -52,6 +50,7 @@
   var mapOf = Kotlin.kotlin.collections.mapOf_qfcya0$;
   var mapOf_0 = Kotlin.kotlin.collections.mapOf_x2b85n$;
   var NoSuchElementException = Kotlin.kotlin.NoSuchElementException;
+  var IllegalStateException_init = Kotlin.kotlin.IllegalStateException_init_pdl1vj$;
   var last = Kotlin.kotlin.collections.last_2p1efm$;
   var linkedMapOf = Kotlin.kotlin.collections.linkedMapOf_qfcya0$;
   ConfigKey.prototype = Object.create(Enum.prototype);
@@ -62,6 +61,8 @@
   CommandState$Ready.prototype.constructor = CommandState$Ready;
   CommandState$ReadyToReTrigger.prototype = Object.create(CommandState.prototype);
   CommandState$ReadyToReTrigger.prototype.constructor = CommandState$ReadyToReTrigger;
+  CommandState$ReadyToRePoll.prototype = Object.create(CommandState.prototype);
+  CommandState$ReadyToRePoll.prototype.constructor = CommandState$ReadyToRePoll;
   CommandState$Queueing.prototype = Object.create(CommandState.prototype);
   CommandState$Queueing.prototype.constructor = CommandState$Queueing;
   CommandState$StillQueueing.prototype = Object.create(CommandState.prototype);
@@ -360,7 +361,7 @@
     var endRightSide = indexOf < 0 ? value.length : indexOf;
     var startIndex = endRegex + 1 | 0;
     var rightSide = value.substring(startIndex, endRightSide);
-    return new Pair(endRightSide, rightSide);
+    return to(endRightSide, rightSide);
   }
   function checkRegexNotEmpty(index, name, input) {
     if (!(index > 0)) {
@@ -410,7 +411,7 @@
       case 'maven':
         tmp$ = 3;
         break;
-      default:throw IllegalArgumentException_init('Illegal format `' + format + '` provided, only `query` and `maven` supported.' + '\n' + 'buildWithParamJobs: ' + buildWithParamJobs);
+      default:throw IllegalArgumentException_init('Illegal format `' + format + '` provided, only `query` and `maven` supported.' + ('\n' + 'buildWithParamJobs: ' + buildWithParamJobs));
     }
     var numOfNames = tmp$;
     var names = split_0(namesAsString, Kotlin.charArrayOf(59));
@@ -444,11 +445,10 @@
   }
   function getToStringRepresentation($receiver) {
     var representation = $receiver.toString();
-    return equals(representation, '[object Object]') ? ensureNotNull(Kotlin.getKClassFromExpression($receiver).simpleName) : representation;
+    return equals(representation, '[object Object]') ? get_simpleNameNonNull(Kotlin.getKClassFromExpression($receiver)) : representation;
   }
   function Command() {
   }
-  var IllegalStateException_init = Kotlin.kotlin.IllegalStateException_init_pdl1vj$;
   Command.prototype.asDeactivated = function () {
     if (!!Kotlin.isType(this.state, CommandState$Deactivated)) {
       var message = 'Cannot deactivate an already deactivated command: ' + this;
@@ -528,6 +528,22 @@
       new CommandState$ReadyToReTrigger();
     }
     return CommandState$ReadyToReTrigger_instance;
+  }
+  function CommandState$ReadyToRePoll() {
+    CommandState$ReadyToRePoll_instance = this;
+    CommandState.call(this);
+  }
+  CommandState$ReadyToRePoll.$metadata$ = {
+    kind: Kind_OBJECT,
+    simpleName: 'ReadyToRePoll',
+    interfaces: [CommandState]
+  };
+  var CommandState$ReadyToRePoll_instance = null;
+  function CommandState$ReadyToRePoll_getInstance() {
+    if (CommandState$ReadyToRePoll_instance === null) {
+      new CommandState$ReadyToRePoll();
+    }
+    return CommandState$ReadyToRePoll_instance;
   }
   function CommandState$Queueing() {
     CommandState$Queueing_instance = this;
@@ -708,26 +724,20 @@
       var message_0 = CommandState$checkTransitionAllowed$lambda(this, newState)();
       throw IllegalStateException_init(message_0.toString());
     }
-    if (Kotlin.isType(newState, CommandState$ReadyToReTrigger))
+    if (Kotlin.isType(newState, CommandState$ReadyToRePoll))
+      tmp$_0 = this.checkNewStateIsAfter_jb7wuq$_0(newState, [getKClass(CommandState$Timeout)]);
+    else if (Kotlin.isType(newState, CommandState$ReadyToReTrigger))
       tmp$_0 = this.checkNewStateIsAfter_jb7wuq$_0(newState, [getKClass(CommandState$Failed), getKClass(CommandState$Timeout)]);
-    else if (Kotlin.isType(newState, CommandState$Ready)) {
-      this.checkNewStateIsAfter_jb7wuq$_0(newState, [getKClass(CommandState$Waiting)]);
-      if (Kotlin.isType(this, CommandState$Waiting)) {
-        if (!this.dependencies.isEmpty()) {
-          var message_1 = 'Can only change from ' + toString(getKClass(CommandState$Waiting).simpleName) + ' to ' + toString(getKClass(CommandState$Ready).simpleName) + ' ' + 'if there are not any dependencies left which we need to wait for.' + ('\n' + 'State was: ' + getToStringRepresentation(this));
-          throw IllegalStateException_init(message_1.toString());
-        }
-      }
-      tmp$_0 = newState;
-    }
-     else if (Kotlin.isType(newState, CommandState$Queueing))
+    else if (Kotlin.isType(newState, CommandState$Ready))
+      tmp$_0 = this.checkNewStateIsAfterWaitingAndNoDependencies_82bbhz$_0(newState);
+    else if (Kotlin.isType(newState, CommandState$Queueing))
       tmp$_0 = this.checkNewStateIsAfter_jb7wuq$_0(newState, [getKClass(CommandState$Ready), getKClass(CommandState$ReadyToReTrigger)]);
     else if (Kotlin.isType(newState, CommandState$StillQueueing))
       tmp$_0 = this.checkNewStateIsAfter_jb7wuq$_0(newState, [getKClass(CommandState$Queueing), getKClass(CommandState$Timeout)]);
     else if (Kotlin.isType(newState, CommandState$InProgress))
       tmp$_0 = this.checkNewStateIsAfter_jb7wuq$_0(newState, [getKClass(CommandState$Queueing), getKClass(CommandState$StillQueueing)]);
     else if (Kotlin.isType(newState, CommandState$RePolling))
-      tmp$_0 = this.checkNewStateIsAfter_jb7wuq$_0(newState, [getKClass(CommandState$InProgress), getKClass(CommandState$Timeout)]);
+      tmp$_0 = this.checkNewStateIsAfter_jb7wuq$_0(newState, [getKClass(CommandState$ReadyToRePoll)]);
     else if (Kotlin.isType(newState, CommandState$Succeeded))
       tmp$_0 = this.checkNewStateIsAfter_jb7wuq$_0(newState, [getKClass(CommandState$InProgress), getKClass(CommandState$RePolling)]);
     else if (Kotlin.isType(newState, CommandState$Timeout))
@@ -744,7 +754,7 @@
     };
   }
   function CommandState$checkNewStateIsAfter$lambda$lambda(it) {
-    return ensureNotNull(it.simpleName);
+    return get_simpleNameNonNull(it);
   }
   CommandState.prototype.checkNewStateIsAfter_jb7wuq$_0 = function (newState, requiredState) {
     var tmp$;
@@ -777,8 +787,18 @@
           tmp$_1 = 'one of: ' + joinToString(requiredState, void 0, void 0, void 0, void 0, void 0, CommandState$checkNewStateIsAfter$lambda$lambda);
         }
         var states = tmp$_1;
-        var message_0 = 'Cannot transition to ' + toString(Kotlin.getKClassFromExpression(newState).simpleName) + ' because state is not ' + toString(states) + '.' + ('\n' + 'State was: ' + getToStringRepresentation(this));
+        var message_0 = 'Cannot transition to ' + get_simpleNameNonNull(Kotlin.getKClassFromExpression(newState)) + ' because state is not ' + toString(states) + '.' + ('\n' + 'State was: ' + getToStringRepresentation(this));
         throw IllegalStateException_init(message_0.toString());
+      }
+    }
+    return newState;
+  };
+  CommandState.prototype.checkNewStateIsAfterWaitingAndNoDependencies_82bbhz$_0 = function (newState) {
+    this.checkNewStateIsAfter_jb7wuq$_0(newState, [getKClass(CommandState$Waiting)]);
+    if (Kotlin.isType(this, CommandState$Waiting)) {
+      if (!this.dependencies.isEmpty()) {
+        var message = 'Can only change from ' + toString(getKClass(CommandState$Waiting).simpleName) + ' to ' + toString(getKClass(CommandState$Ready).simpleName) + ' ' + 'if there are not any dependencies left which we need to wait for.' + ('\n' + 'State was: ' + getToStringRepresentation(this));
+        throw IllegalStateException_init(message.toString());
       }
     }
     return newState;
@@ -809,6 +829,10 @@
     simpleName: 'CommandState',
     interfaces: []
   };
+  function get_simpleNameNonNull($receiver) {
+    var tmp$;
+    return (tmp$ = $receiver.simpleName) != null ? tmp$ : '<simpleName absent>';
+  }
   function Project(id, isSubmodule, currentVersion, releaseVersion, level, commands, relativePath) {
     this.id = id;
     this.isSubmodule = isSubmodule;
@@ -1244,15 +1268,16 @@
     CommandStateJson$State$WAITING_instance = new CommandStateJson$State('WAITING', 0);
     CommandStateJson$State$READY_instance = new CommandStateJson$State('READY', 1);
     CommandStateJson$State$READY_TO_RE_TRIGGER_instance = new CommandStateJson$State('READY_TO_RE_TRIGGER', 2);
-    CommandStateJson$State$QUEUEING_instance = new CommandStateJson$State('QUEUEING', 3);
-    CommandStateJson$State$STILL_QUEUEING_instance = new CommandStateJson$State('STILL_QUEUEING', 4);
-    CommandStateJson$State$IN_PROGRESS_instance = new CommandStateJson$State('IN_PROGRESS', 5);
-    CommandStateJson$State$RE_POLLING_instance = new CommandStateJson$State('RE_POLLING', 6);
-    CommandStateJson$State$SUCCEEDED_instance = new CommandStateJson$State('SUCCEEDED', 7);
-    CommandStateJson$State$FAILED_instance = new CommandStateJson$State('FAILED', 8);
-    CommandStateJson$State$TIMEOUT_instance = new CommandStateJson$State('TIMEOUT', 9);
-    CommandStateJson$State$DEACTIVATED_instance = new CommandStateJson$State('DEACTIVATED', 10);
-    CommandStateJson$State$DISABLED_instance = new CommandStateJson$State('DISABLED', 11);
+    CommandStateJson$State$READY_TO_RE_POLL_instance = new CommandStateJson$State('READY_TO_RE_POLL', 3);
+    CommandStateJson$State$QUEUEING_instance = new CommandStateJson$State('QUEUEING', 4);
+    CommandStateJson$State$STILL_QUEUEING_instance = new CommandStateJson$State('STILL_QUEUEING', 5);
+    CommandStateJson$State$IN_PROGRESS_instance = new CommandStateJson$State('IN_PROGRESS', 6);
+    CommandStateJson$State$RE_POLLING_instance = new CommandStateJson$State('RE_POLLING', 7);
+    CommandStateJson$State$SUCCEEDED_instance = new CommandStateJson$State('SUCCEEDED', 8);
+    CommandStateJson$State$FAILED_instance = new CommandStateJson$State('FAILED', 9);
+    CommandStateJson$State$TIMEOUT_instance = new CommandStateJson$State('TIMEOUT', 10);
+    CommandStateJson$State$DEACTIVATED_instance = new CommandStateJson$State('DEACTIVATED', 11);
+    CommandStateJson$State$DISABLED_instance = new CommandStateJson$State('DISABLED', 12);
   }
   var CommandStateJson$State$WAITING_instance;
   function CommandStateJson$State$WAITING_getInstance() {
@@ -1268,6 +1293,11 @@
   function CommandStateJson$State$READY_TO_RE_TRIGGER_getInstance() {
     CommandStateJson$State_initFields();
     return CommandStateJson$State$READY_TO_RE_TRIGGER_instance;
+  }
+  var CommandStateJson$State$READY_TO_RE_POLL_instance;
+  function CommandStateJson$State$READY_TO_RE_POLL_getInstance() {
+    CommandStateJson$State_initFields();
+    return CommandStateJson$State$READY_TO_RE_POLL_instance;
   }
   var CommandStateJson$State$QUEUEING_instance;
   function CommandStateJson$State$QUEUEING_getInstance() {
@@ -1320,7 +1350,7 @@
     interfaces: [Enum]
   };
   function CommandStateJson$State$values() {
-    return [CommandStateJson$State$WAITING_getInstance(), CommandStateJson$State$READY_getInstance(), CommandStateJson$State$READY_TO_RE_TRIGGER_getInstance(), CommandStateJson$State$QUEUEING_getInstance(), CommandStateJson$State$STILL_QUEUEING_getInstance(), CommandStateJson$State$IN_PROGRESS_getInstance(), CommandStateJson$State$RE_POLLING_getInstance(), CommandStateJson$State$SUCCEEDED_getInstance(), CommandStateJson$State$FAILED_getInstance(), CommandStateJson$State$TIMEOUT_getInstance(), CommandStateJson$State$DEACTIVATED_getInstance(), CommandStateJson$State$DISABLED_getInstance()];
+    return [CommandStateJson$State$WAITING_getInstance(), CommandStateJson$State$READY_getInstance(), CommandStateJson$State$READY_TO_RE_TRIGGER_getInstance(), CommandStateJson$State$READY_TO_RE_POLL_getInstance(), CommandStateJson$State$QUEUEING_getInstance(), CommandStateJson$State$STILL_QUEUEING_getInstance(), CommandStateJson$State$IN_PROGRESS_getInstance(), CommandStateJson$State$RE_POLLING_getInstance(), CommandStateJson$State$SUCCEEDED_getInstance(), CommandStateJson$State$FAILED_getInstance(), CommandStateJson$State$TIMEOUT_getInstance(), CommandStateJson$State$DEACTIVATED_getInstance(), CommandStateJson$State$DISABLED_getInstance()];
   }
   CommandStateJson$State.values = CommandStateJson$State$values;
   function CommandStateJson$State$valueOf(name) {
@@ -1331,6 +1361,8 @@
         return CommandStateJson$State$READY_getInstance();
       case 'READY_TO_RE_TRIGGER':
         return CommandStateJson$State$READY_TO_RE_TRIGGER_getInstance();
+      case 'READY_TO_RE_POLL':
+        return CommandStateJson$State$READY_TO_RE_POLL_getInstance();
       case 'QUEUEING':
         return CommandStateJson$State$QUEUEING_getInstance();
       case 'STILL_QUEUEING':
@@ -1405,6 +1437,8 @@
       return CommandStateJson_init(CommandStateJson$State$READY_getInstance());
     else if (Kotlin.isType(state, CommandState$ReadyToReTrigger))
       return CommandStateJson_init(CommandStateJson$State$READY_TO_RE_TRIGGER_getInstance());
+    else if (Kotlin.isType(state, CommandState$ReadyToRePoll))
+      return CommandStateJson_init(CommandStateJson$State$READY_TO_RE_POLL_getInstance());
     else if (Kotlin.isType(state, CommandState$Queueing))
       return CommandStateJson_init(CommandStateJson$State$QUEUEING_getInstance());
     else if (Kotlin.isType(state, CommandState$StillQueueing))
@@ -1435,6 +1469,8 @@
         return CommandState$Ready_getInstance();
       case 'READY_TO_RE_TRIGGER':
         return CommandState$ReadyToReTrigger_getInstance();
+      case 'READY_TO_RE_POLL':
+        return CommandState$ReadyToRePoll_getInstance();
       case 'QUEUEING':
         return CommandState$Queueing_getInstance();
       case 'STILL_QUEUEING':
@@ -1650,12 +1686,17 @@
     }
   };
   LevelIterator.prototype.next = function () {
+    var tmp$;
     if (this.itemsToVisit_0.isEmpty()) {
       throw new NoSuchElementException('No item left; starting point was ' + this.startingPoint_0);
     }
     this.cleanupCurrentLevel_0();
     var itemsOnTheSameLevel = this.itemsToVisit_0.get_za3lpa$(0);
-    return ensureNotNull(itemsOnTheSameLevel.remove_11rb$(itemsOnTheSameLevel.entries.iterator().next().key));
+    tmp$ = itemsOnTheSameLevel.remove_11rb$(itemsOnTheSameLevel.entries.iterator().next().key);
+    if (tmp$ == null) {
+      throw IllegalStateException_init('Could not remove the next item, this class is not thread safe.');
+    }
+    return tmp$;
   };
   LevelIterator.prototype.addToCurrentLevel_ew669y$ = function (pair) {
     var $receiver = this.itemsToVisit_0.get_za3lpa$(0);
@@ -1686,8 +1727,8 @@
   function hasNextOnTheSameLevel($receiver, level) {
     return $receiver.hasNext() && level === $receiver.peek().level;
   }
-  var noneOrSomeChars;
-  var someChars;
+  var NONE_OR_SOME_CHARS;
+  var SOME_CHARS;
   Object.defineProperty(ConfigKey, 'COMMIT_PREFIX', {
     get: ConfigKey$COMMIT_PREFIX_getInstance
   });
@@ -1746,6 +1787,9 @@
   Object.defineProperty(CommandState, 'ReadyToReTrigger', {
     get: CommandState$ReadyToReTrigger_getInstance
   });
+  Object.defineProperty(CommandState, 'ReadyToRePoll', {
+    get: CommandState$ReadyToRePoll_getInstance
+  });
   Object.defineProperty(CommandState, 'Queueing', {
     get: CommandState$Queueing_getInstance
   });
@@ -1773,6 +1817,7 @@
     get: CommandState$Companion_getInstance
   });
   package$data.CommandState = CommandState;
+  package$data.get_simpleNameNonNull_lr8r8q$ = get_simpleNameNonNull;
   package$data.Project_init_grjrm5$ = Project_init;
   package$data.Project_init_xgsuvp$ = Project_init_0;
   package$data.Project = Project;
@@ -1805,6 +1850,9 @@
   });
   Object.defineProperty(CommandStateJson$State, 'READY_TO_RE_TRIGGER', {
     get: CommandStateJson$State$READY_TO_RE_TRIGGER_getInstance
+  });
+  Object.defineProperty(CommandStateJson$State, 'READY_TO_RE_POLL', {
+    get: CommandStateJson$State$READY_TO_RE_POLL_getInstance
   });
   Object.defineProperty(CommandStateJson$State, 'QUEUEING', {
     get: CommandStateJson$State$QUEUEING_getInstance
@@ -1869,20 +1917,20 @@
   package$depgraph.LevelIterator = LevelIterator;
   package$depgraph.hasNextOnTheSameLevel_r88oei$ = hasNextOnTheSameLevel;
   var package$regex = package$depgraph.regex || (package$depgraph.regex = {});
-  Object.defineProperty(package$regex, 'noneOrSomeChars', {
+  Object.defineProperty(package$regex, 'NONE_OR_SOME_CHARS', {
     get: function () {
-      return noneOrSomeChars;
+      return NONE_OR_SOME_CHARS;
     }
   });
-  Object.defineProperty(package$regex, 'someChars', {
+  Object.defineProperty(package$regex, 'SOME_CHARS', {
     get: function () {
-      return someChars;
+      return SOME_CHARS;
     }
   });
   ReleaseCommand.prototype.asDeactivated = Command.prototype.asDeactivated;
   ReleaseCommand.prototype.asDisabled = Command.prototype.asDisabled;
-  noneOrSomeChars = '[\\S\\s]*?';
-  someChars = '[\\S\\s]+?';
+  NONE_OR_SOME_CHARS = '[\\S\\s]*?';
+  SOME_CHARS = '[\\S\\s]+?';
   Kotlin.defineModule('dep-graph-releaser-api-js', _);
   return _;
 }));

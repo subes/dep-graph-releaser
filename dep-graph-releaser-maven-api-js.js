@@ -325,6 +325,7 @@
   MavenProjectId.prototype.equals = function (other) {
     return this === other || (other !== null && (typeof other === 'object' && (Object.getPrototypeOf(this) === Object.getPrototypeOf(other) && (Kotlin.equals(this.groupId, other.groupId) && Kotlin.equals(this.artifactId, other.artifactId)))));
   };
+  var syntheticRoot;
   var package$ch = _.ch || (_.ch = {});
   var package$loewenfels = package$ch.loewenfels || (package$ch.loewenfels = {});
   var package$depgraph = package$loewenfels.depgraph || (package$loewenfels.depgraph = {});
@@ -349,6 +350,11 @@
     get: MavenProjectId$Companion_getInstance
   });
   package$maven.MavenProjectId = MavenProjectId;
+  Object.defineProperty(package$maven, 'syntheticRoot', {
+    get: function () {
+      return syntheticRoot;
+    }
+  });
   JenkinsCommand.prototype.asDeactivated = Command.prototype.asDeactivated;
   JenkinsCommand.prototype.asDisabled = Command.prototype.asDisabled;
   JenkinsNextDevReleaseCommand.prototype.asDeactivated = ReleaseCommand.prototype.asDeactivated;
@@ -359,6 +365,7 @@
   JenkinsSingleMavenReleaseCommand.prototype.asDisabled = JenkinsNextDevReleaseCommand.prototype.asDisabled;
   JenkinsUpdateDependency.prototype.asDeactivated = JenkinsCommand.prototype.asDeactivated;
   JenkinsUpdateDependency.prototype.asDisabled = JenkinsCommand.prototype.asDisabled;
+  syntheticRoot = new MavenProjectId('ch.loewenfels', 'synthetic-root');
   Kotlin.defineModule('dep-graph-releaser-maven-api-js', _);
   return _;
 }));

@@ -381,6 +381,7 @@ input:disabled {
 
 .command.ready > .fields > .toggle,
 .command.readyToReTrigger > .fields > .toggle,
+.command.readyToRePoll > .fields > .toggle,
 .command.queueing > .fields > .toggle,
 .command.rePolling > .fields > .toggle,
 .command.inProgress > .fields > .toggle,
@@ -392,6 +393,7 @@ input:disabled {
 }
 .command.ready > .fields > .state,
 .command.readyToReTrigger > .fields > .state,
+.command.readyToRePoll > .fields > .state,
 .command.queueing > .fields > .state,
 .command.rePolling > .fields > .state,
 .command.inProgress > .fields > .state,
@@ -405,6 +407,25 @@ input:disabled {
 .command.readyToReTrigger > .fields > .state .material-icons span::after,
 .contextMenu .reTrigger > .material-icons span::after {
     content: 'playlist_play';
+}
+
+.command.readyToRePoll > .fields > .state .material-icons span::before,
+.contextMenu .rePoll > .material-icons span::before {
+    display: inline-block;
+    font-size: 14px;
+    margin-left: 9px;
+}
+.command.readyToRePoll > .fields > .state .material-icons span::after,
+.contextMenu .rePoll > .material-icons span::after {
+    content: 'list';
+    display: inline-block;
+    height: 25px;
+    vertical-align: text-bottom;
+    margin-top: -4px;
+    margin-left: -26px;
+    font-size: 24px;
+    -webkit-clip-path: polygon(80% 0, 80% 55%, 61% 55%, 65% 100%, 25% 80%, 25% 0);
+    clip-path: polygon(80% 0, 80% 55%, 61% 55%, 65% 100%, 25% 80%, 25% 0);
 }
 
 .command.queueing > .fields > .state {
@@ -442,14 +463,19 @@ input:disabled {
 .command.inProgress > .fields > .state .material-icons span::after {
     content: 'play_arrow';
 }
+
+.command.readyToRePoll .state .material-icons span::before,
+.contextMenu .rePoll > .material-icons span::before,
 .command.rePolling .state,
-.contextMenu .rePoll > .material-icons{
+.contextMenu .rePollContinue > .material-icons span::after {
     -moz-transform: scale(-1, 1);
     -webkit-transform: scale(-1, 1);
     transform: scale(-1, 1);
 }
+.command.readyToRePoll .state .material-icons span::before,
+.contextMenu .rePoll > .material-icons span::before,
 .command.rePolling > .fields > .state .material-icons span::after,
-.contextMenu .rePoll > .material-icons span::after {
+.contextMenu .rePollContinue > .material-icons span::after {
     content: 'reply';
 }
 
@@ -554,7 +580,8 @@ input:disabled {
 .contextMenu .succeeded .material-icons {
     color: #008000;
 }
-.contextMenu .deactivated .material-icons {
+.contextMenu .deactivated .material-icons,
+ .contextMenu .rePoll .material-icons {
     color: #666;
 }
 .contextMenu .deactivated > .material-icons span::after {
@@ -565,7 +592,7 @@ input:disabled {
 }
 .contextMenu .reTrigger > .material-icons,
 .contextMenu .succeededContinue > .material-icons,
-.contextMenu .rePoll > .material-icons {
+.contextMenu .rePollContinue > .material-icons {
     color: #e6930d;
 }
 .contextMenu .reTrigger > .material-icons{
@@ -580,6 +607,19 @@ input:disabled {
 }
 .contextMenu .succeededContinue > .material-icons span::after {
     margin-left: -21px;
+}
+
+.contextMenu .rePollContinue > .material-icons span::before {
+    content: 'play_arrow';
+    font-size: 10px;
+    margin-left: 9px;
+}
+.contextMenu .rePollContinue > .material-icons span::after{
+    display: inline-block;
+    height: 24px;
+    vertical-align: text-bottom;
+    margin-top: -4px;
+    margin-left: -16px;
 }
 
 #poweredBy,
@@ -641,28 +681,34 @@ input:disabled {
     margin-top: -4px;
 }
 
+#messages .timestamp {
+    margin-top: -1px;
+    font-size: 10px;
+    float: right;
+    margin-right: 30px;
+}
 #messages .text {
     padding-left: 33px;
 }
 
-#messages > .error {
+#messages .error {
     border-color: #a01c1c;
     background-color: #f7dede;
     color: #a01c1c;
     font-size: 1.2em;
 }
-#messages > .error .material-icons {
+#messages .error .material-icons {
     color: #a01c1c;
 }
 
-#messages > .warning {
+#messages .warning {
     border-color: #d6c500;
     background-color: #fdfcd1;
     color: #272525;
     font-size: 1.1em;
 }
 
-#messages > .warning .material-icons {
+#messages .warning .material-icons {
     color: #caa900;
 }
 
@@ -673,14 +719,14 @@ input:disabled {
     border-color: #caa900;
 }
 
-#messages > .info {
+#messages .info {
     border-color: #a3a3ff;
     background-color: #dae0ff;
     color: #272525;
     font-size: 1em;
 }
 
-#messages > .info .material-icons {
+#messages .info .material-icons {
     color: #5454d4;
 }
 
@@ -691,14 +737,14 @@ input:disabled {
     border-color: #5454d4;
 }
 
-#messages > .success {
+#messages .success {
     border-color: #008000;
     background-color: #c9fdc9;
     color: #272525;
     font-size: 1em;
 }
 
-#messages > .success .material-icons {
+#messages .success .material-icons {
     color: #008000;
 }
 
@@ -730,6 +776,15 @@ input:disabled {
 }
 .close:after {
     transform: rotate(-45deg);
+}
+
+#messages .holder {
+    background-color: #DDD;
+    border-color: #999;
+    cursor: pointer;
+}
+#messages .holder > div {
+    display: none;
 }
 
 
