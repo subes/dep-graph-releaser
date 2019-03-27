@@ -152,9 +152,9 @@ fun TestContainer.assertRootProjectMultiReleaseCommand(
     val rootProject = assertRootProject(releasePlan, rootProjectIdAndVersions)
     test("root project contains just the ${JenkinsMultiMavenReleasePlugin::class.simpleName} command") {
         assert(rootProject) {
-            property(subject::commands).containsStrictly({
+            property(subject::commands).containsExactly {
                 isA<JenkinsMultiMavenReleasePlugin> {}
-            })
+            }
         }
     }
     test("the command is in state Ready with ${JenkinsSingleMavenReleaseCommand::nextDevVersion.name} = ${rootProjectIdAndVersions.nextDevVersion}\"") {
@@ -172,12 +172,12 @@ fun TestContainer.assertRootProjectOnlyReleaseCommand(
     val rootProject = assertRootProject(releasePlan, rootProjectIdAndVersions)
     test("root project contains just the ${JenkinsSingleMavenReleaseCommand::class.simpleName} command, which is Ready with ${JenkinsSingleMavenReleaseCommand::nextDevVersion.name} = ${rootProjectIdAndVersions.nextDevVersion}") {
         assert(rootProject) {
-            property(subject::commands).containsStrictly({
+            property(subject::commands).containsExactly {
                 isA<JenkinsSingleMavenReleaseCommand> {
                     isStateReady()
                     property(subject::nextDevVersion).toBe(rootProjectIdAndVersions.nextDevVersion)
                 }
-            })
+            }
         }
     }
 }
@@ -285,9 +285,9 @@ fun TestContainer.assertOnlyWaitingReleaseCommand(
     test("$name project has only one waiting Release command") {
         assert(releasePlan.getProject(project.id)) {
             idAndVersions(project)
-            property(subject::commands).containsStrictly(
-                { isJenkinsMavenReleaseWaiting(project.nextDevVersion, dependency) }
-            )
+            property(subject::commands).containsExactly {
+                isJenkinsMavenReleaseWaiting(project.nextDevVersion, dependency)
+            }
         }
     }
 }
@@ -310,9 +310,9 @@ fun TestContainer.assertOneUpdateCommand(
     test("$name project has one waiting UpdateVersion and one waiting Release command") {
         assert(releasePlan.getProject(project.id)) {
             idAndVersions(project)
-            property(subject::commands).containsStrictly(
-                { isJenkinsUpdateDependencyWaiting(dependency) }
-            )
+            property(subject::commands).containsExactly {
+                isJenkinsUpdateDependencyWaiting(dependency)
+            }
         }
     }
 }
@@ -326,7 +326,7 @@ fun TestContainer.assertOneUpdateAndOneReleaseCommand(
     test("$name project has one waiting UpdateVersion and one waiting Release command") {
         assert(releasePlan.getProject(project.id)) {
             idAndVersions(project)
-            property(subject::commands).containsStrictly(
+            property(subject::commands).containsExactly(
                 { isJenkinsUpdateDependencyWaiting(dependency) },
                 { isJenkinsMavenReleaseWaiting(project.nextDevVersion, dependency) }
             )
@@ -343,9 +343,9 @@ fun TestContainer.assertOneReleaseCommandWaitingForSyntheticRoot(
     test("$name project has only one waiting Release command") {
         assert(releasePlan.getProject(project.id)) {
             idAndVersions(project)
-            property(subject::commands).containsStrictly(
-                { isJenkinsMavenReleaseWaiting(project.nextDevVersion, syntheticRoot) }
-            )
+            property(subject::commands).containsExactly {
+                isJenkinsMavenReleaseWaiting(project.nextDevVersion, syntheticRoot)
+            }
         }
     }
 }
@@ -358,7 +358,7 @@ fun TestContainer.assertOneUpdateAndOneDisabledReleaseCommand(
 ) {
     test("$name has one waiting Update and one disabled Release command with ${JenkinsSingleMavenReleaseCommand::nextDevVersion.name} = ${project.nextDevVersion}") {
         assert(releasePlan.getProject(project.id)) {
-            property(subject::commands).containsStrictly(
+            property(subject::commands).containsExactly(
                 { isJenkinsUpdateDependencyWaiting(dependency) },
                 { isJenkinsMavenReleaseDisabled(project.nextDevVersion) }
             )
@@ -374,7 +374,7 @@ fun TestContainer.assertOneDeactivatedUpdateAndOneDeactivatedReleaseCommand(
 ) {
     test("$name has one deactivated Update and one deactivated Release command with ${JenkinsSingleMavenReleaseCommand::nextDevVersion.name} = ${project.nextDevVersion}") {
         assert(releasePlan.getProject(project.id)) {
-            property(subject::commands).containsStrictly(
+            property(subject::commands).containsExactly(
                 { isJenkinsUpdateDependencyDeactivatedWaiting(dependency) },
                 { isJenkinsMavenReleaseDeactivatedWaiting(project.nextDevVersion, dependency) }
             )
@@ -390,7 +390,7 @@ fun TestContainer.assertOneDeactivatedUpdateAndOneDisabledReleaseCommand(
 ) {
     test("$name has one deactivated Update and one disabled Release command with ${JenkinsSingleMavenReleaseCommand::nextDevVersion.name} = ${project.nextDevVersion}") {
         assert(releasePlan.getProject(project.id)) {
-            property(subject::commands).containsStrictly(
+            property(subject::commands).containsExactly(
                 { isJenkinsUpdateDependencyDeactivatedWaiting(dependency) },
                 { isJenkinsMavenReleaseDisabled(project.nextDevVersion) }
             )
@@ -425,9 +425,9 @@ fun TestContainer.assertOneMultiReleaseCommandAndIsOnLevelAndSubmodulesAreDepend
     test("$name project has one waiting Release command") {
         assert(releasePlan.getProject(project.id)) {
             idAndVersions(project)
-            property(subject::commands).containsStrictly(
-                { isJenkinsMultiMavenReleaseWaiting(project.nextDevVersion, dependency) }
-            )
+            property(subject::commands).containsExactly {
+                isJenkinsMultiMavenReleaseWaiting(project.nextDevVersion, dependency)
+            }
         }
     }
     assertHasSubmodules(releasePlan, name, project, submodule, *otherSubmodules)
@@ -444,7 +444,7 @@ fun TestContainer.assertOneUpdateAndOneMultiReleaseCommand(
     test("$name project has one waiting UpdateVersion and one waiting Release command") {
         assert(releasePlan.getProject(project.id)) {
             idAndVersions(project)
-            property(subject::commands).containsStrictly(
+            property(subject::commands).containsExactly(
                 { isJenkinsUpdateDependencyWaiting(dependency) },
                 { isJenkinsMultiMavenReleaseWaiting(project.nextDevVersion, dependency) }
             )
@@ -462,7 +462,7 @@ fun TestContainer.assertTwoUpdateAndOneReleaseCommand(
     test("$name project has two waiting UpdateVersion and one waiting Release command") {
         assert(releasePlan.getProject(project.id)) {
             idAndVersions(project)
-            property(subject::commands).containsStrictly(
+            property(subject::commands).containsExactly(
                 { isJenkinsUpdateDependencyWaiting(dependency1) },
                 { isJenkinsUpdateDependencyWaiting(dependency2) },
                 { isJenkinsMavenReleaseWaiting(project.nextDevVersion, dependency1, dependency2) }
@@ -481,7 +481,7 @@ fun TestContainer.assertTwoUpdateAndOneMultiReleaseCommand(
     test("$name project has two waiting UpdateVersion and one waiting Release command") {
         assert(releasePlan.getProject(project.id)) {
             idAndVersions(project)
-            property(subject::commands).containsStrictly(
+            property(subject::commands).containsExactly(
                 { isJenkinsUpdateDependencyWaiting(dependency1) },
                 { isJenkinsUpdateDependencyWaiting(dependency2) },
                 { isJenkinsMultiMavenReleaseWaiting(project.nextDevVersion, dependency1, dependency2) }
@@ -521,7 +521,7 @@ fun TestContainer.assertReleasePlanHasWarningsAboutCiManagement(
     warnings: List<String>
 ) {
     test("warnings contains only warning about ciManagement") {
-        assert(releasePlan.warnings).containsStrictly(warnings.first(), *warnings.drop(1).toTypedArray())
+        assert(releasePlan.warnings).containsExactly(warnings.first(), *warnings.drop(1).toTypedArray())
     }
 }
 
@@ -531,9 +531,9 @@ fun TestContainer.assertReleasePlanHasWarningWithDependencyGraph(
     vararg otherDependencyBranches: String
 ) {
     test("warnings contains the cyclic dependency branch") {
-        assert(releasePlan.warnings).containsStrictly({
+        assert(releasePlan.warnings).containsExactly {
             contains("cyclic dependencies", dependencyBranch, *otherDependencyBranches)
-        })
+        }
     }
 }
 
@@ -543,9 +543,9 @@ fun TestContainer.assertReleasePlanHasInfoWithDependencyGraph(
     vararg otherDependencyBranches: String
 ) {
     test("infos contains the cyclic dependency branch") {
-        assert(releasePlan.infos).containsStrictly({
+        assert(releasePlan.infos).containsExactly {
             contains("cyclic dependencies", dependencyBranch, *otherDependencyBranches)
-        })
+        }
     }
 }
 

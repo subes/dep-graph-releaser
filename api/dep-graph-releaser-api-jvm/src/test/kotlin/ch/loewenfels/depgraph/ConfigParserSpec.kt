@@ -127,7 +127,7 @@ class ConfigParserSpec : Spek({
             it("returns list with two pairs") {
                 val result = parseRemoteRegex("a#https://example.com\nb#https://example2.com")
                 //TODO simplify if Atrium provides shortcut accessors for first, second
-                assert(result).containsStrictly(
+                assert(result).containsExactly(
                     {
                         property(subject::first).property(Regex::pattern).toBe("a")
                         property(subject::second).toBe("https://example.com")

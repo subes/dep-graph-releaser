@@ -171,9 +171,9 @@ object IntegrationSpec : Spek({
                 val testDir = getTestDirectory("warnings/projectWithoutGroupId")
                 val pom = testDir.resolve("b.pom")
                 val releasePlan = analyseAndCreateReleasePlan(exampleA.id, testDir)
-                assert(releasePlan.warnings).containsStrictly({
+                assert(releasePlan.warnings).containsExactly {
                     contains(pom.absolutePathAsString)
-                })
+                }
             }
         }
         given("a project without version") {
@@ -181,9 +181,9 @@ object IntegrationSpec : Spek({
                 val testDir = getTestDirectory("warnings/projectWithoutVersion")
                 val pom = testDir.resolve("b.pom")
                 val releasePlan = analyseAndCreateReleasePlan(exampleA.id, testDir)
-                assert(releasePlan.warnings).containsStrictly({
+                assert(releasePlan.warnings).containsExactly {
                     contains(pom.absolutePathAsString)
-                })
+                }
             }
         }
     }
@@ -280,7 +280,7 @@ object IntegrationSpec : Spek({
             )
             assertSingleProject(releasePlan, singleProjectIdAndVersions)
             test("config contains only empty ${ConfigKey.REMOTE_REGEX.asString()} and ${ConfigKey.JOB_MAPPING.asString()}") {
-                assert(releasePlan.config.entries).containsStrictly(
+                assert(releasePlan.config.entries).containsExactly(
                     { keyValue(ConfigKey.REMOTE_REGEX, "") },
                     { keyValue(ConfigKey.JOB_MAPPING, "") }
                 )
@@ -294,7 +294,7 @@ object IntegrationSpec : Spek({
             )
             assertSingleProject(releasePlan, singleProjectIdAndVersions)
             test("it contains both + empty ${ConfigKey.JOB_MAPPING.asString()} (one is ${ConfigKey.REMOTE_REGEX.asString()}  thus not empty)") {
-                assert(releasePlan.config.entries).containsStrictly(
+                assert(releasePlan.config.entries).containsExactly(
                     { keyValue(ConfigKey.REMOTE_REGEX, "b") },
                     { keyValue(ConfigKey.COMMIT_PREFIX, "d") },
                     { keyValue(ConfigKey.JOB_MAPPING, "") }
@@ -517,7 +517,7 @@ object IntegrationSpec : Spek({
                 test("dependent via bom project has one waiting UpdateVersion (1 dep) and one waiting Release command (2 dep)") {
                     assert(releasePlan.getProject(exampleB.id)) {
                         idAndVersions(exampleB)
-                        property(subject::commands).containsStrictly(
+                        property(subject::commands).containsExactly(
                             { isJenkinsUpdateDependencyWaiting(deps) },
                             { isJenkinsMavenReleaseWaiting(exampleB.nextDevVersion, deps, exampleA) }
                         )
@@ -544,7 +544,7 @@ object IntegrationSpec : Spek({
                 test("direct dependent project has one waiting UpdateVersion and one waiting Release command") {
                     assert(releasePlan.getProject(exampleB.id)) {
                         idAndVersions(exampleB)
-                        property(subject::commands).containsStrictly(
+                        property(subject::commands).containsExactly(
                             { isJenkinsUpdateDependencyWaiting(exampleC) },
                             { isJenkinsMavenReleaseWaiting(exampleB.nextDevVersion, exampleA, exampleC) }
                         )
@@ -570,7 +570,7 @@ object IntegrationSpec : Spek({
                 test("direct dependent project has one waiting UpdateVersion and one waiting Release command") {
                     assert(releasePlan.getProject(exampleB.id)) {
                         idAndVersions(exampleB)
-                        property(subject::commands).containsStrictly(
+                        property(subject::commands).containsExactly(
                             { isJenkinsUpdateDependencyWaiting(exampleC) },
                             { isJenkinsMavenReleaseWaiting(exampleB.nextDevVersion, exampleA, exampleC) }
                         )
@@ -595,7 +595,7 @@ object IntegrationSpec : Spek({
                 test("direct dependent project has one waiting UpdateVersion and one waiting Release command") {
                     assert(releasePlan.getProject(exampleB.id)) {
                         idAndVersions(exampleB)
-                        property(subject::commands).containsStrictly(
+                        property(subject::commands).containsExactly(
                             { isJenkinsUpdateDependencyWaiting(exampleC) },
                             { isJenkinsMavenReleaseWaiting(exampleB.nextDevVersion, exampleA, exampleC) }
                         )
@@ -746,7 +746,7 @@ object IntegrationSpec : Spek({
                 test("the indirect dependent project has three updateVersion and one Release command") {
                     assert(releasePlan.getProject(exampleC.id)) {
                         idAndVersions(exampleC)
-                        property(subject::commands).containsStrictly(
+                        property(subject::commands).containsExactly(
                             { isJenkinsUpdateDependencyWaiting(exampleB) },
                             { isJenkinsUpdateDependencyWaiting(exampleD) },
                             { isJenkinsUpdateDependencyWaiting(exampleA) },
@@ -780,7 +780,7 @@ object IntegrationSpec : Spek({
                 test("the indirect dependent project has three updateVersion and one Release command") {
                     assert(releasePlan.getProject(exampleC.id)) {
                         idAndVersions(exampleC)
-                        property(subject::commands).containsStrictly(
+                        property(subject::commands).containsExactly(
                             { isJenkinsUpdateDependencyWaiting(exampleB) },
                             { isJenkinsUpdateDependencyWaiting(exampleD) },
                             { isJenkinsUpdateDependencyWaiting(exampleA) },

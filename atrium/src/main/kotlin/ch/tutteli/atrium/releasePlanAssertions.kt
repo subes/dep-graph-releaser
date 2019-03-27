@@ -26,7 +26,7 @@ fun Assert<ReleasePlan>.hasDependentsForProject(
 
 fun Assert<ReleasePlan>.iteratorReturnsRootAndStrictly(vararg otherProject: ProjectId) {
     val rootProject = subject.getRootProject()
-    AssertImpl.changeSubject(this) { iteratorProjectIdsToList() }.containsStrictly(rootProject.id, *otherProject)
+    AssertImpl.changeSubject(this) { iteratorProjectIdsToList() }.containsExactly(rootProject.id, *otherProject)
 }
 
 private fun Assert<ReleasePlan>.iteratorProjectIdsToList() =
