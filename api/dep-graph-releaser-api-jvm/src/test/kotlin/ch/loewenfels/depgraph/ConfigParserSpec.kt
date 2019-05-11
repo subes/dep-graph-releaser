@@ -129,12 +129,12 @@ class ConfigParserSpec : Spek({
                 //TODO simplify if Atrium provides shortcut accessors for first, second
                 assert(result).containsExactly(
                     {
-                        property(subject::first).property(Regex::pattern).toBe("a")
-                        property(subject::second).toBe("https://example.com")
+                        first.property(Regex::pattern).toBe("a")
+                        second.toBe("https://example.com")
                     },
                     {
-                        property(subject::first).property(Regex::pattern).toBe("b")
-                        property(subject::second).toBe("https://example2.com")
+                        first.property(Regex::pattern).toBe("b")
+                        second.toBe("https://example2.com")
                     }
                 )
             }

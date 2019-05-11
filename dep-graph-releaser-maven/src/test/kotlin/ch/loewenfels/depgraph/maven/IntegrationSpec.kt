@@ -281,8 +281,8 @@ object IntegrationSpec : Spek({
             assertSingleProject(releasePlan, singleProjectIdAndVersions)
             test("config contains only empty ${ConfigKey.REMOTE_REGEX.asString()} and ${ConfigKey.JOB_MAPPING.asString()}") {
                 assert(releasePlan.config.entries).containsExactly(
-                    { keyValue(ConfigKey.REMOTE_REGEX, "") },
-                    { keyValue(ConfigKey.JOB_MAPPING, "") }
+                    { isKeyValue(ConfigKey.REMOTE_REGEX, "") },
+                    { isKeyValue(ConfigKey.JOB_MAPPING, "") }
                 )
             }
         }
@@ -295,9 +295,9 @@ object IntegrationSpec : Spek({
             assertSingleProject(releasePlan, singleProjectIdAndVersions)
             test("it contains both + empty ${ConfigKey.JOB_MAPPING.asString()} (one is ${ConfigKey.REMOTE_REGEX.asString()}  thus not empty)") {
                 assert(releasePlan.config.entries).containsExactly(
-                    { keyValue(ConfigKey.REMOTE_REGEX, "b") },
-                    { keyValue(ConfigKey.COMMIT_PREFIX, "d") },
-                    { keyValue(ConfigKey.JOB_MAPPING, "") }
+                    { isKeyValue(ConfigKey.REMOTE_REGEX, "b") },
+                    { isKeyValue(ConfigKey.COMMIT_PREFIX, "d") },
+                    { isKeyValue(ConfigKey.JOB_MAPPING, "") }
                 )
             }
         }
