@@ -12,7 +12,7 @@ buildscript {
         kbox_version = '0.9.1'
 
         //test
-        atrium_version = '0.8.0-beta'
+        atrium_version = '0.8.0'
         mockito_kotlin_version = '1.6.0'
         spek_version = '1.1.5'
         tutteli_spek_extensions = '0.3.0'
@@ -26,7 +26,7 @@ buildscript {
         github_url = "https://github.com/loewenfels/${rootProject.name}"
 
         //jacoco-multi-project.gradle
-        jacoco_tool_version = '0.8.1'
+        jacoco_tool_version = '0.8.3'
         projectsWithoutSources = [] //currently all have sources
 
         // detekt/sonarcloud
