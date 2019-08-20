@@ -481,7 +481,10 @@ object IntegrationSpec : Spek({
             testReleaseBWithNoDependent("managingVersions/viaProperty")
         }
 
-        //TODO project with dependent and version is $project.version => https://github.com/loewenfels/dep-graph-releaser/issues/24
+        given("project with dependent and version is \$project.version") {
+            testReleaseAWithDependentB("managingVersions/isProjectVersion")
+            testReleaseBWithNoDependent("managingVersions/isProjectVersion")
+        }
 
         given("project with dependent and version in dependency management") {
             testReleaseAWithDependentB("managingVersions/viaDependencyManagement")
