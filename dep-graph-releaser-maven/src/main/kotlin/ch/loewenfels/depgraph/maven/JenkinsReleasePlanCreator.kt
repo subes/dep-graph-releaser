@@ -385,6 +385,10 @@ class JenkinsReleasePlanCreator(
             val (dependentId, dependentBranch) = projectsToVisit.iterator().next()
             projectsToVisit.remove(dependentId)
             visitedProjects.add(dependentId)
+            if (dependencyId == existingDependent.id) {
+                val map = paramObject.cyclicDependents.getOrPut(existingDependent.id) { linkedMapOf() }
+                map[dependencyId] = dependentBranch
+            }
             paramObject.getDependents(dependentId).forEach {
                 if (it == dependencyId) {
                     if (paramObject.isRelationNotInSameMultiModuleCircleAsDependency()) {
