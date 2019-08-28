@@ -98,8 +98,7 @@ class JsonSpec : Spek({
         describe("non-existing directory") {
             it("throws IllegalStateException mentioning that the directory does not exist") {
                 val happyArgs = createArgs(tempFolder, "com.example:a;com.example:b", ".*#maven#rel;nextDev;add", "")
-                val badArgs = happyArgs.asSequence().map { it.replace("managingVersions/inDependency", "managingVersions/nonExistingFolder") }.toList().toTypedArray()
-                badArgs.forEach { println(it) }
+                val badArgs = happyArgs.asSequence().map { it.replace("inDependency", "nonExistingFolder") }.toList().toTypedArray()
                 expect {
                     dispatch(badArgs, errorHandler, listOf(Json))
                 }.toThrow<IllegalStateException> { messageContains("The given directory to analyse does not exist.") }
