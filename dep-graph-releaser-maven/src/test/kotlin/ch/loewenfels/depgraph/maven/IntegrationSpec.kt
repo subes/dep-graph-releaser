@@ -832,7 +832,20 @@ object IntegrationSpec : Spek({
 
     describe("cyclic dependencies") {
 
-        //TODO cyclic dependency with itself => https://github.com/loewenfels/dep-graph-releaser/issues/25
+        given("project with cyclic dependency with itself") {
+            action("context Analyser which does not resolve poms") {
+                val releasePlan = analyseAndCreateReleasePlan(exampleA.id, "cyclic/cyclicDependencyWithItself")
+                assertHasNoDependentsAndIsOnLevel(releasePlan, "direct dependent", exampleA, 0)
+                assertReleasePlanHasNumOfProjectsAndDependents(releasePlan, 1)
+
+                assertReleasePlanHasWarningWithDependencyGraph(
+                    releasePlan,
+                    "-> ${exampleA.id.identifier} -> ${exampleA.id.identifier}"
+                )
+                assertReleasePlanHasNoInfos(releasePlan)
+                assertReleasePlanIteratorReturnsRootAndStrictly(releasePlan)
+            }
+        }
 
         given("project with direct cyclic dependency") {
             action("context Analyser which does not resolve poms") {
