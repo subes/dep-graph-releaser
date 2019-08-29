@@ -9,8 +9,8 @@ fun parseJobMapping(releasePlan: ReleasePlan): Map<String, String> =
 
 
 fun parseJobMapping(mapping: String): Map<String, String> {
-    //TODO #14 do not associate immediately but first map to list and check if there are duplicates
-    return mapping.trim().split("\n").filter { it.isNotEmpty() }.associate { pair ->
+    val filteredMapping = mapping.trim().split("\n").filter { it.isNotEmpty() }
+    return filteredMapping.associate { pair ->
         val index = pair.indexOf('=')
         require(index > 0) {
             "At least one mapping has no groupId and artifactId defined.\njobMapping: $mapping"
@@ -24,7 +24,9 @@ fun parseJobMapping(mapping: String): Map<String, String> {
             "At least one groupId and artifactId is erroneous, has no job name defined.\njobMapping: $mapping"
         }
         groupIdAndArtifactId to jobName
-    }
+    }.also { resultMap -> require(resultMap.size == filteredMapping.size) {
+        "At least one jobMapping is a duplicate.\njobMapping: $mapping"
+    } }
 }
 
 fun parseRemoteRegex(releasePlan: ReleasePlan) =

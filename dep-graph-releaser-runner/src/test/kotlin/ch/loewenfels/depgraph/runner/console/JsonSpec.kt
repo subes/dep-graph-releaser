@@ -132,7 +132,7 @@ class JsonSpec : Spek({
                     val args = createArgs(tempFolder, "com.example:a;com.example:b", ".*#maven#rel;nextDev;add", "job=job2")
                     expect {
                         dispatch(args, errorHandler, listOf(Json))
-                    }.toThrow<IllegalArgumentException> {}
+                    }.toThrow<IllegalArgumentException> { messageContains("At least one groupId and artifactId is erroneous, does not contain a `:`.") }
                 }
             }
 
@@ -141,7 +141,7 @@ class JsonSpec : Spek({
                     val args = createArgs(tempFolder, "com.example:a;com.example:b", ".*#maven#rel;nextDev;add", "com:job,job2")
                     expect {
                         dispatch(args, errorHandler, listOf(Json))
-                    }.toThrow<IllegalArgumentException> {}
+                    }.toThrow<IllegalArgumentException> { messageContains("At least one mapping has no groupId and artifactId defined.") }
                 }
             }
 
@@ -150,7 +150,7 @@ class JsonSpec : Spek({
                     val args = createArgs(tempFolder, "com.example:a;com.example:b", ".*#maven#rel;nextDev;add", "com:job=job2\ncom:job2,job3")
                     expect {
                         dispatch(args, errorHandler, listOf(Json))
-                    }.toThrow<IllegalArgumentException> {}
+                    }.toThrow<IllegalArgumentException> { messageContains("At least one mapping has no groupId and artifactId defined.") }
                 }
             }
 
@@ -159,7 +159,25 @@ class JsonSpec : Spek({
                     val args = createArgs(tempFolder, "com.example:a;com.example:b", ".*#maven#rel;nextDev;add", "com:job=job2\n\ncom:job2,job3")
                     expect {
                         dispatch(args, errorHandler, listOf(Json))
-                    }.toThrow<IllegalArgumentException> {}
+                    }.toThrow<IllegalArgumentException> { messageContains("At least one mapping has no groupId and artifactId defined.") }
+                }
+            }
+
+            describe("no job name defined") {
+                it("throws IllegalArgumentException") {
+                    val args = createArgs(tempFolder, "com.example:a;com.example:b", ".*#maven#rel;nextDev;add", "com:job=job1\ncom:job2=")
+                    expect {
+                        dispatch(args, errorHandler, listOf(Json))
+                    }.toThrow<IllegalArgumentException> { messageContains("At least one groupId and artifactId is erroneous, has no job name defined.") }
+                }
+            }
+
+            describe("job duplicate") {
+                it("throws IllegalArgumentException") {
+                    val args = createArgs(tempFolder, "com.example:a;com.example:b", ".*#maven#rel;nextDev;add", "com:job=job1\ncom:job=job2")
+                    expect {
+                        dispatch(args, errorHandler, listOf(Json))
+                    }.toThrow<IllegalArgumentException> { messageContains("At least one jobMapping is a duplicate.") }
                 }
             }
         }
