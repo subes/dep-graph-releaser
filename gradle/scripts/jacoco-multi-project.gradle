@@ -21,9 +21,8 @@ task CodeCoverageReport(type: JacocoReport) {
     sourceDirectories = files()
     classDirectories = files()
 
-    jacocoMulti.sourceProjects.each {
-        sourceDirectories += it.sourceSets.main.allJava.sourceDirectories
-        classDirectories += files(it.sourceSets.main.output.classesDirs)
+    jacocoMulti.sourceProjects.each { otherProject ->
+        sourceSets otherProject.sourceSets.main
     }
     doFirst {
         println "going to generate merged jacoco report based on:"
