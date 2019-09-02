@@ -5,7 +5,7 @@ dependencies {
     compile prefixedProject('serialization')
     compile prefixedProject('manipulation')
 
-    runtimeOnly "org.jetbrains.kotlin:kotlin-runtime:$kotlin_version"
+    runtimeOnly "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
     testCompile prefixedProject('maven').sourceSets.test.output
 }
 
