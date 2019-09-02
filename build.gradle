@@ -30,7 +30,7 @@ buildscript {
         projectsWithoutSources = [] //currently all have sources
 
         // detekt/sonarcloud
-        detekt_version = '1.0.0.RC9.2'
+        detekt_version = '1.0.1'
 
         apiProjects = subprojects.findAll { it.name.contains('api') }
         apiJvmProjects = ext.apiProjects.findAll { it.name.endsWith('-jvm') }
@@ -59,7 +59,7 @@ buildscript {
         classpath "ch.tutteli:tutteli-gradle-kotlin-utils:${gradle.ext.tutteli_plugins_version}"
         classpath "ch.tutteli:tutteli-gradle-publish:${gradle.ext.tutteli_plugins_version}"
         classpath "ch.tutteli:tutteli-gradle-spek:${gradle.ext.tutteli_plugins_version}"
-        classpath "gradle.plugin.io.gitlab.arturbosch.detekt:detekt-gradle-plugin:$detekt_version"
+        classpath "io.gitlab.arturbosch.detekt:detekt-gradle-plugin:$detekt_version"
     }
 }
 
@@ -69,12 +69,13 @@ kotlinutils.kotlinVersion = kotlin_version
 apply plugin: "io.gitlab.arturbosch.detekt"
 
 detekt {
-    version = detekt_version
-     defaultProfile {
-         filters = ".*/resources/.*,.dep-graph-releaser/.*/build/.*"
-         output = "$rootProject.buildDir/detekt"
-         config = file("$rootProject.projectDir/gradle/scripts/detekt.yml")
-     }
+    failFast = true
+    input = files(subprojects*.collect { it.projectDir })
+    filters = ".*/resources/.*,.dep-graph-releaser/.*/build/.*"
+    config = files("$rootProject.projectDir/gradle/scripts/detekt.yml")
+    reports {
+        xml.enabled = true
+    }
 }
 
 repositories {
