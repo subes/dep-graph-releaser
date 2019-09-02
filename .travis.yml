@@ -24,7 +24,7 @@ install: true
 
 
 script:
-- ./gr -i build CodeCoverageReport detektCheck
+- ./gr -i build CodeCoverageReport detekt
 # TODO activate once the Sonar TOKEN is fixed in travis
 #- |
 #    if [ "$TRAVIS_TEST_RESULT" == 0 ] && [ "$TRAVIS_JDK_VERSION" == oraclejdk8 ]; then
