@@ -14,15 +14,6 @@ before_install:
 - chmod +x gr
 install: true
 
--Dsonar.coverage.jacoco.xmlReportPaths="\
-                   api/dep-graph-releaser-api-jvm/build/reports/jacoco/report.xml,\
-                   dep-graph-releaser-manipulation/build/reports/jacoco/report.xml,\
-                   dep-graph-releaser-maven/build/reports/jacoco/report.xml,\
-                   dep-graph-releaser-runner/build/reports/jacoco/report.xml,\
-                   dep-graph-releaser-serialization/build/reports/jacoco/report.xml,\
-                   maven-api/dep-graph-releaser-maven-api-jvm/build/reports/jacoco/report.xml \
-
-
 script:
 - ./gr -i build CodeCoverageReport detekt
 - |
