@@ -1,42 +1,18 @@
 autoCorrect: false
-failFast: true
 
 build:
     maxIssues: 200
     weights:
         complexity: 2
-        style: 0.5
-
-test-pattern: # Configure exclusions for test sources
-    active: true
-    patterns: # Test file regexes
-    - '.*atrium.*'
-    - '.*/test/.*'
-    - '.*Test.kt'
-    - '.*Spec.kt'
-    exclude-rule-sets:
-    - 'comments'
-    exclude-rules:
-    - 'NamingRules'
-    - 'WildcardImport'
-    - 'MagicNumber'
-    - 'MaxLineLength'
-    - 'LateinitUsage'
-    - 'StringLiteralDuplication'
-    - 'SpreadOperator'
-    - 'TooManyFunctions'
-    - 'ForEachOnRange'
-    - 'LongParameterList'
-    - 'LargeClass'
-    - 'MethodOverloading'
 
 comments:
+    excludes: "**/test/**,**/androidTest/**,**/*.Test.kt,**/*.Spec.kt,**/*.Spek.kt"
     UndocumentedPublicClass:
         active: false
     UndocumentedPublicFunction:
         active: false
     CommentOverPrivateFunction:
-            active: false
+        active: false
 
 complexity:
     ComplexInterface:
@@ -48,6 +24,12 @@ complexity:
         threshold: 7
     TooManyFunctions:
         ignorePrivate: true
+    StringLiteralDuplication:
+        active: false
+    MethodOverloading:
+        active: false
+    LargeClass:
+        active: false
 
 naming:
     FunctionMaxLength:
@@ -55,9 +37,17 @@ naming:
     MatchingDeclarationName:
         active: false
 
+performance:
+    ArrayPrimitive:
+        excludes: "**/src/test/**,**atrium/**,**/*.Test.kt,**/*.*Spec.kt"
+    SpreadOperator:
+        active: false
+
 potential-bugs:
     UnsafeCast:
         active: false
+    LateinitUsage:
+       active: false
 
 style:
     DataClassContainsFunctions:
