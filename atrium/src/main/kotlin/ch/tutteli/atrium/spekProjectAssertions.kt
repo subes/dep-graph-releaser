@@ -9,16 +9,20 @@ import ch.loewenfels.depgraph.data.maven.jenkins.JenkinsSingleMavenReleaseComman
 import ch.tutteli.atrium.api.cc.en_GB.*
 import org.jetbrains.spek.api.dsl.TestContainer
 
+private const val EXAMPLE = "com.example"
+private const val DIRECT_DEPENDENT = "direct dependent"
+private const val INDIRECT_DEPENDENT = "indirect dependent"
+
 val syntheticRoot =
     IdAndVersions(MavenProjectId("ch.loewenfels", "synthetic-root"), "0.0.0-SNAPSHOT", "0.0.0", "0.1.0-SNAPSHOT")
 val singleProjectIdAndVersions =
-    IdAndVersions(MavenProjectId("com.example", "example"), "1.0-SNAPSHOT", "1.0", "2.0-SNAPSHOT")
-val exampleA = IdAndVersions(MavenProjectId("com.example", "a"), "1.1.1-SNAPSHOT", "1.1.1", "1.1.2-SNAPSHOT")
-val exampleB = IdAndVersions(MavenProjectId("com.example", "b"), "1.0.1-SNAPSHOT", "1.0.1", "1.0.2-SNAPSHOT")
-val exampleC = IdAndVersions(MavenProjectId("com.example", "c"), "3.0.0-SNAPSHOT", "3.0.0", "3.1.0-SNAPSHOT")
-val exampleD = IdAndVersions(MavenProjectId("com.example", "d"), "4.1-SNAPSHOT", "4.1", "4.2-SNAPSHOT")
-val exampleE = IdAndVersions(MavenProjectId("com.example", "e"), "5.1.3-SNAPSHOT", "5.1.3", "5.1.4-SNAPSHOT")
-val exampleDeps = IdAndVersions(MavenProjectId("com.example", "deps"), "9-SNAPSHOT", "9", "10-SNAPSHOT")
+    IdAndVersions(MavenProjectId(EXAMPLE, "example"), "1.0-SNAPSHOT", "1.0", "2.0-SNAPSHOT")
+val exampleA = IdAndVersions(MavenProjectId(EXAMPLE, "a"), "1.1.1-SNAPSHOT", "1.1.1", "1.1.2-SNAPSHOT")
+val exampleB = IdAndVersions(MavenProjectId(EXAMPLE, "b"), "1.0.1-SNAPSHOT", "1.0.1", "1.0.2-SNAPSHOT")
+val exampleC = IdAndVersions(MavenProjectId(EXAMPLE, "c"), "3.0.0-SNAPSHOT", "3.0.0", "3.1.0-SNAPSHOT")
+val exampleD = IdAndVersions(MavenProjectId(EXAMPLE, "d"), "4.1-SNAPSHOT", "4.1", "4.2-SNAPSHOT")
+val exampleE = IdAndVersions(MavenProjectId(EXAMPLE, "e"), "5.1.3-SNAPSHOT", "5.1.3", "5.1.4-SNAPSHOT")
+val exampleDeps = IdAndVersions(MavenProjectId(EXAMPLE, "deps"), "9-SNAPSHOT", "9", "10-SNAPSHOT")
 
 
 fun TestContainer.assertSingleProject(releasePlan: ReleasePlan, projectToRelease: IdAndVersions) {
@@ -39,12 +43,12 @@ fun TestContainer.assertProjectAWithDependentBWithDependentC(
     assertRootProjectWithDependents(releasePlan, exampleA, projectB)
     assertHasRelativePath(releasePlan, "root", exampleA, "./")
 
-    assertOneDirectDependent(releasePlan, "direct dependent", projectB, exampleC)
-    assertHasRelativePath(releasePlan, "direct dependent", projectB, "./")
+    assertOneDirectDependent(releasePlan, DIRECT_DEPENDENT, projectB, exampleC)
+    assertHasRelativePath(releasePlan, DIRECT_DEPENDENT, projectB, "./")
 
-    assertOneUpdateAndOneReleaseCommand(releasePlan, "indirect dependent", exampleC, exampleB)
-    assertHasNoDependentsAndIsOnLevel(releasePlan, "indirect dependent", exampleC, 2)
-    assertHasRelativePath(releasePlan, "indirect dependent", exampleC, "./")
+    assertOneUpdateAndOneReleaseCommand(releasePlan, INDIRECT_DEPENDENT, exampleC, exampleB)
+    assertHasNoDependentsAndIsOnLevel(releasePlan, INDIRECT_DEPENDENT, exampleC, 2)
+    assertHasRelativePath(releasePlan, INDIRECT_DEPENDENT, exampleC, "./")
 
     assertReleasePlanHasNumOfProjectsAndDependents(releasePlan, 3)
 }
@@ -79,8 +83,8 @@ fun TestContainer.assertMultiModuleAWithSubmoduleBWithDependentC(
     assertHasNoCommands(releasePlan, "submodule", projectB)
     assertHasOneDependentAndIsOnLevel(releasePlan, "submodule", projectB, exampleC, 0)
 
-    assertOneUpdateAndOneReleaseCommand(releasePlan, "indirect dependent", exampleC, projectB)
-    assertHasNoDependentsAndIsOnLevel(releasePlan, "indirect dependent", exampleC, 1)
+    assertOneUpdateAndOneReleaseCommand(releasePlan, INDIRECT_DEPENDENT, exampleC, projectB)
+    assertHasNoDependentsAndIsOnLevel(releasePlan, INDIRECT_DEPENDENT, exampleC, 1)
 
     assertReleasePlanHasNumOfProjectsAndDependents(releasePlan, 3)
     assertReleasePlanHasNoWarningsAndNoInfos(releasePlan)
@@ -90,8 +94,8 @@ fun TestContainer.assertMultiModuleAWithSubmoduleBWithDependentC(
 fun TestContainer.assertProjectAWithDependentB(releasePlan: ReleasePlan) {
     assertRootProjectWithDependents(releasePlan, exampleA, exampleB)
 
-    assertOneUpdateAndOneReleaseCommand(releasePlan, "direct dependent", exampleB, exampleA)
-    assertHasNoDependentsAndIsOnLevel(releasePlan, "direct dependent", exampleB, 1)
+    assertOneUpdateAndOneReleaseCommand(releasePlan, DIRECT_DEPENDENT, exampleB, exampleA)
+    assertHasNoDependentsAndIsOnLevel(releasePlan, DIRECT_DEPENDENT, exampleB, 1)
 
     assertReleasePlanHasNumOfProjectsAndDependents(releasePlan, 2)
 }

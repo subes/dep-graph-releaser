@@ -7,17 +7,17 @@ import ch.tutteli.atrium.domain.builders.AssertImpl
 import ch.tutteli.atrium.reporting.translating.StringBasedTranslatable
 import ch.tutteli.atrium.reporting.reporter
 
-fun <T : Any> assert(subject: T)
-    = AssertImpl.coreFactory.newReportingPlant(ASSERT, { subject }, reporter)
+fun <T : Any> assert(subject: T) =
+    AssertImpl.coreFactory.newReportingPlant(ASSERT, { subject }, reporter)
 
-fun <T : Any> assert(subject: T, assertionCreator: Assert<T>.() -> Unit)
-    = AssertImpl.coreFactory.newReportingPlantAndAddAssertionsCreatedBy(ASSERT, { subject }, reporter, assertionCreator)
+fun <T : Any> assert(subject: T, assertionCreator: Assert<T>.() -> Unit) =
+    AssertImpl.coreFactory.newReportingPlantAndAddAssertionsCreatedBy(ASSERT, { subject }, reporter, assertionCreator)
 
-fun <T : Any?> assert(subject: T)
-    = AssertImpl.coreFactory.newReportingPlantNullable(ASSERT, { subject }, reporter)
+fun <T : Any?> assert(subject: T) =
+    AssertImpl.coreFactory.newReportingPlantNullable(ASSERT, { subject }, reporter)
 
-fun expect(act: () -> Unit)
-    = AssertImpl.throwable.thrownBuilder(EXPECT_THROWN, act, reporter)
+fun expect(act: () -> Unit) =
+    AssertImpl.throwable.thrownBuilder(EXPECT_THROWN, act, reporter)
 
 
 internal enum class AssertionVerb(override val value: String) : StringBasedTranslatable {

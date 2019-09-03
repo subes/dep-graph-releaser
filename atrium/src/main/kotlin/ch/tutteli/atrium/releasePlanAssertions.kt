@@ -33,7 +33,7 @@ private fun Assert<ReleasePlan>.iteratorProjectIdsToList() =
     subject.iterator().asSequence().map { it.id }.toList()
 
 /**
- * The elements within the group can occur in any order but have all to be there
+ * The elements within the group can occur in any order but have all to be there.
  */
 fun Assert<ReleasePlan>.iteratorReturnsRootAndInOrderGrouped(vararg otherGroups: List<ProjectId>) {
     val rootProject = subject.getRootProject()

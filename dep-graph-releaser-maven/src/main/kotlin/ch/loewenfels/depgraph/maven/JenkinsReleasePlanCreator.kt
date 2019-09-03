@@ -441,7 +441,7 @@ class JenkinsReleasePlanCreator(
     ) {
         sb.append("-> ")
         dependencies.appendToStringBuilder(sb, "\n-> ") { list ->
-            list.appendToStringBuilder(sb, " -> ") { it ->
+            list.appendToStringBuilder(sb, " -> ") {
                 sb.append(it.identifier)
             }
             sb.append(" -> ").append(dependency.identifier)

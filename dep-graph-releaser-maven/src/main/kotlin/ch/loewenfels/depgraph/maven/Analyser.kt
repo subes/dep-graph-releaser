@@ -80,7 +80,7 @@ class Analyser internal constructor(
     private fun collectParentsNotInAnalysis(options: Options, analysedProjects: Set<String>): Map<Project, Gav> {
         if (options.missingParentAnalysis) {
             return getInternalAnalysedProjectsAsSequence()
-                .filter { it ->
+                .filter {
                     val parentGav = it.parentGav
                     parentGav != null && !analysedProjects.contains(parentGav.toMapKey())
                 }
