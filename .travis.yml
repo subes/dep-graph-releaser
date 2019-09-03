@@ -38,7 +38,8 @@ script:
                 dep-graph-releaser-manipulation/src/test/kotlin,\
                 dep-graph-releaser-maven/src/test/kotlin,\
                 dep-graph-releaser-runner/src/test/kotlin,\
-                dep-graph-releaser-serialization/src/test/kotlin"
+                dep-graph-releaser-serialization/src/test/kotlin" \
+            -Dsonar.coverage.jacoco.xmlReportPaths=build/reports/jacoco/report.xml
     fi
 
 
