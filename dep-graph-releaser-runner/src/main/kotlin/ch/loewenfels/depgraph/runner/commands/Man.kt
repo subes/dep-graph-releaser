@@ -37,7 +37,7 @@ class Man(private val commands: Map<String, ConsoleCommand>) : ConsoleCommand {
             sb.append(k.padEnd(15)).append("// ").append(v.description)
         }
         sb.append("\n\n")
-        commands.values.appendToStringBuilder(sb, "\n\n") { it ->
+        commands.values.appendToStringBuilder(sb, "\n\n") {
             sb.append(it.arguments)
         }
         return sb.toString()

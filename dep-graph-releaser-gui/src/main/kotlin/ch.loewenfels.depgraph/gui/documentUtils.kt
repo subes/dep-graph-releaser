@@ -22,13 +22,13 @@ fun display(id: String, what: String) {
     elementById(id).style.display = what
 }
 
-fun getCheckbox(id: String): HTMLInputElement
-    = getCheckboxOrNull(id) ?: throw IllegalStateException("no checkbox found for id $id")
+fun getCheckbox(id: String): HTMLInputElement = getCheckboxOrNull(id)
+    ?: throw IllegalStateException("no checkbox found for id $id")
 
 fun getCheckboxOrNull(id: String) = getInputElementOrNull(id, "checkbox")
 
-fun getTextField(id: String): HTMLInputElement
-    = getTextFieldOrNull(id) ?: throw IllegalStateException("no text field found for id $id")
+fun getTextField(id: String): HTMLInputElement = getTextFieldOrNull(id)
+    ?: throw IllegalStateException("no text field found for id $id")
 
 fun getTextFieldOrNull(id: String) = getInputElementOrNull(id, "text")
 
