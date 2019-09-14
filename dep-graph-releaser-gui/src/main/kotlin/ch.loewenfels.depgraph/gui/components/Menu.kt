@@ -1,8 +1,11 @@
 package ch.loewenfels.depgraph.gui.components
 
 import ch.loewenfels.depgraph.ConfigKey
+import ch.loewenfels.depgraph.data.ReleasePlan
 import ch.loewenfels.depgraph.data.ReleaseState
 import ch.loewenfels.depgraph.data.TypeOfRun
+import ch.loewenfels.depgraph.data.maven.MavenProjectId
+import ch.loewenfels.depgraph.data.maven.syntheticRoot
 import ch.loewenfels.depgraph.data.toProcessName
 import ch.loewenfels.depgraph.generateEclipsePsf
 import ch.loewenfels.depgraph.generateGitCloneCommands
@@ -182,9 +185,17 @@ class Menu(private val eventManager: EventManager) {
                 releasePlan,
                 Regex(releasePlan.getConfig(ConfigKey.RELATIVE_PATH_EXCLUDE_PROJECT_REGEX))
             )
-            val title = "The following projects are (indirect) dependents of ${releasePlan.rootProjectId.identifier}"
+            val title = "The following projects are (indirect) dependents of " + getProjectTitle(releasePlan)
             showOutput(title, list)
         }
+    }
+
+    fun getProjectTitle(releasePlan: ReleasePlan): String {
+        val rootProjectId = releasePlan.rootProjectId
+        if (rootProjectId == syntheticRoot) return releasePlan.getDependents(releasePlan.rootProjectId).joinToString(", ") {
+            (it as? MavenProjectId)?.artifactId ?: it.identifier
+        }
+        return (rootProjectId as? MavenProjectId)?.artifactId ?: rootProjectId.identifier
     }
 
     private fun initReportButtons(modifiableState: ModifiableState) {

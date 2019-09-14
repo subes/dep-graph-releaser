@@ -15,19 +15,11 @@ import kotlin.browser.document
 class ContentContainer(modifiableState: ModifiableState, private val menu: Menu, processStarter: ProcessStarter?) {
     init {
         val releasePlan = modifiableState.releasePlan
-        val htmlTitle = getHtmlTitle(releasePlan)
+        val htmlTitle = menu.getProjectTitle(releasePlan)
         document.title = "DGR $htmlTitle"
         Messages(releasePlan)
         setUpConfig(releasePlan)
         Pipeline(modifiableState, menu, processStarter)
-    }
-
-    private fun getHtmlTitle(releasePlan: ReleasePlan): String {
-        val rootProjectId = releasePlan.rootProjectId
-        if (rootProjectId == syntheticRoot) return releasePlan.getDependents(releasePlan.rootProjectId).joinToString(", ") {
-                (it as? MavenProjectId)?.artifactId ?: it.identifier
-            }
-        return (rootProjectId as? MavenProjectId)?.artifactId ?: rootProjectId.identifier
     }
 
     private fun setUpConfig(releasePlan: ReleasePlan) {
