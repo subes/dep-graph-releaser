@@ -2,8 +2,6 @@ package ch.loewenfels.depgraph.gui
 
 import ch.loewenfels.depgraph.ConfigKey
 import ch.loewenfels.depgraph.data.ReleasePlan
-import ch.loewenfels.depgraph.data.maven.MavenProjectId
-import ch.loewenfels.depgraph.data.maven.syntheticRoot
 import ch.loewenfels.depgraph.gui.components.*
 import ch.loewenfels.depgraph.gui.jobexecution.ProcessStarter
 import ch.loewenfels.depgraph.gui.serialization.ModifiableState
