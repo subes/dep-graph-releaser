@@ -15,14 +15,19 @@ internal fun generateChangelog(
     appendProjectToCsv: (StringBuilder, Project, String, String) -> Unit
 ): String {
     val sb = StringBuilder("Project;Release Version;Next Dev Version;Other Commands\n")
-    releasePlan.iterator().asSequence().filter { !it.isSubmodule }.forEach { project ->
-        val nextDevVersion = project.commands.asSequence()
+    releasePlan.iterator().asSequence()
+        .filter { !it.isSubmodule }
+        .filter { it.id.identifier != SYNTHETIC_ROOT }
+        .forEach { project ->
+            val nextDevVersion = project.commands.asSequence()
             .filterIsInstance<JenkinsNextDevReleaseCommand>()
             .first().nextDevVersion
         appendProjectToCsv(sb, project, project.releaseVersion, nextDevVersion)
     }
     return sb.toString()
 }
+
+private const val SYNTHETIC_ROOT = "ch.loewenfels:synthetic-root"
 
 internal fun appendProjectToCsvExcel(
     sb: StringBuilder,

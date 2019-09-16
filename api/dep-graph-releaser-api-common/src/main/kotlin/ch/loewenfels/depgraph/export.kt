@@ -99,9 +99,12 @@ private fun projectsWithoutSubmodulesAndExcluded(
     excludeRegex: Regex
 ): Sequence<Project> = sequence
     .filter { !it.isSubmodule }
+    .filter { it.id.identifier != SYNTHETIC_ROOT }
     .filter { !excludeRegex.matches(it.relativePath) }
 
 fun Project.turnIntoGitRepoUrl(
     relativePathTransformerRegex: Regex,
     relativePathTransformerReplacement: String
 ) = relativePathTransformerRegex.replace(relativePath, relativePathTransformerReplacement)
+
+private const val SYNTHETIC_ROOT = "ch.loewenfels:synthetic-root"
