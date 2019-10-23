@@ -1,7 +1,7 @@
 autoCorrect: false
 
 build:
-    maxIssues: 240
+    maxIssues: 150
     weights:
         complexity: 3
         style: 1
@@ -13,6 +13,8 @@ comments:
     UndocumentedPublicFunction:
         active: false
     CommentOverPrivateFunction:
+        active: false
+    UndocumentedPublicProperty:
         active: false
 
 complexity:
