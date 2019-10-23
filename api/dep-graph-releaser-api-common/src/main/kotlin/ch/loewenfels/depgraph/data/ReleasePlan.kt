@@ -88,7 +88,6 @@ data class ReleasePlan(
 
     @Suppress(
         "IteratorNotThrowingNoSuchElementException"
-        //TODO remove once https://github.com/arturbosch/detekt/issues/1219 is fixed
     )
     private class ReleasePlanIterator(
         private val releasePlan: ReleasePlan

@@ -1,9 +1,10 @@
 autoCorrect: false
 
 build:
-    maxIssues: 200
+    maxIssues: 150
     weights:
-        complexity: 2
+        complexity: 3
+        style: 1
 
 comments:
     excludes: "**/test/**,**/androidTest/**,**/*.Test.kt,**/*.Spec.kt,**/*.Spek.kt"
@@ -12,6 +13,8 @@ comments:
     UndocumentedPublicFunction:
         active: false
     CommentOverPrivateFunction:
+        active: false
+    UndocumentedPublicProperty:
         active: false
 
 complexity:
