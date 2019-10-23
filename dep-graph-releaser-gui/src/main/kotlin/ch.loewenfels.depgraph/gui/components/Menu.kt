@@ -29,7 +29,6 @@ import kotlin.dom.hasClass
 import kotlin.dom.removeClass
 import kotlin.js.Promise
 
-@Suppress("UnusedPrivateMember" /*TODO remove if https://github.com/arturbosch/detekt/issues/1227 is fixed */)
 external fun encodeURIComponent(encodedURI: String): String
 
 class Menu(private val eventManager: EventManager) {
@@ -396,9 +395,7 @@ class Menu(private val eventManager: EventManager) {
 
         @Suppress(
             "ObjectPropertyName",
-            "LateinitUsage",
-            //TODO remove once https://github.com/arturbosch/detekt/issues/1215 is fixed
-            "ObjectPropertyNaming"
+            "LateinitUsage"
         )
         private lateinit var _modifiableState: ModifiableState
         var modifiableState: ModifiableState
