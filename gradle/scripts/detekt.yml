@@ -1,10 +1,5 @@
-autoCorrect: false
-
 build:
-    maxIssues: 150
-    weights:
-        complexity: 3
-        style: 1
+    maxIssues: 110
 
 comments:
     excludes: "**/test/**,**/androidTest/**,**/*.Test.kt,**/*.Spec.kt,**/*.Spek.kt"

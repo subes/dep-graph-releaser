@@ -18,8 +18,8 @@ task CodeCoverageReport(type: JacocoReport) {
 
     executionData jacocoMerge.destinationFile
 
-    sourceDirectories = files()
-    classDirectories = files()
+    sourceDirectories.from = files()
+    classDirectories.from = files()
 
     jacocoMulti.sourceProjects.each { otherProject ->
         sourceSets otherProject.sourceSets.main

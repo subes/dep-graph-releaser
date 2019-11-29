@@ -18,7 +18,7 @@ fun Assert<Command>.withStateWaitingWithDependencies(dependency: ProjectId, vara
         withDependencies(dependency, *otherDependencies)
     }
 
-inline fun Assert<CommandState.Waiting>.withDependencies(
+fun Assert<CommandState.Waiting>.withDependencies(
     dependency: ProjectId,
     vararg otherDependencies: ProjectId
 ) {
