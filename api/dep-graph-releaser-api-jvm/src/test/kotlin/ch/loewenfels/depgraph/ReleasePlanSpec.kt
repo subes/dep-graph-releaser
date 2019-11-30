@@ -7,10 +7,8 @@ import ch.tutteli.atrium.api.cc.en_GB.*
 import ch.tutteli.atrium.assert
 import ch.tutteli.atrium.iteratorReturnsRootAndInOrderGrouped
 import ch.tutteli.atrium.iteratorReturnsRootAndStrictly
-import org.jetbrains.spek.api.Spek
-import org.jetbrains.spek.api.dsl.describe
-import org.jetbrains.spek.api.dsl.given
-import org.jetbrains.spek.api.dsl.it
+import org.spekframework.spek2.Spek
+import org.spekframework.spek2.style.specification.describe
 import ch.tutteli.atrium.createReleasePlanWithDefaults
 
 object ReleasePlanSpec : Spek({
@@ -24,7 +22,7 @@ object ReleasePlanSpec : Spek({
 
     describe("iterator") {
 
-        given("root project with dependent parent project with three children each on a different level"){
+        context("root project with dependent parent project with three children each on a different level"){
 
             val rootProjectId = MavenProjectId("com.example", "parent-parent")
             val rootProject = createProject(rootProjectId, false, "1.1.0-SNAPSHOT", "1.2.0", 0)
@@ -87,7 +85,7 @@ object ReleasePlanSpec : Spek({
 
 
 
-        given("multi module project with two submodules") {
+        context("multi module project with two submodules") {
             val dependents = mapOf<ProjectId, Set<MavenProjectId>>(
                 multiModuleId to setOf(submodule1Id, submodule2Id),
                 submodule1Id to setOf(submodule2Id),
@@ -114,7 +112,7 @@ object ReleasePlanSpec : Spek({
             }
         }
 
-        given("multi module project with two submodules and one dependent") {
+        context("multi module project with two submodules and one dependent") {
             val dependentId = MavenProjectId("com.example", "dependent")
             val dependent = createProject(dependentId, false, "4.1.0-SNAPSHOT", "4.2.0", 1)
 

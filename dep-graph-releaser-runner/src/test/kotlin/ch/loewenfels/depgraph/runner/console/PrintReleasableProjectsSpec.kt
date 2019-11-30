@@ -6,22 +6,22 @@ import ch.tutteli.atrium.api.cc.en_GB.message
 import ch.tutteli.atrium.api.cc.en_GB.toThrow
 import ch.tutteli.atrium.expect
 import ch.tutteli.niok.absolutePathAsString
-import ch.tutteli.spek.extensions.TempFolder
-import org.jetbrains.spek.api.Spek
-import org.jetbrains.spek.api.dsl.given
-import org.jetbrains.spek.api.dsl.it
-import org.jetbrains.spek.api.include
+import ch.tutteli.spek.extensions.MemoizedTempFolder
+import org.spekframework.spek2.Spek
+import org.spekframework.spek2.style.specification.describe
 
 class PrintReleasableProjectsSpec : Spek({
     include(PrintReleasableProjectsCommandSpec)
 
-    given("non-existing directory") {
-        val errMsg = "The given directory to analyse does not exist."
-        val inputArgs = arrayOf("projectName","directory")
-        it("throws an error, mentioning $errMsg") {
-            expect {
-                PrintReleasableProjects.execute(inputArgs, errorHandler)
-            }.toThrow<IllegalStateException> { message { contains(errMsg) } }
+    describe("validation errors") {
+        context("non-existing directory") {
+            val errMsg = "The given directory to analyse does not exist."
+            val inputArgs = arrayOf("projectName", "directory")
+            it("throws an error, mentioning $errMsg") {
+                expect {
+                    PrintReleasableProjects.execute(inputArgs, errorHandler)
+                }.toThrow<IllegalStateException> { message { contains(errMsg) } }
+            }
         }
     }
 
@@ -34,7 +34,7 @@ class PrintReleasableProjectsSpec : Spek({
     )
 
     companion object {
-        fun getNotEnoughArgs(@Suppress("UNUSED_PARAMETER") tempFolder: TempFolder): Array<out String> {
+        fun getNotEnoughArgs(@Suppress("UNUSED_PARAMETER") tempFolder: MemoizedTempFolder): Array<out String> {
             return arrayOf(
                 PrintReleasableProjects.name
                 //dir is required as well
@@ -42,7 +42,7 @@ class PrintReleasableProjectsSpec : Spek({
             )
         }
 
-        fun getTooManyArgs(tempFolder: TempFolder): Array<out String> {
+        fun getTooManyArgs(tempFolder: MemoizedTempFolder): Array<out String> {
             return arrayOf(
                 PrintReleasableProjects.name,
                 tempFolder.tmpDir.absolutePathAsString,

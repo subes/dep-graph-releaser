@@ -3,11 +3,8 @@ package ch.loewenfels.depgraph
 import ch.tutteli.atrium.api.cc.en_GB.*
 import ch.tutteli.atrium.assert
 import ch.tutteli.atrium.expect
-import org.jetbrains.spek.api.Spek
-import org.jetbrains.spek.api.dsl.context
-import org.jetbrains.spek.api.dsl.describe
-import org.jetbrains.spek.api.dsl.given
-import org.jetbrains.spek.api.dsl.it
+import org.spekframework.spek2.Spek
+import org.spekframework.spek2.style.specification.describe
 import java.util.regex.PatternSyntaxException
 import kotlin.reflect.KFunction1
 
@@ -34,7 +31,7 @@ class ConfigParserSpec : Spek({
             ::parseRegexParams,
             ::parseBuildWithParamJobs
         ).forEach { fn ->
-            given("empty regex") {
+            context("empty regex") {
                 it("throws an IllegalArgumentException") {
                     expect {
                         fn("#")
@@ -42,7 +39,7 @@ class ConfigParserSpec : Spek({
                 }
             }
 
-            given("# missing") {
+            context("# missing") {
                 it("throws an IllegalArgumentException mentioning # is missing") {
                     expect {
                         fn(".*test")
@@ -50,7 +47,7 @@ class ConfigParserSpec : Spek({
                 }
             }
 
-            given("open bracket") {
+            context("open bracket") {
                 it("throws a PatternSyntaxException") {
                     expect {
                         fn("[#")
@@ -63,14 +60,14 @@ class ConfigParserSpec : Spek({
     describe("fun parseRemoteRegex") {
         describe("validation errors") {
 
-            given("no url defined") {
+            context("no url defined") {
                 it("throws an IllegalArgumentException mentioning url required") {
                     expect {
                         parseRemoteRegex(".*#")
                     }.toThrow<IllegalArgumentException> { messageContains("remoteRegex requires") }
                 }
             }
-            given("blank url defined") {
+            context("blank url defined") {
                 it("throws an IllegalArgumentException mentioning url required") {
                     expect {
                         parseRemoteRegex(".*#   ")
@@ -78,7 +75,7 @@ class ConfigParserSpec : Spek({
                 }
             }
 
-            given("url starts with http://") {
+            context("url starts with http://") {
                 it("throws an IllegalArgumentException mentioning url requires https") {
                     expect {
                         parseRemoteRegex(".*#http://example.com")
@@ -86,7 +83,7 @@ class ConfigParserSpec : Spek({
                 }
             }
 
-            given("second config value does not have a #") {
+            context("second config value does not have a #") {
                 it("throws an IllegalArgumentException mentioning # is missing") {
                     expect {
                         parseRemoteRegex(".*#https://test.com\n.*https://test2.com")
@@ -145,42 +142,42 @@ class ConfigParserSpec : Spek({
         describe("validation errors") {
             listOf("", ".*#a=b\n").forEach { prefix ->
                 context("first regex is `$prefix`") {
-                    given("no parameters defined") {
+                    context("no parameters defined") {
                         it("throws an IllegalArgumentException mentioning parameters required") {
                             expect {
                                 parseRegexParams("$prefix.*#")
                             }.toThrow<IllegalArgumentException> { messageContains("A regexParam requires at least one parameter") }
                         }
                     }
-                    given("one parameter defined but without name") {
+                    context("one parameter defined but without name") {
                         it("throws an IllegalArgumentException mentioning parameters required") {
                             expect {
                                 parseRegexParams("$prefix.*#=a")
                             }.toThrow<IllegalArgumentException> { messageContains("Parameter without name") }
                         }
                     }
-                    given("one parameter defined but without value") {
+                    context("one parameter defined but without value") {
                         it("throws an IllegalArgumentException mentioning parameters required") {
                             expect {
                                 parseRegexParams("$prefix.*#a")
                             }.toThrow<IllegalArgumentException> { messageContains("regexParam does not have a value") }
                         }
                     }
-                    given("second parameter without name") {
+                    context("second parameter without name") {
                         it("throws an IllegalArgumentException mentioning parameters required") {
                             expect {
                                 parseRegexParams("$prefix.*#a=b;=c")
                             }.toThrow<IllegalArgumentException> { messageContains("Parameter without name") }
                         }
                     }
-                    given("second parameter without value") {
+                    context("second parameter without value") {
                         it("throws an IllegalArgumentException mentioning parameters required") {
                             expect {
                                 parseRegexParams("$prefix.*#a=b;c")
                             }.toThrow<IllegalArgumentException> { messageContains("regexParam does not have a value") }
                         }
                     }
-                    given("second parameter without name and value") {
+                    context("second parameter without name and value") {
                         it("throws an IllegalArgumentException mentioning parameters required") {
                             expect {
                                 parseRegexParams("$prefix.*#a=b;;c=d")

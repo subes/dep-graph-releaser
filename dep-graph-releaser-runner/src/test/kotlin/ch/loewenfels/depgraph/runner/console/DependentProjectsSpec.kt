@@ -3,9 +3,8 @@ package ch.loewenfels.depgraph.runner.console
 import ch.loewenfels.depgraph.maven.getTestDirectory
 import ch.loewenfels.depgraph.runner.commands.DependentProjects
 import ch.tutteli.niok.absolutePathAsString
-import ch.tutteli.spek.extensions.TempFolder
-import org.jetbrains.spek.api.Spek
-import org.jetbrains.spek.api.include
+import ch.tutteli.spek.extensions.MemoizedTempFolder
+import org.spekframework.spek2.Spek
 
 class DependentProjectsSpec : Spek({
     include(DependentProjectsCommandSpec)
@@ -22,7 +21,7 @@ class DependentProjectsSpec : Spek({
     )
 
     companion object {
-        fun getNotEnoughArgs(@Suppress("UNUSED_PARAMETER") ignored: TempFolder): Array<out String> {
+        fun getNotEnoughArgs(@Suppress("UNUSED_PARAMETER") ignored: MemoizedTempFolder): Array<out String> {
             return arrayOf(
                 DependentProjects.name, "com.example", "project",
                 getTestDirectory("managingVersions/inDependency").absolutePathAsString
@@ -31,7 +30,7 @@ class DependentProjectsSpec : Spek({
             )
         }
 
-        fun getTooManyArgs(@Suppress("UNUSED_PARAMETER") ignored: TempFolder): Array<out String> {
+        fun getTooManyArgs(@Suppress("UNUSED_PARAMETER") ignored: MemoizedTempFolder): Array<out String> {
             return arrayOf(
                 DependentProjects.name, "com.example", "project",
                 getTestDirectory("managingVersions/inDependency").absolutePathAsString,

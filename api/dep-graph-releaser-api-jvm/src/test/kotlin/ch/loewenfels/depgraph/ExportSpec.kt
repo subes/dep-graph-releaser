@@ -6,10 +6,8 @@ import ch.loewenfels.depgraph.data.maven.MavenProjectId
 import ch.tutteli.atrium.api.cc.en_GB.containsNot
 import ch.tutteli.atrium.assert
 import ch.tutteli.atrium.createReleasePlanWithDefaults
-import org.jetbrains.spek.api.Spek
-import org.jetbrains.spek.api.dsl.describe
-import org.jetbrains.spek.api.dsl.given
-import org.jetbrains.spek.api.dsl.it
+import org.spekframework.spek2.Spek
+import org.spekframework.spek2.style.specification.describe
 
 class ExportSpec : Spek({
 
@@ -22,7 +20,7 @@ class ExportSpec : Spek({
 
     describe("list of dependents") {
 
-        given("release of both project A and project B") {
+        context("release of both project A and project B") {
 
             val rootProjectId = MavenProjectId("com.example", "parent-parent")
             val rootProject = createProject(rootProjectId, false, "1.1.0-SNAPSHOT", "1.2.0", 0)

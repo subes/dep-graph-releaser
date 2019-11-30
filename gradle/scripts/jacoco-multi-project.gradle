@@ -7,7 +7,7 @@ jacoco {
 
 task jacocoMerge(type: JacocoMerge) {
     jacocoMulti.jacocoProjects.each {
-        executionData "${it.buildDir}/jacoco/junitPlatformTest.exec"
+        executionData file("${it.buildDir}/jacoco").listFiles().findAll { it.name.endsWith(".exec") }
     }
 }
 

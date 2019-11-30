@@ -4,10 +4,10 @@ import ch.tutteli.atrium.api.cc.en_GB.toBe
 import ch.tutteli.niok.readAllBytes
 import ch.tutteli.niok.readText
 import ch.tutteli.niok.writeBytes
-import ch.tutteli.spek.extensions.TempFolder
+import ch.tutteli.spek.extensions.MemoizedTempFolder
 import java.nio.file.Path
 
-fun copyPom(tempFolder: TempFolder, pom: Path): Path {
+fun copyPom(tempFolder: MemoizedTempFolder, pom: Path): Path {
     val tmpPom = tempFolder.newFile("pom.xml")
     tmpPom.writeBytes(pom.readAllBytes())
     return tmpPom
