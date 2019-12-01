@@ -2,8 +2,8 @@ package ch.loewenfels.depgraph.maven
 
 import ch.tutteli.atrium.api.cc.en_GB.toBe
 import ch.tutteli.atrium.assert
-import org.jetbrains.spek.api.Spek
-import org.jetbrains.spek.api.dsl.describe
+import org.spekframework.spek2.Spek
+import org.spekframework.spek2.style.specification.describe
 
 object VersionDeterminerSpec : Spek({
     val testee = VersionDeterminer()
@@ -43,12 +43,12 @@ object VersionDeterminerSpec : Spek({
             "0.0.0" to "0.1.0",
             "0.0" to "1.0",
             "0" to "1"
-        ).forEach { version, expected ->
-            test("$version turns into $expected") {
+        ).forEach { (version, expected) ->
+            it("$version turns into $expected") {
                 val result = testee.releaseVersion(version)
                 assert(result).toBe(expected)
             }
-            test("v$version turns into v$expected") {
+            it("v$version turns into v$expected") {
                 val result = testee.releaseVersion("v$version")
                 assert(result).toBe("v$expected")
             }
@@ -101,12 +101,12 @@ object VersionDeterminerSpec : Spek({
             "0.0.0" to "0.2.0-SNAPSHOT",
             "0.0" to "2.0-SNAPSHOT",
             "0" to "2-SNAPSHOT"
-        ).forEach { version, expected ->
-            test("$version turns into $expected") {
+        ).forEach { (version, expected) ->
+            it("$version turns into $expected") {
                 val result = testee.nextDevVersion(version)
                 assert(result).toBe(expected)
             }
-            test("v$version turns into v$expected") {
+            it("v$version turns into v$expected") {
                 val result = testee.nextDevVersion("v$version")
                 assert(result).toBe("v$expected")
             }

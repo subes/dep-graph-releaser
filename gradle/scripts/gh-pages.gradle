@@ -35,17 +35,23 @@ dokka {
     outputDirectory = "$ghPagesPathWithoutVersion/$ghPages_version"
 
     includes = ['misc/kdoc/packages.md']
-    jdkVersion = 6
+    jdkVersion = 8
+    reportUndocumented = false
 
     doFirst {
         println "going to generate kdoc including the projects: ${docProjects*.name}"
         println "====================="
     }
-    docProjects.each { subProject ->
-        linkMapping {
-            dir = "${subProject.projectDir}/$srcKotlin"
-            url = "$github_url/${dokka_sourceMapping}/${subProject.projectDir}/$srcKotlin"
-            suffix = '#L'
+    linkMapping {
+        dir = './'
+        url = "$github_url/$dokka_sourceMapping/"
+        suffix = '#L'
+    }
+
+    sourceDirs = docProjects.collect { subProject -> file("${subProject.projectDir}/$srcKotlin") }
+    rootProject.configure(docProjects) { subProject ->
+        subProject.afterEvaluate {
+            classpath += kotlin.target.compilations.getByName("main").compileDependencyFiles.files.collect { file -> file }
         }
     }
     sourceDirs = docProjects.collect { subProject -> file("${subProject.projectDir}/$srcKotlin") }

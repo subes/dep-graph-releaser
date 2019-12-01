@@ -7,7 +7,7 @@ import ch.loewenfels.depgraph.data.maven.MavenProjectId
 import ch.loewenfels.depgraph.data.maven.jenkins.JenkinsMultiMavenReleasePlugin
 import ch.loewenfels.depgraph.data.maven.jenkins.JenkinsSingleMavenReleaseCommand
 import ch.tutteli.atrium.api.cc.en_GB.*
-import org.jetbrains.spek.api.dsl.TestContainer
+import org.spekframework.spek2.style.specification.Suite
 
 private const val EXAMPLE = "com.example"
 private const val DIRECT_DEPENDENT = "direct dependent"
@@ -25,18 +25,18 @@ val exampleE = IdAndVersions(MavenProjectId(EXAMPLE, "e"), "5.1.3-SNAPSHOT", "5.
 val exampleDeps = IdAndVersions(MavenProjectId(EXAMPLE, "deps"), "9-SNAPSHOT", "9", "10-SNAPSHOT")
 
 
-fun TestContainer.assertSingleProject(releasePlan: ReleasePlan, projectToRelease: IdAndVersions) {
+fun Suite.assertSingleProject(releasePlan: ReleasePlan, projectToRelease: IdAndVersions) {
     assertRootProjectOnlyReleaseCommand(releasePlan, projectToRelease)
 
     assertHasNoDependentsAndIsOnLevel(releasePlan, "root", projectToRelease, 0)
     assertReleasePlanHasNumOfProjectsAndDependents(releasePlan, 1)
     assertReleasePlanHasNoWarningsAndNoInfos(releasePlan)
-    test("ReleasePlan.iterator() returns only the root Project projects in the expected order") {
+    it("ReleasePlan.iterator() returns only the root Project projects in the expected order") {
         assert(releasePlan).iteratorReturnsRootAndStrictly()
     }
 }
 
-fun TestContainer.assertProjectAWithDependentBWithDependentC(
+fun Suite.assertProjectAWithDependentBWithDependentC(
     releasePlan: ReleasePlan,
     projectB: IdAndVersions = exampleB
 ) {
@@ -53,28 +53,28 @@ fun TestContainer.assertProjectAWithDependentBWithDependentC(
     assertReleasePlanHasNumOfProjectsAndDependents(releasePlan, 3)
 }
 
-fun TestContainer.assertHasRelativePath(
+fun Suite.assertHasRelativePath(
     releasePlan: ReleasePlan,
     name: String,
     project: IdAndVersions,
     relativePath: String
 ) {
-    test("$name has relative path $relativePath") {
+    it("$name has relative path $relativePath") {
         assert(releasePlan.getProject(project.id).relativePath).toBe(relativePath)
     }
 }
 
-fun TestContainer.assertHasConfig(
+fun Suite.assertHasConfig(
     releasePlan: ReleasePlan,
     configKey: ConfigKey,
     expected: String
 ) {
-    test("has config for key $configKey which is $expected") {
+    it("has config for key $configKey which is $expected") {
         assert(releasePlan.getConfig(configKey)).toBe(expected)
     }
 }
 
-fun TestContainer.assertMultiModuleAWithSubmoduleBWithDependentC(
+fun Suite.assertMultiModuleAWithSubmoduleBWithDependentC(
     releasePlan: ReleasePlan,
     projectB: IdAndVersions
 ) {
@@ -91,7 +91,7 @@ fun TestContainer.assertMultiModuleAWithSubmoduleBWithDependentC(
     assertReleasePlanIteratorReturnsRootAndStrictly(releasePlan, exampleB, exampleC)
 }
 
-fun TestContainer.assertProjectAWithDependentB(releasePlan: ReleasePlan) {
+fun Suite.assertProjectAWithDependentB(releasePlan: ReleasePlan) {
     assertRootProjectWithDependents(releasePlan, exampleA, exampleB)
 
     assertOneUpdateAndOneReleaseCommand(releasePlan, DIRECT_DEPENDENT, exampleB, exampleA)
@@ -100,7 +100,7 @@ fun TestContainer.assertProjectAWithDependentB(releasePlan: ReleasePlan) {
     assertReleasePlanHasNumOfProjectsAndDependents(releasePlan, 2)
 }
 
-fun TestContainer.assertRootProjectWithDependents(
+fun Suite.assertRootProjectWithDependents(
     releasePlan: ReleasePlan,
     rootProjectIdAndVersions: IdAndVersions,
     dependentIdAndVersions: IdAndVersions,
@@ -116,7 +116,7 @@ fun TestContainer.assertRootProjectWithDependents(
     )
 }
 
-fun TestContainer.assertRootProjectHasDependents(
+fun Suite.assertRootProjectHasDependents(
     releasePlan: ReleasePlan,
     rootProjectIdAndVersions: IdAndVersions,
     dependentIdAndVersions: IdAndVersions,
@@ -131,7 +131,7 @@ fun TestContainer.assertRootProjectHasDependents(
     )
 }
 
-fun TestContainer.assertRootProjectMultiReleaseCommandWithSubmodulesAndSameDependents(
+fun Suite.assertRootProjectMultiReleaseCommandWithSubmodulesAndSameDependents(
     releasePlan: ReleasePlan,
     rootProjectIdAndVersions: IdAndVersions,
     submodule: IdAndVersions,
@@ -142,26 +142,26 @@ fun TestContainer.assertRootProjectMultiReleaseCommandWithSubmodulesAndSameDepen
     assertRootProjectHasDependents(releasePlan, rootProjectIdAndVersions, submodule, *otherSubmodules)
 }
 
-fun TestContainer.assertRootProjectHasSubmodules(
+fun Suite.assertRootProjectHasSubmodules(
     releasePlan: ReleasePlan,
     project: IdAndVersions,
     submodule: IdAndVersions,
     vararg otherSubmodules: IdAndVersions
 ) = assertHasSubmodules(releasePlan, "root", project, submodule, *otherSubmodules)
 
-fun TestContainer.assertRootProjectMultiReleaseCommand(
+fun Suite.assertRootProjectMultiReleaseCommand(
     releasePlan: ReleasePlan,
     rootProjectIdAndVersions: IdAndVersions
 ) {
     val rootProject = assertRootProject(releasePlan, rootProjectIdAndVersions)
-    test("root project contains just the ${JenkinsMultiMavenReleasePlugin::class.simpleName} command") {
+    it("root project contains just the ${JenkinsMultiMavenReleasePlugin::class.simpleName} command") {
         assert(rootProject) {
             property(subject::commands).containsExactly {
                 isA<JenkinsMultiMavenReleasePlugin> {}
             }
         }
     }
-    test("the command is in state Ready with ${JenkinsSingleMavenReleaseCommand::nextDevVersion.name} = ${rootProjectIdAndVersions.nextDevVersion}\"") {
+    it("the command is in state Ready with ${JenkinsSingleMavenReleaseCommand::nextDevVersion.name} = ${rootProjectIdAndVersions.nextDevVersion}\"") {
         assert(rootProject.commands[0]).isA<JenkinsMultiMavenReleasePlugin> {
             isStateReady()
             property(subject::nextDevVersion).toBe(rootProjectIdAndVersions.nextDevVersion)
@@ -169,12 +169,12 @@ fun TestContainer.assertRootProjectMultiReleaseCommand(
     }
 }
 
-fun TestContainer.assertRootProjectOnlyReleaseCommand(
+fun Suite.assertRootProjectOnlyReleaseCommand(
     releasePlan: ReleasePlan,
     rootProjectIdAndVersions: IdAndVersions
 ) {
     val rootProject = assertRootProject(releasePlan, rootProjectIdAndVersions)
-    test("root project contains just the ${JenkinsSingleMavenReleaseCommand::class.simpleName} command, which is Ready with ${JenkinsSingleMavenReleaseCommand::nextDevVersion.name} = ${rootProjectIdAndVersions.nextDevVersion}") {
+    it("root project contains just the ${JenkinsSingleMavenReleaseCommand::class.simpleName} command, which is Ready with ${JenkinsSingleMavenReleaseCommand::nextDevVersion.name} = ${rootProjectIdAndVersions.nextDevVersion}") {
         assert(rootProject) {
             property(subject::commands).containsExactly {
                 isA<JenkinsSingleMavenReleaseCommand> {
@@ -187,23 +187,23 @@ fun TestContainer.assertRootProjectOnlyReleaseCommand(
 }
 
 
-fun TestContainer.assertSyntheticRootProject(releasePlan: ReleasePlan) {
+fun Suite.assertSyntheticRootProject(releasePlan: ReleasePlan) {
     assertRootProject(releasePlan, syntheticRoot)
     assertHasNoCommands(releasePlan, "synthetic root", syntheticRoot)
     assertHasRelativePath(releasePlan, "synthetic root", syntheticRoot, "::nonExistingPath::")
 }
 
-fun TestContainer.assertRootProject(releasePlan: ReleasePlan, rootProjectIdAndVersions: IdAndVersions): Project {
-    test("${ReleasePlan::rootProjectId.name} is expected rootProject") {
+fun Suite.assertRootProject(releasePlan: ReleasePlan, rootProjectIdAndVersions: IdAndVersions): Project {
+    it("${ReleasePlan::rootProjectId.name} is expected rootProject") {
         assert(releasePlan.rootProjectId).toBe(rootProjectIdAndVersions.id)
     }
     val rootProject = releasePlan.getProject(rootProjectIdAndVersions.id)
-    test("root project's ${Project::id.name} and versions are $rootProjectIdAndVersions") {
+    it("root project's ${Project::id.name} and versions are $rootProjectIdAndVersions") {
         assert(rootProject) {
             idAndVersions(rootProjectIdAndVersions)
         }
     }
-    test("root project's level is 0") {
+    it("root project's level is 0") {
         assert(rootProject) {
             property(subject::level).toBe(0)
         }
@@ -211,7 +211,7 @@ fun TestContainer.assertRootProject(releasePlan: ReleasePlan, rootProjectIdAndVe
     return rootProject
 }
 
-fun TestContainer.assertOneDirectDependent(
+fun Suite.assertOneDirectDependent(
     releasePlan: ReleasePlan,
     name: String,
     project: IdAndVersions,
@@ -221,7 +221,7 @@ fun TestContainer.assertOneDirectDependent(
     assertHasOneDependentAndIsOnLevel(releasePlan, name, project, dependent, 1)
 }
 
-fun TestContainer.assertHasOneDependentAndIsOnLevel(
+fun Suite.assertHasOneDependentAndIsOnLevel(
     releasePlan: ReleasePlan,
     name: String,
     project: IdAndVersions,
@@ -232,7 +232,7 @@ fun TestContainer.assertHasOneDependentAndIsOnLevel(
     assertProjectIsOnLevel(releasePlan, name, project, level)
 }
 
-fun TestContainer.assertHasTwoDependentsAndIsOnLevel(
+fun Suite.assertHasTwoDependentsAndIsOnLevel(
     releasePlan: ReleasePlan,
     name: String,
     project: IdAndVersions,
@@ -244,49 +244,49 @@ fun TestContainer.assertHasTwoDependentsAndIsOnLevel(
     assertProjectIsOnLevel(releasePlan, name, project, level)
 }
 
-private fun TestContainer.assertHasDependents(
+private fun Suite.assertHasDependents(
     releasePlan: ReleasePlan,
     name: String,
     project: IdAndVersions,
     dependentIdAndVersions: IdAndVersions,
     vararg otherDependentIdAndVersions: IdAndVersions
 ) {
-    test("$name project has ${otherDependentIdAndVersions.size + 1} dependent(s)") {
+    it("$name project has ${otherDependentIdAndVersions.size + 1} dependent(s)") {
         assert(releasePlan).hasDependentsForProject(project, dependentIdAndVersions, *otherDependentIdAndVersions)
     }
 }
 
 
-fun TestContainer.assertHasNoDependentsAndIsOnLevel(
+fun Suite.assertHasNoDependentsAndIsOnLevel(
     releasePlan: ReleasePlan,
     name: String,
     dependent: IdAndVersions,
     level: Int
 ) {
-    test("$name project does not have dependents") {
+    it("$name project does not have dependents") {
         assert(releasePlan).hasNoDependentsForProject(dependent)
     }
     assertProjectIsOnLevel(releasePlan, name, dependent, level)
 }
 
-private fun TestContainer.assertProjectIsOnLevel(
+private fun Suite.assertProjectIsOnLevel(
     releasePlan: ReleasePlan,
     name: String,
     project: IdAndVersions,
     level: Int
 ) {
-    test("$name project is on level $level") {
+    it("$name project is on level $level") {
         assert(releasePlan.getProject(project.id).level).toBe(level)
     }
 }
 
-fun TestContainer.assertOnlyWaitingReleaseCommand(
+fun Suite.assertOnlyWaitingReleaseCommand(
     releasePlan: ReleasePlan,
     name: String,
     project: IdAndVersions,
     dependency: IdAndVersions
 ) {
-    test("$name project has only one waiting Release command") {
+    it("$name project has only one waiting Release command") {
         assert(releasePlan.getProject(project.id)) {
             idAndVersions(project)
             property(subject::commands).containsExactly {
@@ -296,8 +296,8 @@ fun TestContainer.assertOnlyWaitingReleaseCommand(
     }
 }
 
-fun TestContainer.assertHasNoCommands(releasePlan: ReleasePlan, name: String, idAndVersions: IdAndVersions) {
-    test("$name project has no commands") {
+fun Suite.assertHasNoCommands(releasePlan: ReleasePlan, name: String, idAndVersions: IdAndVersions) {
+    it("$name project has no commands") {
         assert(releasePlan.getProject(idAndVersions.id)) {
             idAndVersions(idAndVersions)
             property(subject::commands).isEmpty()
@@ -305,13 +305,13 @@ fun TestContainer.assertHasNoCommands(releasePlan: ReleasePlan, name: String, id
     }
 }
 
-fun TestContainer.assertOneUpdateCommand(
+fun Suite.assertOneUpdateCommand(
     releasePlan: ReleasePlan,
     name: String,
     project: IdAndVersions,
     dependency: IdAndVersions
 ) {
-    test("$name project has one waiting UpdateVersion and one waiting Release command") {
+    it("$name project has one waiting UpdateVersion and one waiting Release command") {
         assert(releasePlan.getProject(project.id)) {
             idAndVersions(project)
             property(subject::commands).containsExactly {
@@ -321,13 +321,13 @@ fun TestContainer.assertOneUpdateCommand(
     }
 }
 
-fun TestContainer.assertOneUpdateAndOneReleaseCommand(
+fun Suite.assertOneUpdateAndOneReleaseCommand(
     releasePlan: ReleasePlan,
     name: String,
     project: IdAndVersions,
     dependency: IdAndVersions
 ) {
-    test("$name project has one waiting UpdateVersion and one waiting Release command") {
+    it("$name project has one waiting UpdateVersion and one waiting Release command") {
         assert(releasePlan.getProject(project.id)) {
             idAndVersions(project)
             property(subject::commands).containsExactly(
@@ -339,12 +339,12 @@ fun TestContainer.assertOneUpdateAndOneReleaseCommand(
 }
 
 
-fun TestContainer.assertOneReleaseCommandWaitingForSyntheticRoot(
+fun Suite.assertOneReleaseCommandWaitingForSyntheticRoot(
     releasePlan: ReleasePlan,
     name: String,
     project: IdAndVersions
 ) {
-    test("$name project has only one waiting Release command") {
+    it("$name project has only one waiting Release command") {
         assert(releasePlan.getProject(project.id)) {
             idAndVersions(project)
             property(subject::commands).containsExactly {
@@ -354,13 +354,13 @@ fun TestContainer.assertOneReleaseCommandWaitingForSyntheticRoot(
     }
 }
 
-fun TestContainer.assertOneUpdateAndOneDisabledReleaseCommand(
+fun Suite.assertOneUpdateAndOneDisabledReleaseCommand(
     releasePlan: ReleasePlan,
     name: String,
     project: IdAndVersions,
     dependency: IdAndVersions
 ) {
-    test("$name has one waiting Update and one disabled Release command with ${JenkinsSingleMavenReleaseCommand::nextDevVersion.name} = ${project.nextDevVersion}") {
+    it("$name has one waiting Update and one disabled Release command with ${JenkinsSingleMavenReleaseCommand::nextDevVersion.name} = ${project.nextDevVersion}") {
         assert(releasePlan.getProject(project.id)) {
             property(subject::commands).containsExactly(
                 { isJenkinsUpdateDependencyWaiting(dependency) },
@@ -370,13 +370,13 @@ fun TestContainer.assertOneUpdateAndOneDisabledReleaseCommand(
     }
 }
 
-fun TestContainer.assertOneDeactivatedUpdateAndOneDeactivatedReleaseCommand(
+fun Suite.assertOneDeactivatedUpdateAndOneDeactivatedReleaseCommand(
     releasePlan: ReleasePlan,
     name: String,
     project: IdAndVersions,
     dependency: IdAndVersions
 ) {
-    test("$name has one deactivated Update and one deactivated Release command with ${JenkinsSingleMavenReleaseCommand::nextDevVersion.name} = ${project.nextDevVersion}") {
+    it("$name has one deactivated Update and one deactivated Release command with ${JenkinsSingleMavenReleaseCommand::nextDevVersion.name} = ${project.nextDevVersion}") {
         assert(releasePlan.getProject(project.id)) {
             property(subject::commands).containsExactly(
                 { isJenkinsUpdateDependencyDeactivatedWaiting(dependency) },
@@ -386,13 +386,13 @@ fun TestContainer.assertOneDeactivatedUpdateAndOneDeactivatedReleaseCommand(
     }
 }
 
-fun TestContainer.assertOneDeactivatedUpdateAndOneDisabledReleaseCommand(
+fun Suite.assertOneDeactivatedUpdateAndOneDisabledReleaseCommand(
     releasePlan: ReleasePlan,
     name: String,
     project: IdAndVersions,
     dependency: IdAndVersions
 ) {
-    test("$name has one deactivated Update and one disabled Release command with ${JenkinsSingleMavenReleaseCommand::nextDevVersion.name} = ${project.nextDevVersion}") {
+    it("$name has one deactivated Update and one disabled Release command with ${JenkinsSingleMavenReleaseCommand::nextDevVersion.name} = ${project.nextDevVersion}") {
         assert(releasePlan.getProject(project.id)) {
             property(subject::commands).containsExactly(
                 { isJenkinsUpdateDependencyDeactivatedWaiting(dependency) },
@@ -402,7 +402,7 @@ fun TestContainer.assertOneDeactivatedUpdateAndOneDisabledReleaseCommand(
     }
 }
 
-fun TestContainer.assertOneUpdateAndOneMultiReleaseCommandAndIsOnLevelAndSubmodulesAreDependents(
+fun Suite.assertOneUpdateAndOneMultiReleaseCommandAndIsOnLevelAndSubmodulesAreDependents(
     releasePlan: ReleasePlan,
     name: String,
     project: IdAndVersions,
@@ -417,7 +417,7 @@ fun TestContainer.assertOneUpdateAndOneMultiReleaseCommandAndIsOnLevelAndSubmodu
     assertProjectIsOnLevel(releasePlan, name, project, level)
 }
 
-fun TestContainer.assertOneMultiReleaseCommandAndIsOnLevelAndSubmodulesAreDependents(
+fun Suite.assertOneMultiReleaseCommandAndIsOnLevelAndSubmodulesAreDependents(
     releasePlan: ReleasePlan,
     name: String,
     project: IdAndVersions,
@@ -426,7 +426,7 @@ fun TestContainer.assertOneMultiReleaseCommandAndIsOnLevelAndSubmodulesAreDepend
     submodule: IdAndVersions,
     vararg otherSubmodules: IdAndVersions
 ) {
-    test("$name project has one waiting Release command") {
+    it("$name project has one waiting Release command") {
         assert(releasePlan.getProject(project.id)) {
             idAndVersions(project)
             property(subject::commands).containsExactly {
@@ -439,13 +439,13 @@ fun TestContainer.assertOneMultiReleaseCommandAndIsOnLevelAndSubmodulesAreDepend
     assertProjectIsOnLevel(releasePlan, name, project, level)
 }
 
-fun TestContainer.assertOneUpdateAndOneMultiReleaseCommand(
+fun Suite.assertOneUpdateAndOneMultiReleaseCommand(
     releasePlan: ReleasePlan,
     name: String,
     project: IdAndVersions,
     dependency: IdAndVersions
 ) {
-    test("$name project has one waiting UpdateVersion and one waiting Release command") {
+    it("$name project has one waiting UpdateVersion and one waiting Release command") {
         assert(releasePlan.getProject(project.id)) {
             idAndVersions(project)
             property(subject::commands).containsExactly(
@@ -456,14 +456,14 @@ fun TestContainer.assertOneUpdateAndOneMultiReleaseCommand(
     }
 }
 
-fun TestContainer.assertTwoUpdateAndOneReleaseCommand(
+fun Suite.assertTwoUpdateAndOneReleaseCommand(
     releasePlan: ReleasePlan,
     name: String,
     project: IdAndVersions,
     dependency1: IdAndVersions,
     dependency2: IdAndVersions
 ) {
-    test("$name project has two waiting UpdateVersion and one waiting Release command") {
+    it("$name project has two waiting UpdateVersion and one waiting Release command") {
         assert(releasePlan.getProject(project.id)) {
             idAndVersions(project)
             property(subject::commands).containsExactly(
@@ -475,14 +475,14 @@ fun TestContainer.assertTwoUpdateAndOneReleaseCommand(
     }
 }
 
-fun TestContainer.assertTwoUpdateAndOneMultiReleaseCommand(
+fun Suite.assertTwoUpdateAndOneMultiReleaseCommand(
     releasePlan: ReleasePlan,
     name: String,
     project: IdAndVersions,
     dependency1: IdAndVersions,
     dependency2: IdAndVersions
 ) {
-    test("$name project has two waiting UpdateVersion and one waiting Release command") {
+    it("$name project has two waiting UpdateVersion and one waiting Release command") {
         assert(releasePlan.getProject(project.id)) {
             idAndVersions(project)
             property(subject::commands).containsExactly(
@@ -494,8 +494,8 @@ fun TestContainer.assertTwoUpdateAndOneMultiReleaseCommand(
     }
 }
 
-fun TestContainer.assertReleasePlanHasNumOfProjectsAndDependents(releasePlan: ReleasePlan, num: Int) {
-    test("release plan has $num projects and $num dependents") {
+fun Suite.assertReleasePlanHasNumOfProjectsAndDependents(releasePlan: ReleasePlan, num: Int) {
+    it("release plan has $num projects and $num dependents") {
         assert(releasePlan) {
             returnValueOf(subject::getNumberOfProjects).toBe(num)
             returnValueOf(subject::getNumberOfDependents).toBe(num)
@@ -503,83 +503,83 @@ fun TestContainer.assertReleasePlanHasNumOfProjectsAndDependents(releasePlan: Re
     }
 }
 
-fun TestContainer.assertReleasePlanHasNoWarningsAndNoInfos(releasePlan: ReleasePlan) {
+fun Suite.assertReleasePlanHasNoWarningsAndNoInfos(releasePlan: ReleasePlan) {
     assertReleasePlanHasNoWarnings(releasePlan)
     assertReleasePlanHasNoInfos(releasePlan)
 }
 
-fun TestContainer.assertReleasePlanHasNoWarnings(releasePlan: ReleasePlan) {
-    test("it does not have warnings") {
+fun Suite.assertReleasePlanHasNoWarnings(releasePlan: ReleasePlan) {
+    it("it does not have warnings") {
         assert(releasePlan.warnings).isEmpty()
     }
 }
 
-fun TestContainer.assertReleasePlanHasNoInfos(releasePlan: ReleasePlan) {
-    test("it does not have infos") {
+fun Suite.assertReleasePlanHasNoInfos(releasePlan: ReleasePlan) {
+    it("it does not have infos") {
         assert(releasePlan.infos).isEmpty()
     }
 }
 
-fun TestContainer.assertReleasePlanHasWarningsAboutCiManagement(
+fun Suite.assertReleasePlanHasWarningsAboutCiManagement(
     releasePlan: ReleasePlan,
     warnings: List<String>
 ) {
-    test("warnings contains only warning about ciManagement") {
+    it("warnings contains only warning about ciManagement") {
         assert(releasePlan.warnings).containsExactly(warnings.first(), *warnings.drop(1).toTypedArray())
     }
 }
 
-fun TestContainer.assertReleasePlanHasWarningWithDependencyGraph(
+fun Suite.assertReleasePlanHasWarningWithDependencyGraph(
     releasePlan: ReleasePlan,
     dependencyBranch: String,
     vararg otherDependencyBranches: String
 ) {
-    test("warnings contains the cyclic dependency branch") {
+    it("warnings contains the cyclic dependency branch") {
         assert(releasePlan.warnings).containsExactly {
             contains("cyclic dependencies", dependencyBranch, *otherDependencyBranches)
         }
     }
 }
 
-fun TestContainer.assertReleasePlanHasInfoWithDependencyGraph(
+fun Suite.assertReleasePlanHasInfoWithDependencyGraph(
     releasePlan: ReleasePlan,
     dependencyBranch: String,
     vararg otherDependencyBranches: String
 ) {
-    test("infos contains the cyclic dependency branch") {
+    it("infos contains the cyclic dependency branch") {
         assert(releasePlan.infos).containsExactly {
             contains("cyclic dependencies", dependencyBranch, *otherDependencyBranches)
         }
     }
 }
 
-fun TestContainer.assertReleasePlanIteratorReturnsRootAndStrictly(
+fun Suite.assertReleasePlanIteratorReturnsRootAndStrictly(
     releasePlan: ReleasePlan,
     vararg projects: IdAndVersions
 ) {
-    test("ReleasePlan.iterator() returns the projects in the expected order") {
+    it("ReleasePlan.iterator() returns the projects in the expected order") {
         assert(releasePlan).iteratorReturnsRootAndStrictly(*projects.mapToProjectIds())
     }
 }
 
-fun TestContainer.assertReleasePlanIteratorReturnsRootAnd(
+fun Suite.assertReleasePlanIteratorReturnsRootAnd(
     releasePlan: ReleasePlan,
     vararg groups: List<IdAndVersions>
 ) {
-    test("ReleasePlan.iterator() returns the projects in the expected order") {
+    it("ReleasePlan.iterator() returns the projects in the expected order") {
         val projectGroups = groups.map { it.map { it.id } }.toTypedArray()
         assert(releasePlan).iteratorReturnsRootAndInOrderGrouped(*projectGroups)
     }
 }
 
-fun TestContainer.assertHasSubmodules(
+fun Suite.assertHasSubmodules(
     releasePlan: ReleasePlan,
     name: String,
     project: IdAndVersions,
     submodule: IdAndVersions,
     vararg otherSubmodules: IdAndVersions
 ) {
-    test("$name project has ${otherSubmodules.size + 1} submodules") {
+    it("$name project has ${otherSubmodules.size + 1} submodules") {
         assert(releasePlan.getSubmodules(project.id)).contains.inAnyOrder.only.values(
             submodule.id, *otherSubmodules.mapToProjectIds()
         )

@@ -2,23 +2,24 @@ package ch.loewenfels.depgraph.runner.console
 
 import ch.loewenfels.depgraph.runner.Main
 import ch.loewenfels.depgraph.runner.commands.ConsoleCommand
-import ch.tutteli.atrium.api.cc.en_GB.*
+import ch.tutteli.atrium.api.cc.en_GB.messageContains
+import ch.tutteli.atrium.api.cc.en_GB.toBe
+import ch.tutteli.atrium.api.cc.en_GB.toThrow
 import ch.tutteli.atrium.assert
 import ch.tutteli.atrium.expect
-import ch.tutteli.spek.extensions.TempFolder
-import org.jetbrains.spek.api.Spek
-import org.jetbrains.spek.api.dsl.describe
-import org.jetbrains.spek.api.dsl.it
+import ch.tutteli.spek.extensions.MemoizedTempFolder
+import ch.tutteli.spek.extensions.memoizedTempFolder
+import org.spekframework.spek2.Spek
+import org.spekframework.spek2.style.specification.describe
 import java.nio.file.Paths
 
 abstract class CommandSpec(
     testee: ConsoleCommand,
-    notEnoughArgs: (TempFolder) -> Array<out String>,
-    tooManyArgs: (TempFolder) -> Array<out String>,
+    notEnoughArgs: (MemoizedTempFolder) -> Array<out String>,
+    tooManyArgs: (MemoizedTempFolder) -> Array<out String>,
     allowedNumberOfArgs: IntRange
 ) : Spek({
-    val tempFolder = TempFolder.perTest()
-    registerListener(tempFolder)
+    val tempFolder by memoizedTempFolder()
 
     Main.pathVerifier = object : PathVerifier {
         override fun path(path: String, fileDescription: String) = Paths.get(path)
@@ -42,20 +43,19 @@ abstract class CommandSpec(
             }
         }
 
-        describe("fun ${testee::numOfArgsNotOk.name}") {
-            group("returns false for a correct number of args") {
-                allowedNumberOfArgs.forEach { number ->
-                    test("$number") {
-                        assert(testee.numOfArgsNotOk(number)).toBe(false)
-                    }
-                }
+    }
+
+    group("fun ${testee::numOfArgsNotOk.name} returns false for a correct number of args") {
+        allowedNumberOfArgs.forEach { number ->
+            test("$number") {
+                assert(testee.numOfArgsNotOk(number)).toBe(false)
             }
-            group("returns true for an incorrect number of args") {
-                listOf(allowedNumberOfArgs.start - 1, allowedNumberOfArgs.endInclusive + 1).forEach { number ->
-                    test("$number") {
-                        assert(testee.numOfArgsNotOk(number)).toBe(true)
-                    }
-                }
+        }
+    }
+    group("fun ${testee::numOfArgsNotOk.name} returns true for an incorrect number of args") {
+        listOf(allowedNumberOfArgs.first - 1, allowedNumberOfArgs.last + 1).forEach { number ->
+            test("$number") {
+                assert(testee.numOfArgsNotOk(number)).toBe(true)
             }
         }
     }

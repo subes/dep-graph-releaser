@@ -9,8 +9,9 @@ import ch.loewenfels.depgraph.data.maven.jenkins.JenkinsSingleMavenReleaseComman
 import ch.loewenfels.depgraph.data.maven.jenkins.JenkinsUpdateDependency
 import ch.tutteli.atrium.*
 import ch.tutteli.atrium.api.cc.en_GB.*
-import org.jetbrains.spek.api.Spek
-import org.jetbrains.spek.api.dsl.*
+import org.spekframework.spek2.Spek
+import org.spekframework.spek2.style.specification.Suite
+import org.spekframework.spek2.style.specification.describe
 
 object ReleasePlanManipulatorSpec : Spek({
     val rootProjectId = MavenProjectId("com.example", "root")
@@ -85,17 +86,17 @@ object ReleasePlanManipulatorSpec : Spek({
         )
     )
 
-    fun TestContainer.assertRootProjectVersionsAndDependentsUnchanged(newReleasePlan: ReleasePlan) {
-        test("rootProjectId is still the same") {
+    fun Suite.assertRootProjectVersionsAndDependentsUnchanged(newReleasePlan: ReleasePlan) {
+        it("rootProjectId is still the same") {
             assert(newReleasePlan.rootProjectId).toBe(rootProjectId)
         }
-        test("rootProject is still the same instance") {
+        it("rootProject is still the same instance") {
             assert(newReleasePlan.getProject(rootProjectId)).isSameAs(rootProject)
         }
-        test("there are still 4 projects") {
+        it("there are still 4 projects") {
             assert(newReleasePlan.getNumberOfProjects()).toBe(4)
         }
-        test("the dependents are unchanged, is still the same instance") {
+        it("the dependents are unchanged, is still the same instance") {
             assert(newReleasePlan) {
                 returnValueOf(subject::getNumberOfDependents).toBe(dependents.size)
                 dependents.forEach {
@@ -104,35 +105,35 @@ object ReleasePlanManipulatorSpec : Spek({
             }
         }
 
-        test("the project with dependent still has the same versions") {
+        it("the project with dependent still has the same versions") {
             assert(newReleasePlan.getProject(multiModuleId)).hasSameVersionsAs(multiModule)
         }
-        test("the project with dependent still has the same level") {
+        it("the project with dependent still has the same level") {
             assert(newReleasePlan.getProject(multiModuleId).level).toBe(multiModule.level)
         }
 
-        test("the project without dependent still has the same versions") {
+        it("the project without dependent still has the same versions") {
             assert(newReleasePlan.getProject(projectWithoutDependentId)).hasSameVersionsAs(projectWithoutDependent)
         }
-        test("the project without dependent still has the same level") {
+        it("the project without dependent still has the same level") {
             assert(newReleasePlan.getProject(projectWithoutDependentId).level).toBe(projectWithoutDependent.level)
         }
     }
 
-    fun TestContainer.assertMultiModuleStillSame(newReleasePlan: ReleasePlan) {
-        test("multi module is still the same") {
+    fun Suite.assertMultiModuleStillSame(newReleasePlan: ReleasePlan) {
+        it("multi module is still the same") {
             assert(newReleasePlan.getProject(multiModuleId)).isSameAs(multiModule)
         }
     }
 
-    fun TestContainer.assertSubmoduleStillSame(newReleasePlan: ReleasePlan) {
-        test("submodule is still the same") {
+    fun Suite.assertSubmoduleStillSame(newReleasePlan: ReleasePlan) {
+        it("submodule is still the same") {
             assert(newReleasePlan.getProject(submoduleId)).isSameAs(submodule)
         }
     }
 
-    fun SpecBody.errorCasesInvalidProjectId(action: String, act: (ProjectId) -> Unit) {
-        given("id of the root project") {
+    fun Suite.errorCasesInvalidProjectId(action: String, act: (ProjectId) -> Unit) {
+        context("id of the root project") {
             it("throws an IllegalArgumentException which contains rootProjectId") {
                 expect {
                     act(rootProjectId)
@@ -147,7 +148,7 @@ object ReleasePlanManipulatorSpec : Spek({
             }
         }
 
-        given("projectId which is not part of the analysis") {
+        context("projectId which is not part of the analysis") {
             it("throws an IllegalArgumentException which contains projectId") {
                 val projectId = MavenProjectId("test", "one")
                 expect {
@@ -165,9 +166,9 @@ object ReleasePlanManipulatorSpec : Spek({
             }
         }
 
-        given("rootProject with dependent multi module with one submodule which has another dependent project") {
+        describe("rootProject with dependent multi module with one submodule which has another dependent project") {
 
-            on("deactivating the multi module") {
+            context("deactivating the multi module") {
                 val newReleasePlan = testee.deactivateProject(multiModuleId)
                 assertRootProjectVersionsAndDependentsUnchanged(newReleasePlan)
 
@@ -196,7 +197,7 @@ object ReleasePlanManipulatorSpec : Spek({
                 }
             }
 
-            on("deactivating the submodule") {
+            context("deactivating the submodule") {
                 val newReleasePlan = testee.deactivateProject(submoduleId)
                 assertRootProjectVersionsAndDependentsUnchanged(newReleasePlan)
                 assertMultiModuleStillSame(newReleasePlan)
@@ -219,7 +220,7 @@ object ReleasePlanManipulatorSpec : Spek({
                 }
             }
 
-            on("deactivating the project without dependents") {
+            context("deactivating the project without dependents") {
                 val newReleasePlan = testee.deactivateProject(projectWithoutDependentId)
                 assertRootProjectVersionsAndDependentsUnchanged(newReleasePlan)
                 assertMultiModuleStillSame(newReleasePlan)
@@ -244,7 +245,7 @@ object ReleasePlanManipulatorSpec : Spek({
                 testee.deactivateCommand(projectId, 0)
             }
 
-            given("index which is bigger than the number of commands the project has") {
+            context("index which is bigger than the number of commands the project has") {
                 it("throws an IllegalArgumentException, containing the index and the projectId") {
                     expect {
                         testee.deactivateCommand(multiModuleId, 5)
@@ -254,7 +255,7 @@ object ReleasePlanManipulatorSpec : Spek({
                 }
             }
 
-            given("deactivate already deactivated command") {
+            context("deactivate already deactivated command") {
                 it("throws an IllegalArgumentException, containing the index and the projectId") {
                     expect {
                         testee.deactivateCommand(projectWithoutDependentId, 1)
@@ -270,9 +271,9 @@ object ReleasePlanManipulatorSpec : Spek({
             }
         }
 
-        given("rootProject with dependent multi module with one submodule which has another dependent project") {
+        describe("rootProject with dependent multi module with one submodule which has another dependent project") {
 
-            on("deactivate ${JenkinsUpdateDependency::class.simpleName} of multi module") {
+            context("deactivate ${JenkinsUpdateDependency::class.simpleName} of multi module") {
                 val newReleasePlan = testee.deactivateCommand(multiModuleId, 0)
                 assertRootProjectVersionsAndDependentsUnchanged(newReleasePlan)
 
@@ -301,7 +302,7 @@ object ReleasePlanManipulatorSpec : Spek({
                 }
             }
 
-            on("deactivate first ${JenkinsUpdateDependency::class.simpleName} of submodule") {
+            context("deactivate first ${JenkinsUpdateDependency::class.simpleName} of submodule") {
                 val newReleasePlan = testee.deactivateCommand(submoduleId, 0)
                 assertRootProjectVersionsAndDependentsUnchanged(newReleasePlan)
                 assertMultiModuleStillSame(newReleasePlan)
@@ -324,7 +325,7 @@ object ReleasePlanManipulatorSpec : Spek({
                 }
             }
 
-            on("deactivate first ${JenkinsUpdateDependency::class.simpleName} on project without dependent") {
+            context("deactivate first ${JenkinsUpdateDependency::class.simpleName} on project without dependent") {
                 val newReleasePlan = testee.deactivateCommand(projectWithoutDependentId, 0)
                 assertRootProjectVersionsAndDependentsUnchanged(newReleasePlan)
                 assertMultiModuleStillSame(newReleasePlan)
@@ -350,7 +351,7 @@ object ReleasePlanManipulatorSpec : Spek({
                     testee.disableCommand(projectId, 0)
                 }
 
-                given("index which is bigger than the number of commands the project has") {
+                context("index which is bigger than the number of commands the project has") {
                     it("throws an IllegalArgumentException, containing the index and the projectId") {
                         expect {
                             testee.disableCommand(multiModuleId, 5)
@@ -360,7 +361,7 @@ object ReleasePlanManipulatorSpec : Spek({
                     }
                 }
 
-                given("disable already disable command") {
+                context("disable already disable command") {
                     it("throws an IllegalArgumentException, containing the index and the projectId") {
                         val newReleasePlan = testee.disableCommand(projectWithoutDependentId, 2)
                         val oldReleaseCommand = newReleasePlan.getProject(projectWithoutDependentId).commands[2]
@@ -381,9 +382,9 @@ object ReleasePlanManipulatorSpec : Spek({
 
         }
 
-        given("rootProject with dependent multi module with one submodule which has another dependent project") {
+        describe("rootProject with dependent multi module with one submodule which has another dependent project") {
 
-            on("disable ${JenkinsUpdateDependency::class.simpleName} of multi module") {
+            context("disable ${JenkinsUpdateDependency::class.simpleName} of multi module") {
                 val newReleasePlan = testee.disableCommand(multiModuleId, 0)
                 assertRootProjectVersionsAndDependentsUnchanged(newReleasePlan)
 
@@ -412,7 +413,7 @@ object ReleasePlanManipulatorSpec : Spek({
                 }
             }
 
-            on("disable first ${JenkinsUpdateDependency::class.simpleName} of submodule") {
+            describe("disable first ${JenkinsUpdateDependency::class.simpleName} of submodule") {
                 val newReleasePlan = testee.disableCommand(submoduleId, 0)
                 assertRootProjectVersionsAndDependentsUnchanged(newReleasePlan)
                 assertMultiModuleStillSame(newReleasePlan)
@@ -435,7 +436,7 @@ object ReleasePlanManipulatorSpec : Spek({
                 }
             }
 
-            on("disable first ${JenkinsUpdateDependency::class.simpleName} on project without dependent") {
+            context("disable first ${JenkinsUpdateDependency::class.simpleName} on project without dependent") {
                 val newReleasePlan = testee.disableCommand(projectWithoutDependentId, 0)
                 assertRootProjectVersionsAndDependentsUnchanged(newReleasePlan)
                 assertMultiModuleStillSame(newReleasePlan)

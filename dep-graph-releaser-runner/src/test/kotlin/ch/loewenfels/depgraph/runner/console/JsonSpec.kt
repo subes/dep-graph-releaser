@@ -7,11 +7,10 @@ import ch.tutteli.atrium.api.cc.en_GB.messageContains
 import ch.tutteli.atrium.api.cc.en_GB.toThrow
 import ch.tutteli.atrium.expect
 import ch.tutteli.niok.absolutePathAsString
-import ch.tutteli.spek.extensions.TempFolder
-import org.jetbrains.spek.api.Spek
-import org.jetbrains.spek.api.dsl.describe
-import org.jetbrains.spek.api.dsl.it
-import org.jetbrains.spek.api.include
+import ch.tutteli.spek.extensions.MemoizedTempFolder
+import ch.tutteli.spek.extensions.memoizedTempFolder
+import org.spekframework.spek2.Spek
+import org.spekframework.spek2.style.specification.describe
 
 import java.lang.IllegalStateException
 import java.nio.file.Paths
@@ -20,14 +19,13 @@ import java.util.regex.PatternSyntaxException
 class JsonSpec : Spek({
     include(JsonCommandSpec)
 
-    val tempFolder = TempFolder.perTest()
-    registerListener(tempFolder)
+    val tempFolder by memoizedTempFolder()
 
     Main.pathVerifier = object : PathVerifier {
         override fun path(path: String, fileDescription: String) = Paths.get(path)
     }
 
-    fun createArgs(tempFolder: TempFolder, mvnIds: String, regex: String, jobMapping: String): Array<String> {
+    fun createArgs(tempFolder: MemoizedTempFolder, mvnIds: String, regex: String, jobMapping: String): Array<String> {
         val jsonFile = tempFolder.tmpDir.resolve("test.json")
         return arrayOf(
             Json.name, mvnIds,
@@ -47,11 +45,11 @@ class JsonSpec : Spek({
         )
     }
 
-    fun createArgs(tempFolder: TempFolder, mvnIds: String, regex: String): Array<String> =
+    fun createArgs(tempFolder: MemoizedTempFolder, mvnIds: String, regex: String): Array<String> =
         createArgs(tempFolder, mvnIds, regex, "com.example:project=ownJobName\n" +
             "com.example:anotherProject=another-project")
 
-    fun createArgs(tempFolder: TempFolder, regex: String): Array<String> =
+    fun createArgs(tempFolder: MemoizedTempFolder, regex: String): Array<String> =
         createArgs(tempFolder, "com.example:a;com.example:b", regex, "com.example:project=ownJobName\n" +
             "com.example:anotherProject=another-project")
 
@@ -261,7 +259,7 @@ class JsonSpec : Spek({
     )
 
     companion object {
-        fun getNotEnoughArgs(tempFolder: TempFolder): Array<out String> {
+        fun getNotEnoughArgs(tempFolder: MemoizedTempFolder): Array<out String> {
             val jsonFile = tempFolder.tmpDir.resolve("test.json")
             return arrayOf(
                 Json.name, "com.example:a;com:b;com:c;com:d",
@@ -277,7 +275,7 @@ class JsonSpec : Spek({
             )
         }
 
-        fun getTooManyArgs(tempFolder: TempFolder): Array<out String> {
+        fun getTooManyArgs(tempFolder: MemoizedTempFolder): Array<out String> {
             val jsonFile = tempFolder.tmpDir.resolve("test.json")
             return arrayOf(
                 Json.name, "com.example:a;com:b;com:c",

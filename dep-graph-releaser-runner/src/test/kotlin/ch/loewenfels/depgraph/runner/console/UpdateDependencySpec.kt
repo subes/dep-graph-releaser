@@ -8,28 +8,28 @@ import ch.tutteli.atrium.api.cc.en_GB.toThrow
 import ch.tutteli.atrium.copyPom
 import ch.tutteli.atrium.expect
 import ch.tutteli.niok.absolutePathAsString
-import ch.tutteli.spek.extensions.TempFolder
-import org.jetbrains.spek.api.Spek
-import org.jetbrains.spek.api.dsl.given
-import org.jetbrains.spek.api.dsl.it
-import org.jetbrains.spek.api.include
+import ch.tutteli.spek.extensions.MemoizedTempFolder
+import org.spekframework.spek2.Spek
+import org.spekframework.spek2.style.specification.describe
 
 class UpdateDependencySpec : Spek({
     include(UpdateDependencyCommandSpec)
 
-    given("non-existing pom") {
-        val errMsg = "The given pom file does not exist."
-        val inputArgs = arrayOf(
-            UpdateDependency.name,
-            "non_existing_path/pom.xml",
-            "junit",
-            "junit",
-            "4.12"
-        )
-        it("throws an error, mentioning $errMsg") {
-            expect {
-                UpdateDependency.execute(inputArgs, errorHandler)
-            }.toThrow<IllegalStateException> { message { contains(errMsg) } }
+    describe("validation errors") {
+        context("non-existing pom") {
+            val errMsg = "The given pom file does not exist."
+            val inputArgs = arrayOf(
+                UpdateDependency.name,
+                "non_existing_path/pom.xml",
+                "junit",
+                "junit",
+                "4.12"
+            )
+            it("throws an error, mentioning $errMsg") {
+                expect {
+                    UpdateDependency.execute(inputArgs, errorHandler)
+                }.toThrow<IllegalStateException> { message { contains(errMsg) } }
+            }
         }
     }
 
@@ -44,7 +44,7 @@ class UpdateDependencySpec : Spek({
     )
 
     companion object {
-        fun getNotEnoughArgs(tempFolder: TempFolder): Array<out String> {
+        fun getNotEnoughArgs(tempFolder: MemoizedTempFolder): Array<out String> {
             val pom = getTestDirectory("singleProject").resolve("pom.xml")
             val tmpPom = copyPom(tempFolder, pom)
             return arrayOf(
@@ -57,7 +57,7 @@ class UpdateDependencySpec : Spek({
             )
         }
 
-        fun getTooManyArgs(tempFolder: TempFolder): Array<out String> {
+        fun getTooManyArgs(tempFolder: MemoizedTempFolder): Array<out String> {
             val pom = getTestDirectory("singleProject").resolve("pom.xml")
             val tmpPom = copyPom(tempFolder, pom)
             return arrayOf(

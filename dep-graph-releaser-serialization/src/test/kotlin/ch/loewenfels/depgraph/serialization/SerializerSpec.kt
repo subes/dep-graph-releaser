@@ -8,10 +8,8 @@ import ch.tutteli.atrium.assert
 import ch.tutteli.atrium.createReleasePlanWithDefaults
 import ch.tutteli.atrium.expect
 import com.squareup.moshi.JsonEncodingException
-import org.jetbrains.spek.api.Spek
-import org.jetbrains.spek.api.dsl.describe
-import org.jetbrains.spek.api.dsl.given
-import org.jetbrains.spek.api.dsl.it
+import org.spekframework.spek2.Spek
+import org.spekframework.spek2.style.specification.describe
 
 object SerializerSpec : Spek({
     val testee = Serializer()
@@ -90,7 +88,7 @@ object SerializerSpec : Spek({
         )
 
         (states.asSequence() + projects.asSequence()).forEach { (description, project) ->
-            action(description) {
+            context(description) {
                 val json = testee.serialize(project)
                 val result = testee.deserialize(json)
                 it("is an equal project") {
@@ -105,7 +103,7 @@ object SerializerSpec : Spek({
     }
 
     describe("malformed JSON") {
-        given("dangling }") {
+        context("dangling }") {
             it("throws a JsonEncodingException") {
                 val json = testee.serialize(createReleasePlan(CommandState.Ready))
                 expect {
@@ -113,7 +111,7 @@ object SerializerSpec : Spek({
                 }.toThrow<JsonEncodingException>{}
             }
         }
-        given("comment at the beginning") {
+        context("comment at the beginning") {
             it("throws a JsonEncodingException") {
                 val json = testee.serialize(createReleasePlan(CommandState.Ready))
                 expect {

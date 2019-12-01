@@ -11,11 +11,8 @@ import com.squareup.moshi.JsonDataException
 import com.squareup.moshi.JsonReader
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
-import org.jetbrains.spek.api.Spek
-import org.jetbrains.spek.api.dsl.describe
-import org.jetbrains.spek.api.dsl.given
-import org.jetbrains.spek.api.dsl.it
-import org.jetbrains.spek.api.dsl.on
+import org.spekframework.spek2.Spek
+import org.spekframework.spek2.style.specification.describe
 import java.io.EOFException
 
 object PolymorphicAdapterFactorySpec : Spek({
@@ -32,7 +29,7 @@ object PolymorphicAdapterFactorySpec : Spek({
     describe("Adapter creation") {
 
         describe("validation errors") {
-            given("not an interface nor an abstract class passed into the constructor") {
+            context("not an interface nor an abstract class passed into the constructor") {
                 class Dummy(override val typeId: String) : PolymorphSerializable
 
                 it("throws an IllegalArgumentException containing the wrong type") {
@@ -45,14 +42,14 @@ object PolymorphicAdapterFactorySpec : Spek({
             }
         }
 
-        given("another type") {
+        context("another type") {
             it("returns `null`") {
                 val result = testee.create(PolymorphicAdapterFactorySpec::class.java, mutableSetOf(), moshi)
                 assert(result).toBe(null)
             }
         }
 
-        given("the correct type") {
+        context("the correct type") {
             it("returns an adapter") {
                 val result = testee.create(ProjectId::class.java, mutableSetOf(), moshi)
                 assert(result).notToBeNull {}
@@ -63,7 +60,7 @@ object PolymorphicAdapterFactorySpec : Spek({
     describe("serialization") {
         describe("validation errors") {
 
-            given("anonymous class") {
+            context("anonymous class") {
                 it("throws an IllegalArgumentException") {
                     val value = object : ProjectId {
                         override val typeId = "anon"
@@ -78,7 +75,7 @@ object PolymorphicAdapterFactorySpec : Spek({
             }
         }
 
-        on("serialize ${DummyProjectId::class.java.simpleName}") {
+        context("serialize ${DummyProjectId::class.java.simpleName}") {
             val result = adapter.toJson(DummyProjectId("test"))
             it("contains $typeDummy") {
                 assert(result).contains(typeDummy)
@@ -92,7 +89,7 @@ object PolymorphicAdapterFactorySpec : Spek({
     describe("deserialization") {
         describe("validation errors") {
 
-            given("empty string") {
+            context("empty string") {
                 it("throws an EOFException") {
                     expect {
                         adapter.fromJson("")
@@ -100,7 +97,7 @@ object PolymorphicAdapterFactorySpec : Spek({
                 }
             }
 
-            given("json with top-level array instead of object") {
+            context("json with top-level array instead of object") {
                 it("throws an EOFException") {
                     expect {
                         adapter.fromJson("""[{$typeDummy, "$PAYLOAD": "asdf"}]""")
@@ -111,7 +108,7 @@ object PolymorphicAdapterFactorySpec : Spek({
             }
 
             listOf(PAYLOAD, notType).forEach { wrongType ->
-                given("json with field `$wrongType` as first field instead of `$TYPE`") {
+                context("json with field `$wrongType` as first field instead of `$TYPE`") {
                     it("throws an IllegalArgumentException containing expected and given field name") {
                         expect {
                             adapter.fromJson("""{"$wrongType": 1, "$PAYLOAD": "bla"}""")
@@ -123,7 +120,7 @@ object PolymorphicAdapterFactorySpec : Spek({
             }
 
             listOf(TYPE, notType).forEach { wrongType ->
-                given("json with field `$wrongType` as second field instead of `$PAYLOAD`") {
+                context("json with field `$wrongType` as second field instead of `$PAYLOAD`") {
                     it("throws an IllegalArgumentException containing expected and given field name") {
                         expect {
                             adapter.fromJson("""{$typeDummy, "$wrongType": 1}""")
@@ -134,7 +131,7 @@ object PolymorphicAdapterFactorySpec : Spek({
                 }
             }
 
-            given("json with unknown typeId as $TYPE") {
+            context("json with unknown typeId as $TYPE") {
                 it("throws an IllegalStateException") {
                     val typeId = """AnUnknownTypeId"""
                     expect {
@@ -143,7 +140,7 @@ object PolymorphicAdapterFactorySpec : Spek({
                 }
             }
 
-            given("json with empty $PAYLOAD") {
+            context("json with empty $PAYLOAD") {
                 it("throws a JsonDataException") {
                     expect {
                         adapter.fromJson("""{$typeDummy, "$PAYLOAD":{}}""")
@@ -153,7 +150,7 @@ object PolymorphicAdapterFactorySpec : Spek({
                 }
             }
 
-            given("json with incomplete type (not all required fields are set)") {
+            context("json with incomplete type (not all required fields are set)") {
                 it("throws a JsonDataException") {
                     expect {
                         adapter.fromJson("""{$typeDummy, "$PAYLOAD":{"version":"1.0"}}""")
@@ -170,7 +167,7 @@ object PolymorphicAdapterFactorySpec : Spek({
             "expected order" to """"identifier":"$identifier", "version": "$version"""",
             "flipped order" to """"version": "$version", "identifier":"$identifier""""
         ).forEach { (order, fields) ->
-            on("deserialize ${DummyProjectId::class.java.simpleName} fields in $order") {
+            context("deserialize ${DummyProjectId::class.java.simpleName} fields in $order") {
 
                 val result = adapter.fromJson("""{$typeDummy, "$PAYLOAD": {$fields}}""")
 
@@ -187,7 +184,7 @@ object PolymorphicAdapterFactorySpec : Spek({
         val original = DummyProjectId("test")
         val json = adapter.toJson(original)
         val result = adapter.fromJson(json)
-        on("serialize and deserialize") {
+        context("serialize and deserialize") {
             it("it is an equal object") {
                 assert(result).notToBeNull { toBe(original) }
             }
