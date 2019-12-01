@@ -35,7 +35,8 @@ dokka {
     outputDirectory = "$ghPagesPathWithoutVersion/$ghPages_version"
 
     includes = ['misc/kdoc/packages.md']
-    jdkVersion = 6
+    jdkVersion = 8
+    reportUndocumented = false
 
     doFirst {
         println "going to generate kdoc including the projects: ${docProjects*.name}"
