@@ -54,5 +54,4 @@ dokka {
             classpath += kotlin.target.compilations.getByName("main").compileDependencyFiles.files.collect { file -> file }
         }
     }
-    sourceDirs = docProjects.collect { subProject -> file("${subProject.projectDir}/$srcKotlin") }
 }
