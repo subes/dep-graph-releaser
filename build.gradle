@@ -30,7 +30,7 @@ buildscript {
         projectsWithoutSources = [] //currently all have sources
 
         // detekt/sonarcloud
-        detekt_version = '1.2.1'
+        detekt_version = '1.2.2'
 
         apiProjects = subprojects.findAll { it.name.contains('api') }
         apiJvmProjects = ext.apiProjects.findAll { it.name.endsWith('-jvm') }
